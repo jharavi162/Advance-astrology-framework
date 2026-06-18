@@ -21,17 +21,22 @@ accurate astronomical core.
 | Area | What's included |
 | --- | --- |
 | **Divisional charts** | All 16 Shodasavarga (D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45, D60) + Vimshopaka bala |
-| **Dasha systems** | Vimshottari, Ashtottari, Yogini, Kalachakra, and Jaimini Chara dasha — all with sub-periods |
-| **Jaimini** | Chara Karakas (7/8 scheme), Karakamsha, Argala, Chara dasha |
+| **Dasha systems** | Vimshottari, Ashtottari, Yogini, Kalachakra; Jaimini **Chara** & **Narayana** rashi dashas — with sub-periods |
+| **Jaimini** | Chara Karakas (7/8 scheme), Karakamsha, Argala, Chara/Narayana dasha |
 | **Arudhas** | Arudha Lagna, all bhava arudhas (A1–A12), Upapada |
-| **Ashtakavarga** | Bhinnashtakavarga (BAV) + Sarvashtakavarga (SAV) |
+| **Ashtakavarga** | Bhinna (BAV) + Sarva (SAV) + contributor-level bindus |
+| **Strengths** | **Full Ṣaḍbala** (all 6 balas), **Iṣṭa/Kaṣṭa phala**, Vimshopaka, **Vaiśeṣikāṃśa** tiers |
+| **Nature** | Natural + functional benefic/malefic, **Yogakaraka**, **Maraka** |
 | **Dignities** | Exalt/debilitation/moolatrikona/own + natural, temporal & compound relationships |
 | **Aspects** | Graha drishti (special aspects) + Rashi drishti |
+| **Houses** | Rāśi (whole-sign) **and Bhāva-Chalit** (Placidus shift detection) |
+| **KP** | Sign→Star→Sub→Sub-sub lord chains + house/planet significators + ruling planets |
+| **Kakṣyā** | 8 sub-zones/sign with lords + transit bindu activation |
+| **Transits (Gochara)** | Sidereal transit positions, sign/house from lagna or Moon, degree hits, SAV scan, Sade Sati |
 | **Panchanga** | Tithi, Vara, Nakshatra, Yoga, Karana + planetary hora |
-| **Lagnas** | Bhava, Hora, Ghati, Sree, Indu special ascendants |
-| **Upagrahas** | Dhuma, Vyatipata, Parivesha, Indrachapa, Upaketu + Gulika/Mandi |
+| **Lagnas / Points** | Bhava, Hora, Ghati, Sree, Indu lagnas; **Bhṛgu Bindu**; Upagrahas (Dhuma…) + Gulika/Mandi |
+| **Avasthas** | Baladi, Jagradadi, Dīptādi (8 moods) + **combustion** |
 | **Yogas** | Pancha Mahapurusha, Gajakesari, Sunapha/Anapha/Durudhara/Kemadruma, Raja, Viparita Raja, Dhana, Kala Sarpa, … |
-| **Avasthas** | Baladi, Jagradadi, Deeptadi states |
 | **Compatibility** | Full Ashtakoota / 36-point Guna Milan |
 
 ## Installation

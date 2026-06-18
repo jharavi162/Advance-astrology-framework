@@ -141,6 +141,15 @@ def test_chara_dasha_twelve_signs(vchart):
     assert len({d.note for d in cd}) == 12
 
 
+def test_narayana_dasha_twelve_signs(vchart):
+    nd = vchart.narayana_dasha()
+    assert len(nd) == 12
+    assert len({d.note for d in nd}) == 12
+    # Each span is a whole number of years in 1..12.
+    for d in nd:
+        assert 1 <= round(d.years) <= 12
+
+
 # --------------------------------------------------------------------------- #
 # Arudha
 # --------------------------------------------------------------------------- #

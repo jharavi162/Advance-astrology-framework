@@ -151,6 +151,78 @@ def chara_dasha_years(sign: int, planet_signs: dict[Planet, int]) -> int:
     return 12 if years == 0 else years
 
 
+def _rashi_strength(sign: int, planet_signs: dict[Planet, int]) -> float:
+    """Simplified Jaimini rashi bala for seeding Narayana dasha.
+
+    Counts occupants, a bonus if the sign holds its own lord, and a bonus for an
+    aspect from Jupiter. (Full Jaimini rashi bala is more elaborate; this is a
+    deterministic, documented approximation for the 1st-vs-7th seed choice.)
+    """
+    from .aspects import rashi_aspects
+    occupants = sum(1 for s in planet_signs.values() if s == sign)
+    strength = float(occupants)
+    lord = _co_lord_sign(sign, planet_signs)
+    if planet_signs.get(lord) == sign:
+        strength += 1.0
+    jup = planet_signs.get(Planet.JUPITER)
+    if jup is not None and sign in rashi_aspects(jup):
+        strength += 0.5
+    return strength
+
+
+def narayana_dasha(
+    ascendant_sign: int,
+    planet_signs: dict[Planet, int],
+    planet_longitudes: dict[Planet, float],
+    birth: datetime,
+    cycles: int = 1,
+) -> list[DashaPeriod]:
+    """Nārāyaṇa (Padakrama) Daśā — Parashari Jaimini rashi dasha.
+
+    Seeds from the stronger of the Lagna and the 7th house; progresses
+    zodiacally for an odd seed sign and reverse for an even one. Each sign's
+    span is (signs to its lord − 1), counted directly for odd signs and in
+    reverse for even ones, adjusted ±1 year for an exalted/debilitated lord.
+    """
+    seventh = (ascendant_sign + 6) % 12
+    seed = (ascendant_sign
+            if _rashi_strength(ascendant_sign, planet_signs)
+            >= _rashi_strength(seventh, planet_signs)
+            else seventh)
+    direct = seed % 2 == 0
+    order = [((seed + i) if direct else (seed - i)) % 12 for i in range(12)]
+
+    periods: list[DashaPeriod] = []
+    cursor = birth
+    for _ in range(cycles):
+        for s in order:
+            years = narayana_years(s, planet_signs, planet_longitudes)
+            end = cursor + timedelta(days=years * DAYS_PER_YEAR)
+            lord = _co_lord_sign(s, planet_signs)
+            periods.append(DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s]))
+            cursor = end
+    return periods
+
+
+def narayana_years(sign: int, planet_signs: dict[Planet, int],
+                   planet_longitudes: dict[Planet, float]) -> int:
+    """Duration (years) of a sign's Narayana dasha."""
+    from .dignities import dignity
+    lord = _co_lord_sign(sign, planet_signs)
+    lord_sign = planet_signs[lord]
+    odd = sign % 2 == 0
+    count = ((lord_sign - sign) if odd else (sign - lord_sign)) % 12 + 1
+    base = count - 1
+    if base == 0:
+        base = 12
+    dig = dignity(lord, planet_longitudes[lord])
+    if dig.is_exalted:
+        base = min(12, base + 1)
+    elif dig.is_debilitated:
+        base = max(1, base - 1)
+    return base
+
+
 def chara_dasha(
     ascendant_sign: int,
     planet_signs: dict[Planet, int],
