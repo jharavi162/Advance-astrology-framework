@@ -44,6 +44,7 @@ class DashaPeriod:
     end: datetime
     level: int                       # 1 = maha, 2 = antar, 3 = pratyantar
     sub_periods: list["DashaPeriod"] = field(default_factory=list)
+    note: str = ""                   # optional label (e.g. sign for Kalachakra)
 
     @property
     def years(self) -> float:
