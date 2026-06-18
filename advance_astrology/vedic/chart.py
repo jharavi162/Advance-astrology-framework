@@ -97,7 +97,13 @@ class VedicChart:
                       when: datetime | None = None) -> list[DashaPeriod]:
         when = when or datetime.now(timezone.utc)
         levels = 3 if system in ("vimshottari", "ashtottari", "yogini") else 1
-        periods = self.dasha(system, levels=levels)
+        # Project enough cycles for short dashas (e.g. Yogini's 36 years) to
+        # reach the requested date.
+        cycles = 1
+        periods = self.dasha(system, levels=levels, cycles=cycles)
+        while periods and periods[-1].end < when and cycles < 10:
+            cycles += 1
+            periods = self.dasha(system, levels=levels, cycles=cycles)
         return current_dasha(periods, when)
 
     def chara_dasha(self, **kwargs) -> list[DashaPeriod]:
