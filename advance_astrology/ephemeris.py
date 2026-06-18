@@ -99,6 +99,57 @@ class Ephemeris:
         return lst_hours * 15.0
 
     # ------------------------------------------------------------------ #
+    # Rise / set events (needed for Vedic day-portion calculations)
+    # ------------------------------------------------------------------ #
+
+    def _rise_set_events(self, dt_utc: datetime, latitude: float,
+                         longitude: float):
+        """Sorted (datetime, kind) sun rise/set events around `dt_utc`.
+
+        kind is 1 for sunrise, 0 for sunset. Searches a window wide enough to
+        bracket the instant regardless of the UTC day boundary.
+        """
+        from datetime import timedelta
+
+        from skyfield import almanac
+        from skyfield.api import wgs84
+
+        observer = wgs84.latlon(latitude, longitude)
+        center = dt_utc.astimezone(timezone.utc)
+        t0 = self._ts.from_datetime(center - timedelta(days=1, hours=12))
+        t1 = self._ts.from_datetime(center + timedelta(days=1, hours=12))
+        f = almanac.sunrise_sunset(self._eph, observer)
+        times, events = almanac.find_discrete(t0, t1, f)
+        return [(ti.utc_datetime(), int(ev)) for ti, ev in zip(times, events)]
+
+    def day_portions(self, dt_utc: datetime, latitude: float, longitude: float):
+        """Bracketing sun events for the Vedic day containing `dt_utc`.
+
+        Returns ``(preceding_sunrise, following_sunset, next_sunrise, is_day)``.
+        The Vedic day runs sunrise-to-sunrise, so ``preceding_sunrise`` is the
+        most recent sunrise at or before the instant.
+        """
+        events = self._rise_set_events(dt_utc, latitude, longitude)
+        dt_utc = dt_utc.astimezone(timezone.utc)
+        rises = [t for t, ev in events if ev == 1]
+        sets = [t for t, ev in events if ev == 0]
+        if not rises or not sets:
+            return None, None, None, None
+
+        preceding_sunrise = max((t for t in rises if t <= dt_utc), default=rises[0])
+        following_sunset = min((t for t in sets if t > preceding_sunrise),
+                               default=sets[-1])
+        next_sunrise = min((t for t in rises if t > following_sunset),
+                           default=rises[-1])
+        is_day = dt_utc < following_sunset
+        return preceding_sunrise, following_sunset, next_sunrise, is_day
+
+    def sun_rise_set(self, dt_utc: datetime, latitude: float, longitude: float):
+        """(sunrise, sunset) for the Vedic day containing `dt_utc`."""
+        rise, setting, _, _ = self.day_portions(dt_utc, latitude, longitude)
+        return rise, setting
+
+    # ------------------------------------------------------------------ #
     # Body positions
     # ------------------------------------------------------------------ #
 
