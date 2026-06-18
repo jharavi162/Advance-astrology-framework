@@ -238,3 +238,76 @@ def test_current_dasha_chain(vchart):
     chain = vchart.current_dasha("vimshottari",
                                  datetime(2026, 6, 18, tzinfo=timezone.utc))
     assert chain and chain[0].level == 1
+
+
+# --------------------------------------------------------------------------- #
+# Shadbala & strengths
+# --------------------------------------------------------------------------- #
+
+def test_shadbala_seven_planets(vchart):
+    sb = vchart.shadbala()
+    assert set(sb) == {Planet.SUN, Planet.MOON, Planet.MARS, Planet.MERCURY,
+                       Planet.JUPITER, Planet.VENUS, Planet.SATURN}
+
+
+def test_shadbala_components_nonnegative(vchart):
+    for r in vchart.shadbala().values():
+        assert r.sthana >= 0 and r.dig >= 0 and r.kala >= 0
+        assert r.naisargika > 0
+        assert r.total_rupa > 0
+        assert r.total_rupa == pytest.approx(r.total_virupa / 60.0)
+
+
+def test_uccha_bala_extremes():
+    from advance_astrology.vedic.shadbala import uccha_bala
+    from advance_astrology.vedic.dignities import EXALTATION
+    from advance_astrology.constants import SIGNS
+    sign, deg = EXALTATION[Planet.SUN]
+    exalt_lon = SIGNS.index(sign) * 30 + deg
+    assert uccha_bala(Planet.SUN, exalt_lon) == pytest.approx(60, abs=1e-6)
+    assert uccha_bala(Planet.SUN, (exalt_lon + 180) % 360) == pytest.approx(0, abs=1e-6)
+
+
+def test_naisargika_order():
+    from advance_astrology.vedic.shadbala import NAISARGIKA
+    assert NAISARGIKA[Planet.SUN] > NAISARGIKA[Planet.MOON] > NAISARGIKA[Planet.SATURN]
+
+
+def test_ishta_kashta_bounds(vchart):
+    for ik in vchart.ishta_kashta().values():
+        assert 0 <= ik.ishta <= 60
+        assert 0 <= ik.kashta <= 60
+
+
+def test_functional_nature_has_yogakaraka():
+    # Taurus lagna: Saturn rules 9th & 10th -> classic Yogakaraka.
+    from advance_astrology.vedic.nature import functional_nature
+    nat = functional_nature(1)   # Taurus ascendant
+    assert nat[Planet.SATURN] == "Yogakaraka"
+
+
+def test_marakas_are_2nd_7th_lords():
+    from advance_astrology.vedic.nature import marakas
+    # Aries lagna: 2nd=Taurus(Venus), 7th=Libra(Venus) -> Venus is maraka.
+    assert Planet.VENUS in marakas(0)
+
+
+def test_vaiseshikamsa_returns_tier(vchart):
+    tier = vchart.vaiseshikamsa(Planet.VENUS)
+    assert isinstance(tier, str) and tier
+
+
+def test_combustion_detection():
+    from advance_astrology.vedic.avastha import is_combust
+    assert is_combust(Planet.MERCURY, 100.0, 105.0)      # 5° from Sun
+    assert not is_combust(Planet.MERCURY, 100.0, 150.0)  # far from Sun
+
+
+def test_bhrigu_bindu_is_rahu_moon_midpoint(vchart):
+    from advance_astrology.angles import angular_separation
+    bb = vchart.bhrigu_bindu()
+    rahu = vchart.longitudes[Planet.RAHU]
+    moon = vchart.longitudes[Planet.MOON]
+    # Equidistant from Rahu and Moon along the short arc.
+    assert angular_separation(bb, rahu) == pytest.approx(
+        angular_separation(bb, moon), abs=1e-6)

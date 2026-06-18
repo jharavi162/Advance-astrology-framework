@@ -188,13 +188,48 @@ class VedicChart:
             self.ascendant_sign, self.signs[Planet.MOON], self.signs
         )
 
+    # -- Strengths ------------------------------------------------------ #
+    def shadbala(self):
+        """Full Ṣaḍbala profile for the seven grahas."""
+        from .shadbala import compute_shadbala
+        return compute_shadbala(self)
+
+    def ishta_kashta(self):
+        """Iṣṭa-phala (benefic yield) vs Kaṣṭa-phala (malefic yield)."""
+        from .shadbala import compute_ishta_kashta
+        return compute_ishta_kashta(self)
+
+    def vaiseshikamsa(self, planet: Planet) -> str:
+        """Varga-dignity tier (Pārijāta … Bhāsvath) across the Ṣoḍaśavarga."""
+        from .strength import vaiseshikamsa
+        return vaiseshikamsa(planet, self.longitudes)
+
+    # -- Planetary nature ----------------------------------------------- #
+    def functional_nature(self) -> dict[Planet, str]:
+        from .nature import functional_nature
+        return functional_nature(self.ascendant_sign)
+
+    def marakas(self) -> list[Planet]:
+        from .nature import marakas
+        return marakas(self.ascendant_sign)
+
+    # -- Sensitive points ----------------------------------------------- #
+    def bhrigu_bindu(self) -> float:
+        """Bhṛgu Bindu — the midpoint of Rahu and the Moon."""
+        from ..angles import norm180
+        rahu = self.longitudes[Planet.RAHU]
+        moon = self.longitudes[Planet.MOON]
+        return norm360(rahu + norm180(moon - rahu) / 2.0)
+
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,
                                      self.longitudes)
 
     def avasthas(self, planet: Planet) -> dict[str, str]:
-        return avastha.all_avasthas(planet, self.longitudes[planet])
+        sun = self.longitudes[Planet.SUN]
+        return avastha.all_avasthas(planet, self.longitudes[planet],
+                                    sun_longitude=sun)
 
     # -- Compatibility -------------------------------------------------- #
     @staticmethod
