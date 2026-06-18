@@ -311,3 +311,66 @@ def test_bhrigu_bindu_is_rahu_moon_midpoint(vchart):
     # Equidistant from Rahu and Moon along the short arc.
     assert angular_separation(bb, rahu) == pytest.approx(
         angular_separation(bb, moon), abs=1e-6)
+
+
+# --------------------------------------------------------------------------- #
+# Bhava-Chalit, KP, Kakshya, Transits
+# --------------------------------------------------------------------------- #
+
+def test_bhava_chalit_houses_valid(vchart):
+    chalit = vchart.bhava_chalit()
+    for c in chalit.values():
+        assert 1 <= c.rashi_house <= 12
+        assert 1 <= c.chalit_house <= 12
+
+
+def test_kp_chain_four_lords(vchart):
+    chain = vchart.kp_chain(Planet.MOON)
+    assert chain.sign_lord and chain.star_lord and chain.sub_lord
+    assert chain.sub_sub_lord
+
+
+def test_kp_sublord_partitions_sum_to_nakshatra():
+    # The nine subs of a nakshatra must tile its 13°20' span exactly.
+    from advance_astrology.vedic.kp import _subdivide
+    from advance_astrology.constants import NAKSHATRA_ARC, Planet
+    segs = _subdivide(0.0, NAKSHATRA_ARC, Planet.KETU)
+    assert len(segs) == 9
+    assert segs[-1][2] == pytest.approx(NAKSHATRA_ARC)
+
+
+def test_kp_significators_present(vchart):
+    kps = vchart.kp_significators()
+    assert kps.planet_signifies(Planet.SUN)
+    assert kps.house_significators(7)
+
+
+def test_kakshya_lords_order():
+    from advance_astrology.vedic.kakshya import KAKSHYA_LORDS, kakshya_index
+    assert len(KAKSHYA_LORDS) == 8
+    assert KAKSHYA_LORDS[0] == Planet.SATURN
+    assert kakshya_index(0.0) == 0
+    assert kakshya_index(29.9) == 7
+
+
+def test_contributor_bindu_consistency(vchart):
+    # Summing each contributor's bindu over all signs reproduces the BAV total.
+    from advance_astrology.vedic.ashtakavarga import (
+        _CONTRIBUTORS, contributor_gives_bindu)
+    total = 0
+    for sign in range(12):
+        for c in _CONTRIBUTORS:
+            if contributor_gives_bindu(Planet.SUN, c, sign,
+                                       vchart.signs, vchart.ascendant_sign):
+                total += 1
+    assert total == sum(vchart.bhinnashtakavarga(Planet.SUN)) == 48
+
+
+def test_transits_positions_and_sade_sati(vchart):
+    tr = vchart.transits()
+    when = datetime(2026, 6, 18, tzinfo=timezone.utc)
+    pos = tr.positions(when)
+    assert all(0 <= v < 360 for v in pos.values())
+    ss = tr.sade_sati(when)
+    assert set(ss) == {"active", "phase", "saturn_sign"}
+    assert 1 <= tr.transit_house(when, Planet.JUPITER) <= 12

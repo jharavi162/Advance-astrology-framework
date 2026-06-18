@@ -221,6 +221,31 @@ class VedicChart:
         moon = self.longitudes[Planet.MOON]
         return norm360(rahu + norm180(moon - rahu) / 2.0)
 
+    # -- Bhava-Chalit, KP, Kakshya, Transits ---------------------------- #
+    def bhava_chalit(self):
+        """Rāśi vs Placidus (Chalit) house placement, with shift detection."""
+        from .chalit import bhava_chalit
+        return bhava_chalit(self)
+
+    def kp_chain(self, planet: Planet):
+        """KP sign/star/sub/sub-sub lord chain for a planet."""
+        from .kp import kp_chain
+        return kp_chain(self.longitudes[planet])
+
+    def kp_significators(self):
+        """KP significator engine (house & planet significators)."""
+        from .kp import KPSignificators
+        return KPSignificators(self)
+
+    def kakshya_lord(self, planet: Planet):
+        from .kakshya import kakshya_lord
+        return kakshya_lord(self.longitudes[planet])
+
+    def transits(self):
+        """Gochara calculator bound to this natal chart."""
+        from .transits import Transits
+        return Transits(self)
+
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,

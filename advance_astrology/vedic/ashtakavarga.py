@@ -109,6 +109,24 @@ def bhinnashtakavarga(
     return bindus
 
 
+def contributor_gives_bindu(
+    planet: Planet,
+    contributor,
+    sign: int,
+    planet_signs: dict[Planet, int],
+    ascendant_sign: int,
+) -> bool:
+    """Whether one reference point contributes a bindu to a planet's BAV in a
+    sign.
+
+    `contributor` is a Planet or the string ``"Lagna"``. Used by the Kakṣyā
+    transit test to decide whether a transit is "active".
+    """
+    ref_sign = ascendant_sign if contributor == "Lagna" else planet_signs[contributor]
+    house = (sign - ref_sign) % 12 + 1
+    return house in BENEFIC_PLACES[planet][contributor]
+
+
 def sarvashtakavarga(
     planet_signs: dict[Planet, int],
     ascendant_sign: int,
