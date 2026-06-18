@@ -203,6 +203,37 @@ class NatalChart:
     def planets_in_sign(self, sign: str) -> list[PlanetPlacement]:
         return [p for p in self.placements.values() if p.sign == sign]
 
+    # -- Western extensions --------------------------------------------- #
+
+    @property
+    def is_day_chart(self) -> bool:
+        """Day chart when the Sun is above the horizon (houses 7-12)."""
+        return self.placements[Planet.SUN].house in (7, 8, 9, 10, 11, 12)
+
+    def lots(self) -> dict[str, float]:
+        """Arabic Parts / Hellenistic Lots (Fortune, Spirit, ...)."""
+        from .western.lots import all_lots
+        lon = {p: pl.longitude for p, pl in self.placements.items()}
+        return all_lots(lon, self.angles.ascendant, self.is_day_chart)
+
+    def declinations(self) -> dict[Planet, float]:
+        from .western.declination import declination
+        return {
+            p: declination(pl.longitude, pl.latitude, self.obliquity)
+            for p, pl in self.placements.items()
+        }
+
+    def essential_dignity(self, planet: Planet):
+        from .western.dignities import essential_dignity
+        return essential_dignity(
+            self.placements[planet].longitude, self.is_day_chart
+        )
+
+    def to_vedic(self):
+        """Return a :class:`VedicChart` view (requires a sidereal chart)."""
+        from .vedic import VedicChart
+        return VedicChart(self)
+
     def planets_in_house(self, house: int) -> list[PlanetPlacement]:
         return [p for p in self.placements.values() if p.house == house]
 

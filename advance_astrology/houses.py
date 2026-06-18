@@ -158,11 +158,50 @@ def placidus_cusps(
 
 
 # --------------------------------------------------------------------------- #
+# Regiomontanus (equal division of the celestial equator)
+# --------------------------------------------------------------------------- #
+
+def regiomontanus_cusps(
+    ramc: float, obliquity: float, latitude: float
+) -> dict[int, float]:
+    """Regiomontanus cusps.
+
+    Each intermediate cusp is the ecliptic point on the great circle through the
+    horizon's north/south points at a fixed right-ascension offset from the
+    meridian. With offset 90° this reduces exactly to the Ascendant, so the
+    formula is self-consistent with the chart angles.
+    """
+    eps = obliquity * _DEG
+    phi = latitude * _DEG
+
+    def cusp(offset: float) -> float:
+        d = (ramc + offset) * _DEG
+        lon = math.atan2(
+            math.sin(d),
+            math.cos(d) * math.cos(eps) - math.tan(phi) * math.sin(eps),
+        )
+        return norm360(lon / _DEG)
+
+    mc = midheaven(ramc, obliquity)
+    cusps = {
+        10: mc, 1: cusp(90.0),
+        11: cusp(30.0), 12: cusp(60.0),
+        2: cusp(120.0), 3: cusp(150.0),
+    }
+    cusps[4] = norm360(mc + 180.0)
+    for h in (1, 2, 3):
+        cusps[h + 6] = norm360(cusps[h] + 180.0)
+    cusps[5] = norm360(cusps[11] + 180.0)
+    cusps[6] = norm360(cusps[12] + 180.0)
+    return {h: cusps[h] for h in range(1, 13)}
+
+
+# --------------------------------------------------------------------------- #
 # Dispatch
 # --------------------------------------------------------------------------- #
 
 HOUSE_SYSTEMS = {
-    "placidus", "whole_sign", "equal", "porphyry",
+    "placidus", "whole_sign", "equal", "porphyry", "regiomontanus",
 }
 
 
@@ -189,6 +228,8 @@ def compute_cusps(
         cusps = equal_cusps(asc)
     elif system == "porphyry":
         cusps = porphyry_cusps(asc, mc)
+    elif system == "regiomontanus":
+        cusps = regiomontanus_cusps(ramc, obliquity, latitude)
     else:
         raise ValueError(
             f"Unknown house system '{system}'. Available: {sorted(HOUSE_SYSTEMS)}"

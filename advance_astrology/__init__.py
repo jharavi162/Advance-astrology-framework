@@ -23,6 +23,7 @@ from .angles import ZodiacPosition, format_longitude, to_zodiac
 from .aspects import Aspect, find_aspects, find_major_aspects
 from .ayanamsa import ayanamsa, available_models as ayanamsa_models
 from .chart import NatalChart, PlanetPlacement
+from .vedic import VedicChart
 from .constants import (
     ASPECTS,
     DEFAULT_PLANETS,
@@ -40,6 +41,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "NatalChart",
+    "VedicChart",
     "PlanetPlacement",
     "Planet",
     "Ephemeris",
