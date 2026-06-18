@@ -1,0 +1,213 @@
+"""VedicChart — a high-level Jyotish chart wrapping the sidereal NatalChart.
+
+Exposes vargas, all dasha systems, Jaimini tools, arudhas, ashtakavarga,
+panchanga, special lagnas, upagrahas, yogas and avasthas through one object.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from functools import cached_property
+
+from ..angles import norm360, to_zodiac
+from ..chart import NatalChart
+from ..constants import SIGNS, VEDIC_GRAHAS, Planet
+from ..dasha import DashaPeriod, current_dasha
+from . import (
+    arudha,
+    ashtakavarga,
+    avastha,
+    compatibility,
+    dashas as dasha_systems,
+    jaimini,
+    panchanga as panchanga_mod,
+    special_lagnas,
+    upagrahas,
+    yogas as yoga_mod,
+)
+from .aspects import all_graha_aspects, planets_aspecting_sign, rashi_aspects
+from .dignities import dignity
+from .vargas import VARGA_NAMES, build_varga
+
+
+class VedicChart:
+    """A sidereal (Vedic) chart with the full Jyotish toolkit attached."""
+
+    def __init__(self, natal: NatalChart):
+        if natal.zodiac != "sidereal":
+            raise ValueError("VedicChart requires a sidereal NatalChart")
+        self.natal = natal
+        self.when_utc = natal.when_utc
+        self.ayanamsa = natal.ayanamsa_value
+
+        # Sidereal longitudes and sign indices for every charted body.
+        self.longitudes: dict[Planet, float] = {
+            p: pl.sidereal_longitude for p, pl in natal.placements.items()
+        }
+        self.signs: dict[Planet, int] = {
+            p: to_zodiac(l).sign_index for p, l in self.longitudes.items()
+        }
+        self.ascendant = natal.angles.ascendant
+        self.ascendant_sign = to_zodiac(self.ascendant).sign_index
+
+    # ------------------------------------------------------------------ #
+    @classmethod
+    def create(cls, when: datetime, latitude: float, longitude: float, *,
+               name: str = "", ayanamsa: str = "lahiri",
+               house_system: str = "whole_sign", **kwargs) -> "VedicChart":
+        natal = NatalChart.create(
+            when=when, latitude=latitude, longitude=longitude, name=name,
+            zodiac="sidereal", ayanamsa=ayanamsa, house_system=house_system,
+            **kwargs,
+        )
+        return cls(natal)
+
+    # -- Houses --------------------------------------------------------- #
+    def house_of(self, planet: Planet) -> int:
+        return (self.signs[planet] - self.ascendant_sign) % 12 + 1
+
+    def planets_in_house(self, house: int) -> list[Planet]:
+        target = (self.ascendant_sign + house - 1) % 12
+        return [p for p, s in self.signs.items() if s == target]
+
+    # -- Dignities ------------------------------------------------------ #
+    def dignity(self, planet: Planet):
+        return dignity(planet, self.longitudes[planet])
+
+    # -- Vargas --------------------------------------------------------- #
+    def varga(self, division: int):
+        """Build a divisional chart (e.g. ``chart.varga(9)`` for Navamsha)."""
+        return build_varga(division, self.ascendant, self.longitudes)
+
+    @cached_property
+    def navamsha(self):
+        return self.varga(9)
+
+    def all_vargas(self, divisions=None) -> dict[int, object]:
+        from .vargas import SHODASHAVARGA
+        divisions = divisions or SHODASHAVARGA
+        return {d: self.varga(d) for d in divisions}
+
+    # -- Dashas --------------------------------------------------------- #
+    def dasha(self, system: str = "vimshottari", **kwargs) -> list[DashaPeriod]:
+        moon = self.longitudes[Planet.MOON]
+        return dasha_systems.compute_dasha(system, moon, self.when_utc, **kwargs)
+
+    def current_dasha(self, system: str = "vimshottari",
+                      when: datetime | None = None) -> list[DashaPeriod]:
+        when = when or datetime.now(timezone.utc)
+        levels = 3 if system in ("vimshottari", "ashtottari", "yogini") else 1
+        periods = self.dasha(system, levels=levels)
+        return current_dasha(periods, when)
+
+    def chara_dasha(self, **kwargs) -> list[DashaPeriod]:
+        return jaimini.chara_dasha(self.ascendant_sign, self.signs,
+                                   self.when_utc, **kwargs)
+
+    # -- Jaimini -------------------------------------------------------- #
+    def chara_karakas(self, scheme: int = 8) -> dict[str, Planet]:
+        return jaimini.chara_karakas(self.longitudes, scheme)
+
+    def atmakaraka(self, scheme: int = 8) -> Planet:
+        return jaimini.atmakaraka(self.longitudes, scheme)
+
+    def karakamsha(self, scheme: int = 8) -> int:
+        return jaimini.karakamsha(self.longitudes, self.navamsha.signs, scheme)
+
+    def argala(self, house: int = 1):
+        ref = (self.ascendant_sign + house - 1) % 12
+        return jaimini.argala_on_sign(ref, self.signs)
+
+    # -- Arudhas -------------------------------------------------------- #
+    def arudhas(self) -> dict[str, int]:
+        return arudha.all_arudhas(self.ascendant_sign, self.signs)
+
+    def arudha_lagna(self) -> int:
+        return arudha.arudha_lagna(self.ascendant_sign, self.signs)
+
+    # -- Ashtakavarga --------------------------------------------------- #
+    def bhinnashtakavarga(self, planet: Planet) -> list[int]:
+        return ashtakavarga.bhinnashtakavarga(planet, self.signs,
+                                              self.ascendant_sign)
+
+    def sarvashtakavarga(self) -> list[int]:
+        return ashtakavarga.sarvashtakavarga(self.signs, self.ascendant_sign)
+
+    # -- Aspects -------------------------------------------------------- #
+    def graha_aspects(self):
+        return all_graha_aspects(self.signs)
+
+    def planets_aspecting(self, house: int) -> list[Planet]:
+        sign = (self.ascendant_sign + house - 1) % 12
+        return planets_aspecting_sign(sign, self.signs)
+
+    def rashi_aspects_from(self, house: int) -> list[int]:
+        sign = (self.ascendant_sign + house - 1) % 12
+        return rashi_aspects(sign)
+
+    # -- Panchanga ------------------------------------------------------ #
+    def panchanga(self):
+        sun = self.natal.get(Planet.SUN)
+        moon = self.natal.get(Planet.MOON)
+        return panchanga_mod.panchanga(
+            sun.tropical_longitude, moon.tropical_longitude,
+            sun.sidereal_longitude, moon.sidereal_longitude, self.when_utc,
+        )
+
+    # -- Special lagnas & upagrahas ------------------------------------- #
+    def calculated_upagrahas(self) -> dict[str, float]:
+        return upagrahas.calculated_upagrahas(self.longitudes[Planet.SUN])
+
+    def special_lagnas(self) -> dict[str, float]:
+        """Bhava/Hora/Ghati (sunrise-based) and Sree lagna longitudes."""
+        eph = self.natal._ephemeris
+        rise, _, _, _ = eph.day_portions(
+            self.when_utc, self.natal.latitude, self.natal.longitude
+        )
+        out: dict[str, float] = {}
+        if rise is not None:
+            ghatis = special_lagnas._ghatis_since_sunrise(self.when_utc, rise)
+            t_sr = eph.time(rise)
+            sun_sr = norm360(eph.position(Planet.SUN, t_sr).longitude - self.ayanamsa)
+            out["bhava"] = special_lagnas.bhava_lagna(sun_sr, ghatis)
+            out["hora"] = special_lagnas.hora_lagna(sun_sr, ghatis)
+            out["ghati"] = special_lagnas.ghati_lagna(sun_sr, ghatis)
+        out["sree"] = special_lagnas.sree_lagna(
+            self.ascendant, self.longitudes[Planet.MOON]
+        )
+        return out
+
+    def indu_lagna(self) -> int:
+        return special_lagnas.indu_lagna(
+            self.ascendant_sign, self.signs[Planet.MOON], self.signs
+        )
+
+    # -- Yogas & avasthas ----------------------------------------------- #
+    def yogas(self):
+        return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,
+                                     self.longitudes)
+
+    def avasthas(self, planet: Planet) -> dict[str, str]:
+        return avastha.all_avasthas(planet, self.longitudes[planet])
+
+    # -- Compatibility -------------------------------------------------- #
+    @staticmethod
+    def compatibility(boy: "VedicChart", girl: "VedicChart"):
+        return compatibility.guna_milan(
+            boy.longitudes[Planet.MOON], girl.longitudes[Planet.MOON]
+        )
+
+    # -- Presentation --------------------------------------------------- #
+    def summary(self) -> str:
+        lines = [f"Vedic Chart — {self.when_utc:%Y-%m-%d %H:%M UTC}",
+                 f"  Ayanamsa: {self.natal.ayanamsa_name} ({self.ayanamsa:.3f}°)",
+                 f"  Lagna: {to_zodiac(self.ascendant)} ({SIGNS[self.ascendant_sign]})",
+                 ""]
+        for p in VEDIC_GRAHAS:
+            if p not in self.longitudes:
+                continue
+            pos = to_zodiac(self.longitudes[p])
+            dig = self.dignity(p)
+            lines.append(f"  {p.value:<8} {pos}  H{self.house_of(p)}  "
+                         f"[{dig.state}]")
+        return "\n".join(lines)
