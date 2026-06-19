@@ -69,7 +69,11 @@ without ever feeding the answers back in.
 ### P3 — Delivery / UX (parked by user — "later")
 - [ ] NLP / natural-language prose layer that *reads* the deterministic dossier
       (never recomputes numbers).
-- [ ] Wire the triangulation dossier into the paste-ready prompt (`build_prompt`).
+- [x] Paste-ready AI **narrator** prompt for the blind test
+      (`python -m interpreter.predict … --prompt`): wraps the engine's committed
+      output with strict "explain-only, do-not-recompute, do-not-invent-events"
+      rules + the Section-6 template. The engine remains the predictor; the AI
+      only narrates.
 - [ ] Optional: automatic geocoding (place → lat/lon); currently manual.
 
 ---
