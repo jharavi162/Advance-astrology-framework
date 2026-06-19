@@ -12,3 +12,5 @@ venv/
 advance_astrology/data/de440*.bsp
 advance_astrology/data/de406*.bsp
 *.tmp
+# Proprietary playbook IP — kept out of git; load from an external path instead
+interpreter/playbook.txt
