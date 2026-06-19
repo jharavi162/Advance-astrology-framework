@@ -660,12 +660,12 @@ class Triangulator:
             lord = self.house_lord(d.houses[0])
             if lord in self.c.longitudes:
                 targets[lord] = self.c.longitudes[lord]
-            for p in (Planet.SATURN, Planet.JUPITER, Planet.RAHU):
+            for p in (Planet.SATURN, Planet.JUPITER):
                 for name, tgt in targets.items():
                     out += self.tr.conjunction_windows(
-                        p, tgt, self.start, self.end, orb=2.0, step_days=4)
+                        p, tgt, self.start, self.end, orb=2.0, step_days=6)
             out += self.tr.kakshya_windows(Planet.SATURN, self.start,
-                                           self.end, step_days=3)
+                                           self.end, step_days=4)
         out.sort(key=lambda w: w.start)
         return out[:10]
 

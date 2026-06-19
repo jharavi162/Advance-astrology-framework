@@ -416,8 +416,10 @@ def test_transits_positions_and_sade_sati(vchart):
 
 
 def test_triangulation_ranks_and_discriminates(vchart):
-    start = datetime(2022, 1, 1, tzinfo=timezone.utc)
-    end = datetime(2023, 1, 1, tzinfo=timezone.utc)
+    # Long window (>400d) so run() uses coarse timing only — this test asserts
+    # ranking/discrimination, not the precise-trigger path.
+    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2022, 1, 1, tzinfo=timezone.utc)
     t = vchart.triangulate(start, end)
     from advance_astrology.vedic.triangulate import DOMAINS
     assert len(t.scores) == len(DOMAINS)
