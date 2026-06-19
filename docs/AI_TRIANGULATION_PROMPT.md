@@ -13,6 +13,10 @@
 >
 > This operationalises the Architectural Playbook (Sections 1–6) into a strict,
 > no-skip procedure. The Playbook is the philosophy; this file is the checklist.
+>
+> **This document is your DIRECTOR.** For any astrological analysis, execute every
+> phase below in order, from here. Do not improvise outside it and do not stop
+> early.
 
 ---
 
@@ -73,13 +77,42 @@ Call the Engine to obtain the full evidence set for the native and the period.
   lords; BNN degree-to-degree transit hits on natal points; Aṣṭakavarga SAV/BAV
   and Kakṣyā windows; Bhāva-Chalit shifts; graha-dṛṣṭi map.
 
-*Engine entry points (run these as needed):* `VedicChart.create(...)`,
-`.shadbala()`, `.ishta_kashta()`, `.avasthas(p)`, `.functional_nature()`,
-`.argala(h)`, `.chara_karakas()`, `.arudhas()`, `.varga(n)`, `.current_dasha(sys,
-when)`, `.narayana_dasha()/.chara_dasha()/.sudasa_dasha()`, `.sarvashtakavarga()`,
-`.bhinnashtakavarga(p)`, `.kp_chain(p)`, `.kp_significators()`, `.bhava_chalit()`,
-`.graha_aspects()`, `.varshaphal(year)`, and `.transits()` →
-`.slow_movers()/.house_windows()/.conjunction_windows()/.kakshya_windows()`.
+### THE ONE FRONT DOOR — `VedicChart`
+There is a **single entry point** for every calculation: the `VedicChart` class
+in `advance_astrology/vedic/chart.py`. Build the chart once, then pull anything
+from that one object — it internally uses all the calculation modules (transits,
+vargas, shadbala, kp, jaimini, ashtakavarga, avastha, chalit, yogas, varshaphal,
+dashas). You never call those modules directly.
+
+```python
+from advance_astrology import VedicChart
+v = VedicChart.create(when=BIRTH_DT, latitude=LAT, longitude=LON, ayanamsa="lahiri")
+#   (use ayanamsa="kp" when you specifically need KP positions)
+
+# pull whatever the question needs, e.g.:
+v.shadbala(); v.ishta_kashta(); v.avasthas(p); v.functional_nature()
+v.argala(h); v.chara_karakas(); v.arudhas(); v.bhrigu_bindu()
+v.varga(9); v.varga(10); v.varga(30)            # divisional charts
+v.current_dasha("vimshottari", when); v.narayana_dasha(); v.chara_dasha(); v.sudasa_dasha()
+v.sarvashtakavarga(); v.bhinnashtakavarga(p)
+v.kp_chain(p); v.kp_significators(); v.bhava_chalit(); v.graha_aspects()
+v.varshaphal(YEAR)                               # Tajika annual: Varsha-lagna + Muntha
+tr = v.transits()
+tr.slow_movers(when); tr.house_windows(p, h, start, end)
+tr.conjunction_windows(p, natal_long, start, end)   # BNN degree triggers
+tr.kakshya_windows(p, start, end)                   # Kaksya timing windows
+```
+
+**Shortcut:** `python -m interpreter.build_matrix --when ... --lat ... --lon ...`
+prints most natal + period calculations in one block — a good starting dump;
+then fetch the remaining specifics (KP / BNN / Kakṣyā / Varṣaphal) from `VedicChart`.
+
+### ⚠️ FILES TO IGNORE FOR THE VERDICT
+Do **not** take your conclusion from `interpreter/predict.py` or
+`advance_astrology/vedic/triangulate.py`. That is an older *fixed-domain* engine
+whose triangulation we have replaced — **YOU do the triangulation** using this
+framework. Those files may be read only as a source of raw numbers, never as the
+decision-maker.
 
 ---
 
