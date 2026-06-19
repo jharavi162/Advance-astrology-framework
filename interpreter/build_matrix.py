@@ -225,6 +225,13 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
     if cd:
         L.append(f"  Chara       {cd[0].note} ({cd[0].lord.value})  "
                  f"{cd[0].start:%Y-%m-%d}→{cd[0].end:%Y-%m-%d}")
+    sd_all = v.sudasa_dasha(cycles=1)
+    while sd_all and sd_all[-1].end < now:
+        sd_all = v.sudasa_dasha(cycles=len(sd_all) // 12 + 1)
+    sd = [d for d in sd_all if d.start <= now < d.end]
+    if sd:
+        L.append(f"  Sudasa      {sd[0].note} ({sd[0].lord.value})  "
+                 f"{sd[0].start:%Y-%m-%d}→{sd[0].end:%Y-%m-%d}   [wealth/prosperity]")
 
     # ---- Slow gochara ---------------------------------------------------
     _h(L, "Section 3 — Structural Heavyweights (slow gochara, today)")

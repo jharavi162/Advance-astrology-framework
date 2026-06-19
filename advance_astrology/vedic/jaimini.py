@@ -254,3 +254,32 @@ def chara_dasha(
             periods.append(period)
             cursor = end
     return periods
+
+
+def sudasa_dasha(
+    sree_lagna_sign: int,
+    planet_signs: dict[Planet, int],
+    birth: datetime,
+    cycles: int = 1,
+) -> list[DashaPeriod]:
+    """Sudasā (Sri / Jaimini prosperity rashi dasha).
+
+    Identical Chara progression and durations, but seeded from the Sree Lagna
+    instead of the natal Lagna — the classical reference for wealth and
+    prosperity timing. Direction is zodiacal for an odd seed sign and reverse
+    for an even one; each sign's span is the Chara count (signs to its lord − 1).
+    """
+    direct = sree_lagna_sign % 2 == 0   # odd seed -> direct (zodiacal)
+    order = [((sree_lagna_sign + i) if direct else (sree_lagna_sign - i)) % 12
+             for i in range(12)]
+
+    periods: list[DashaPeriod] = []
+    cursor = birth
+    for _ in range(cycles):
+        for s in order:
+            years = chara_dasha_years(s, planet_signs)
+            end = cursor + timedelta(days=years * DAYS_PER_YEAR)
+            lord = _co_lord_sign(s, planet_signs)
+            periods.append(DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s]))
+            cursor = end
+    return periods

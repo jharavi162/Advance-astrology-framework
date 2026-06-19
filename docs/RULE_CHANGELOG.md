@@ -43,3 +43,22 @@ addresses (coverage vs discrimination).
   transformative support, the classic windfall-vs-crisis witness) was invisible
   to triangulation.
 - **Tests:** `test_argala_houses_and_counters`, `test_secondary_argala_from_eighth`.
+
+## 2026-06-19 — Add Sudasā (Sri) rashi dasha
+
+- **Change:** New `jaimini.sudasa_dasha` + `VedicChart.sudasa_dasha`; wired into
+  the matrix's Jaimini timekeepers next to Nārāyaṇa and Chara.
+- **Why (śāstra):** The playbook (§3 Step 1) names Sudasā as a parallel rashi
+  dasha to cross-vote for "Hot Themes," specifically the wealth/prosperity
+  witness. Sudasā uses the Chara progression and durations but is **seeded from
+  the Sree Lagna** (the classical prosperity reference) instead of the natal
+  Lagna. Direction zodiacal for an odd seed sign, reverse for even; span = Chara
+  count (signs to lord − 1).
+- **Source:** Sanjay Rath, *Jaimini Maharishi's Upadesa Sutras* (Sudasa / Sri
+  dasa); K.N. Rao on Jaimini rashi dashas.
+- **Failure-mode addressed:** Coverage — a third independent rashi-dasha vote for
+  the macro-scan, raising convergence resolution for wealth-domain events.
+- **Variant note:** Some traditions reckon Sudasā always zodiacally; we follow
+  the odd/even directional rule shared with Chara for consistency. Flagged here
+  so it can be revisited if blind testing implicates the direction.
+- **Tests:** `test_sudasa_dasha_twelve_signs`.

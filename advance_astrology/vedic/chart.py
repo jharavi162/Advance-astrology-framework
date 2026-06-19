@@ -114,6 +114,11 @@ class VedicChart:
         return jaimini.narayana_dasha(self.ascendant_sign, self.signs,
                                       self.longitudes, self.when_utc, **kwargs)
 
+    def sudasa_dasha(self, **kwargs) -> list[DashaPeriod]:
+        sree_sign = int(self.special_lagnas()["sree"] // 30)
+        return jaimini.sudasa_dasha(sree_sign, self.signs,
+                                    self.when_utc, **kwargs)
+
     # -- Jaimini -------------------------------------------------------- #
     def chara_karakas(self, scheme: int = 8) -> dict[str, Planet]:
         return jaimini.chara_karakas(self.longitudes, scheme)

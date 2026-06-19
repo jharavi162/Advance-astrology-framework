@@ -150,6 +150,17 @@ def test_narayana_dasha_twelve_signs(vchart):
         assert 1 <= round(d.years) <= 12
 
 
+def test_sudasa_dasha_twelve_signs(vchart):
+    sd = vchart.sudasa_dasha()
+    assert len(sd) == 12
+    assert len({d.note for d in sd}) == 12          # all 12 signs, no repeats
+    for d in sd:
+        assert 1 <= round(d.years) <= 12
+    # Seeds from the Sree Lagna, not the natal Lagna.
+    sree_sign = int(vchart.special_lagnas()["sree"] // 30)
+    assert SIGNS[sree_sign] == sd[0].note
+
+
 # --------------------------------------------------------------------------- #
 # Arudha
 # --------------------------------------------------------------------------- #
