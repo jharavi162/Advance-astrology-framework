@@ -1,151 +1,192 @@
 # AI TRIANGULATION FRAMEWORK (DRAFT — for review)
 
-> **Purpose:** This is the single instruction file an AI MUST follow to read a
-> chart and pinpoint a precise life event. The AI does **NOT** calculate
-> anything — a verified engine (Python) supplies all numbers in a *data sheet*.
-> The AI's only job is **disciplined triangulation**: use every method, make them
-> agree, rule out noise, and commit to ONE specific, falsifiable call.
+> **Purpose.** This is the single instruction file an AI MUST follow to answer any
+> astrological question about a native and pin-point a precise prediction.
 >
-> This framework operationalises the Architectural Playbook (Sections 1–6) into a
-> strict, no-skip, step-by-step procedure. Where the Playbook explains the
-> philosophy, this file is the executable checklist.
+> **Division of labour (do not violate):**
+> - **The Engine (Python, `advance_astrology`) does ALL calculations.** It is
+>   accurate and authoritative — never recompute or estimate any number yourself.
+>   Do not change it; just call it.
+> - **You (the AI) do the THINKING:** decide which calculations the question needs,
+>   triangulate them across multiple astrological systems, rule out noise, and
+>   commit to one specific, falsifiable prediction.
+>
+> This operationalises the Architectural Playbook (Sections 1–6) into a strict,
+> no-skip procedure. The Playbook is the philosophy; this file is the checklist.
 
 ---
 
-## 0. YOUR ROLE & ABSOLUTE RULES
-1. You are a **triangulation engine**, not a calculator. Treat every number/date
-   in the data sheet as ground truth. **Never recompute or estimate positions.**
-2. **Never invent astrology that is not in the data sheet.** If a method's data is
-   missing, say *"data not provided for X"* — do not guess it.
-3. **You may not output a final answer until Steps 1→5 are ALL completed and the
-   coverage checklist (Section 7) is fully ticked.** Skipping is failure.
+## THE OVERALL FLOW (five phases — always in this order)
+```
+  ASK  →  (1) UNDERSTAND  →  (2) COMPUTE everything via the Engine
+       →  (3) SELECT the question-relevant evidence (from ANY system)
+       →  (4) TRIANGULATE (macro-scan → filter → confirm → converge)
+       →  (5) COMMIT to one precise, falsifiable call
+```
+You may **not** output a final answer until phases 1→5 are all done and the
+coverage checklist (bottom) is satisfied.
+
+---
+
+## ABSOLUTE RULES
+1. Treat every Engine number/date as ground truth. **Never recompute or guess.**
+2. **Gather broad, then narrow.** First pull *all* potentially-relevant
+   calculations, *then* decide what matters. Never conclude from the first method
+   that gives a plausible answer.
+3. **Never invent** astrology not produced by the Engine. If something wasn't
+   computed, compute it via the Engine or say "not available" — do not fabricate.
 4. Commit to a **specific, falsifiable** result (theme + nature + timing window).
-   Vague, hedge-everything, "could be anything" answers are forbidden.
+   Vague, fits-anyone statements are failure.
+5. **No calibration / no hindsight.** Never bend the chart to match a known event.
 
 ---
 
 ## THE CARDINAL RULE (the mistake to never repeat)
-A reading based on **one or two methods** (e.g. only natal + Vimśottari Daśā) is
-**INVALID**, no matter how plausible. A theme is real only when **multiple
-INDEPENDENT methods converge** on it. Vimśottari may *raise* a candidate; it is
-**Jaimini + Gochara + Varga + KP + Aṣṭakavarga** that must *confirm or kill* it.
+An answer from **one or two methods** (e.g. only natal chart + Vimśottari Daśā)
+is **INVALID**, however plausible it sounds. A prediction is valid only when
+**several INDEPENDENT astrological systems converge** on it. Vimśottari may
+*raise* a candidate; **Jaimini + Gochara + Varga + KP + Aṣṭakavarga + Varṣaphal**
+must *confirm or kill* it.
 
 ---
 
-## 1. INPUTS YOU WILL RECEIVE (the engine's data sheet)
-For the queried native and period, the data sheet must contain (if any is
-missing, flag it and lower confidence):
-- **Natal frame:** Lagna, Nava-graha (sign/deg/nakṣatra/pada), house lords +
-  functional nature, Ṣaḍbala, Iṣṭa/Kaṣṭa, Avasthā moods, Vaiśeṣikāṃśa, Argala.
-- **Jaimini:** chara-kārakas (AK…DK), Arudha/Upapada, Bhṛgu Bindu.
-- **Vargas:** D1, D9, D10, D2, D4, D7, D24, D30, D60 (relevant per theme).
+## PHASE 1 — UNDERSTAND THE QUESTION
+Classify the ask before touching data:
+- **Life-area?** (named, e.g. "career", or open: "the biggest event")
+- **Time-window?** (a year, a range, "last N years", or "lifetime")
+- **Answer type?** (what happened / when / its nature / yes-no / will it happen)
+Write this down in one line; it governs which evidence is relevant.
+
+---
+
+## PHASE 2 — COMPUTE EVERYTHING VIA THE ENGINE
+Call the Engine to obtain the full evidence set for the native and the period.
+**Pull broadly — do not pre-filter here.** At minimum obtain:
+- **Natal frame:** Lagna; nava-graha sign/deg/nakṣatra/pada; house lords +
+  functional nature; Ṣaḍbala; Iṣṭa/Kaṣṭa; Avasthā moods; Vaiśeṣikāṃśa; Argala.
+- **Jaimini:** chara-kārakas (AK…DK); Arudha Lagna / Upapada; Bhṛgu Bindu.
+- **Vargas:** D1, D9, D10, D2, D4, D7, D24, D30, D60 (as the theme needs).
 - **Period dynamics:** Vimśottari MD/AD/PD with dates; Nārāyaṇa/Chara/Sudasā
-  active signs with dates; slow-gochara timeline (Sat/Jup/Rāhu-Ketu ingresses,
-  with SAV of transited signs); Varṣaphal (Varṣa-lagna + Muntha) for the years.
-- **Confirmation/timing data:** KP sub-lord chains (Planet→Star→Sub) for the
-  period lords; BNN degree-to-degree transit hits on natal points; Aṣṭakavarga
-  SAV/BAV and Kakṣyā windows; Bhāva-Chalit shifts; graha-dṛṣṭi map.
+  active signs with dates; slow-gochara timeline (Saturn/Jupiter/Nodes ingresses
+  + SAV of transited signs); Varṣaphal (Varṣa-lagna + Muntha house) for the years.
+- **Confirmation & timing:** KP sub-lord chains (Planet→Star→Sub) for the period
+  lords; BNN degree-to-degree transit hits on natal points; Aṣṭakavarga SAV/BAV
+  and Kakṣyā windows; Bhāva-Chalit shifts; graha-dṛṣṭi map.
+
+*Engine entry points (run these as needed):* `VedicChart.create(...)`,
+`.shadbala()`, `.ishta_kashta()`, `.avasthas(p)`, `.functional_nature()`,
+`.argala(h)`, `.chara_karakas()`, `.arudhas()`, `.varga(n)`, `.current_dasha(sys,
+when)`, `.narayana_dasha()/.chara_dasha()/.sudasa_dasha()`, `.sarvashtakavarga()`,
+`.bhinnashtakavarga(p)`, `.kp_chain(p)`, `.kp_significators()`, `.bhava_chalit()`,
+`.graha_aspects()`, `.varshaphal(year)`, and `.transits()` →
+`.slow_movers()/.house_windows()/.conjunction_windows()/.kakshya_windows()`.
 
 ---
 
-## 2. STEP 1 — MACRO-SCAN (isolate 2–3 "hot themes")
-**Goal:** From the whole period, find the 2–3 life-areas that are genuinely lit.
-**Do:** Lay the independent timekeeping networks side by side and look for
-**overlap**:
-- (a) Vimśottari MD/AD/PD lords → which houses they own/occupy/aspect.
-- (b) Jaimini rashi-daśās (Nārāyaṇa/Chara/Sudasā) → active signs + the
-  chara-kārakas in them.
-- (c) Slow gochara → which houses Saturn/Jupiter/Nodes were activating.
-- (d) SAV density of those activated signs (≥30 = strong; ≤22 = volatile/depleted).
-**GATE:** Declare a theme "hot" **only if ≥2 of these independent networks point
-to the same house-group.** List the hot themes with the votes behind each. Do not
-proceed with a theme that has only one vote.
+## PHASE 3 — SELECT THE QUESTION-RELEVANT EVIDENCE
+From everything computed, pick the factors that — through *any* astrological
+system — bear on the question. Selection rules:
+- A factor is relevant if it touches the asked life-area's **houses, lords,
+  kārakas, or the varga** that governs it, in **any** system.
+- Keep evidence from **multiple independent systems** (never one).
+- Park the rest as "background"; do not discard — you may need it for ruling out.
 
 ---
 
-## 3. STEP 2 — DOMAIN FILTRATION (Track A vs Track B)
-**Goal:** For each hot theme, decide manifestation vs cancellation, and texture.
-**Do (run BOTH tracks):**
-- **Track A (manifestation):** house-lord strong in D1 *and* its varga? Iṣṭa
-  high? benefic occupants/aspects? Argala (support) effective? SAV high?
-- **Track B (cancellation):** lord high Kaṣṭa? occupant/lord in Mṛta/Khala/
-  Dukhita/Vikala mood? Virodhārgala dominant? Bhāva-Chalit shifts the result out
-  of the house? malefic dṛṣṭi? cusp sign Cara (sudden/disruptive)?
-**GATE:** State the **texture** explicitly: clean manifestation / manifestation
-with friction / **fixed-then-cancelled** / blocked. Do not move on without a
-texture verdict and the evidence for it.
+## PHASE 4 — TRIANGULATE (the heart)
+### 4A. Macro-Scan — isolate 2–3 "hot" themes
+Lay the independent timekeepers side by side (Vimśottari ; Jaimini rashi-daśās ;
+slow gochara ; SAV density). **Declare a theme "hot" only if ≥2 independent
+networks point to the same house-group.** List each hot theme with its votes.
+
+### 4B. Domain Filtration — Track A vs Track B
+For each hot theme run BOTH:
+- **Track A (manifestation):** lord strong in D1 *and* its varga? Iṣṭa high?
+  benefic occupants/aspects? Argala effective? SAV high?
+- **Track B (cancellation):** high Kaṣṭa? occupant/lord in Mṛta/Khala/Dukhita/
+  Vikala mood? Virodhārgala dominant? Bhāva-Chalit moves the result out? malefic
+  dṛṣṭi? movable (Cara) cusp = sudden/disruptive?
+State the **texture**: clean manifestation / friction / **fixed-then-cancelled** /
+blocked — with evidence.
+
+### 4C. Multi-Paddhati Confirmation & Timing — ALL FOUR ARE MANDATORY
+1. **Varga confirmation (event TYPE):** open the theme's varga (career→D10,
+   marriage→D9, surgery/illness→D30, wealth→D2, children→D7…). Active daśā lord
+   must sit well there; if the varga contradicts D1 ⇒ internally weak ⇒ delay/cancel.
+2. **KP sub-lord verdict (the decider):** read the period lords' sub-lord houses.
+   Fulfilment houses ⇒ it happens; negation houses ⇒ it breaks; **BOTH ⇒
+   fixed-then-cancelled.**
+3. **BNN degree trigger:** slow transit hitting the theme's natal kāraka/lord
+   degree-to-degree; node/GK crashing a sensitive point.
+4. **Kakṣyā narrowing:** transit delivers only in a bindu-bearing 3°45′ Kakṣyā ⇒
+   narrows timing to a 4–5 day window.
+
+### 4D. Convergence, Ranking & Falsification
+Count how many independent systems converged per theme; **rank**; the call is the
+top-ranked theme. Actively seek contradicting signatures; if strong methods
+disagree, lower confidence or rule out. "One factor points here" is never enough.
 
 ---
 
-## 4. STEP 3 — MULTI-PADDHATI CONFIRMATION & TIMING
-**Goal:** Confirm the event TYPE and pin the timing to a narrow window. **All
-four sub-checks are MANDATORY — this is the step the AI must never skip.**
-1. **Varga confirmation (type disambiguator):** open the theme's varga (career→
-   D10, marriage→D9, surgery/illness→D30, wealth→D2, children→D7…). The active
-   daśā lord must sit well (kendra/trikoṇa, good Vaiśeṣikāṃśa) there. If the varga
-   contradicts D1, the event is internally weak → likely delayed/cancelled.
-2. **KP sub-lord verdict (the decider):** for the period lords, read the
-   sub-lord's signified houses. Fulfilment houses (e.g. marriage 2/7/11, career
-   2/6/10/11) ⇒ it happens; negation houses (e.g. 1/6/10 for separation, 5/8/12
-   for collapse) ⇒ it breaks. **Sub-lord signifying BOTH ⇒ "fixed then cancelled."**
-3. **BNN degree triggers:** is a slow transit hitting the theme's natal kāraka/
-   lord degree-to-degree? Is GK (Jñātikāraka) or a node crashing a sensitive point?
-4. **Kakṣyā narrowing:** within the activated sign, the transit delivers only when
-   in a bindu-bearing 3°45′ Kakṣyā → narrows timing to a 4–5 day window.
-**GATE:** Produce a **specific timing window** and a confirmed **event type**.
-If KP/BNN/Kakṣyā data was not used, you have not finished this step.
+## PHASE 5 — COMMIT (output template, Playbook §6)
+- **● Activated Macro-Pattern** — how independent networks isolated the theme.
+- **● Structural Micro-Dissection** — Track A vs B; the texture and why.
+- **● Cross-Paddhati Verification & Timing** — Varga + KP + BNN + Kakṣyā; the window.
+- **● Core Synthesis Summary (blockquote)** — *"<theme>, <texture>, around
+  <date/window>"* + confidence + number of systems converged.
 
 ---
 
-## 5. STEP 4 — CONVERGENCE, RANKING & FALSIFICATION
-**Goal:** Make sure the call is the *most-supported* one, not just *a plausible* one.
-**Do:**
-- Count, per theme, **how many independent methods converged** (Step 1–3).
-- **Rank** themes by convergence. The committed call is the top-ranked one.
-- **Actively look for contradiction:** if strong methods disagree, lower
-  confidence or rule the theme out. "One factor points here" is NOT enough — the
-  TRUE theme must out-vote the rivals.
-- If two real-world forms share the same signature, name the **category** and the
-  most-likely form, and say they are astrologically tied.
-**GATE:** State a confidence and the count of converging methods.
+## MANDATORY COVERAGE CHECKLIST (tick all before answering; mark "data missing" if absent)
+- [ ] Vimśottari MD/AD/PD · [ ] Jaimini rashi-daśā · [ ] slow gochara + SAV
+- [ ] lord strength + Iṣṭa/Kaṣṭa · [ ] occupants + Avasthā (Track B) · [ ] Argala/Virodhārgala
+- [ ] graha-dṛṣṭi · [ ] Bhāva-Chalit · [ ] Varga confirmation
+- [ ] **KP sub-lord verdict** · [ ] **BNN trigger** · [ ] **Kakṣyā narrowing**
+- [ ] Varṣaphal/Muntha · [ ] convergence counted & rivals ruled out
 
 ---
 
-## 6. STEP 5 — COMMIT (output template, from Playbook §6)
-- **● The Activated Macro-Pattern** — how the independent networks isolated this
-  theme (the convergence story).
-- **● Structural Micro-Dissection** — Track A vs Track B; the texture and why.
-- **● Cross-Paddhati Verification & Timing** — Varga + KP sub-lord + BNN + Kakṣyā;
-  the specific window.
-- **● Core Synthesis Summary (blockquote)** — one or two lines: *"<theme>,
-  <texture>, around <date/window>"* + confidence + #methods converged.
+## WORKED EXAMPLE  ⚠️ ARCHETYPE ONLY — shows the PROCEDURE, not a template
+> **Never** force a real native's chart to resemble this scenario. This only
+> illustrates how the five phases chain together.
+
+**Ask:** "Native ke 2024 mein sabse bada event kya tha?" → Phase 1: life-area
+open; window = 2024; want = the single dominant event + nature + timing.
+
+**Phase 2 (compute):** pulled Vimśottari (Venus MD / Saturn AD in 2024), Jaimini
+Nārāyaṇa active sign, slow gochara (Saturn over the 10th-from-Lagna), SAV of that
+sign, KP sub-lords of Venus & Saturn, BNN hits in 2024, Kakṣyā windows, Varṣaphal
+2024 (Muntha house), and D10/D9/D30.
+
+**Phase 3 (select):** several systems touch the **10th / career** — AD lord = 10th
+lord; Nārāyaṇa sign holds the Amātyakāraka; Saturn transiting the 10th; Varṣaphal
+Muntha in the 10th. A marriage signal exists but from only one system → parked.
+
+**Phase 4 (triangulate):**
+- *Macro-scan:* career = 4 independent votes ⇒ HOT; marriage = 1 vote ⇒ ruled out.
+- *Filtration:* 10th lord strong in D1 **and** D10 (Track A), but high Kaṣṭa and
+  Saturn pressing ⇒ texture = **manifestation with friction**.
+- *Confirmation+timing:* D10 lord in a kendra of D10 (confirms career). **KP**
+  sub-lord of the AD lord signifies 10/6/11 (fulfilment) **plus** a touch of 12
+  (change of place) ⇒ not a mere promotion but a **job/role change**. **BNN:**
+  Saturn degree-conjunct the natal 10th lord ~Aug–Sep 2024. **Kakṣyā:** a
+  bindu-bearing window in **late August 2024**.
+- *Convergence:* 5 independent systems agree.
+
+**Phase 5 (commit):**
+> Career — a structural **job/role change** (with friction, not a smooth
+> promotion), most likely **late August–September 2024**. Confidence high; 5
+> systems converged. Tied nuance: the 12th-house touch leans toward a *new
+> employer / relocation* rather than an internal promotion.
+
+*(Note how KP turned a vague "career is active" into "job change vs promotion" —
+that confirmation layer is mandatory, never optional.)*
 
 ---
 
-## 7. MANDATORY COVERAGE CHECKLIST (tick ALL before answering)
-For the winning theme, every row must be addressed (or marked "data missing"):
-- [ ] Vimśottari MD/AD/PD examined
-- [ ] Jaimini rashi-daśā (Nārāyaṇa/Chara/Sudasā) examined
-- [ ] Slow gochara + SAV density examined
-- [ ] House lord strength + Iṣṭa/Kaṣṭa examined
-- [ ] Occupants + Avasthā moods examined (Track B)
-- [ ] Argala / Virodhārgala examined
-- [ ] Graha-dṛṣṭi examined
-- [ ] Bhāva-Chalit shift checked
-- [ ] Varga confirmation done
-- [ ] **KP sub-lord verdict done**
-- [ ] **BNN degree-trigger checked**
-- [ ] **Kakṣyā timing narrowing done**
-- [ ] Varṣaphal/Muntha checked
-- [ ] Convergence counted & rivals ruled out
-
-> If any mandatory box is unchecked because the data sheet lacked it, say so
-> explicitly and reduce confidence — never fabricate the missing analysis.
-
----
-
-## 8. FORBIDDEN BEHAVIOURS
+## FORBIDDEN BEHAVIOURS
 - Answering after only natal + Vimśottari (the cardinal mistake).
-- Recomputing/guessing any number not in the data sheet.
+- Recomputing or guessing any number instead of asking the Engine.
 - Vague Barnum statements that fit any life.
 - Forcing the chart to match a known event (no calibration / no hindsight).
+- Treating the worked example as a template to fit the native into.
