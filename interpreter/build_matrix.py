@@ -19,7 +19,7 @@ from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart, Planet, to_zodiac
 from advance_astrology.constants import SIGNS
-from advance_astrology.vedic.jaimini import KARAKA_ABBR
+from advance_astrology.vedic.jaimini import KARAKA_ABBR, argala_on_sign
 from advance_astrology.vedic.vargas import SHODASHAVARGA, VARGA_NAMES
 
 # Planet order used throughout (9 grahas).
@@ -172,6 +172,7 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
     if "UL" in ar:
         L.append(f"  Upapada Lagna (UL): {_sign(ar['UL'])}")
     L.append(f"  Bhrigu Bindu: {to_zodiac(v.bhrigu_bindu())}")
+    L.append(f"  Indu Lagna (wealth): {_sign(v.indu_lagna())}")
     for nm, lon in v.calculated_upagrahas().items():
         if nm.lower() in ("gulika", "mandi"):
             L.append(f"  {nm}: {to_zodiac(lon)}")
@@ -192,6 +193,23 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
             continue
         L.append(f"  {a.planet.value:<8} in {_sign(a.from_sign):<12} "
                  f"aspects {_sign(a.to_sign):<12} ({a.distance}th)")
+
+    # ---- Jaimini Argala (support vs obstruction per bhava) --------------
+    _h(L, "Jaimini Argala (intervention: support vs Virodha obstruction)")
+    L.append("  Per house: argala-house[causers vs counterers]; "
+             "* = effective (support wins) → manifestation vector.")
+    vedic_signs = {p: v.signs[p] for p in GRAHAS}        # 9 grahas only
+    for h in range(1, 13):
+        ref_sign = (v.ascendant_sign + h - 1) % 12
+        parts = []
+        for a in argala_on_sign(ref_sign, vedic_signs):
+            if not a.causers and not a.counterers:
+                continue
+            c = "+".join(p.value[:2] for p in a.causers) or "·"
+            x = "+".join(p.value[:2] for p in a.counterers) or "·"
+            mark = "*" if (a.effective and a.causers) else ""
+            parts.append(f"{a.house}H[{c} vs {x}]{mark}")
+        L.append(f"  H{h:<2} " + ("  ".join(parts) if parts else "(no intervention)"))
 
     # ---- Section 3 timekeepers: Dashas ----------------------------------
     _h(L, "Section 3 — Chronological Timekeepers (current periods)")
