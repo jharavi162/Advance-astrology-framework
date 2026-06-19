@@ -85,6 +85,7 @@ W_YOGA = 0.8
 W_ARUDHA = 0.6
 W_CHARAKARAKA = 0.6
 W_VIMSOPAKA = 0.6
+W_MARAKA = 0.5
 
 # Vaiśeṣikāṃśa grades (varga-strength); Gopura+ = strong, Adhama = weak.
 HIGH_VAISESHIKA = {"Gopura", "Simhasana", "Paravata", "Devaloka",
@@ -122,7 +123,7 @@ DUSTHANA = (6, 8, 12)
 # activation; Step-2 filtration = promise/strength.)
 STATIC_FAMILIES = {"lord", "occupant", "argala", "karaka", "varga", "sav",
                    "avastha", "aspect", "chalit", "yoga", "arudha",
-                   "charakaraka", "vimsopaka"}
+                   "charakaraka", "vimsopaka", "maraka"}
 DYNAMIC_FAMILIES = {"vimshottari", "rashi_dasha", "gochara", "kp"}
 
 
@@ -596,20 +597,45 @@ class Triangulator:
                             f"malefic {p.value} pressures H{h}")
 
     def w_kp(self) -> None:
+        """KP sub-lord verdict (§3 Step-3.2, the ultimate negation tool).
+
+        For the active Mahā/Antar lords, take the *sub-lord* of their natal
+        longitude and read what it signifies: fulfilment houses ⇒ manifestation,
+        negation houses ⇒ obstruction, BOTH ⇒ the 'fixed-then-cancelled' texture.
+        """
+        from .kp import kp_chain
         try:
             kps = self.c.kp_significators()
         except Exception:
             return
-        md = self.c.current_dasha("vimshottari", self.mid)[0].lord
+        for period in self.c.current_dasha("vimshottari", self.mid)[:2]:
+            lord = period.lord
+            sub = kp_chain(self.c.longitudes[lord]).sub_lord
+            for d in DOMAINS:
+                fulfil = kps.signifies_any(sub, d.houses)
+                negate = kps.signifies_any(sub, d.negation)
+                if fulfil and negate:
+                    self.scores[d.key].add("kp", -1, W_KP * 0.6,
+                        f"L{period.level} {lord.value}→sub {sub.value} signifies "
+                        f"both fulfil & negation (cancellation signature)")
+                elif fulfil:
+                    self.scores[d.key].add("kp", +1, W_KP,
+                        f"L{period.level} {lord.value}→sub {sub.value} signifies fulfilment")
+                elif negate:
+                    self.scores[d.key].add("kp", -1, W_KP,
+                        f"L{period.level} {lord.value}→sub {sub.value} signifies negation")
+
+    def w_maraka(self) -> None:
+        """Maraka planets reinforce the adverse-event (health/litigation)
+        domains when they sit on a domain house (§2.2 maraka doctrine)."""
+        marakas = set(self.c.marakas())
         for d in DOMAINS:
-            sig_fulfil = any(md in kps.house_significators(h) for h in d.houses)
-            sig_negate = any(md in kps.house_significators(h) for h in d.negation)
-            if sig_fulfil and not sig_negate:
-                self.scores[d.key].add("kp", +1, W_KP,
-                    f"KP: period lord {md.value} signifies fulfilment houses")
-            elif sig_negate and not sig_fulfil:
-                self.scores[d.key].add("kp", -1, W_KP,
-                    f"KP: period lord {md.value} signifies negation houses")
+            if not d.malefic_event:
+                continue
+            for p in marakas:
+                if self.occupies_house(p, d.houses):
+                    self.scores[d.key].add("maraka", +1, W_MARAKA,
+                        f"maraka {p.value} on a domain house")
 
     # -- timing ---------------------------------------------------------- #
     def _windows_for(self, d: Domain) -> list:
@@ -625,7 +651,7 @@ class Triangulator:
     # -- orchestration --------------------------------------------------- #
     _STATIC = ("w_natal_lords", "w_occupants", "w_argala", "w_karakas",
                "w_varga", "w_sav", "w_avastha", "w_aspect", "w_chalit",
-               "w_yoga", "w_arudha", "w_charakaraka", "w_vimsopaka")
+               "w_yoga", "w_arudha", "w_charakaraka", "w_vimsopaka", "w_maraka")
     _DYNAMIC = ("w_vimshottari", "w_rashi_dasha", "w_gochara", "w_kp")
 
     def _prepare_static(self) -> None:

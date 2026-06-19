@@ -175,3 +175,20 @@ addresses (coverage vs discrimination).
   Top-domain witness breadth rose from 10 → 15 families.
 - **Coverage status:** closes 4 more Tier-2 gaps (yogas, arudha/UL, chara-kāraka
   placement, Vimśopaka).
+
+## 2026-06-19 — Tier-2 wiring (3/4): KP sub-lord verdict + Marakas
+
+- **Change:** `w_kp` upgraded from "is the MD lord among house significators" to
+  the proper KP chain — for the active Mahā/Antar lords, take the *sub-lord* of
+  their natal longitude (`kp_chain(...).sub_lord`) and read `signifies_any` over
+  fulfilment vs negation houses. Fulfil⇒+, negate⇒−, BOTH⇒ the fixed-then-
+  cancelled signature (−). New `w_maraka` reinforces adverse-event domains.
+- **Why (śāstra):** §3 Step-3.2 names the sub-lord as the "ultimate negation
+  tool — manifestation's final verdict"; the previous proxy ignored the
+  star→sub chain. Maraka doctrine (§2.2) bears on health/longevity events.
+- **Source:** Krishnamurti Paddhati sub-lord theory; BPHS maraka rules.
+- **Failure-mode addressed:** Discrimination + texture — the sub-lord "both
+  fulfil & negation" case is exactly the playbook's "marriage fixed but cancelled"
+  detector, now firing (seen on the native's Health/Relocation domains).
+- **Coverage status:** closes the KP-sub-lord and maraka Tier-2 gaps. Remaining
+  Tier-2: wire Kakṣyā + BNN conjunction + fast-transit triggers into timing (4/4).
