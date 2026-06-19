@@ -14,3 +14,6 @@ advance_astrology/data/de406*.bsp
 *.tmp
 # Proprietary playbook IP — kept out of git; load from an external path instead
 interpreter/playbook.txt
+# Generated dry-run prompt (embeds proprietary playbook) — keep out of git
+interpreter/dryrun_prompt.txt
+interpreter/*_prompt.txt

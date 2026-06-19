@@ -36,6 +36,12 @@ def _sign(idx: int) -> str:
     return SIGNS[idx]
 
 
+def _dasha_at(v, when: datetime, depth: int = 2) -> str:
+    """Active Vimshottari Maha>Antar(>…) lord abbreviations at *when*."""
+    chain = v.current_dasha("vimshottari", when)
+    return ">".join(d.lord.value[:2] for d in chain[:depth]) or "—"
+
+
 def _sign_ingresses(tr, planet: Planet, start: datetime, end: datetime,
                     step_days: int = 15):
     """Detect every sign change of *planet* in [start, end].
@@ -219,6 +225,8 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
     start = now - timedelta(days=int(365.25 * transit_years))
     L.append(f"  Window: {start:%Y-%m-%d} → {now:%Y-%m-%d}  "
              f"(houses from lagna/moon; SAV = natal bindus of entered sign)")
+    L.append("  Dasha(M>A) = active Vimshottari Maha>Antar lord at ingress "
+             "(Su Mo Ma Me Ju Ve Sa Ra Ke).")
     L.append("")
     L.append("  Anchor (positions at window start):")
     for p in SLOW:
@@ -234,8 +242,8 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
             events.append((date, p, sgn))
     events.sort(key=lambda e: e[0])
     L.append(f"  {'Date':<12}{'Planet':<8}{'Enters':<12}{'House(L/M)':<12}"
-             f"{'SAV':<5}{'Note'}")
-    L.append("  " + "-" * 70)
+             f"{'SAV':<5}{'Dasha(M>A)':<12}{'Note'}")
+    L.append("  " + "-" * 82)
     for date, p, sgn in events:
         hl = (sgn - v.ascendant_sign) % 12 + 1
         hm = (sgn - v.signs[Planet.MOON]) % 12 + 1
@@ -244,7 +252,8 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
             sst = tr.sade_sati(date + timedelta(days=2))
             note = ("Sade Sati: " + sst["phase"]) if sst["active"] else "—"
         L.append(f"  {date:%Y-%m-%d}  {p.value:<8}{_sign(sgn):<12}"
-                 f"{('H%d/H%d' % (hl, hm)):<12}{sav[sgn]:<5}{note}")
+                 f"{('H%d/H%d' % (hl, hm)):<12}{sav[sgn]:<5}"
+                 f"{_dasha_at(v, date):<12}{note}")
     if not events:
         L.append("  (no slow-mover sign changes in window)")
 
