@@ -264,6 +264,17 @@ class VedicChart:
         from .triangulate import Triangulator
         return Triangulator(self, start, end).run()
 
+    def triangulate_timeline(self, start: datetime, end: datetime,
+                             width_days: int = 183, step_days: int = 30,
+                             timing: bool = True):
+        """Slide a short window across [start, end] and detect when each
+        life-event theme peaks — discrete, dated events with precise gochara
+        triggers. The time-localization layer over :meth:`triangulate`.
+        """
+        from .triangulate import Triangulator
+        tl = Triangulator(self, start, end).timeline(width_days, step_days)
+        return tl.with_timing() if timing else tl
+
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,

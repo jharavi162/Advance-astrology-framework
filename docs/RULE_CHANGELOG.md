@@ -116,3 +116,28 @@ addresses (coverage vs discrimination).
   calls need short windows. Next step: automatic sliding sub-window segmentation
   so a multi-year sweep reports *when* each domain peaks.
 - **Tests:** `test_triangulation_ranks_and_discriminates`.
+
+## 2026-06-19 — Time-localization: sliding sub-window timeline
+
+- **Change:** `VedicChart.triangulate_timeline` + `Triangulator.timeline` and
+  `TimelineResult`/`TimelineEvent`/`Sample`. Refactored the engine so STATIC
+  (lifelong) witnesses compute once and only DYNAMIC witnesses re-run per
+  sub-window. Slides a short window (default 183d, step 30d) across the span,
+  builds each domain's activation series, and detects events as contiguous
+  above-baseline runs (plateaus collapsed, valleys separate events). Each event
+  gets precise slow-gochara trigger windows from the scanner. Output grouped by
+  theme so one can "narrow to a domain" and read its candidate event dates.
+- **Why (śāstra):** Playbook §3 is a TIMELINE engine ("analyse the last N years");
+  a single aggregate window cannot localize discrete events. Per-domain peak
+  detection against each domain's own baseline answers "when did THIS theme fire",
+  rather than letting the two highest natal-promise domains monopolise a
+  cross-domain lead (the discrimination failure observed in the first build).
+- **Source:** Architectural Playbook §3 (Macro-scan over a timeline) + §3 Step-3
+  (Kakṣyā / gochara timing narrowing).
+- **Failure-mode addressed:** Discrimination/timing — turns "career is a live
+  theme over 6 years" into "career peaks ~2022-03 and ~2024-11", which is the
+  precise-prediction target.
+- **Known limitation:** event *texture* currently reads "clean manifestation"
+  for most themes (obstruction witnesses fire rarely); cancellation-signature
+  sensitivity is the next calibration area, to be driven by blind testing.
+- **Tests:** `test_triangulation_timeline_localizes_events`.

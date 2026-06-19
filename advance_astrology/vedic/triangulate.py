@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from ..constants import RULERSHIPS, SIGNS, Planet
 from .nature import natural_benefic
@@ -207,6 +207,51 @@ class Triangulation:
 
     def text(self) -> str:
         return _render(self)
+
+
+@dataclass
+class Sample:
+    mid: datetime
+    scores: dict[str, float]      # domain key -> raw_score
+    lead: str | None              # leading converged domain key
+    lead_conf: float
+    lead_texture: str
+
+
+@dataclass
+class TimelineEvent:
+    domain: Domain
+    peak: datetime                # date of strongest activation
+    window_start: datetime        # span over which this theme led
+    window_end: datetime
+    score: float
+    texture: str
+    timing: list = field(default_factory=list)   # precise gochara windows
+
+
+@dataclass
+class TimelineResult:
+    start: datetime
+    end: datetime
+    width_days: int
+    step_days: int
+    samples: list[Sample]
+    events: list[TimelineEvent]
+    _engine: "Triangulator" = None
+
+    def with_timing(self, min_score: float = 0.0) -> "TimelineResult":
+        """Attach precise slow-gochara windows to each event's lead domain."""
+        for e in self.events:
+            if e.score >= min_score:
+                eng = self._engine
+                saved = (eng.start, eng.end)
+                eng.start, eng.end = e.window_start, e.window_end
+                e.timing = eng._windows_for(e.domain)
+                eng.start, eng.end = saved
+        return self
+
+    def text(self) -> str:
+        return _render_timeline(self)
 
 
 # --------------------------------------------------------------------------- #
@@ -430,29 +475,114 @@ class Triangulator:
         return out[:8]
 
     # -- orchestration --------------------------------------------------- #
+    _STATIC = ("w_natal_lords", "w_occupants", "w_argala",
+               "w_karakas", "w_varga", "w_sav")
+    _DYNAMIC = ("w_vimshottari", "w_rashi_dasha", "w_gochara", "w_kp")
+
+    def _prepare_static(self) -> None:
+        """Compute the lifelong (window-independent) votes exactly once."""
+        for name in self._STATIC:
+            getattr(self, name)()
+        self._static_votes = {k: list(s.votes) for k, s in self.scores.items()}
+
+    @staticmethod
+    def _normalise(scores: list[DomainScore]) -> None:
+        """Field-relative salience: min-max raw_score across converged domains
+        so the ranking SEPARATES rather than saturating near 1. This answers
+        'which domain stands out', not an absolute probability."""
+        conv = [s for s in scores if s.converged]
+        if not conv:
+            return
+        hi = max(s.raw_score for s in conv)
+        lo = min(s.raw_score for s in conv)
+        span = hi - lo or 1.0
+        for s in conv:
+            s.confidence = round(0.30 + 0.70 * (s.raw_score - lo) / span, 3)
+
+    def _score_at(self, mid: datetime) -> list[DomainScore]:
+        """Snapshot the ranked domains at a given mid-date (reuses static votes)."""
+        if not hasattr(self, "_static_votes"):
+            self._prepare_static()
+        self.mid = mid
+        self.scores = {d.key: DomainScore(d, votes=list(self._static_votes[d.key]))
+                       for d in DOMAINS}
+        for name in self._DYNAMIC:
+            getattr(self, name)()
+        scores = list(self.scores.values())
+        self._normalise(scores)
+        return sorted(scores, key=lambda s: (s.converged, s.raw_score),
+                      reverse=True)
+
     def run(self) -> Triangulation:
-        for w in (self.w_natal_lords, self.w_occupants, self.w_argala,
-                  self.w_karakas, self.w_varga, self.w_sav, self.w_vimshottari,
-                  self.w_rashi_dasha, self.w_gochara, self.w_kp):
-            w()
-        all_scores = list(self.scores.values())
-        # Field-relative salience: min-max normalise raw_score across converged
-        # domains so the ranking SEPARATES rather than saturating near 1. This
-        # answers "which domain stands out in this window", not an absolute
-        # probability (we make no calibrated-probability claim).
-        conv = [s for s in all_scores if s.converged]
-        if conv:
-            hi = max(s.raw_score for s in conv)
-            lo = min(s.raw_score for s in conv)
-            span = hi - lo or 1.0
-            for s in conv:
-                s.confidence = round(0.30 + 0.70 * (s.raw_score - lo) / span, 3)
-        ranked = sorted(all_scores,
-                        key=lambda s: (s.converged, s.raw_score), reverse=True)
-        # Timing windows only for the top calls (the only ones rendered).
+        ranked = self._score_at(self.mid)
         top = [s for s in ranked if s.converged][:3]
         windows = {s.domain.key: self._windows_for(s.domain) for s in top}
         return Triangulation(self.start, self.end, ranked, windows)
+
+    def timeline(self, width_days: int = 183, step_days: int = 30) -> "TimelineResult":
+        """Slide a short window across [start, end] and detect when each theme
+        peaks — turning a multi-year sweep into discrete, dated events."""
+        self._prepare_static()
+        half = timedelta(days=width_days / 2)
+        step = timedelta(days=step_days)
+        samples: list[Sample] = []
+        cursor = self.start + half
+        last = self.end - half
+        if last < cursor:
+            last = cursor
+        while cursor <= last:
+            ranked = self._score_at(cursor)
+            lead = next((s for s in ranked if s.converged), None)
+            samples.append(Sample(
+                mid=cursor,
+                scores={s.domain.key: (s.raw_score if s.converged else 0.0)
+                        for s in ranked},
+                lead=lead.domain.key if lead else None,
+                lead_conf=lead.confidence if lead else 0.0,
+                lead_texture=lead.texture if lead else "",
+            ))
+            cursor += step
+
+        # Per-domain peak detection: for each promised domain, find the local
+        # maxima of ITS OWN activation series (against its own baseline). This
+        # localizes each theme's event(s) independently, instead of letting the
+        # two highest-promise domains monopolise a cross-domain "lead".
+        import statistics
+        events: list[TimelineEvent] = []
+        for d in DOMAINS:
+            vals = [s.scores.get(d.key, 0.0) for s in samples]
+            pos = [v for v in vals if v > 0]
+            if len(pos) < 1:
+                continue                       # never converged in the span
+            mean = statistics.mean(pos)
+            spread = statistics.pstdev(pos) if len(pos) > 1 else 0.0
+            thr = mean + 0.4 * spread          # prominence floor
+            # Contiguous above-threshold runs = distinct events (separated by
+            # genuine valleys); plateaus collapse to their single peak.
+            peaks = []
+            i, n = 0, len(vals)
+            while i < n:
+                if vals[i] > 0 and vals[i] >= thr:
+                    j = i
+                    while j + 1 < n and vals[j + 1] > 0 and vals[j + 1] >= thr:
+                        j += 1
+                    v, mid = max((vals[k], samples[k].mid) for k in range(i, j + 1))
+                    peaks.append((v, mid))
+                    i = j + 1
+                else:
+                    i += 1
+            for v, mid in sorted(peaks, reverse=True)[:3]:   # ≤3 events/theme
+                ranked = self._score_at(mid)
+                ds = next(s for s in ranked if s.domain.key == d.key)
+                events.append(TimelineEvent(
+                    domain=d, peak=mid,
+                    window_start=mid - half, window_end=mid + half,
+                    score=v, texture=ds.texture))
+        events.sort(key=lambda e: e.peak)
+        return TimelineResult(self.start, self.end, width_days, step_days,
+                              samples, events, self)
+
+
 
 
 # --------------------------------------------------------------------------- #
@@ -501,4 +631,33 @@ def _render(t: Triangulation) -> str:
     for v in sorted(top.votes, key=lambda v: (-v.polarity, -v.weight)):
         sign = "＋" if v.polarity > 0 else "－"
         L.append(f"  {sign} [{v.family:<12}] {v.weight:.2f}  {v.reason}")
+    return "\n".join(L)
+
+
+def _render_timeline(t: TimelineResult) -> str:
+    L: list[str] = []
+    L.append("# TRIANGULATION TIMELINE (theme peaks across the span)")
+    L.append(f"Window: {t.start:%Y-%m-%d} → {t.end:%Y-%m-%d}  "
+             f"(sliding {t.width_days}d / step {t.step_days}d)")
+    if not t.events:
+        L.append("\nNo domain led any sub-window (nothing converged).")
+        return "\n".join(L)
+    # Group by domain, strongest theme first, peaks chronological within.
+    by_domain: dict[str, list[TimelineEvent]] = {}
+    for e in t.events:
+        by_domain.setdefault(e.domain.key, []).append(e)
+    order = sorted(by_domain.values(),
+                   key=lambda evs: max(e.score for e in evs), reverse=True)
+    L.append("")
+    L.append("## Theme peaks (narrow to a theme → its candidate event dates)")
+    for evs in order:
+        evs.sort(key=lambda e: e.peak)
+        dom = evs[0].domain
+        L.append(f"\n● {dom.label}")
+        for e in evs:
+            L.append(f"    Peak {e.peak:%Y-%m-%d}  "
+                     f"[{e.window_start:%Y-%m-%d}→{e.window_end:%Y-%m-%d}]  "
+                     f"salience {e.score:.2f} · {e.texture}")
+            for w in e.timing[:3]:
+                L.append(f"        ⟶ {w}")
     return "\n".join(L)

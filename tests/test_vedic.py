@@ -446,6 +446,25 @@ def test_triangulation_ranks_and_discriminates(vchart):
             assert not s.converged and s.confidence == 0.0
 
 
+def test_triangulation_timeline_localizes_events(vchart):
+    start = datetime(2021, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    tl = vchart.triangulate_timeline(start, end, width_days=183,
+                                     step_days=60, timing=False)
+    assert tl.events, "a three-year span should localize at least one event"
+    # events sorted chronologically; peaks lie inside the span
+    peaks = [e.peak for e in tl.events]
+    assert peaks == sorted(peaks)
+    for e in tl.events:
+        assert start <= e.peak <= end
+        assert e.score > 0 and e.texture and "latent" not in e.texture
+    # determinism
+    tl2 = vchart.triangulate_timeline(start, end, width_days=183,
+                                      step_days=60, timing=False)
+    assert [(e.domain.key, e.peak) for e in tl.events] == \
+           [(e.domain.key, e.peak) for e in tl2.events]
+
+
 def test_scan_windows_trivial(vchart):
     tr = vchart.transits()
     start = datetime(2020, 1, 1, tzinfo=timezone.utc)
