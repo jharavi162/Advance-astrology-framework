@@ -165,6 +165,25 @@ def test_all_arudhas_complete(vchart):
     assert set(ar) >= {f"A{i}" for i in range(1, 13)} | {"AL", "UL"}
 
 
+def test_argala_houses_and_counters():
+    # Argala/virodhargala pairs are symmetric about the lagna axis:
+    # primary 2/4/11 (counter 12/10/3) and secondary 5/8 (counter 9/6).
+    assert jaimini.ARGALA_HOUSES == {2: 12, 4: 10, 11: 3, 5: 9, 8: 6}
+
+
+def test_secondary_argala_from_eighth(vchart):
+    # A planet in the 8th from a reference sign casts secondary argala on it,
+    # countered only by a planet in the 6th.
+    ref = vchart.ascendant_sign
+    eighth_sign = (ref + 7) % 12
+    signs = {Planet.SUN: eighth_sign}        # lone causer, no counter in 6th
+    args = {a.house: a for a in jaimini.argala_on_sign(ref, signs)}
+    assert 8 in args
+    assert args[8].counter_house == 6
+    assert args[8].causers == [Planet.SUN]
+    assert args[8].effective
+
+
 # --------------------------------------------------------------------------- #
 # Ashtakavarga
 # --------------------------------------------------------------------------- #

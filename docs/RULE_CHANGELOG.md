@@ -28,8 +28,18 @@ addresses (coverage vs discrimination).
 - **Purity fix:** Argala restricted to the 9 grahas (Jaimini excludes the outer
   planets Uranus/Neptune/Pluto).
 
-### Known gap to address in the engine (logged, not yet changed)
-- `advance_astrology/vedic/jaimini.py: ARGALA_HOUSES` encodes secondary argala
-  only from the 5th (counter 9th). Classical Jaimini also gives **secondary
-  argala from the 8th, countered by the 6th**. Adding 8→6 is a śāstra-grounded
-  completion, to be done as a dedicated engine change with its own entry here.
+## 2026-06-19 — Complete secondary Argala (add 8th → counter 6th)
+
+- **Change:** `ARGALA_HOUSES` now `{2:12, 4:10, 11:3, 5:9, 8:6}` — adds secondary
+  argala from the 8th house, countered (virodhargala) by the 6th.
+- **Why (śāstra):** Argala and its counter form pairs symmetric about the lagna
+  axis (2↔12, 4↔10, 5↔9, 11↔3, and **6↔8**). Sanjay Rath's formulation lists
+  primary argala from the 2nd/4th/11th and **secondary argala from the 5th and
+  8th**, with virodhargala from the 12th/10th/3rd and the 9th/6th. The 8th pair
+  was the only one missing.
+- **Source:** Sanjay Rath, *Jaimini Maharishi's Upadesa Sutras* (Argala chapter);
+  Jaimini Sūtras 1.1.
+- **Failure-mode addressed:** Coverage — the 8th-house intervention (sudden /
+  transformative support, the classic windfall-vs-crisis witness) was invisible
+  to triangulation.
+- **Tests:** `test_argala_houses_and_counters`, `test_secondary_argala_from_eighth`.

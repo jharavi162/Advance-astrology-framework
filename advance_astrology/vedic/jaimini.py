@@ -76,8 +76,10 @@ def karakamsha(
 # Argala (intervention) and Virodhargala (counter-intervention)
 # --------------------------------------------------------------------------- #
 
-# Primary argala houses and the house that counters each.
-ARGALA_HOUSES = {2: 12, 4: 10, 11: 3, 5: 9}
+# Argala-causing houses mapped to the house that counters each (virodhargala).
+# Primary argala: 2nd, 4th, 11th (countered by 12th, 10th, 3rd).
+# Secondary argala: 5th, 8th (countered by 9th, 6th).
+ARGALA_HOUSES = {2: 12, 4: 10, 11: 3, 5: 9, 8: 6}
 
 
 @dataclass
