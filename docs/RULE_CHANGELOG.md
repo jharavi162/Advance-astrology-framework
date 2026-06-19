@@ -229,3 +229,13 @@ addresses (coverage vs discrimination).
   Sahams, and Muddā daśā — the robust outputs (Varṣa lagna, Muntha, lords) are
   wired now; the contested bala-ranking is left for a dedicated entry.
 - **Tests:** `test_varshaphal_solar_return_and_muntha`.
+
+## 2026-06-19 — Blind-prediction CLI (interpreter/predict.py)
+
+- **Change:** `python -m interpreter.predict` runs the convergence engine for a
+  birth and prints the triangulation timeline (theme peaks + precise gochara/BNN/
+  Kakṣyā triggers) plus the aggregate-window dossier. No new rules; a harness.
+- **Why:** Makes the no-calibration blind test a single command — the engine
+  commits its calls, the native compares against real events, misses point to the
+  next śāstra-grounded fix. This is the highest-leverage next step for the goal,
+  ahead of further (diminishing-returns) element-completeness work.
