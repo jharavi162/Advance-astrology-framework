@@ -150,6 +150,17 @@ def test_narayana_dasha_twelve_signs(vchart):
         assert 1 <= round(d.years) <= 12
 
 
+def test_sudasa_dasha_twelve_signs(vchart):
+    sd = vchart.sudasa_dasha()
+    assert len(sd) == 12
+    assert len({d.note for d in sd}) == 12          # all 12 signs, no repeats
+    for d in sd:
+        assert 1 <= round(d.years) <= 12
+    # Seeds from the Sree Lagna, not the natal Lagna.
+    sree_sign = int(vchart.special_lagnas()["sree"] // 30)
+    assert SIGNS[sree_sign] == sd[0].note
+
+
 # --------------------------------------------------------------------------- #
 # Arudha
 # --------------------------------------------------------------------------- #
@@ -163,6 +174,25 @@ def test_arudha_exception_not_in_house_or_seventh():
 def test_all_arudhas_complete(vchart):
     ar = vchart.arudhas()
     assert set(ar) >= {f"A{i}" for i in range(1, 13)} | {"AL", "UL"}
+
+
+def test_argala_houses_and_counters():
+    # Argala/virodhargala pairs are symmetric about the lagna axis:
+    # primary 2/4/11 (counter 12/10/3) and secondary 5/8 (counter 9/6).
+    assert jaimini.ARGALA_HOUSES == {2: 12, 4: 10, 11: 3, 5: 9, 8: 6}
+
+
+def test_secondary_argala_from_eighth(vchart):
+    # A planet in the 8th from a reference sign casts secondary argala on it,
+    # countered only by a planet in the 6th.
+    ref = vchart.ascendant_sign
+    eighth_sign = (ref + 7) % 12
+    signs = {Planet.SUN: eighth_sign}        # lone causer, no counter in 6th
+    args = {a.house: a for a in jaimini.argala_on_sign(ref, signs)}
+    assert 8 in args
+    assert args[8].counter_house == 6
+    assert args[8].causers == [Planet.SUN]
+    assert args[8].effective
 
 
 # --------------------------------------------------------------------------- #
@@ -383,3 +413,113 @@ def test_transits_positions_and_sade_sati(vchart):
     ss = tr.sade_sati(when)
     assert set(ss) == {"active", "phase", "saturn_sign"}
     assert 1 <= tr.transit_house(when, Planet.JUPITER) <= 12
+
+
+def test_triangulation_ranks_and_discriminates(vchart):
+    # Long window (>400d) so run() uses coarse timing only — this test asserts
+    # ranking/discrimination, not the precise-trigger path.
+    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2022, 1, 1, tzinfo=timezone.utc)
+    t = vchart.triangulate(start, end)
+    from advance_astrology.vedic.triangulate import DOMAINS
+    assert len(t.scores) == len(DOMAINS)
+
+    # Deterministic — identical run yields identical ranking and confidences.
+    t2 = vchart.triangulate(start, end)
+    assert [s.domain.key for s in t.scores] == [s.domain.key for s in t2.scores]
+    assert [s.confidence for s in t.scores] == [s.confidence for s in t2.scores]
+
+    # Converged domains sort ahead of non-converged, by descending raw_score.
+    conv = t.active
+    assert conv, "at least one domain should converge over a year"
+    raws = [s.raw_score for s in conv]
+    assert raws == sorted(raws, reverse=True)
+
+    # Field-relative confidence separates: not everything pinned near 1.0.
+    assert max(s.confidence for s in conv) >= 0.66
+    for s in conv:
+        assert 0.30 <= s.confidence <= 1.0
+        # convergence requires promise gate + ≥2 dynamic + ≥3 total families
+        assert s.promise > 0 and len(s.dynamic_families) >= 2
+
+    # A domain the chart does not promise (promise ≤ 0) must not converge.
+    for s in t.scores:
+        if s.promise <= 0:
+            assert not s.converged and s.confidence == 0.0
+
+
+def test_varshaphal_solar_return_and_muntha(vchart):
+    # vchart born 1990-05-15. Solar return for 2020 should fall near mid-May,
+    # and the Muntha advances one sign per completed year of age.
+    a = vchart.varshaphal(2020)
+    assert a.solar_return.month == 5
+    age = 2020 - 1990
+    assert a.muntha_house == (age % 12) + 1
+    assert 0 <= a.varsha_lagna_sign < 12
+    # the Sun in the annual chart sits at the native's natal sidereal longitude
+    natal_sun = vchart.longitudes[Planet.SUN]
+    ann_sun = a.chart.longitudes[Planet.SUN]
+    sep = abs((ann_sun - natal_sun + 180) % 360 - 180)
+    assert sep < 0.05
+
+
+def test_triangulation_timeline_localizes_events(vchart):
+    start = datetime(2021, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    tl = vchart.triangulate_timeline(start, end, width_days=183,
+                                     step_days=60, timing=False)
+    assert tl.events, "a three-year span should localize at least one event"
+    # events sorted chronologically; peaks lie inside the span
+    peaks = [e.peak for e in tl.events]
+    assert peaks == sorted(peaks)
+    for e in tl.events:
+        assert start <= e.peak <= end
+        assert e.score > 0 and e.texture and "latent" not in e.texture
+    # determinism
+    tl2 = vchart.triangulate_timeline(start, end, width_days=183,
+                                      step_days=60, timing=False)
+    assert [(e.domain.key, e.peak) for e in tl.events] == \
+           [(e.domain.key, e.peak) for e in tl2.events]
+
+
+def test_scan_windows_trivial(vchart):
+    tr = vchart.transits()
+    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2021, 1, 1, tzinfo=timezone.utc)
+    always = tr.scan_windows(lambda w: True, start, end, step_days=30)
+    assert len(always) == 1
+    assert always[0].start == start and always[0].end == end
+    assert tr.scan_windows(lambda w: False, start, end, step_days=30) == []
+
+
+def test_house_windows_well_formed(vchart):
+    tr = vchart.transits()
+    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2023, 6, 1, tzinfo=timezone.utc)
+    wins = []
+    for h in range(1, 13):
+        wins += tr.house_windows(Planet.SATURN, h, start, end, step_days=15)
+    assert wins, "Saturn must occupy some house over the span"
+    for w in wins:
+        assert start <= w.start < w.end <= end
+    # Saturn (~2.5 yr/sign) must visit at least two houses across this span.
+    mids = {tr.transit_house(w.start + (w.end - w.start) / 2, Planet.SATURN)
+            for w in wins}
+    assert len(mids) >= 2
+
+
+def test_conjunction_window_finds_and_bounds(vchart):
+    from advance_astrology.angles import angular_separation
+    tr = vchart.transits()
+    start = datetime(2022, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 6, 1, tzinfo=timezone.utc)
+    target = 315.0  # Saturn crosses this degree (mid-Aquarius) in 2022-2024
+    wins = tr.conjunction_windows(Planet.SATURN, target, start, end,
+                                  orb=1.0, step_days=3)
+    assert wins, "Saturn should cross 315° within the window"
+    for a, b in zip(wins, wins[1:]):
+        assert a.end <= b.start            # sorted, non-overlapping
+    for w in wins:
+        mid = w.start + (w.end - w.start) / 2
+        lon = tr.positions(mid, [Planet.SATURN])[Planet.SATURN]
+        assert angular_separation(lon, target) <= 1.0 + 1e-6

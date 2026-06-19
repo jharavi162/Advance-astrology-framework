@@ -114,6 +114,11 @@ class VedicChart:
         return jaimini.narayana_dasha(self.ascendant_sign, self.signs,
                                       self.longitudes, self.when_utc, **kwargs)
 
+    def sudasa_dasha(self, **kwargs) -> list[DashaPeriod]:
+        sree_sign = int(self.special_lagnas()["sree"] // 30)
+        return jaimini.sudasa_dasha(sree_sign, self.signs,
+                                    self.when_utc, **kwargs)
+
     # -- Jaimini -------------------------------------------------------- #
     def chara_karakas(self, scheme: int = 8) -> dict[str, Planet]:
         return jaimini.chara_karakas(self.longitudes, scheme)
@@ -249,6 +254,31 @@ class VedicChart:
         """Gochara calculator bound to this natal chart."""
         from .transits import Transits
         return Transits(self)
+
+    def triangulate(self, start: datetime, end: datetime):
+        """Multi-paddhati convergence analysis over a time window.
+
+        Returns a :class:`~.triangulate.Triangulation` ranking activated
+        life-event domains with texture, confidence and candidate timing.
+        """
+        from .triangulate import Triangulator
+        return Triangulator(self, start, end).run()
+
+    def triangulate_timeline(self, start: datetime, end: datetime,
+                             width_days: int = 183, step_days: int = 30,
+                             timing: bool = True):
+        """Slide a short window across [start, end] and detect when each
+        life-event theme peaks — discrete, dated events with precise gochara
+        triggers. The time-localization layer over :meth:`triangulate`.
+        """
+        from .triangulate import Triangulator
+        tl = Triangulator(self, start, end).timeline(width_days, step_days)
+        return tl.with_timing() if timing else tl
+
+    def varshaphal(self, year: int):
+        """Tājika annual chart for *year*: solar-return Varṣa lagna + Muntha."""
+        from .varshaphal import annual_chart
+        return annual_chart(self, year)
 
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
