@@ -26,6 +26,21 @@ without ever feeding the answers back in.
 
 ---
 
+## Architecture (decided 2026-06-19) — IMPORTANT
+The triangulation is now done by the **AI**, not by Python:
+- **Python (`advance_astrology`) = calculator only.** Accurate, unchanged. The
+  single front door is **`VedicChart`** (`advance_astrology/vedic/chart.py`).
+- **AI = the triangulation brain.** It follows **`docs/AI_TRIANGULATION_PROMPT.md`**
+  (its DIRECTOR): understand the question → pull all calculations from the engine
+  → select question-relevant evidence (any system) → triangulate (KP/BNN/Kakṣyā
+  mandatory) → commit to one precise, falsifiable call.
+- **Retired as a baseline:** the old fixed-domain `advance_astrology/vedic/
+  triangulate.py` + `interpreter/predict.py`. Kept in the repo as a deterministic
+  reference / calculation source, but **NOT** the decision-maker for readings.
+- **User's starter prompt:** `docs/MY_PROMPT.md` (copy-paste to begin a reading).
+
+---
+
 ## ✅ DONE (built, tested, pushed)
 - [x] Engine foundations: Argala (incl. 8→6 secondary), Sudasā daśā, forward
       activation-window **scanner** (house / BNN conjunction / Kakṣyā).
