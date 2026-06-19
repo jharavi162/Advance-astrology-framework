@@ -49,8 +49,9 @@ Follow the Section 6 output template exactly:
 
 def build_prompt(playbook_text: str, when_local: datetime, lat: float,
                  lon: float, place: str, sex: str, name: str,
-                 ayanamsa: str, query: str) -> str:
-    matrix = build_matrix(when_local, lat, lon, place, sex, name, ayanamsa)
+                 ayanamsa: str, query: str, transit_years: int = 6) -> str:
+    matrix = build_matrix(when_local, lat, lon, place, sex, name, ayanamsa,
+                          transit_years)
     return PROMPT_TEMPLATE.format(playbook=playbook_text.strip(),
                                   matrix=matrix, query=query.strip())
 
@@ -66,6 +67,8 @@ def main() -> None:
     ap.add_argument("--sex", default="")
     ap.add_argument("--name", default="")
     ap.add_argument("--ayanamsa", default="lahiri")
+    ap.add_argument("--transit-years", type=int, default=6,
+                    help="Years of slow-gochara timeline to emit (default 6)")
     ap.add_argument("--query", required=True, help="The native's question for the engine")
     ap.add_argument("--out", default="", help="Output file (default: stdout)")
     args = ap.parse_args()
@@ -76,7 +79,7 @@ def main() -> None:
         tzinfo=ZoneInfo(args.tz))
     prompt = build_prompt(playbook_text, when_local, args.lat, args.lon,
                           args.place, args.sex, args.name, args.ayanamsa,
-                          args.query)
+                          args.query, args.transit_years)
     if args.out:
         with open(args.out, "w") as fh:
             fh.write(prompt)

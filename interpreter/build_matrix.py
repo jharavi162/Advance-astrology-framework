@@ -14,7 +14,7 @@ text block suitable for feeding to an interpretation layer.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart, Planet, to_zodiac
@@ -28,10 +28,40 @@ GRAHAS = [Planet.SUN, Planet.MOON, Planet.MARS, Planet.MERCURY, Planet.JUPITER,
 # Sapta/ashta-graha for strength tables (nodes have no Shadbala).
 SEVEN = [Planet.SUN, Planet.MOON, Planet.MARS, Planet.MERCURY, Planet.JUPITER,
          Planet.VENUS, Planet.SATURN]
+# Structural heavyweights whose multi-year gochara drives major life events.
+SLOW = [Planet.SATURN, Planet.JUPITER, Planet.RAHU, Planet.KETU]
 
 
 def _sign(idx: int) -> str:
     return SIGNS[idx]
+
+
+def _sign_ingresses(tr, planet: Planet, start: datetime, end: datetime,
+                    step_days: int = 15):
+    """Detect every sign change of *planet* in [start, end].
+
+    Coarse-scans on *step_days* then bisects to the day of each ingress, so
+    retrograde re-entries across a boundary are captured as distinct events.
+    Returns a list of (date, new_sign_index) tuples.
+    """
+    events: list[tuple[datetime, int]] = []
+    d = start
+    prev = tr.transit_sign(d, planet)
+    while d < end:
+        nxt = min(d + timedelta(days=step_days), end)
+        cur = tr.transit_sign(nxt, planet)
+        if cur != prev:
+            lo, hi = d, nxt
+            while (hi - lo) > timedelta(days=1):
+                mid = lo + (hi - lo) / 2
+                if tr.transit_sign(mid, planet) == prev:
+                    lo = mid
+                else:
+                    hi = mid
+            events.append((hi, cur))
+            prev = cur
+        d = nxt
+    return events
 
 
 def _h(lines: list[str], title: str) -> None:
@@ -40,7 +70,8 @@ def _h(lines: list[str], title: str) -> None:
 
 
 def build_matrix(when_local: datetime, lat: float, lon: float,
-                 place: str, sex: str, name: str, ayanamsa: str) -> str:
+                 place: str, sex: str, name: str, ayanamsa: str,
+                 transit_years: int = 6) -> str:
     v = VedicChart.create(when=when_local, latitude=lat, longitude=lon,
                           name=name, ayanamsa=ayanamsa)
     now = datetime.now(timezone.utc)
@@ -182,6 +213,41 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
     L.append(f"  Sade Sati: {'ACTIVE — ' + ss['phase'] if ss['active'] else 'inactive'} "
              f"(Saturn in {ss['saturn_sign']})")
 
+    # ---- Multi-year slow gochara timeline -------------------------------
+    _h(L, f"Section 3 — Slow Gochara Timeline (last {transit_years} years, "
+          f"sign-ingress events)")
+    start = now - timedelta(days=int(365.25 * transit_years))
+    L.append(f"  Window: {start:%Y-%m-%d} → {now:%Y-%m-%d}  "
+             f"(houses from lagna/moon; SAV = natal bindus of entered sign)")
+    L.append("")
+    L.append("  Anchor (positions at window start):")
+    for p in SLOW:
+        sgn = tr.transit_sign(start, p)
+        hl = (sgn - v.ascendant_sign) % 12 + 1
+        hm = (sgn - v.signs[Planet.MOON]) % 12 + 1
+        L.append(f"    {p.value:<8}{_sign(sgn):<12} H{hl} (lagna) / "
+                 f"H{hm} (moon)   SAV={sav[sgn]}")
+    L.append("")
+    events = []
+    for p in SLOW:
+        for date, sgn in _sign_ingresses(tr, p, start, now):
+            events.append((date, p, sgn))
+    events.sort(key=lambda e: e[0])
+    L.append(f"  {'Date':<12}{'Planet':<8}{'Enters':<12}{'House(L/M)':<12}"
+             f"{'SAV':<5}{'Note'}")
+    L.append("  " + "-" * 70)
+    for date, p, sgn in events:
+        hl = (sgn - v.ascendant_sign) % 12 + 1
+        hm = (sgn - v.signs[Planet.MOON]) % 12 + 1
+        note = ""
+        if p == Planet.SATURN:
+            sst = tr.sade_sati(date + timedelta(days=2))
+            note = ("Sade Sati: " + sst["phase"]) if sst["active"] else "—"
+        L.append(f"  {date:%Y-%m-%d}  {p.value:<8}{_sign(sgn):<12}"
+                 f"{('H%d/H%d' % (hl, hm)):<12}{sav[sgn]:<5}{note}")
+    if not events:
+        L.append("  (no slow-mover sign changes in window)")
+
     # ---- KP chains ------------------------------------------------------
     _h(L, "Section 3 — KP Stellar Significator Chains (negation tool)")
     for p in GRAHAS:
@@ -213,13 +279,15 @@ def main() -> None:
     ap.add_argument("--sex", default="")
     ap.add_argument("--name", default="")
     ap.add_argument("--ayanamsa", default="lahiri")
+    ap.add_argument("--transit-years", type=int, default=6,
+                    help="Years of slow-gochara timeline to emit (default 6)")
     ap.add_argument("--out", default="", help="Optional output file")
     args = ap.parse_args()
 
     when_local = datetime.strptime(args.when, "%Y-%m-%d %H:%M").replace(
         tzinfo=ZoneInfo(args.tz))
     text = build_matrix(when_local, args.lat, args.lon, args.place,
-                        args.sex, args.name, args.ayanamsa)
+                        args.sex, args.name, args.ayanamsa, args.transit_years)
     if args.out:
         with open(args.out, "w") as fh:
             fh.write(text)
