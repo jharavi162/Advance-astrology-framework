@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+.DS_Store
+# Additional downloaded ephemeris kernels (de421.bsp is intentionally tracked)
+advance_astrology/data/de440*.bsp
+advance_astrology/data/de406*.bsp
+*.tmp
