@@ -415,6 +415,37 @@ def test_transits_positions_and_sade_sati(vchart):
     assert 1 <= tr.transit_house(when, Planet.JUPITER) <= 12
 
 
+def test_triangulation_ranks_and_discriminates(vchart):
+    start = datetime(2022, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2023, 1, 1, tzinfo=timezone.utc)
+    t = vchart.triangulate(start, end)
+    from advance_astrology.vedic.triangulate import DOMAINS
+    assert len(t.scores) == len(DOMAINS)
+
+    # Deterministic — identical run yields identical ranking and confidences.
+    t2 = vchart.triangulate(start, end)
+    assert [s.domain.key for s in t.scores] == [s.domain.key for s in t2.scores]
+    assert [s.confidence for s in t.scores] == [s.confidence for s in t2.scores]
+
+    # Converged domains sort ahead of non-converged, by descending raw_score.
+    conv = t.active
+    assert conv, "at least one domain should converge over a year"
+    raws = [s.raw_score for s in conv]
+    assert raws == sorted(raws, reverse=True)
+
+    # Field-relative confidence separates: not everything pinned near 1.0.
+    assert max(s.confidence for s in conv) >= 0.66
+    for s in conv:
+        assert 0.30 <= s.confidence <= 1.0
+        # convergence requires promise gate + ≥2 dynamic + ≥3 total families
+        assert s.promise > 0 and len(s.dynamic_families) >= 2
+
+    # A domain the chart does not promise (promise ≤ 0) must not converge.
+    for s in t.scores:
+        if s.promise <= 0:
+            assert not s.converged and s.confidence == 0.0
+
+
 def test_scan_windows_trivial(vchart):
     tr = vchart.transits()
     start = datetime(2020, 1, 1, tzinfo=timezone.utc)

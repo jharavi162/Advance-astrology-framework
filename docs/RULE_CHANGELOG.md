@@ -82,3 +82,37 @@ addresses (coverage vs discrimination).
   *date* an activated theme, not just detect it.
 - **Tests:** `test_scan_windows_trivial`, `test_house_windows_well_formed`,
   `test_conjunction_window_finds_and_bounds`.
+
+## 2026-06-19 — Convergence engine (multi-paddhati triangulation)
+
+- **Change:** New `advance_astrology/vedic/triangulate.py` (`Domain`, `Vote`,
+  `DomainScore`, `Triangulator`, `Triangulation`) + `VedicChart.triangulate`.
+  Scores ten śāstra-mapped life-event domains over a time window from ten
+  witness families (natal lords, occupants, Argala, kārakas, varga confirmation,
+  SAV, Vimśottari, rashi daśās, gochara, KP), producing a ranked blind dossier
+  with texture, confidence and candidate timing.
+- **Why (śāstra):** Implements Playbook §3–§4: Step-1 macro-scan (dasha + rashi
+  dasha + gochara cross-votes), Step-2 manifestation-vs-cancellation filtration
+  (lord strength, Iṣṭa/Kaṣṭa, occupant nature, Argala/Virodhārgala), Step-3 varga
+  confirmation + timing. Domain house/kāraka/negation/varga maps follow classical
+  significations (e.g. marriage 2/7/11 fulfilment, 1/6/10 negation, D9, Venus/DK;
+  surgery D30/Mars/6-8). Fulfilment vs negation house sets per playbook §3 Step-3.
+- **Source:** Architectural Playbook §3–§4; BPHS bhāva significations; KP
+  fulfilment/negation house doctrine; Jaimini kāraka scheme.
+- **Failure-mode addressed (the central one):** *Discrimination.* A first naïve
+  build scored ALL ten domains at 0.82–0.96 over a 6-year window — the predicted
+  "everything lights up" failure. Fixed by (a) splitting STATIC natal promise
+  from DYNAMIC window-activation, (b) **gating** activation by a positive natal
+  promise (a domain the chart does not promise cannot fire on transit alone),
+  and (c) ranking by **field-relative salience** (min-max normalised) so the
+  output separates instead of saturating. Confidence is therefore *relative
+  salience within the window*, NOT a calibrated probability — consistent with the
+  no-calibration premise.
+- **Determinism:** One mechanical assembly; identical inputs → identical ranking
+  (asserted in tests). No constant is fit to any chart's history; all weights are
+  documented methodological choices above.
+- **Known limitation (logged, not hidden):** over long windows many domains stay
+  "active" because life genuinely has many themes across years; sharp single-event
+  calls need short windows. Next step: automatic sliding sub-window segmentation
+  so a multi-year sweep reports *when* each domain peaks.
+- **Tests:** `test_triangulation_ranks_and_discriminates`.

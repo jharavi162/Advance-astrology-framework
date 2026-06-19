@@ -255,6 +255,15 @@ class VedicChart:
         from .transits import Transits
         return Transits(self)
 
+    def triangulate(self, start: datetime, end: datetime):
+        """Multi-paddhati convergence analysis over a time window.
+
+        Returns a :class:`~.triangulate.Triangulation` ranking activated
+        life-event domains with texture, confidence and candidate timing.
+        """
+        from .triangulate import Triangulator
+        return Triangulator(self, start, end).run()
+
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,
