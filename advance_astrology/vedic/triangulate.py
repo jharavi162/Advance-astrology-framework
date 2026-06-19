@@ -81,6 +81,26 @@ W_KP = 0.7
 W_AVASTHA = 0.6
 W_ASPECT = 0.5
 W_CHALIT = 0.4
+W_YOGA = 0.8
+W_ARUDHA = 0.6
+W_CHARAKARAKA = 0.6
+W_VIMSOPAKA = 0.6
+
+# Vaiśeṣikāṃśa grades (varga-strength); Gopura+ = strong, Adhama = weak.
+HIGH_VAISESHIKA = {"Gopura", "Simhasana", "Paravata", "Devaloka",
+                   "Brahmaloka", "Airavata", "Sridhama"}
+LOW_VAISESHIKA = {"Adhama"}
+
+# Named yogas → (domain, polarity). Falls back to kind (Raja→career, Dhana→wealth).
+YOGA_MAP = {
+    "Raja": (("career", +1), ("wealth", +1)),
+    "Dhana": (("wealth", +1),),
+    "Gajakesari": (("education", +1), ("career", +1), ("spirituality", +1)),
+    "Budha-Aditya": (("education", +1), ("career", +1)),
+    "Chandra-Mangala": (("wealth", +1), ("property", +1)),
+    "Kemadruma": (("wealth", -1),),
+    "Kala Sarpa": (("career", -1), ("wealth", -1), ("marriage", -1)),
+}
 
 # Temperamental moods (Dīptādi) — the playbook's §3 Step-2 "mood blockade".
 GOOD_MOODS = {"Dipta", "Svastha", "Pramudita"}
@@ -447,6 +467,79 @@ class Triangulator:
                     self.scores[d.key].add("sav", -1, W_SAV,
                         f"SAV H{h}={bindus} (depleted)")
 
+    def w_yoga(self) -> None:
+        """Natal yogas → domain promise (Rāja/Dhana/Mahāpuruṣa, etc.)."""
+        for y in self.c.yogas():
+            hit = False
+            for key, maps in YOGA_MAP.items():
+                if key in y.name:
+                    for dk, pol in maps:
+                        self.scores[dk].add("yoga", pol, W_YOGA, y.name)
+                    hit = True
+                    break
+            if hit:
+                continue
+            if y.kind == "Raja":
+                self.scores["career"].add("yoga", +1, W_YOGA, y.name)
+            elif y.kind == "Dhana":
+                self.scores["wealth"].add("yoga", +1, W_YOGA, y.name)
+            elif y.kind == "Mahapurusha":
+                self.scores["career"].add("yoga", +1, W_YOGA, y.name)
+
+    def w_arudha(self) -> None:
+        """Arudha pada of the domain's primary house — its worldly manifestation.
+        Benefic occupants project the theme, malefics distort it (§2.6)."""
+        occ_by_sign: dict[int, list[Planet]] = {}
+        for p in list(self.shad) + [Planet.RAHU, Planet.KETU]:
+            occ_by_sign.setdefault(self.signs[p], []).append(p)
+        ar = self.c.arudhas()
+        for d in DOMAINS:
+            pada = ar.get(f"A{d.houses[0]}")
+            if pada is None:
+                continue
+            for p in occ_by_sign.get(pada, []):
+                benefic = self.is_benefic(p)
+                manifests = benefic if not d.malefic_event else (not benefic)
+                self.scores[d.key].add("arudha", +1 if manifests else -1,
+                    W_ARUDHA, f"{p.value} in Arudha A{d.houses[0]}")
+
+    def w_charakaraka(self) -> None:
+        """Jaimini chara-kāraka placement (e.g. DK for marriage, AmK career)."""
+        ck = self.c.chara_karakas()
+        for d in DOMAINS:
+            if not d.chara_karaka:
+                continue
+            p = ck.get(d.chara_karaka)
+            if p is None:
+                continue
+            if self.occupies_house(p, d.houses) or self.rules_house(p, d.houses):
+                self.scores[d.key].add("charakaraka", +1, W_CHARAKARAKA,
+                    f"{d.chara_karaka} {p.value} on a domain house")
+            if p in (Planet.RAHU, Planet.KETU):
+                continue
+            ratio, val = self.strength(p)
+            if ratio >= STRONG_RATIO and val >= 0:
+                self.scores[d.key].add("charakaraka", +1, W_CHARAKARAKA * 0.7,
+                    f"{d.chara_karaka} {p.value} strong")
+            elif val < -0.15:
+                self.scores[d.key].add("charakaraka", -1, W_CHARAKARAKA * 0.7,
+                    f"{d.chara_karaka} {p.value} afflicted")
+
+    def w_vimsopaka(self) -> None:
+        """Vaiśeṣikāṃśa (multi-varga) strength of the domain lord and kārakas."""
+        for d in DOMAINS:
+            actors = {self.house_lord(d.houses[0])} | set(d.karakas)
+            for p in actors:
+                if p in (Planet.RAHU, Planet.KETU):
+                    continue
+                grade = self.c.vaiseshikamsa(p)
+                if grade in HIGH_VAISESHIKA:
+                    self.scores[d.key].add("vimsopaka", +1, W_VIMSOPAKA,
+                        f"{p.value} {grade} (varga-strong)")
+                elif grade in LOW_VAISESHIKA:
+                    self.scores[d.key].add("vimsopaka", -1, W_VIMSOPAKA,
+                        f"{p.value} {grade} (varga-weak)")
+
     def w_vimshottari(self) -> None:
         chain = self.c.current_dasha("vimshottari", self.mid)
         for period in chain[:3]:
@@ -531,7 +624,8 @@ class Triangulator:
 
     # -- orchestration --------------------------------------------------- #
     _STATIC = ("w_natal_lords", "w_occupants", "w_argala", "w_karakas",
-               "w_varga", "w_sav", "w_avastha", "w_aspect", "w_chalit")
+               "w_varga", "w_sav", "w_avastha", "w_aspect", "w_chalit",
+               "w_yoga", "w_arudha", "w_charakaraka", "w_vimsopaka")
     _DYNAMIC = ("w_vimshottari", "w_rashi_dasha", "w_gochara", "w_kp")
 
     def _prepare_static(self) -> None:

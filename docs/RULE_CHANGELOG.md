@@ -158,3 +158,20 @@ addresses (coverage vs discrimination).
   read "clean manifestation" because no Track-B obstruction witness fired. Now
   obstruction is non-trivial and textures separate (clean vs friction).
 - **Coverage status:** closes 3 of the Tier-2 gaps (avastha, aspects, chalit).
+
+## 2026-06-19 — Tier-2 wiring (2/4): promise witnesses (yogas, arudha, chara-kāraka, Vimśopaka)
+
+- **Change:** Four STATIC witness families in `triangulate.py`: `w_yoga`
+  (Rāja/Dhana/Mahāpuruṣa/Gajakesari… mapped to domains), `w_arudha` (occupants
+  of the domain's Arudha pada), `w_charakaraka` (Jaimini DK/AmK/etc. placement &
+  strength), `w_vimsopaka` (Vaiśeṣikāṃśa multi-varga grade of lord/kārakas).
+- **Why (śāstra):** §2.2 chara-kārakas, §2.4 Vimśopaka/Vaiśeṣikāṃśa scales, §2.6
+  Arudha manifestation points, and yoga doctrine (Rāja=elevation, Dhana=wealth)
+  all bear on a domain's *promise* and were computed but unused.
+- **Source:** Jaimini chara-kāraka scheme; BPHS yogas; Vaiśeṣikāṃśa (Pārijāta→
+  Śrīdhāma) strength tiers; Arudha pada doctrine.
+- **Failure-mode addressed:** Coverage — domain promise was previously judged on
+  lord/occupant/argala/karaka/varga/SAV only; now 13 static witnesses inform it.
+  Top-domain witness breadth rose from 10 → 15 families.
+- **Coverage status:** closes 4 more Tier-2 gaps (yogas, arudha/UL, chara-kāraka
+  placement, Vimśopaka).
