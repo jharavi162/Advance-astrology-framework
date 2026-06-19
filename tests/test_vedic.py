@@ -413,3 +413,46 @@ def test_transits_positions_and_sade_sati(vchart):
     ss = tr.sade_sati(when)
     assert set(ss) == {"active", "phase", "saturn_sign"}
     assert 1 <= tr.transit_house(when, Planet.JUPITER) <= 12
+
+
+def test_scan_windows_trivial(vchart):
+    tr = vchart.transits()
+    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2021, 1, 1, tzinfo=timezone.utc)
+    always = tr.scan_windows(lambda w: True, start, end, step_days=30)
+    assert len(always) == 1
+    assert always[0].start == start and always[0].end == end
+    assert tr.scan_windows(lambda w: False, start, end, step_days=30) == []
+
+
+def test_house_windows_well_formed(vchart):
+    tr = vchart.transits()
+    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2023, 6, 1, tzinfo=timezone.utc)
+    wins = []
+    for h in range(1, 13):
+        wins += tr.house_windows(Planet.SATURN, h, start, end, step_days=15)
+    assert wins, "Saturn must occupy some house over the span"
+    for w in wins:
+        assert start <= w.start < w.end <= end
+    # Saturn (~2.5 yr/sign) must visit at least two houses across this span.
+    mids = {tr.transit_house(w.start + (w.end - w.start) / 2, Planet.SATURN)
+            for w in wins}
+    assert len(mids) >= 2
+
+
+def test_conjunction_window_finds_and_bounds(vchart):
+    from advance_astrology.angles import angular_separation
+    tr = vchart.transits()
+    start = datetime(2022, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 6, 1, tzinfo=timezone.utc)
+    target = 315.0  # Saturn crosses this degree (mid-Aquarius) in 2022-2024
+    wins = tr.conjunction_windows(Planet.SATURN, target, start, end,
+                                  orb=1.0, step_days=3)
+    assert wins, "Saturn should cross 315° within the window"
+    for a, b in zip(wins, wins[1:]):
+        assert a.end <= b.start            # sorted, non-overlapping
+    for w in wins:
+        mid = w.start + (w.end - w.start) / 2
+        lon = tr.positions(mid, [Planet.SATURN])[Planet.SATURN]
+        assert angular_separation(lon, target) <= 1.0 + 1e-6

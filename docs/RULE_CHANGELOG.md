@@ -62,3 +62,23 @@ addresses (coverage vs discrimination).
   the odd/even directional rule shared with Chara for consistency. Flagged here
   so it can be revisited if blind testing implicates the direction.
 - **Tests:** `test_sudasa_dasha_twelve_signs`.
+
+## 2026-06-19 — Forward activation-window scanner (§3 Step-3 timing engine)
+
+- **Change:** New `Transits.scan_windows` (generic bisecting window finder) plus
+  three concrete finders — `conjunction_windows`, `house_windows`,
+  `kakshya_windows` — and an `ActivationWindow` dataclass, in
+  `advance_astrology/vedic/transits.py`. Boundaries refined to ~1-day resolution.
+- **Why (śāstra):** Section 3 Step 3 of the playbook requires pinning an event's
+  timing to a narrow window via two classical triggers: the **Bhrigu-Nandi-Nāḍī
+  degree-to-degree transit conjunction** (`conjunction_windows`) and the
+  **Aṣṭakavarga Kakṣyā narrowing** — a planet delivers results only while
+  transiting a 3°45′ Kakṣyā that carries a bindu (`kakshya_windows`). House
+  ingress windows (`house_windows`) support the slow-gochara macro-scan (Step 1).
+- **Source:** Playbook §3 Step 3.3–3.4; Aṣṭakavarga Kakṣyā method (classical);
+  Bhrigu-Nandi-Nāḍī transit triggers.
+- **Failure-mode addressed:** Discrimination/timing — generalizes the inline
+  ingress bisection into a reusable primitive the convergence engine will call to
+  *date* an activated theme, not just detect it.
+- **Tests:** `test_scan_windows_trivial`, `test_house_windows_well_formed`,
+  `test_conjunction_window_finds_and_bounds`.
