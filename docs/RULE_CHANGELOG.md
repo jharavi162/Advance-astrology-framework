@@ -209,3 +209,23 @@ addresses (coverage vs discrimination).
 - **Coverage status:** **Tier-2 complete.** All playbook-mandated, already-
   computed witnesses are now wired (17 families + precise timing). Next: Tier-3
   new-computation systems (Varṣaphal, deeper daśā levels, extra daśās, A1–A12).
+
+## 2026-06-19 — Tier-3 (1): Varṣaphal (Tājika annual chart) witness
+
+- **Change:** New `advance_astrology/vedic/varshaphal.py` (`AnnualChart`,
+  `solar_return_time`, `annual_chart`) + `VedicChart.varshaphal(year)`. Wired into
+  the convergence engine as the DYNAMIC `varshaphal` family (per-year cached):
+  the Muntha's house is the year's live theme; Muntha/Varṣa-lagna lords tie it to
+  natal domains.
+- **Why (śāstra):** Varṣaphal is the classical year-resolution system. The solar
+  return is the Sun's return to its natal *sidereal* longitude; the Muntha
+  advances one sign per completed year of age from the natal lagna. This adds a
+  genuinely new (annual) dimension to the macro-scan, not just another rashi-daśā.
+- **Source:** Tājika śāstra (Nīlakaṇṭha's *Tājika Nīlakaṇṭhī*); Varṣaphal /
+  Muntha doctrine.
+- **Failure-mode addressed:** Coverage + timing — year-level activation that
+  Vimśottari/rashi-daśās alone do not isolate.
+- **Deferred (logged):** full Pañcādhikārī lord-of-the-year (Pañca-vargīya bala),
+  Sahams, and Muddā daśā — the robust outputs (Varṣa lagna, Muntha, lords) are
+  wired now; the contested bala-ranking is left for a dedicated entry.
+- **Tests:** `test_varshaphal_solar_return_and_muntha`.

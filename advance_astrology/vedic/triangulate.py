@@ -86,6 +86,7 @@ W_ARUDHA = 0.6
 W_CHARAKARAKA = 0.6
 W_VIMSOPAKA = 0.6
 W_MARAKA = 0.5
+W_VARSHAPHAL = 0.7
 
 # Vaiśeṣikāṃśa grades (varga-strength); Gopura+ = strong, Adhama = weak.
 HIGH_VAISESHIKA = {"Gopura", "Simhasana", "Paravata", "Devaloka",
@@ -124,7 +125,7 @@ DUSTHANA = (6, 8, 12)
 STATIC_FAMILIES = {"lord", "occupant", "argala", "karaka", "varga", "sav",
                    "avastha", "aspect", "chalit", "yoga", "arudha",
                    "charakaraka", "vimsopaka", "maraka"}
-DYNAMIC_FAMILIES = {"vimshottari", "rashi_dasha", "gochara", "kp"}
+DYNAMIC_FAMILIES = {"vimshottari", "rashi_dasha", "gochara", "kp", "varshaphal"}
 
 
 # --------------------------------------------------------------------------- #
@@ -314,7 +315,14 @@ class Triangulator:
         self.aspects = [a for a in chart.graha_aspects()
                         if a.planet in self.shad]
         self.chalit = chart.bhava_chalit()
+        self._annual_cache: dict[int, object] = {}
         self.scores = {d.key: DomainScore(d) for d in DOMAINS}
+
+    def _annual(self, year: int):
+        if year not in self._annual_cache:
+            from .varshaphal import annual_chart
+            self._annual_cache[year] = annual_chart(self.c, year)
+        return self._annual_cache[year]
 
     # -- small helpers --------------------------------------------------- #
     def house_lord(self, house: int) -> Planet:
@@ -629,6 +637,23 @@ class Triangulator:
                     self.scores[d.key].add("kp", -1, W_KP,
                         f"L{period.level} {lord.value}→sub {sub.value} signifies negation")
 
+    def w_varshaphal(self) -> None:
+        """Varṣaphal (Tājika annual) witness — the Muntha's house is the year's
+        live theme; the Muntha/Varṣa-lagna lords tie it to natal domains."""
+        try:
+            ann = self._annual(self.mid.year)
+        except Exception:
+            return
+        for d in DOMAINS:
+            if ann.muntha_house in d.houses:
+                self.scores[d.key].add("varshaphal", +1, W_VARSHAPHAL,
+                    f"Muntha in H{ann.muntha_house} this Varṣa")
+            if (self.rules_house(ann.muntha_lord, d.houses)
+                    or self.rules_house(ann.lagna_lord, d.houses)):
+                self.scores[d.key].add("varshaphal", +1, W_VARSHAPHAL * 0.6,
+                    f"Varṣeśa ({ann.muntha_lord.value}/{ann.lagna_lord.value}) "
+                    f"rules a domain house")
+
     def w_maraka(self) -> None:
         """Maraka planets reinforce the adverse-event (health/litigation)
         domains when they sit on a domain house (§2.2 maraka doctrine)."""
@@ -673,7 +698,8 @@ class Triangulator:
     _STATIC = ("w_natal_lords", "w_occupants", "w_argala", "w_karakas",
                "w_varga", "w_sav", "w_avastha", "w_aspect", "w_chalit",
                "w_yoga", "w_arudha", "w_charakaraka", "w_vimsopaka", "w_maraka")
-    _DYNAMIC = ("w_vimshottari", "w_rashi_dasha", "w_gochara", "w_kp")
+    _DYNAMIC = ("w_vimshottari", "w_rashi_dasha", "w_gochara", "w_kp",
+                "w_varshaphal")
 
     def _prepare_static(self) -> None:
         """Compute the lifelong (window-independent) votes exactly once."""

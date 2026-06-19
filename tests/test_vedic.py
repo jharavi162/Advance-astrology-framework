@@ -448,6 +448,21 @@ def test_triangulation_ranks_and_discriminates(vchart):
             assert not s.converged and s.confidence == 0.0
 
 
+def test_varshaphal_solar_return_and_muntha(vchart):
+    # vchart born 1990-05-15. Solar return for 2020 should fall near mid-May,
+    # and the Muntha advances one sign per completed year of age.
+    a = vchart.varshaphal(2020)
+    assert a.solar_return.month == 5
+    age = 2020 - 1990
+    assert a.muntha_house == (age % 12) + 1
+    assert 0 <= a.varsha_lagna_sign < 12
+    # the Sun in the annual chart sits at the native's natal sidereal longitude
+    natal_sun = vchart.longitudes[Planet.SUN]
+    ann_sun = a.chart.longitudes[Planet.SUN]
+    sep = abs((ann_sun - natal_sun + 180) % 360 - 180)
+    assert sep < 0.05
+
+
 def test_triangulation_timeline_localizes_events(vchart):
     start = datetime(2021, 1, 1, tzinfo=timezone.utc)
     end = datetime(2024, 1, 1, tzinfo=timezone.utc)

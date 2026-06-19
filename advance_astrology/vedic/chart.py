@@ -275,6 +275,11 @@ class VedicChart:
         tl = Triangulator(self, start, end).timeline(width_days, step_days)
         return tl.with_timing() if timing else tl
 
+    def varshaphal(self, year: int):
+        """Tājika annual chart for *year*: solar-return Varṣa lagna + Muntha."""
+        from .varshaphal import annual_chart
+        return annual_chart(self, year)
+
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,
