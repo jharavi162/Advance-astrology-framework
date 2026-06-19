@@ -1,4 +1,4 @@
-# AI TRIANGULATION FRAMEWORK (DRAFT — for review)
+# AI TRIANGULATION FRAMEWORK
 
 > **Purpose.** This is the single instruction file an AI MUST follow to answer any
 > astrological question about a native and pin-point a precise prediction.
