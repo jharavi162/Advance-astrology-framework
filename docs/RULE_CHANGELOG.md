@@ -192,3 +192,20 @@ addresses (coverage vs discrimination).
   detector, now firing (seen on the native's Health/Relocation domains).
 - **Coverage status:** closes the KP-sub-lord and maraka Tier-2 gaps. Remaining
   Tier-2: wire Kakṣyā + BNN conjunction + fast-transit triggers into timing (4/4).
+
+## 2026-06-19 — Tier-2 wiring (4/4): precise timing triggers (BNN + Kakṣyā)
+
+- **Change:** `Triangulator._windows_for` now, on event-scale spans (≤400d),
+  adds Bhrigu-Nandi-Nāḍī degree-to-degree conjunction windows (slow transit
+  within 2° of the domain's natal kārakas/lord) and Saturn Kakṣyā windows, on
+  top of the coarse slow-gochara house windows. `with_timing` caps precise
+  computation to the top-N events by salience to bound runtime.
+- **Why (śāstra):** §3 Step-3.3 (BNN transit triggers) and §3 Step-3.4 (Kakṣyā
+  4–5-day narrowing) — the scanner primitives existed but were never invoked by
+  the convergence layer.
+- **Source:** Playbook §3 Step-3.3–3.4.
+- **Failure-mode addressed:** Timing precision — each detected event now carries
+  its degree-to-degree and Kakṣyā trigger windows, not just the house-ingress span.
+- **Coverage status:** **Tier-2 complete.** All playbook-mandated, already-
+  computed witnesses are now wired (17 families + precise timing). Next: Tier-3
+  new-computation systems (Varṣaphal, deeper daśā levels, extra daśās, A1–A12).

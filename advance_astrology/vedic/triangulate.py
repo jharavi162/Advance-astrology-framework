@@ -269,15 +269,19 @@ class TimelineResult:
     events: list[TimelineEvent]
     _engine: "Triangulator" = None
 
-    def with_timing(self, min_score: float = 0.0) -> "TimelineResult":
-        """Attach precise slow-gochara windows to each event's lead domain."""
+    def with_timing(self, top_n: int = 6) -> "TimelineResult":
+        """Attach precise BNN/Kakṣyā trigger windows to the strongest events
+        (capped at *top_n* by salience to bound runtime)."""
+        ranked = sorted(self.events, key=lambda e: e.score, reverse=True)[:top_n]
+        chosen = set(id(e) for e in ranked)
         for e in self.events:
-            if e.score >= min_score:
-                eng = self._engine
-                saved = (eng.start, eng.end)
-                eng.start, eng.end = e.window_start, e.window_end
-                e.timing = eng._windows_for(e.domain)
-                eng.start, eng.end = saved
+            if id(e) not in chosen:
+                continue
+            eng = self._engine
+            saved = (eng.start, eng.end)
+            eng.start, eng.end = e.window_start, e.window_end
+            e.timing = eng._windows_for(e.domain)
+            eng.start, eng.end = saved
         return self
 
     def text(self) -> str:
@@ -639,14 +643,31 @@ class Triangulator:
 
     # -- timing ---------------------------------------------------------- #
     def _windows_for(self, d: Domain) -> list:
+        """Timing for a domain over [start, end]: coarse slow-gochara house
+        windows always; on short (event-scale) spans also the BNN degree-to-
+        degree conjunctions to the domain's natal kārakas/lord and the Kakṣyā
+        4–5-day narrowing — the §3 Step-3.3/3.4 precision triggers."""
         out = []
         movers = (Planet.SATURN, Planet.JUPITER, Planet.RAHU, Planet.KETU)
         for p in movers:
             for h in d.houses[:2]:
                 out += self.tr.house_windows(p, h, self.start, self.end,
                                              step_days=15)
+        span_days = (self.end - self.start).days
+        if span_days <= 400:                       # event-scale: add precision
+            targets = {k: self.c.longitudes[k] for k in d.karakas
+                       if k in self.c.longitudes}
+            lord = self.house_lord(d.houses[0])
+            if lord in self.c.longitudes:
+                targets[lord] = self.c.longitudes[lord]
+            for p in (Planet.SATURN, Planet.JUPITER, Planet.RAHU):
+                for name, tgt in targets.items():
+                    out += self.tr.conjunction_windows(
+                        p, tgt, self.start, self.end, orb=2.0, step_days=4)
+            out += self.tr.kakshya_windows(Planet.SATURN, self.start,
+                                           self.end, step_days=3)
         out.sort(key=lambda w: w.start)
-        return out[:8]
+        return out[:10]
 
     # -- orchestration --------------------------------------------------- #
     _STATIC = ("w_natal_lords", "w_occupants", "w_argala", "w_karakas",
