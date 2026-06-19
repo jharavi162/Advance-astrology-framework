@@ -78,6 +78,13 @@ W_KARAKA = 0.6
 W_VARGA = 0.8
 W_SAV = 0.5
 W_KP = 0.7
+W_AVASTHA = 0.6
+W_ASPECT = 0.5
+W_CHALIT = 0.4
+
+# Temperamental moods (Dīptādi) — the playbook's §3 Step-2 "mood blockade".
+GOOD_MOODS = {"Dipta", "Svastha", "Pramudita"}
+BAD_MOODS = {"Khala", "Vikala", "Dukhita"}     # corrupt the house promise
 
 SAV_HIGH, SAV_LOW = 30, 22           # playbook §3 Step-1 density thresholds
 STRONG_RATIO = 1.0                   # Shadbala ratio ≥1 meets required rūpa
@@ -93,7 +100,9 @@ DUSTHANA = (6, 8, 12)
 # the activated theme can manifest. This separation is what discriminates one
 # window's event from the lifelong background. (Playbook: Step-1 macro-scan =
 # activation; Step-2 filtration = promise/strength.)
-STATIC_FAMILIES = {"lord", "occupant", "argala", "karaka", "varga", "sav"}
+STATIC_FAMILIES = {"lord", "occupant", "argala", "karaka", "varga", "sav",
+                   "avastha", "aspect", "chalit", "yoga", "arudha",
+                   "charakaraka", "vimsopaka"}
 DYNAMIC_FAMILIES = {"vimshottari", "rashi_dasha", "gochara", "kp"}
 
 
@@ -276,6 +285,10 @@ class Triangulator:
         self.sav = chart.sarvashtakavarga()
         self.nature = chart.functional_nature()
         self.tr = chart.transits()
+        self.moods = {p: chart.avasthas(p)["deeptadi"] for p in self.shad}
+        self.aspects = [a for a in chart.graha_aspects()
+                        if a.planet in self.shad]
+        self.chalit = chart.bhava_chalit()
         self.scores = {d.key: DomainScore(d) for d in DOMAINS}
 
     # -- small helpers --------------------------------------------------- #
@@ -381,6 +394,48 @@ class Triangulator:
                 self.scores[d.key].add("varga", -1, W_VARGA,
                     f"D{d.varga}: H{d.houses[0]} lord in dusthāna (H{hv})")
 
+    def w_avastha(self) -> None:
+        """Mood (Dīptādi) blockade — §3 Step-2. A Khala/Vikala/Dukhita lord or
+        kāraka corrupts the house promise (a Track-B cancellation signature)."""
+        for d in DOMAINS:
+            actors = {self.house_lord(d.houses[0])} | set(d.karakas)
+            for p in actors:
+                mood = self.moods.get(p)
+                if mood in GOOD_MOODS:
+                    self.scores[d.key].add("avastha", +1, W_AVASTHA,
+                        f"{p.value} in {mood} (radiant)")
+                elif mood in BAD_MOODS:
+                    self.scores[d.key].add("avastha", -1, W_AVASTHA,
+                        f"{p.value} in {mood} (mood blockade)")
+
+    def w_aspect(self) -> None:
+        """Graha Dṛṣṭi onto the domain houses — §3 Step-2 aspectual geometry."""
+        for a in self.aspects:
+            house = (a.to_sign - self.asc) % 12 + 1
+            benefic = self.is_benefic(a.planet)
+            for d in DOMAINS:
+                if house in d.houses:
+                    manifests = benefic if not d.malefic_event else (not benefic)
+                    self.scores[d.key].add("aspect", +1 if manifests else -1,
+                        W_ASPECT, f"{a.planet.value} aspects H{house}")
+
+    def w_chalit(self) -> None:
+        """Bhāva-Chalit (Placidus) shift — §2.5/§3 Step-2. A planet whose
+        physical result-house moves out of the domain weakens it; into it
+        strengthens it."""
+        for p, pl in self.chalit.items():
+            if not pl.shifted or (p not in self.shad
+                                  and p not in (Planet.RAHU, Planet.KETU)):
+                continue
+            r, cc = pl.rashi_house, pl.chalit_house
+            for d in DOMAINS:
+                if r in d.houses and cc not in d.houses:
+                    self.scores[d.key].add("chalit", -1, W_CHALIT,
+                        f"{p.value} result shifts H{r}→H{cc} (out of domain)")
+                elif cc in d.houses and r not in d.houses:
+                    self.scores[d.key].add("chalit", +1, W_CHALIT,
+                        f"{p.value} result shifts H{r}→H{cc} (into domain)")
+
     def w_sav(self) -> None:
         for d in DOMAINS:
             for h in d.houses:
@@ -475,8 +530,8 @@ class Triangulator:
         return out[:8]
 
     # -- orchestration --------------------------------------------------- #
-    _STATIC = ("w_natal_lords", "w_occupants", "w_argala",
-               "w_karakas", "w_varga", "w_sav")
+    _STATIC = ("w_natal_lords", "w_occupants", "w_argala", "w_karakas",
+               "w_varga", "w_sav", "w_avastha", "w_aspect", "w_chalit")
     _DYNAMIC = ("w_vimshottari", "w_rashi_dasha", "w_gochara", "w_kp")
 
     def _prepare_static(self) -> None:

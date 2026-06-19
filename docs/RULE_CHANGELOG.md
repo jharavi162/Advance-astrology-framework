@@ -141,3 +141,20 @@ addresses (coverage vs discrimination).
   for most themes (obstruction witnesses fire rarely); cancellation-signature
   sensitivity is the next calibration area, to be driven by blind testing.
 - **Tests:** `test_triangulation_timeline_localizes_events`.
+
+## 2026-06-19 — Tier-2 wiring (1/4): texture witnesses (avastha, aspects, chalit)
+
+- **Change:** Three new witness families in `triangulate.py`: `w_avastha`
+  (Dīptādi mood blockade), `w_aspect` (graha dṛṣṭi onto domain houses),
+  `w_chalit` (Bhāva-Chalit Placidus result-shift). All STATIC (natal) families,
+  cached once in `__init__`.
+- **Why (śāstra):** §3 Step-2 mandates "Mood and Avastha Blockades" (a Khala/
+  Vikala/Dukhita lord corrupts the promise — the cancellation signature),
+  "Aspectual Geometry" (benefic vs malefic dṛṣṭi shaping the house), and
+  "Placidus Shift Corrections" (§2.5 — result-house migration). All three were
+  computed by the engine but absent from triangulation.
+- **Source:** BPHS Avasthā/Dīptādi; Parāśarī graha dṛṣṭi; Placidus Bhāva-Chalit.
+- **Failure-mode addressed:** *Texture/cancellation* — previously every theme
+  read "clean manifestation" because no Track-B obstruction witness fired. Now
+  obstruction is non-trivial and textures separate (clean vs friction).
+- **Coverage status:** closes 3 of the Tier-2 gaps (avastha, aspects, chalit).
