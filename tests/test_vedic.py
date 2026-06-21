@@ -415,6 +415,38 @@ def test_transits_positions_and_sade_sati(vchart):
     assert 1 <= tr.transit_house(when, Planet.JUPITER) <= 12
 
 
+def test_current_dasha_drills_to_sukshma(vchart):
+    when = datetime(2024, 6, 1, tzinfo=timezone.utc)
+    ch3 = vchart.current_dasha("vimshottari", when)
+    ch5 = vchart.current_dasha("vimshottari", when, levels=5)
+    assert [d.level for d in ch3] == [1, 2, 3]
+    assert [d.level for d in ch5] == [1, 2, 3, 4, 5]           # incl. Sūkṣma/Prāṇa
+    assert [d.lord for d in ch5[:3]] == [d.lord for d in ch3]  # same MD/AD/PD
+
+
+def test_house_lord_and_house_lords(vchart):
+    from advance_astrology.constants import RULERSHIPS, SIGNS
+    asc = vchart.ascendant_sign
+    assert vchart.house_lord(1) == RULERSHIPS[SIGNS[asc]]
+    assert vchart.house_lord(7) == RULERSHIPS[SIGNS[(asc + 6) % 12]]
+    hl = vchart.house_lords()
+    assert len(hl) == 12 and hl[10] == vchart.house_lord(10)
+
+
+def test_transit_aspects_and_aspects_house(vchart):
+    tr = vchart.transits()
+    when = datetime(2024, 6, 1, tzinfo=timezone.utc)
+    ta = tr.transit_aspects(when)
+    # every planet casts a 7th aspect from its own transit house
+    for p, houses in ta.items():
+        own = tr.transit_house(when, p)
+        seventh = (own + 5) % 12 + 1
+        assert seventh in houses
+    # aspects_house is consistent with transit_aspects
+    for p in tr.aspects_house(when, 7):
+        assert 7 in ta[p]
+
+
 def test_triangulation_ranks_and_discriminates(vchart):
     # Long window (>400d) so run() uses coarse timing only — this test asserts
     # ranking/discrimination, not the precise-trigger path.
