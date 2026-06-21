@@ -146,13 +146,62 @@ blocked — with evidence.
 1. **Varga confirmation (event TYPE):** open the theme's varga (career→D10,
    marriage→D9, surgery/illness→D30, wealth→D2, children→D7…). Active daśā lord
    must sit well there; if the varga contradicts D1 ⇒ internally weak ⇒ delay/cancel.
-2. **KP sub-lord verdict (the decider):** read the period lords' sub-lord houses.
-   Fulfilment houses ⇒ it happens; negation houses ⇒ it breaks; **BOTH ⇒
-   fixed-then-cancelled.**
+2. **KP sub-lord verdict (the decider):** read the *houses each period lord
+   itself signifies* (`KPSignificators.planet_signifies(p)`) **and the matter's
+   cusp sub-lord** (`kp_chain(cusp).sub_lord`). Fulfilment houses ⇒ it happens;
+   negation houses ⇒ it breaks; **BOTH ⇒ fixed-then-cancelled.**
+   ⚠️ **Do NOT** substitute a period lord's *sub-lord's* houses for the lord's
+   own significations — that conflates two different KP objects and will mislead
+   the verdict. A matter is *promised* when its cusp sub-lord signifies the
+   matter's houses (e.g. 7th-cusp sub-lord → 2/7/11 ⇒ marriage promised); it is
+   *timed* when the running D-B-A lords also signify those houses.
 3. **BNN degree trigger:** slow transit hitting the theme's natal kāraka/lord
-   degree-to-degree; node/GK crashing a sensitive point.
+   degree-to-degree; node/GK crashing a sensitive point. **Check the kāraka's
+   _dṛṣṭi_, not only its sign-ingress** — e.g. Jupiter need not *enter* the 7th
+   to fire marriage; from the 1st it already *aspects* the 7th. Also test the
+   slow/dispositor benefics transiting **2nd-from-Upapada** (the Jaimini
+   marriage house) and the kāraka conjoining the relevant chara-kāraka (DK for
+   spouse) by gochara. A degree-perfect hit may mark a *later* peak, not the
+   event day — rank it against the daśā-sūkṣma + Kakṣyā evidence, never above it.
 4. **Kakṣyā narrowing:** transit delivers only in a bindu-bearing 3°45′ Kakṣyā ⇒
-   narrows timing to a 4–5 day window.
+   narrows timing to a 4–5 day window. A Kakṣyā window already open *around the
+   asked date* outranks a tidier window months away — don't chase the prettier
+   trigger.
+5. **Daśā sūkṣma drill (event-DAY precision):** for a dated event, open
+   Vimśottari to the **4th–5th level (Sūkṣma/Prāṇa)**, not just Pratyantar. The
+   PD may look inert (e.g. a Rahu PD) while a benefic Sūkṣma (e.g. Jupiter)
+   sitting exactly on the date is the real micro-trigger. Stopping at PD is a
+   timing error.
+
+> **IMPORTANT — these five rules are DOMAIN-GENERAL, not marriage-only.** The
+> marriage signatures used above (the 7th cusp sub-lord, 2nd-from-Upapada, and
+> the Darakāraka) are merely the *worked illustration* of a principle that you
+> must apply to whatever life-area the question is about. The principle, stated
+> in full, is this: when you confirm and time any event, do not look only at the
+> Parāśarī house and its lord — you must ALSO read the same matter through its
+> **Jaimini / Arudha significator and its chara-kāraka**, and treat a transit as
+> a trigger when a slow benefic or the matter's kāraka activates *that* point too
+> (by occupation, by aspect/dṛṣṭi, or by conjunction with the kāraka). Carry
+> this mapping across to every domain, exactly as you would for marriage:
+> - **Marriage / spouse** → 7th house + 7th-cusp sub-lord + **2nd-from-Upapada
+>   (UL)** + **Darakāraka (DK)**; benefic transit *aspecting* (not only entering)
+>   the 7th or 2nd-from-UL is a trigger.
+> - **Career / profession / job-change** → 10th house + 10th-cusp sub-lord +
+>   **Arudha of the 10th (A10)** + **Amātyakāraka (AmK)**; watch slow movers
+>   aspecting the 10th / A10 and the AmK by gochara.
+> - **Children / progeny** → 5th house + 5th-cusp sub-lord + **Arudha of the 5th
+>   (A5)** + **Putrakāraka (PK)**, cross-checked in the Saptāṃśa (D7).
+> - **Wealth / gains** → 2nd & 11th + their cusp sub-lords + **Arudha of the 2nd
+>   (A2) / Indu Lagna**, in the Hora (D2).
+> - **Mother** → 4th + A4 + **Mātṛkāraka (MK)**; **Father** → 9th + **Pitṛkāraka
+>   (PiK)**; **Illness / surgery / longevity** → 6th & 8th + their cusp sub-lords
+>   + **Gnatikāraka (GK)** / **Atmakāraka (AK)**, in the Triṃśāṃśa (D30).
+>
+> So for ANY question: pick the matter's house, its cusp sub-lord, its Arudha,
+> and its chara-kāraka FIRST, and only then judge whether the running daśā and
+> the gochara (by occupation, aspect, AND conjunction with the kāraka) are
+> lighting that whole bundle up. Reading the Parāśarī house alone — for marriage
+> OR for anything else — is the same mistake in a different costume.
 
 ### 4D. Convergence, Ranking & Falsification
 Count how many independent systems converged per theme; **rank**; the call is the
@@ -174,7 +223,9 @@ disagree, lower confidence or rule out. "One factor points here" is never enough
 - [ ] Vimśottari MD/AD/PD · [ ] Jaimini rashi-daśā · [ ] slow gochara + SAV
 - [ ] lord strength + Iṣṭa/Kaṣṭa · [ ] occupants + Avasthā (Track B) · [ ] Argala/Virodhārgala
 - [ ] graha-dṛṣṭi · [ ] Bhāva-Chalit · [ ] Varga confirmation
-- [ ] **KP sub-lord verdict** · [ ] **BNN trigger** · [ ] **Kakṣyā narrowing**
+- [ ] **KP sub-lord verdict** (planet's *own* significations + cusp sub-lord — not the sub-lord's houses)
+- [ ] **BNN trigger** (incl. kāraka *dṛṣṭi* + 2nd-from-Upapada) · [ ] **Kakṣyā narrowing**
+- [ ] **Daśā drilled to Sūkṣma/Prāṇa for a dated event** (not just Pratyantar)
 - [ ] Varṣaphal/Muntha · [ ] convergence counted & rivals ruled out
 
 ---
@@ -216,6 +267,23 @@ Muntha in the 10th. A marriage signal exists but from only one system → parked
 that confirmation layer is mandatory, never optional.)*
 
 ---
+
+## COMMON TIMING-MISSES (method lessons — not chart templates)
+Theme can be right while the *date* is wrong. The recurring causes:
+1. **Stopping the daśā at Pratyantar.** Event-day lives in the Sūkṣma/Prāṇa
+   level. An "inert" PD often hides the benefic Sūkṣma that actually fires.
+2. **Reading transit ingress instead of dṛṣṭi.** A kāraka aspecting the target
+   house (e.g. Jupiter from the 1st onto the 7th) fires *before* it bodily
+   enters a "textbook" house months later.
+3. **Ignoring the Jaimini overlay in gochara.** Kārakas / DK transiting
+   **2nd-from-Upapada** is a precise marriage trigger that pure Parāśarī transit
+   misses.
+4. **Letting a degree-perfect BNN outrank an active Kakṣyā at the asked date.**
+   A tidy degree hit can be a *later* peak; the window already open around the
+   event usually is the event. Rank Sūkṣma + Kakṣyā + dṛṣṭi above a distant
+   degree hit.
+5. **A misread KP object** (a lord's sub-lord's houses ≠ the lord's own
+   significations) can flip the whole theme. Verify with `planet_signifies`.
 
 ## FORBIDDEN BEHAVIOURS
 - Answering after only natal + Vimśottari (the cardinal mistake).
