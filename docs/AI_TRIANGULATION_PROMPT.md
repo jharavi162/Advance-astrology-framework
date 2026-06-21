@@ -173,6 +173,36 @@ blocked — with evidence.
    sitting exactly on the date is the real micro-trigger. Stopping at PD is a
    timing error.
 
+> **IMPORTANT — these five rules are DOMAIN-GENERAL, not marriage-only.** The
+> marriage signatures used above (the 7th cusp sub-lord, 2nd-from-Upapada, and
+> the Darakāraka) are merely the *worked illustration* of a principle that you
+> must apply to whatever life-area the question is about. The principle, stated
+> in full, is this: when you confirm and time any event, do not look only at the
+> Parāśarī house and its lord — you must ALSO read the same matter through its
+> **Jaimini / Arudha significator and its chara-kāraka**, and treat a transit as
+> a trigger when a slow benefic or the matter's kāraka activates *that* point too
+> (by occupation, by aspect/dṛṣṭi, or by conjunction with the kāraka). Carry
+> this mapping across to every domain, exactly as you would for marriage:
+> - **Marriage / spouse** → 7th house + 7th-cusp sub-lord + **2nd-from-Upapada
+>   (UL)** + **Darakāraka (DK)**; benefic transit *aspecting* (not only entering)
+>   the 7th or 2nd-from-UL is a trigger.
+> - **Career / profession / job-change** → 10th house + 10th-cusp sub-lord +
+>   **Arudha of the 10th (A10)** + **Amātyakāraka (AmK)**; watch slow movers
+>   aspecting the 10th / A10 and the AmK by gochara.
+> - **Children / progeny** → 5th house + 5th-cusp sub-lord + **Arudha of the 5th
+>   (A5)** + **Putrakāraka (PK)**, cross-checked in the Saptāṃśa (D7).
+> - **Wealth / gains** → 2nd & 11th + their cusp sub-lords + **Arudha of the 2nd
+>   (A2) / Indu Lagna**, in the Hora (D2).
+> - **Mother** → 4th + A4 + **Mātṛkāraka (MK)**; **Father** → 9th + **Pitṛkāraka
+>   (PiK)**; **Illness / surgery / longevity** → 6th & 8th + their cusp sub-lords
+>   + **Gnatikāraka (GK)** / **Atmakāraka (AK)**, in the Triṃśāṃśa (D30).
+>
+> So for ANY question: pick the matter's house, its cusp sub-lord, its Arudha,
+> and its chara-kāraka FIRST, and only then judge whether the running daśā and
+> the gochara (by occupation, aspect, AND conjunction with the kāraka) are
+> lighting that whole bundle up. Reading the Parāśarī house alone — for marriage
+> OR for anything else — is the same mistake in a different costume.
+
 ### 4D. Convergence, Ranking & Falsification
 Count how many independent systems converged per theme; **rank**; the call is the
 top-ranked theme. Actively seek contradicting signatures; if strong methods
