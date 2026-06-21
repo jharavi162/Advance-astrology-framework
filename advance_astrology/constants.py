@@ -182,3 +182,36 @@ NAKSHATRA_LORDS = [
     Planet.KETU, Planet.VENUS, Planet.SUN, Planet.MOON, Planet.MARS,
     Planet.RAHU, Planet.JUPITER, Planet.SATURN, Planet.MERCURY,
 ] * 3
+
+# Naamakshara (name-syllable) for each nakshatra's four padas — the classical
+# 108-syllable correspondence. This is definitional reference data (like
+# NAKSHATRA_LORDS), not a calculation: index [nakshatra 0..26][pada 1..4].
+PADA_SYLLABLES = [
+    ["Chu", "Che", "Cho", "La"],     # Ashwini
+    ["Li", "Lu", "Le", "Lo"],        # Bharani
+    ["A", "I", "U", "E"],            # Krittika
+    ["O", "Va", "Vi", "Vu"],         # Rohini
+    ["Ve", "Vo", "Ka", "Ki"],        # Mrigashira
+    ["Ku", "Gha", "Nga", "Chha"],    # Ardra
+    ["Ke", "Ko", "Ha", "Hi"],        # Punarvasu
+    ["Hu", "He", "Ho", "Da"],        # Pushya
+    ["Di", "Du", "De", "Do"],        # Ashlesha
+    ["Ma", "Mi", "Mu", "Me"],        # Magha
+    ["Mo", "Ta", "Ti", "Tu"],        # Purva Phalguni
+    ["Te", "To", "Pa", "Pi"],        # Uttara Phalguni
+    ["Pu", "Sha", "Na", "Tha"],      # Hasta
+    ["Pe", "Po", "Ra", "Ri"],        # Chitra
+    ["Ru", "Re", "Ro", "Ta"],        # Swati
+    ["Ti", "Tu", "Te", "To"],        # Vishakha
+    ["Na", "Ni", "Nu", "Ne"],        # Anuradha
+    ["No", "Ya", "Yi", "Yu"],        # Jyeshtha
+    ["Ye", "Yo", "Bha", "Bhi"],      # Mula
+    ["Bhu", "Dha", "Pha", "Dha"],    # Purva Ashadha
+    ["Bhe", "Bho", "Ja", "Ji"],      # Uttara Ashadha
+    ["Khi", "Khu", "Khe", "Kho"],    # Shravana
+    ["Ga", "Gi", "Gu", "Ge"],        # Dhanishta
+    ["Go", "Sa", "Si", "Su"],        # Shatabhisha
+    ["Se", "So", "Da", "Di"],        # Purva Bhadrapada
+    ["Du", "Tha", "Jha", "Tra"],     # Uttara Bhadrapada
+    ["De", "Do", "Cha", "Chi"],      # Revati
+]

@@ -9,6 +9,7 @@ from .constants import (
     NAKSHATRA_ARC,
     NAKSHATRA_LORDS,
     NAKSHATRAS,
+    PADA_SYLLABLES,
     Planet,
 )
 
@@ -23,9 +24,11 @@ class NakshatraPosition:
     pada: int             # 1..4
     degree_in_nakshatra: float
     fraction_traversed: float  # [0, 1) progress through the nakshatra
+    syllable: str         # Naamakshara (name-syllable) of this pada
 
     def __str__(self) -> str:
-        return f"{self.name} (pada {self.pada}, lord {self.lord.value})"
+        return (f"{self.name} (pada {self.pada}, lord {self.lord.value}, "
+                f"syllable {self.syllable})")
 
 
 def nakshatra_of(sidereal_longitude: float) -> NakshatraPosition:
@@ -41,4 +44,5 @@ def nakshatra_of(sidereal_longitude: float) -> NakshatraPosition:
         pada=pada,
         degree_in_nakshatra=degree_in,
         fraction_traversed=degree_in / NAKSHATRA_ARC,
+        syllable=PADA_SYLLABLES[index][pada - 1],
     )

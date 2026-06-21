@@ -188,6 +188,18 @@ def test_nakshatra_resolution():
     assert nak2.name == "Bharani"
 
 
+def test_naamakshara_syllables():
+    from advance_astrology.constants import PADA_SYLLABLES
+    # Table is the full 108-syllable correspondence (27 nakshatras x 4 padas).
+    assert len(PADA_SYLLABLES) == 27
+    assert all(len(p) == 4 for p in PADA_SYLLABLES)
+    # 0° Aries → Ashwini pada 1 → "Chu"; pada 4 (last 3°20') → "La".
+    assert nakshatra_of(0.0).syllable == "Chu"
+    assert nakshatra_of(NAKSHATRA_ARC - 0.1).syllable == "La"
+    # Krittika pada 1 begins at 2 * 13°20' = 26°40' → "A".
+    assert nakshatra_of(2 * NAKSHATRA_ARC + 0.1).syllable == "A"
+
+
 def test_dasha_total_is_120_years():
     periods = vimshottari_dasha(45.0, WHEN, levels=1)
     total = sum(p.years for p in periods)

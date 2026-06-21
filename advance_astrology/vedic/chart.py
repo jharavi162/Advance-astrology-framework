@@ -78,6 +78,16 @@ class VedicChart:
         """Lords of all twelve houses, keyed 1..12."""
         return {h: self.house_lord(h) for h in range(1, 13)}
 
+    # -- Nakshatra & Naamakshara ---------------------------------------- #
+    def nakshatra(self, planet: Planet):
+        """Nakshatra/pada (with Naamakshara syllable) of a planet."""
+        from ..nakshatra import nakshatra_of
+        return nakshatra_of(self.longitudes[planet])
+
+    def naamakshara(self, planet: Planet) -> str:
+        """Name-syllable (Naamakshara) of a planet's nakshatra-pada."""
+        return self.nakshatra(planet).syllable
+
     # -- Dignities ------------------------------------------------------ #
     def dignity(self, planet: Planet):
         return dignity(planet, self.longitudes[planet])
