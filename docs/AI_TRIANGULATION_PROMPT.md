@@ -93,7 +93,10 @@ v = VedicChart.create(when=BIRTH_DT, latitude=LAT, longitude=LON, ayanamsa="lahi
 v.shadbala(); v.ishta_kashta(); v.avasthas(p); v.functional_nature()
 v.argala(h); v.chara_karakas(); v.arudhas(); v.bhrigu_bindu()
 v.varga(9); v.varga(10); v.varga(30)            # divisional charts
-v.current_dasha("vimshottari", when); v.narayana_dasha(); v.chara_dasha(); v.sudasa_dasha()
+v.current_dasha("vimshottari", when)              # MD/AD/PD
+v.current_dasha("vimshottari", when, levels=5)    # drill to Sukshma/Prana (event-DAY precision)
+v.narayana_dasha(); v.chara_dasha(); v.sudasa_dasha()
+v.house_lord(h); v.house_lords()                  # Parashari house rulers (one call)
 v.sarvashtakavarga(); v.bhinnashtakavarga(p)
 v.kp_chain(p); v.kp_significators(); v.bhava_chalit(); v.graha_aspects()
 v.varshaphal(YEAR)                               # Tajika annual: Varsha-lagna + Muntha
@@ -101,6 +104,8 @@ tr = v.transits()
 tr.slow_movers(when); tr.house_windows(p, h, start, end)
 tr.conjunction_windows(p, natal_long, start, end)   # BNN degree triggers
 tr.kakshya_windows(p, start, end)                   # Kaksya timing windows
+tr.transit_aspects(when)                            # gochar drishti: houses each transit ASPECTS
+tr.aspects_house(when, h)                           # which transits aspect a given house
 ```
 
 **Shortcut:** `python -m interpreter.build_matrix --when ... --lat ... --lon ...`
