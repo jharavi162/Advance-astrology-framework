@@ -114,6 +114,55 @@ relationships into one arc. The six lessons below are domain-general for any
   `planet_signifies`; if 12 leads and 2/7/11 are weak, mark "closure-probable
   from <AD start>".
 
+### 7. "Same partner love→marriage" vs "married someone else" — read the bundle LINKAGE, not the timeline
+- **Symptom:** When a relationship timeline runs *continuous* up to marriage, the
+  narration assumes the **loved partner == the married partner**. But a love arc
+  can run unbroken and the *marriage still happen with a different person* — the
+  dāśā continuity does not certify partner-identity.
+- **Root cause:** Inferring partner-identity from *timeline continuity* instead of
+  from whether the **romance bundle and the marriage bundle are structurally
+  linked**.
+- **Improved rule — triangulate two separate bundles and test their linkage:**
+  - **Romance bundle:** 5th house + 5th-lord + **Venus** + A5.
+  - **Marriage/spouse bundle:** 7th + **UL & UL-lord** + 2nd-from-UL + **DK** +
+    the **gender-correct spouse-kāraka** (Jupiter = husband for a female chart,
+    Venus = wife for a male chart).
+  - **Same person (love converts to marriage):** the two bundles **link** —
+    shared lord, conjunction, sign-exchange, mutual dṛṣṭi, same nakṣatra-lord, or
+    DK conjunct/aspecting the UL-lord, and the spouse-kāraka unafflicted.
+  - **Different person (married someone else, even on a continuous timeline):**
+    the bundles are **disjoint or mutually afflicting** — e.g. the romance-kāraka
+    sits *alone* and unconnected while the **spouse-cluster (UL-lord + DK +
+    spouse-kāraka) is combust / in dusthāna / Vikala**, with no aspect tying the
+    love-significator to the spouse-significators. The love is promised, the
+    marriage is promised, but they point at *different* significators.
+- **Operationalise:** Compute both bundles; explicitly state whether a linkage
+  exists. If the romance-kāraka is strong-and-separate while the spouse-cluster is
+  afflicted-and-disjoint, narrate "the loved one may not be the one married /
+  love-and-marriage split" as a live branch — do **not** collapse it into one
+  partner just because the dāśā ran unbroken.
+
+### 8. Read Shadbala + Iṣṭa/Kaṣṭa + Avasthā *per-kāraka and as a contrast* — and use the gender-correct kāraka
+- **Symptom:** Planetary strength was used only qualitatively ("combust",
+  "debilitated") in passing; the **husband-kāraka for a female chart (Jupiter)**
+  was not foregrounded, and no romance-vs-spouse **strength contrast** was drawn.
+- **Root cause:** Treating Shadbala/Iṣṭa/Kaṣṭa/Avasthā as a databank dump rather
+  than a discriminator, and defaulting to Venus/7th without switching to the
+  **gender-correct** spouse-kāraka.
+- **Improved rule:** For every relationship reading, pull **Shadbala, Iṣṭa/Kaṣṭa,
+  and Avasthā for each marriage-kāraka separately** and *contrast* them:
+  - A **high-Iṣṭa, clean romance-kāraka** beside a **high-Kaṣṭa / Vikala /
+    combust spouse-kāraka** is a classic "**love favoured, marriage distressed**"
+    split — pairs directly with #7 (loved one ≠ married one, or marriage fails to
+    convert).
+  - Always select the **gender-correct kāraka**: Jupiter = husband (female
+    chart), Venus = wife (male chart); never reduce the spouse-kāraka's condition
+    to "combust" without reading its **Avasthā (Vikala/Mṛta/Duḥkhita)** and
+    **Kaṣṭa** too.
+- **Operationalise:** Already in the matrix (`shadbala()`, `ishta_kashta()`,
+  `avasthas(p)`); the fix is to *quote each kāraka's row side-by-side* and let the
+  contrast set the texture, not to mention strength only when it is convenient.
+
 ---
 
 ### Net change to the relationship-reading procedure
@@ -122,5 +171,9 @@ narration must: **(a)** segment by AD boundaries and label each segment's *type*
 from its KP house-mix (#3), **(b)** allow multiple distinct relationships (#2),
 **(c)** set each segment's *sign* from Track-B + the MD/AD umbrella, not the dāśā
 label or a pretty Sūkṣma (#1, #5), **(d)** emit explicit **ending/closure
-windows** beside onset windows (#4, #6). Timing methodology is unchanged — only
-the *reading* of sign, type, and segmentation is tightened.
+windows** beside onset windows (#4, #6), **(e)** test romance-bundle vs
+marriage-bundle **linkage** to decide same-vs-different partner (#7), and
+**(f)** drive texture from a **per-kāraka, gender-correct strength contrast**
+(Iṣṭa/Kaṣṭa/Avasthā/Shadbala), not from dignity in passing (#8). Timing
+methodology is unchanged — only the *reading* of sign, type, segmentation,
+partner-identity, and strength is tightened.
