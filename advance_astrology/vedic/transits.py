@@ -14,6 +14,7 @@ from ..angles import angular_separation, norm360, to_zodiac
 from ..ayanamsa import ayanamsa as compute_ayanamsa
 from ..constants import DEFAULT_PLANETS, SIGNS, Planet
 from . import kakshya as kakshya_mod
+from .aspects import graha_aspect_houses
 from .ashtakavarga import sarvashtakavarga
 
 
@@ -191,6 +192,31 @@ class Transits:
             return self.kakshya_active(when, planet)
         lbl = f"{planet.value} in a bindu-bearing Kakṣyā"
         return self.scan_windows(pred, start, end, step_days, lbl)
+
+    def transit_aspects(self, when: datetime, reference: str = "lagna",
+                        planets=None) -> dict[Planet, list[int]]:
+        """Gochar dṛṣṭi: houses each transiting planet ASPECTS (not just occupies).
+
+        Uses Parāśarī special aspects, so e.g. a transit Jupiter aspects the 5th/
+        7th/9th from itself — it need not bodily enter a house to act on it.
+        """
+        planets = planets or DEFAULT_PLANETS
+        base = self.asc_sign if reference == "lagna" else self.natal_moon_sign
+        out: dict[Planet, list[int]] = {}
+        for p in planets:
+            sign = self.transit_sign(when, p)
+            houses = set()
+            for dist in graha_aspect_houses(p):
+                target_sign = (sign + dist - 1) % 12
+                houses.add((target_sign - base) % 12 + 1)
+            out[p] = sorted(houses)
+        return out
+
+    def aspects_house(self, when: datetime, house: int,
+                      reference: str = "lagna", planets=None) -> list[Planet]:
+        """Which transiting planets cast a graha-dṛṣṭi on a given natal house."""
+        return [p for p, hs in self.transit_aspects(when, reference, planets).items()
+                if house in hs]
 
     def slow_movers(self, when: datetime) -> dict[Planet, dict]:
         """Sign/house summary for the structural heavyweights."""

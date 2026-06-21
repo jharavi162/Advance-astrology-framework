@@ -11,7 +11,7 @@ from functools import cached_property
 
 from ..angles import norm360, to_zodiac
 from ..chart import NatalChart
-from ..constants import SIGNS, VEDIC_GRAHAS, Planet
+from ..constants import RULERSHIPS, SIGNS, VEDIC_GRAHAS, Planet
 from ..dasha import DashaPeriod, current_dasha
 from . import (
     arudha,
@@ -70,6 +70,14 @@ class VedicChart:
         target = (self.ascendant_sign + house - 1) % 12
         return [p for p, s in self.signs.items() if s == target]
 
+    def house_lord(self, house: int) -> Planet:
+        """Parāśarī lord of a whole-sign house (sign on the house → its ruler)."""
+        return RULERSHIPS[SIGNS[(self.ascendant_sign + house - 1) % 12]]
+
+    def house_lords(self) -> dict[int, Planet]:
+        """Lords of all twelve houses, keyed 1..12."""
+        return {h: self.house_lord(h) for h in range(1, 13)}
+
     # -- Dignities ------------------------------------------------------ #
     def dignity(self, planet: Planet):
         return dignity(planet, self.longitudes[planet])
@@ -94,9 +102,13 @@ class VedicChart:
         return dasha_systems.compute_dasha(system, moon, self.when_utc, **kwargs)
 
     def current_dasha(self, system: str = "vimshottari",
-                      when: datetime | None = None) -> list[DashaPeriod]:
+                      when: datetime | None = None,
+                      levels: int | None = None) -> list[DashaPeriod]:
+        """Active dasha chain at *when*. ``levels`` overrides the default depth —
+        e.g. ``levels=5`` drills Vimśottari to Sūkṣma/Prāṇa for event-day timing."""
         when = when or datetime.now(timezone.utc)
-        levels = 3 if system in ("vimshottari", "ashtottari", "yogini") else 1
+        if levels is None:
+            levels = 3 if system in ("vimshottari", "ashtottari", "yogini") else 1
         # Project enough cycles for short dashas (e.g. Yogini's 36 years) to
         # reach the requested date.
         cycles = 1

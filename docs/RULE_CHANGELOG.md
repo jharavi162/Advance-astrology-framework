@@ -239,3 +239,21 @@ addresses (coverage vs discrimination).
   commits its calls, the native compares against real events, misses point to the
   next śāstra-grounded fix. This is the highest-leverage next step for the goal,
   ahead of further (diminishing-returns) element-completeness work.
+
+## 2026-06-21 — Engine helpers for the new prompt rules (Sūkṣma/Prāṇa, gochar dṛṣṭi, house lord)
+
+- **Change:** (1) `VedicChart.current_dasha(..., levels=N)` — drill Vimśottari to
+  Sūkṣma/Prāṇa (level 4–5) in one call. (2) `Transits.transit_aspects(when)` +
+  `Transits.aspects_house(when, house)` — gochar dṛṣṭi (which houses a transiting
+  planet ASPECTS, Parāśarī special aspects), not just occupation/conjunction.
+  (3) `VedicChart.house_lord(h)` + `house_lords()` convenience.
+- **Why (śāstra):** The triangulation prompt's timing rules (added separately)
+  now mandate event-day daśā drill to Sūkṣma/Prāṇa and reading a kāraka's *dṛṣṭi*
+  (e.g. Jupiter aspecting the 7th from the 1st without entering it). The engine
+  could compute these only via multi-step assembly; these helpers expose them as
+  one call so the AI follows the rule reliably (and does not "stop at Pratyantar"
+  or miss a transit aspect).
+- **Source:** Parāśarī graha-dṛṣṭi (Mars 4/7/8, Jupiter 5/7/9, Saturn 3/7/10);
+  Vimśottari sub-period structure (Sūkṣma/Prāṇa).
+- **Tests:** `test_current_dasha_drills_to_sukshma`,
+  `test_house_lord_and_house_lords`, `test_transit_aspects_and_aspects_house`.
