@@ -130,6 +130,25 @@ v.sudarshana(when)                                  # Sudarshana Chakra: Lagna/M
 prints most natal + period calculations in one block — a good starting dump;
 then fetch the remaining specifics (KP / BNN / Kakṣyā / Varṣaphal) from `VedicChart`.
 
+**MANDATORY mechanical pass — run the domain-general evidence builder FIRST, then
+synthesize.** Before reasoning to a date, run
+`python -m interpreter.event_evidence --domain <matter|scan> --when ... --lat ...
+--lon ... --start ... --end ...` (or append `--events <matter|scan>` to
+`build_matrix`). It computes, for the asked life-area and across the FULL span,
+the complete triangulation evidence the playbook below demands — Promise & Tempo
+(Ṣaḍbala, Iṣṭa/Kaṣṭa, Avasthā, varga-dignity, Argala, SAV), and a per-window
+ledger of KP fulfil/negate, the kāraka at sūkṣma, Lagna/Lagnesh materialization,
+the Jupiter+Saturn double-transit on the house AND its lord, the BNN and Kakṣyā
+triggers, the domain Saham, Sudarśana and Varṣaphal-Muntha — plus the REVERSAL
+timed as its own event. This exists because the recurring failure is the AI
+*forgetting to compute* one of these and then fixating on a single rule; the
+builder guarantees the evidence is complete. Domains are an open `dict`
+(`DOMAIN_PROFILES` / `register_domain(...)`) — add a life-area as a data row, do
+not hard-code. The builder gives EVIDENCE, never the verdict: you must still read
+it multivalently (a node = the event's TYPE, a dark Lagna = lower materialization-
+intensity not denial, a converged reversal is not vetoed by one strong benefic),
+exactly as Phase 4 directs.
+
 ### ⚠️ FILES TO IGNORE FOR THE VERDICT
 Do **not** take your conclusion from `interpreter/predict.py` or
 `advance_astrology/vedic/triangulate.py`. That is an older *fixed-domain* engine

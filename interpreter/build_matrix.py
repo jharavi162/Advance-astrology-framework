@@ -315,6 +315,13 @@ def main() -> None:
     ap.add_argument("--ayanamsa", default="lahiri")
     ap.add_argument("--transit-years", type=int, default=6,
                     help="Years of slow-gochara timeline to emit (default 6)")
+    ap.add_argument("--events", default="",
+                    help="Append the domain-general event-evidence pack: a domain "
+                         "name (marriage/career/…) or 'scan' for an open question.")
+    ap.add_argument("--events-start", default="",
+                    help="Event span start YYYY-MM-DD (default: birth+18y)")
+    ap.add_argument("--events-end", default="",
+                    help="Event span end YYYY-MM-DD (default: birth+45y)")
     ap.add_argument("--out", default="", help="Optional output file")
     args = ap.parse_args()
 
@@ -322,6 +329,28 @@ def main() -> None:
         tzinfo=ZoneInfo(args.tz))
     text = build_matrix(when_local, args.lat, args.lon, args.place,
                         args.sex, args.name, args.ayanamsa, args.transit_years)
+
+    if args.events:
+        from interpreter.event_evidence import (
+            DOMAIN_PROFILES, render_domain, scan_domains)
+        from advance_astrology import VedicChart
+        v = VedicChart.create(when=when_local, latitude=args.lat,
+                              longitude=args.lon, name=args.name,
+                              ayanamsa=args.ayanamsa)
+        es = (datetime.strptime(args.events_start, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+              if args.events_start else when_local.astimezone(timezone.utc)
+              + timedelta(days=int(365.25 * 18)))
+        ee = (datetime.strptime(args.events_end, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+              if args.events_end else when_local.astimezone(timezone.utc)
+              + timedelta(days=int(365.25 * 45)))
+        text += "\n\n" + ("=" * 78) + "\n"
+        if args.events == "scan":
+            text += scan_domains(v, es, ee)
+        elif args.events in DOMAIN_PROFILES:
+            text += render_domain(v, DOMAIN_PROFILES[args.events], es, ee)
+        else:
+            text += (f"(unknown --events {args.events!r}; "
+                     f"choose {list(DOMAIN_PROFILES)} or 'scan')")
     if args.out:
         with open(args.out, "w") as fh:
             fh.write(text)
