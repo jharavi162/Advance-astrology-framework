@@ -42,6 +42,19 @@ coverage checklist (bottom) is satisfied.
 4. Commit to a **specific, falsifiable** result (theme + nature + timing window).
    Vague, fits-anyone statements are failure.
 5. **No calibration / no hindsight.** Never bend the chart to match a known event.
+6. **Compute every event independently; never let a known or previously-derived
+   fact anchor another.** When you already know (or have just estimated) one
+   life-event — for example that the native is divorced, or that some earlier
+   event fell in a certain year — you must NOT reason backwards from it to place
+   a second event ("the divorce was in 2026, so the marriage must have been
+   around 2021"). That is narrative-coherence reasoning, and it silently
+   corrupts the chart's independent testimony. Each event is to be timed *only*
+   from its own promising significators, its own daśā activations, and its own
+   transit triggers, computed from scratch. A coherent life-story may *emerge*
+   after all events are independently timed, but it must never be *assumed*
+   beforehand and used to bend any single calculation. If a known fact and the
+   independent calculation disagree, report the disagreement honestly — do not
+   retrofit.
 
 ---
 
@@ -82,7 +95,7 @@ There is a **single entry point** for every calculation: the `VedicChart` class
 in `advance_astrology/vedic/chart.py`. Build the chart once, then pull anything
 from that one object — it internally uses all the calculation modules (transits,
 vargas, shadbala, kp, jaimini, ashtakavarga, avastha, chalit, yogas, varshaphal,
-dashas). You never call those modules directly.
+dashas, sahams). You never call those modules directly.
 
 ```python
 from advance_astrology import VedicChart
@@ -106,6 +119,11 @@ tr.conjunction_windows(p, natal_long, start, end)   # BNN degree triggers
 tr.kakshya_windows(p, start, end)                   # Kaksya timing windows
 tr.transit_aspects(when)                            # gochar drishti: houses each transit ASPECTS
 tr.aspects_house(when, h)                           # which transits aspect a given house
+tr.double_transit_windows(h, start, end)            # Jupiter+Saturn JOINT activation of a bhava
+tr.double_transit_on_sign(lord_sign, start, end)    # ...and of the bhava-LORD's sign (test BOTH)
+v.current_chara_dasha(when, levels=2)               # active Jaimini rashi MAHA + ANTARDASHA
+v.sahams()                                          # Tajika sensitive points (domain Sahams) + their lords
+v.sudarshana(when)                                  # Sudarshana Chakra: Lagna/Moon/Sun tri-wheel (year+month)
 ```
 
 **Shortcut:** `python -m interpreter.build_matrix --when ... --lat ... --lon ...`
@@ -137,6 +155,39 @@ Lay the independent timekeepers side by side (Vimśottari ; Jaimini rashi-daśā
 slow gochara ; SAV density). **Declare a theme "hot" only if ≥2 independent
 networks point to the same house-group.** List each hot theme with its votes.
 
+### 4A-bis. First map the FULL candidate set across the span, THEN converge
+Before committing to any single date, lay out *every* window across the relevant
+span — and, for a retrodiction of something that has already happened, across
+the **whole life** — in which the domain's significators are even partially lit.
+Build this as an explicit ledger: for each candidate window write down the
+Vimśottari MD-AD-PD then running, the Jaimini Chara/Nārāyaṇa rāśi *and* its
+antardaśā, the slow-gochara picture, and whether the double-transit condition
+(see 4C-6) is satisfied. The reason this step is mandatory is that ordinary daśā
+plus single-planet transit will almost always produce several plausible windows,
+and stopping at the first one that "looks right" is the single most common cause
+of a wrong year. Only once the complete ledger exists do you apply the
+discriminators — the double transit on the house *and* its lord, agreement
+across multiple daśā systems, the domain Saham and its dispositor, and Sudarśana
+corroboration — to collapse the many candidates down to the one window that the
+largest number of *independent* systems jointly endorse. The pinpoint is the
+product of **elimination across a full map**, never of latching onto the
+earliest lit window.
+
+### 4A-ter. Judge the PROMISE and the TEMPO before you time anything
+For whatever domain is asked, first establish whether the matter is promised at
+all and, if it is, whether the chart inclines it to arrive *early*, *on time*,
+*late*, or to be *denied / repeatedly broken* — because this tempo decides which
+of the mapped windows is even eligible to carry the event. Read the dignity and
+avasthā of the kāraka and of the house-lord, the benefic-versus-malefic pressure
+on the matter's house and on its Arudha, and especially the influence of Saturn
+and the nodes: Saturn aspecting or occupying the matter's house, or an afflicted
+Arudha sitting in a dusthāna, is a classic **delay-and-difficulty** signature,
+whereas an unafflicted, well-supported lord and kāraka incline the event early
+and smoothly. State this tempo explicitly in your working and let it *weight* the
+window-selection — never force an "early" reading onto a chart whose every slow
+factor is signalling delay, and never insist on a late date when the promise is
+strong and unobstructed.
+
 ### 4B. Domain Filtration — Track A vs Track B
 For each hot theme run BOTH:
 - **Track A (manifestation):** lord strong in D1 *and* its varga? Iṣṭa high?
@@ -147,7 +198,7 @@ For each hot theme run BOTH:
 State the **texture**: clean manifestation / friction / **fixed-then-cancelled** /
 blocked — with evidence.
 
-### 4C. Multi-Paddhati Confirmation & Timing — ALL FOUR ARE MANDATORY
+### 4C. Multi-Paddhati Confirmation & Timing — ALL SIX ARE MANDATORY
 1. **Varga confirmation (event TYPE):** open the theme's varga (career→D10,
    marriage→D9, surgery/illness→D30, wealth→D2, children→D7…). Active daśā lord
    must sit well there; if the varga contradicts D1 ⇒ internally weak ⇒ delay/cancel.
@@ -177,8 +228,28 @@ blocked — with evidence.
    PD may look inert (e.g. a Rahu PD) while a benefic Sūkṣma (e.g. Jupiter)
    sitting exactly on the date is the real micro-trigger. Stopping at PD is a
    timing error.
+6. **The Double-Transit discriminator (Jupiter + Saturn) — the decisive
+   pinpoint when several windows compete.** Because ordinary daśā plus
+   single-planet transit will almost always throw up *multiple* plausible
+   windows across a life, you need a stronger filter to choose between them, and
+   the classical one is the *double transit* of the two slow movers: an event of
+   a given domain ripens only when **both Jupiter and Saturn simultaneously
+   influence the matter's house AND the lord of that house** — where "influence"
+   means either bodily occupation *or* graha-dṛṣṭi, and where you must test **the
+   house *and* its dispositor separately**, because very often it is the *lord's*
+   sign that receives the clean joint hit while the house itself is touched by
+   only one of the two. Concretely, pull `tr.double_transit_windows(house, …)`
+   for the matter's bhāva and `tr.double_transit_on_sign(lord_sign, …)` for the
+   sign holding that bhāva's lord (and, where it matters, for the kāraka's sign
+   too), and treat a window in which *both* lights converge on the
+   house-or-its-lord as the true trigger-band, ranking it above any window that
+   rests on a single slow transit. Apply this to whatever domain is asked — the
+   10th and its lord for career, the 5th and its lord (with Jupiter the
+   putra-kāraka) for children, the 2nd/11th and their lords for wealth, the
+   6th/8th and their lords for illness — in exactly the way you would use the 7th
+   and Venus for marriage.
 
-> **IMPORTANT — these five rules are DOMAIN-GENERAL, not marriage-only.** The
+> **IMPORTANT — these six rules are DOMAIN-GENERAL, not marriage-only.** The
 > marriage signatures used above (the 7th cusp sub-lord, 2nd-from-Upapada, and
 > the Darakāraka) are merely the *worked illustration* of a principle that you
 > must apply to whatever life-area the question is about. The principle, stated
@@ -208,6 +279,22 @@ blocked — with evidence.
 > lighting that whole bundle up. Reading the Parāśarī house alone — for marriage
 > OR for anything else — is the same mistake in a different costume.
 
+> **Distinguish the sub-events *within* a single domain, because they are timed
+> by different signatures and must not be collapsed into one date.** A life-area
+> is rarely one undifferentiated event. Marriage, for instance, has a
+> *romance/courtship* dimension (read from the 5th house, Venus, Rahu and the
+> 7th) that is genuinely distinct from the *formal/legal union* dimension (read
+> from the 7th together with the Upapada, the 2nd, the Darākāraka and Jupiter's
+> sanction) — the relationship may begin in one window while the wedding is
+> solemnised in another, and calling one of them by the other's name is a real
+> error even when the *year* is otherwise right. The same layering applies
+> everywhere: a career carries separate *job* versus *business* versus
+> *promotion* sub-events; progeny separates *conception* from *birth*; wealth
+> separates *steady earning* from *inheritance* from *sudden windfall*. So decide
+> first which sub-event the question is actually about, time each sub-dimension
+> on its own significators, and report them separately rather than fusing two
+> distinct moments into a single claim.
+
 ### 4D. Convergence, Ranking & Falsification
 Count how many independent systems converged per theme; **rank**; the call is the
 top-ranked theme. Actively seek contradicting signatures; if strong methods
@@ -231,6 +318,13 @@ disagree, lower confidence or rule out. "One factor points here" is never enough
 - [ ] **KP sub-lord verdict** (planet's *own* significations + cusp sub-lord — not the sub-lord's houses)
 - [ ] **BNN trigger** (incl. kāraka *dṛṣṭi* + 2nd-from-Upapada) · [ ] **Kakṣyā narrowing**
 - [ ] **Daśā drilled to Sūkṣma/Prāṇa for a dated event** (not just Pratyantar)
+- [ ] **Full life-span candidate map built, THEN converged** (not first-plausible)
+- [ ] **Double-Transit (Jupiter+Saturn) on the matter's house *and* its lord/kāraka**
+- [ ] **Chara/Nārāyaṇa antardaśā** (rāśi sub-period), not just the rāśi mahādaśā
+- [ ] **Domain Saham + its dispositor** (Vivāha/Karma/Putra/Roga/Artha… as the theme needs)
+- [ ] **Sudarśana Chakra** corroboration (≥2 of the three wheels agreeing)
+- [ ] **Promise-and-tempo stated** (early / on-time / late / denied) · **sub-event identified**
+- [ ] **Independent computation** — no known or prior-derived event used to anchor another
 - [ ] Varṣaphal/Muntha · [ ] convergence counted & rivals ruled out
 
 ---
@@ -289,6 +383,18 @@ Theme can be right while the *date* is wrong. The recurring causes:
    degree hit.
 5. **A misread KP object** (a lord's sub-lord's houses ≠ the lord's own
    significations) can flip the whole theme. Verify with `planet_signifies`.
+6. **Trusting a single slow-transit instead of the double transit, and stopping
+   at the first lit window.** A lone Jupiter (or a lone Saturn) over the relevant
+   house feels convincing but routinely misfires; the event waits for *both*
+   slow movers to converge on the house-or-its-lord. Equally, because daśā throws
+   up several candidate windows, picking the earliest plausible one — instead of
+   mapping them all and letting the double transit, the rāśi antardaśā, the
+   domain Saham and Sudarśana jointly elect the winner — is a recurring source of
+   a wrong year.
+7. **Anchoring one event on another (hindsight-by-narrative).** Reasoning "the
+   later event was in year X, so the earlier one must be around Y" corrupts the
+   independent reading. Time each event from its own significators; let the
+   life-story emerge, never assume it.
 
 ## FORBIDDEN BEHAVIOURS
 - Answering after only natal + Vimśottari (the cardinal mistake).
@@ -296,3 +402,7 @@ Theme can be right while the *date* is wrong. The recurring causes:
 - Vague Barnum statements that fit any life.
 - Forcing the chart to match a known event (no calibration / no hindsight).
 - Treating the worked example as a template to fit the native into.
+- Anchoring one event's timing on another known/derived event instead of
+  computing it independently.
+- Committing to a date on a single slow-transit, or on the first lit window,
+  without the Jupiter+Saturn double transit and the full-span candidate map.

@@ -600,13 +600,16 @@ def test_chara_dasha_antardashas(vchart):
 
 def test_sahams(vchart):
     sahams = vchart.sahams()
-    assert {"Vivaha", "Punarvivaha"} <= set(sahams)
+    expected = {"Vivaha", "Punarvivaha", "Punya", "Vidya", "Karma", "Yasas",
+                "Putra", "Artha", "Roga", "Mrityu"}
+    assert expected <= set(sahams)
     for name, sah in sahams.items():
         assert 0.0 <= sah.longitude < 360.0
         assert 0 <= sah.sign_index < 12
         assert sah.lord in set(Planet)
-    # Day vs night swap: the two formulas are mirror points unless degenerate.
+    # Day vs night swap: mirror-pair formulas are distinct points.
     assert sahams["Vivaha"].longitude != sahams["Punarvivaha"].longitude
+    assert sahams["Punya"].longitude != sahams["Vidya"].longitude
 
 
 def test_sudarshana_chakra(vchart):
