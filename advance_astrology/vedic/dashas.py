@@ -243,6 +243,65 @@ def kalachakra(moon_sidereal_longitude: float, birth: datetime,
 
 
 # --------------------------------------------------------------------------- #
+# Sudarśana Chakra dasha (tri-wheel progression)
+# --------------------------------------------------------------------------- #
+
+from dataclasses import dataclass as _dataclass  # local alias, avoid top churn
+from ..constants import SIGNS as _SIGNS
+
+
+@_dataclass(frozen=True)
+class SudarshanaState:
+    """Active signs of the three Sudarśana wheels at a moment.
+
+    The chakra advances one house per *year* of life from each of the three
+    references (Lagna, Moon, Sun) and, within a year, one house per *month*.
+    A theme is highlighted when the same house/sign lights up on two or three
+    wheels at once — a fast corroborating layer over the slower dashas.
+    """
+    years_elapsed: int
+    month_index: int                 # 0..11 within the running year
+    lagna_year_sign: int
+    moon_year_sign: int
+    sun_year_sign: int
+    lagna_month_sign: int
+    moon_month_sign: int
+    sun_month_sign: int
+
+    def year_signs(self) -> dict[str, str]:
+        return {"lagna": _SIGNS[self.lagna_year_sign],
+                "moon": _SIGNS[self.moon_year_sign],
+                "sun": _SIGNS[self.sun_year_sign]}
+
+    def month_signs(self) -> dict[str, str]:
+        return {"lagna": _SIGNS[self.lagna_month_sign],
+                "moon": _SIGNS[self.moon_month_sign],
+                "sun": _SIGNS[self.sun_month_sign]}
+
+
+def sudarshana_chakra(ascendant_sign: int, moon_sign: int, sun_sign: int,
+                      birth: datetime, when: datetime) -> SudarshanaState:
+    """Sudarśana Chakra daśā state at *when* (year + month wheels)."""
+    days = (when - birth).total_seconds() / 86400.0
+    years_elapsed = int(days // DAYS_PER_YEAR)
+    frac_year = (days - years_elapsed * DAYS_PER_YEAR) / DAYS_PER_YEAR
+    month_index = min(11, int(frac_year * 12))
+
+    def yr(base: int) -> int:
+        return (base + years_elapsed) % 12
+
+    def mo(year_sign: int) -> int:
+        return (year_sign + month_index) % 12
+
+    ly, my, sy = yr(ascendant_sign), yr(moon_sign), yr(sun_sign)
+    return SudarshanaState(
+        years_elapsed=years_elapsed, month_index=month_index,
+        lagna_year_sign=ly, moon_year_sign=my, sun_year_sign=sy,
+        lagna_month_sign=mo(ly), moon_month_sign=mo(my), sun_month_sign=mo(sy),
+    )
+
+
+# --------------------------------------------------------------------------- #
 # Registry
 # --------------------------------------------------------------------------- #
 

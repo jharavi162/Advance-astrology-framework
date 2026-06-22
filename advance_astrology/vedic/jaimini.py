@@ -172,12 +172,35 @@ def _rashi_strength(sign: int, planet_signs: dict[Planet, int]) -> float:
     return strength
 
 
+def _rashi_antardashas(maha_sign: int, start: datetime, end: datetime,
+                       direct: bool, planet_signs: dict[Planet, int]
+                       ) -> list[DashaPeriod]:
+    """Twelve antardashas within a rashi mahadasha (KN Rao method).
+
+    The mahadasha span is divided into twelve equal parts; the sub-signs
+    progress in the *same* direction as the mahadasha sequence, beginning from
+    the mahadasha sign itself. Each antardasha's lord is the sign ruler and the
+    sign name is stored in ``DashaPeriod.note``.
+    """
+    total = (end - start).total_seconds()
+    subs: list[DashaPeriod] = []
+    cursor = start
+    for i in range(12):
+        s = (maha_sign + i) % 12 if direct else (maha_sign - i) % 12
+        sub_end = start + timedelta(seconds=total * (i + 1) / 12.0)
+        lord = _co_lord_sign(s, planet_signs)
+        subs.append(DashaPeriod(lord, cursor, sub_end, level=2, note=SIGNS[s]))
+        cursor = sub_end
+    return subs
+
+
 def narayana_dasha(
     ascendant_sign: int,
     planet_signs: dict[Planet, int],
     planet_longitudes: dict[Planet, float],
     birth: datetime,
     cycles: int = 1,
+    levels: int = 1,
 ) -> list[DashaPeriod]:
     """Nārāyaṇa (Padakrama) Daśā — Parashari Jaimini rashi dasha.
 
@@ -201,7 +224,11 @@ def narayana_dasha(
             years = narayana_years(s, planet_signs, planet_longitudes)
             end = cursor + timedelta(days=years * DAYS_PER_YEAR)
             lord = _co_lord_sign(s, planet_signs)
-            periods.append(DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s]))
+            period = DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s])
+            if levels >= 2:
+                period.sub_periods = _rashi_antardashas(
+                    s, cursor, end, direct, planet_signs)
+            periods.append(period)
             cursor = end
     return periods
 
@@ -230,12 +257,14 @@ def chara_dasha(
     planet_signs: dict[Planet, int],
     birth: datetime,
     cycles: int = 1,
+    levels: int = 1,
 ) -> list[DashaPeriod]:
     """Jaimini Chara (rashi) dasha sequence beginning from the lagna.
 
     Progression is zodiacal when the lagna is an odd sign and reverse when it
     is even. Each period's lord is recorded as the sign ruler; the sign name is
-    stored in ``DashaPeriod.note``.
+    stored in ``DashaPeriod.note``. With ``levels >= 2`` each mahadasha carries
+    its twelve antardashas (see :func:`_rashi_antardashas`).
     """
     direct = ascendant_sign % 2 == 0   # odd lagna -> direct
     order = []
@@ -251,6 +280,9 @@ def chara_dasha(
             end = cursor + timedelta(days=years * DAYS_PER_YEAR)
             lord = _co_lord_sign(s, planet_signs)
             period = DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s])
+            if levels >= 2:
+                period.sub_periods = _rashi_antardashas(
+                    s, cursor, end, direct, planet_signs)
             periods.append(period)
             cursor = end
     return periods
@@ -261,6 +293,7 @@ def sudasa_dasha(
     planet_signs: dict[Planet, int],
     birth: datetime,
     cycles: int = 1,
+    levels: int = 1,
 ) -> list[DashaPeriod]:
     """Sudasā (Sri / Jaimini prosperity rashi dasha).
 
@@ -280,6 +313,10 @@ def sudasa_dasha(
             years = chara_dasha_years(s, planet_signs)
             end = cursor + timedelta(days=years * DAYS_PER_YEAR)
             lord = _co_lord_sign(s, planet_signs)
-            periods.append(DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s]))
+            period = DashaPeriod(lord, cursor, end, level=1, note=SIGNS[s])
+            if levels >= 2:
+                period.sub_periods = _rashi_antardashas(
+                    s, cursor, end, direct, planet_signs)
+            periods.append(period)
             cursor = end
     return periods

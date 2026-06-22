@@ -218,6 +218,54 @@ class Transits:
         return [p for p, hs in self.transit_aspects(when, reference, planets).items()
                 if house in hs]
 
+    # ------------------------------------------------------------------ #
+    # Double Transit (Gochara of Jupiter + Saturn) — the classic pinpoint
+    # discriminator. An event fructifies only when BOTH the slow benefic
+    # (Jupiter) and the slow karmic mover (Saturn) simultaneously activate
+    # the bhava and/or its lord — by occupation OR by graha-dṛṣṭi.
+    # ------------------------------------------------------------------ #
+    def slow_activators(self, when: datetime, house: int,
+                        reference: str = "lagna",
+                        planets=(Planet.JUPITER, Planet.SATURN)) -> set:
+        """Which of *planets* activate a whole-sign house (occupy OR aspect)."""
+        base = self.asc_sign if reference == "lagna" else self.natal_moon_sign
+        asp = self.transit_aspects(when, reference, planets)
+        out = set()
+        for p in planets:
+            h_occ = (self.transit_sign(when, p) - base) % 12 + 1
+            if h_occ == house or house in asp.get(p, []):
+                out.add(p)
+        return out
+
+    def double_transit_windows(self, house: int, start: datetime,
+                               end: datetime, reference: str = "lagna",
+                               required=(Planet.JUPITER, Planet.SATURN),
+                               step_days: float = 10.0
+                               ) -> list[ActivationWindow]:
+        """Windows where *all* ``required`` slow planets activate ``house``.
+
+        The Double-Transit (Gochara) rule: marriage/career/etc. peaks when
+        Jupiter AND Saturn together transit or aspect the matter's house.
+        """
+        req = set(required)
+        def pred(when: datetime) -> bool:
+            return req.issubset(
+                self.slow_activators(when, house, reference, tuple(req)))
+        lbl = (f"double-transit ({'+'.join(p.value for p in required)}) "
+               f"on H{house} from {reference}")
+        return self.scan_windows(pred, start, end, step_days, lbl)
+
+    def double_transit_on_sign(self, sign: int, start: datetime,
+                               end: datetime,
+                               required=(Planet.JUPITER, Planet.SATURN),
+                               step_days: float = 10.0
+                               ) -> list[ActivationWindow]:
+        """Double-transit windows on a fixed natal sign (e.g. the Upapada sign
+        or the 7th-lord's sign), evaluated from the lagna."""
+        house = (sign - self.asc_sign) % 12 + 1
+        return self.double_transit_windows(house, start, end, "lagna",
+                                           required, step_days)
+
     def slow_movers(self, when: datetime) -> dict[Planet, dict]:
         """Sign/house summary for the structural heavyweights."""
         out = {}

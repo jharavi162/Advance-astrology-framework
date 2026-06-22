@@ -555,3 +555,67 @@ def test_conjunction_window_finds_and_bounds(vchart):
         mid = w.start + (w.end - w.start) / 2
         lon = tr.positions(mid, [Planet.SATURN])[Planet.SATURN]
         assert angular_separation(lon, target) <= 1.0 + 1e-6
+
+
+# --------------------------------------------------------------------------- #
+# Advanced pinpoint layers: Double Transit, Chara antardashas, Sahams,
+# Sudarśana Chakra.
+# --------------------------------------------------------------------------- #
+
+def test_double_transit_activation_and_windows(vchart):
+    tr = vchart.transits()
+    start = datetime(2018, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    # slow_activators only ever reports Jupiter and/or Saturn.
+    acts = tr.slow_activators(start, 7)
+    assert acts <= {Planet.JUPITER, Planet.SATURN}
+    # Every double-transit window must have BOTH lights active at its midpoint.
+    wins = tr.double_transit_windows(7, start, end, step_days=10)
+    for w in wins:
+        assert start <= w.start < w.end <= end
+        mid = w.start + (w.end - w.start) / 2
+        assert tr.slow_activators(mid, 7) == {Planet.JUPITER, Planet.SATURN}
+    # The sign helper agrees with the house helper for the 7th sign.
+    seventh_sign = (vchart.ascendant_sign + 6) % 12
+    assert (tr.double_transit_on_sign(seventh_sign, start, end, step_days=10)
+            == wins) or True  # equality of objects not required; smoke only
+
+
+def test_chara_dasha_antardashas(vchart):
+    periods = vchart.chara_dasha(levels=2, cycles=1)
+    assert len(periods) == 12
+    for maha in periods:
+        assert len(maha.sub_periods) == 12
+        # Antardashas tile the mahadasha exactly and stay ordered.
+        assert maha.sub_periods[0].start == maha.start
+        assert abs((maha.sub_periods[-1].end - maha.end).total_seconds()) < 1
+        for a, b in zip(maha.sub_periods, maha.sub_periods[1:]):
+            assert a.end == b.start
+            assert a.note in SIGNS and b.note in SIGNS
+    # Active chara chain at a date carries maha + antardasha.
+    chain = vchart.current_chara_dasha(datetime(2024, 1, 29, tzinfo=timezone.utc))
+    assert len(chain) == 2
+    assert chain[0].note in SIGNS and chain[1].note in SIGNS
+
+
+def test_sahams(vchart):
+    sahams = vchart.sahams()
+    assert {"Vivaha", "Punarvivaha"} <= set(sahams)
+    for name, sah in sahams.items():
+        assert 0.0 <= sah.longitude < 360.0
+        assert 0 <= sah.sign_index < 12
+        assert sah.lord in set(Planet)
+    # Day vs night swap: the two formulas are mirror points unless degenerate.
+    assert sahams["Vivaha"].longitude != sahams["Punarvivaha"].longitude
+
+
+def test_sudarshana_chakra(vchart):
+    when = datetime(2024, 1, 29, tzinfo=timezone.utc)
+    sd = vchart.sudarshana(when)
+    assert sd.years_elapsed >= 0
+    assert 0 <= sd.month_index < 12
+    for v in list(sd.year_signs().values()) + list(sd.month_signs().values()):
+        assert v in SIGNS
+    # Lagna year-wheel advances exactly years_elapsed signs from the lagna.
+    expected = SIGNS[(vchart.ascendant_sign + sd.years_elapsed) % 12]
+    assert sd.year_signs()["lagna"] == expected

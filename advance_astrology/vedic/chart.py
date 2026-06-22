@@ -292,6 +292,28 @@ class VedicChart:
         from .varshaphal import annual_chart
         return annual_chart(self, year)
 
+    # -- Tājika Sahams -------------------------------------------------- #
+    def sahams(self):
+        """Tājika Sahams (incl. Vivāha / Punarvivāha) — marriage timers."""
+        from .sahams import compute_sahams
+        return compute_sahams(self)
+
+    # -- Sudarśana Chakra daśā ------------------------------------------ #
+    def sudarshana(self, when: datetime | None = None):
+        """Sudarśana Chakra daśā state (Lagna/Moon/Sun tri-wheel) at *when*."""
+        from .dashas import sudarshana_chakra
+        when = when or datetime.now(timezone.utc)
+        return sudarshana_chakra(self.ascendant_sign, self.signs[Planet.MOON],
+                                 self.signs[Planet.SUN], self.when_utc, when)
+
+    # -- Active Jaimini rashi-daśā (with antardashas) ------------------- #
+    def current_chara_dasha(self, when: datetime | None = None,
+                            levels: int = 2):
+        """Active Chara rashi-daśā chain (maha + antardasha) at *when*."""
+        when = when or datetime.now(timezone.utc)
+        periods = self.chara_dasha(levels=levels, cycles=1)
+        return current_dasha(periods, when)
+
     # -- Yogas & avasthas ----------------------------------------------- #
     def yogas(self):
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,
