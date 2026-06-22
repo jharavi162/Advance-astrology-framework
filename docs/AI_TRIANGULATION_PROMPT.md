@@ -211,6 +211,20 @@ blocked — with evidence.
    the verdict. A matter is *promised* when its cusp sub-lord signifies the
    matter's houses (e.g. 7th-cusp sub-lord → 2/7/11 ⇒ marriage promised); it is
    *timed* when the running D-B-A lords also signify those houses.
+   ⚠️ Equally important is what you must NOT do with KP: never treat a running
+   period-lord that merely *fails to signify* the matter's houses as though it
+   *negates* them. A daśā level — especially an antara or pratyantara — that is
+   silent on the matter (signifying neither its fulfilment houses nor its
+   negation houses) is **transparent, not obstructive**, and must be allowed to
+   pass the matter through. The promise is owned by the cusp sub-lord; the timing
+   is supplied by whichever level of the running chain — mahādaśā, antara,
+   pratyantara, **or the sūkṣma/prāṇa** — does signify the houses, while the other
+   levels need only refrain from active negation. It is therefore a method error
+   to hard-gate an entire period out of contention just because its
+   antara/pratyantara lord is mute on the matter; if the mahādaśā lord or the
+   sūkṣma carries the houses and nothing in the chain signifies the negation
+   houses, the period stays fully eligible to deliver the event. Always drop to
+   the sūkṣma before rejecting a candidate date.
 3. **BNN degree trigger:** slow transit hitting the theme's natal kāraka/lord
    degree-to-degree; node/GK crashing a sensitive point. **Check the kāraka's
    _dṛṣṭi_, not only its sign-ingress** — e.g. Jupiter need not *enter* the 7th
@@ -248,6 +262,18 @@ blocked — with evidence.
    putra-kāraka) for children, the 2nd/11th and their lords for wealth, the
    6th/8th and their lords for illness — in exactly the way you would use the 7th
    and Venus for marriage.
+   Run this double transit on the matter's **lord's sign across the ENTIRE
+   relevant span** — the whole forward life for a future event and the whole past
+   for a retrodiction — with **no premature cut-off date**, because the clean
+   joint Jupiter–Saturn hit on the **lord** very often lands in a different,
+   frequently later year than the hit on the **house** itself, and a scan that
+   stops early, or that only re-checks the house without re-checking the lord's
+   sign over the full remaining span, will silently hide the true trigger band.
+   Count the joint influence through **every** form of contact — bodily
+   occupation as well as **all** the special dṛṣṭis (Jupiter's 5th/7th/9th and
+   Saturn's 3rd/7th/10th), never the 7th aspect alone — so that, for instance, a
+   Saturn casting only its 3rd or 10th glance onto the lord's sign while Jupiter
+   occupies it still counts as a full double transit.
 
 > **IMPORTANT — these six rules are DOMAIN-GENERAL, not marriage-only.** The
 > marriage signatures used above (the 7th cusp sub-lord, 2nd-from-Upapada, and
@@ -320,6 +346,8 @@ disagree, lower confidence or rule out. "One factor points here" is never enough
 - [ ] **Daśā drilled to Sūkṣma/Prāṇa for a dated event** (not just Pratyantar)
 - [ ] **Full life-span candidate map built, THEN converged** (not first-plausible)
 - [ ] **Double-Transit (Jupiter+Saturn) on the matter's house *and* its lord/kāraka**
+- [ ] **Lord's-sign double-transit scanned across the FULL span** (no early cut-off; Saturn 3rd/10th + Jupiter 5th/9th counted, not occupation/7th-aspect alone)
+- [ ] **KP gate not over-applied** — a non-signifying AD/PD treated as neutral (not a block); date drilled to sūkṣma before any rejection
 - [ ] **Chara/Nārāyaṇa antardaśā** (rāśi sub-period), not just the rāśi mahādaśā
 - [ ] **Domain Saham + its dispositor** (Vivāha/Karma/Putra/Roga/Artha… as the theme needs)
 - [ ] **Sudarśana Chakra** corroboration (≥2 of the three wheels agreeing)
@@ -395,6 +423,20 @@ Theme can be right while the *date* is wrong. The recurring causes:
    later event was in year X, so the earlier one must be around Y" corrupts the
    independent reading. Time each event from its own significators; let the
    life-story emerge, never assume it.
+8. **Hard-gating a period out because a sub-period lord is silent.** Demanding
+   that the mahādaśā AND the antara AND the pratyantara all signify the matter's
+   houses at once is too rigid and routinely throws away the real window. Events
+   frequently fire on the mahādaśā (or the cusp sub-lord) plus a benefic
+   **sūkṣma**, while the antara/pratyantara are merely neutral. A non-signifying
+   period-lord is transparent, not a veto — only an *actively-negating* one
+   blocks. Soften the gate, and drill to sūkṣma before rejecting any date.
+9. **Truncating the lord's-sign double-transit scan, or testing only the house.**
+   The joint Jupiter–Saturn activation of the matter's LORD commonly falls in a
+   later year than its activation of the HOUSE, so a scan with an early end-date
+   — or one that re-checks the house but forgets to re-scan the lord's sign over
+   the full remaining span — will miss the actual trigger. Re-scan the lord's
+   sign to the very end of the span, and count Saturn's 3rd/10th and Jupiter's
+   5th/9th glances, not occupation or the 7th aspect alone.
 
 ## FORBIDDEN BEHAVIOURS
 - Answering after only natal + Vimśottari (the cardinal mistake).
@@ -406,3 +448,9 @@ Theme can be right while the *date* is wrong. The recurring causes:
   computing it independently.
 - Committing to a date on a single slow-transit, or on the first lit window,
   without the Jupiter+Saturn double transit and the full-span candidate map.
+- Rejecting a daśā period merely because its antara/pratyantara lord does not
+  signify the matter's houses (a silent sub-lord is neutral, not a negation), or
+  committing to a date without first drilling the running chain to the sūkṣma.
+- Truncating the matter's-lord double-transit scan before the end of the span, or
+  testing the double transit on the house alone and not also on the lord's sign
+  with every form of dṛṣṭi (Saturn's 3rd/10th and Jupiter's 5th/9th included).
