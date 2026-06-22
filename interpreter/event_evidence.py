@@ -57,6 +57,125 @@ _SIGN_RULER = [Planet.MARS, Planet.VENUS, Planet.MERCURY, Planet.MOON, Planet.SU
 _EXALT_SIGN = {Planet.SUN: 0, Planet.MOON: 1, Planet.MARS: 9, Planet.MERCURY: 5,
                Planet.JUPITER: 3, Planet.VENUS: 11, Planet.SATURN: 6}
 _MALEFIC_NODES = {Planet.SATURN, Planet.RAHU, Planet.KETU, Planet.MARS, Planet.SUN}
+_NAT_BENEFIC = {Planet.JUPITER, Planet.VENUS, Planet.MERCURY, Planet.MOON}
+_NAT_MALEFIC = {Planet.SATURN, Planet.MARS, Planet.SUN, Planet.RAHU, Planet.KETU}
+
+
+# ---------------------------------------------------------------------------- #
+# WITNESS / NODE REGISTRY — an open list of independent testimonies. A verdict
+# (manifest vs cancel, upgrade vs loss) is the WEIGHTED CONVERGENCE of every
+# witness that fires, never one rule. Each witness votes a signed strength in
+# [-1, +1] (pro = +, anti = -); the engine multiplies by its weight and sums.
+# Adding a new node = one register_witness(...) call, not a logic rewrite.
+# ---------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class Witness:
+    name: str
+    layer: str                 # "standing" (natal, time-independent) | "timing"
+    weight: float
+    vote: object               # callable(v, profile) -> float in [-1, +1]
+
+
+WITNESSES: list[Witness] = []
+
+
+def register_witness(name, layer, weight, vote) -> Witness:
+    w = Witness(name, layer, weight, vote)
+    WITNESSES.append(w)
+    return w
+
+
+def _house_signs(v, profile):
+    return [(v.ascendant_sign + h - 1) % 12 for h in profile.houses]
+
+
+def _aspectors(v, signs):
+    out = {}
+    for a in v.graha_aspects():
+        if a.to_sign in signs and a.planet in (_NAT_BENEFIC | _NAT_MALEFIC):
+            out.setdefault(a.planet, a)
+    return out
+
+
+# --- seed STANDING (natal) witnesses — the multi-nodal pattern on the matter --
+def _w_benefic_drishti(v, p):
+    asp = _aspectors(v, set(_house_signs(v, p)))
+    return min(1.0, 0.5 * sum(1 for x in asp if x in _NAT_BENEFIC))
+
+
+def _w_malefic_drishti(v, p):
+    asp = _aspectors(v, set(_house_signs(v, p)))
+    return -min(1.0, 0.5 * sum(1 for x in asp if x in _NAT_MALEFIC))
+
+
+def _w_lord_dignity(v, p):
+    score = 0.0
+    sb = v.shadbala()
+    for h in p.houses:
+        lord = v.house_lord(h)
+        dig = str(v.dignity(lord))
+        if any(k in dig for k in ("Exalt", "Own", "Moolatrikona")):
+            score += 1
+        elif "Debil" in dig:
+            score -= 1
+        s = sb.get(lord)
+        score += 0.5 if (s and s.is_strong) else -0.5
+    return max(-1.0, min(1.0, score / (len(p.houses) or 1)))
+
+
+def _w_occupant_nature(v, p):
+    score = 0.0
+    for h in p.houses:
+        for x in v.planets_in_house(h):
+            score += 0.5 if x in _NAT_BENEFIC else (-0.5 if x in _NAT_MALEFIC else 0)
+    return max(-1.0, min(1.0, score))
+
+
+def _w_rajayoga_lord(v, p):
+    """Raja/Mahāpuruṣa-like: the house-lord dignified in a kendra/trikoṇa."""
+    for h in p.houses:
+        lord = v.house_lord(h)
+        if (v.house_of(lord) in _KENDRA_TRIKONA
+                and any(k in str(v.dignity(lord)) for k in ("Exalt", "Own", "Moolatrikona"))):
+            return 1.0
+    return 0.0
+
+
+def _w_argala(v, p):
+    return max(-1.0, min(1.0, _argala_net_on_house(v, p.houses[0]) / 2))
+
+
+def _w_sav(v, p):
+    sav = v.sarvashtakavarga()
+    avg = sum(sav[(v.ascendant_sign + h - 1) % 12] for h in p.houses) / len(p.houses)
+    if avg >= 30:
+        return min(1.0, (avg - 28) / 8)
+    if avg <= 25:
+        return -min(1.0, (28 - avg) / 8)
+    return 0.0
+
+
+register_witness("benefic-dṛṣṭi-on-house", "standing", 1.0, _w_benefic_drishti)
+register_witness("malefic-dṛṣṭi-on-house", "standing", 0.8, _w_malefic_drishti)
+register_witness("house-lord-dignity/strength", "standing", 1.2, _w_lord_dignity)
+register_witness("occupant-nature", "standing", 0.8, _w_occupant_nature)
+register_witness("rāja-yoga (lord dignified in kendra/trikoṇa)", "standing", 1.2, _w_rajayoga_lord)
+register_witness("argala-net", "standing", 0.8, _w_argala)
+register_witness("SAV-of-house", "standing", 0.8, _w_sav)
+
+
+def standing_balance(v, profile):
+    """Net natal pro/anti pattern on the matter + the list of firing nodes."""
+    total = 0.0
+    fired = []
+    for w in WITNESSES:
+        if w.layer != "standing":
+            continue
+        c = w.vote(v, profile) * w.weight
+        if abs(c) > 1e-9:
+            fired.append((w.name, round(c, 2)))
+        total += c
+    return round(total, 2), fired
 
 
 # ---------------------------------------------------------------------------- #
@@ -346,6 +465,7 @@ class ReversalRow:
     reversal_saham_dt: bool
     lagna_dark_with_malefic: bool
     kp_fulfil: int = 0                     # manifestation lit in the SAME window?
+    standing: float = 0.0                  # natal witness-balance on the matter
 
     @property
     def rupture_score(self) -> int:
@@ -355,16 +475,20 @@ class ReversalRow:
 
     @property
     def kind(self) -> str:
-        """Disambiguate a dusthāna-from-the-house activation. The 6/8/12-from-H
-        houses light up BOTH for leaving the matter (loss) AND for upgrading it
-        (a job-change to a better post, a move to a better home). The decider is
-        whether the FULFILMENT signature co-occurs: rupture WITH fulfilment ⇒ a
-        positive CHANGE/UPGRADE (old ended, better gained); rupture WITHOUT
-        fulfilment (and a dark Lagna under malefics) ⇒ a true LOSS/BREAK."""
-        if self.rupture_score >= 2 and self.kp_fulfil >= 2:
+        """Disambiguate a dusthāna-from-the-house activation as a MULTI-NODAL
+        pattern, not a single rule. The 6/8/12-from-H houses light up BOTH for
+        leaving the matter (loss) AND for upgrading it. The verdict is the balance
+        of PRO testimony — the timing fulfilment (AD/PD) PLUS the STANDING natal
+        pattern on the matter (benefic dṛṣṭi, a dignified/strong lord, a rāja-yoga,
+        good argala/SAV) — against the rupture. A chart whose matter-house is
+        natally blessed rarely breaks; it upgrades. A true LOSS/BREAK needs the
+        rupture lit, the fulfilment absent, a dark Lagna under malefics, AND a
+        non-positive standing pattern."""
+        pro = self.kp_fulfil >= 2 or self.standing >= 1.0
+        if self.rupture_score >= 2 and pro:
             return "CHANGE/UPGRADE"
         if (self.rupture_score >= 3 and self.kp_fulfil < 2
-                and self.lagna_dark_with_malefic):
+                and self.lagna_dark_with_malefic and self.standing < 1.0):
             return "LOSS/BREAK"
         return "transition-watch"
 
@@ -389,6 +513,7 @@ def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
         sah = v.sahams().get(profile.reversal_saham)
         if sah:
             saham_dt = _dt_windows(tr, (sah.sign_index - lagna) % 12 + 1, start, end)
+    standing, _ = standing_balance(v, profile)   # natal multi-nodal pattern (once)
     rows, d, last = [], start, None
     while d < end:
         chain = _chain_lords(v, d, levels=3)
@@ -406,7 +531,7 @@ def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
                 separators_running=any(l in separators for l in chain),
                 break_house_dt=_in(d, bh_dt), reversal_saham_dt=_in(d, saham_dt),
                 lagna_dark_with_malefic=dark and any(l in nodes_sat for l in chain),
-                kp_fulfil=fulfil))
+                kp_fulfil=fulfil, standing=standing))
         d += timedelta(days=step_days)
     return rows
 
@@ -517,6 +642,13 @@ def render_domain(v, profile, start, end) -> str:
          f"+{profile.natural_karaka.value if profile.natural_karaka else '-'} "
          f"Saham={profile.saham} Varga=D{profile.varga}", ""]
     L += _fmt_tempo(pt)
+    # STANDING WITNESS PATTERN — the natal multi-nodal weight on the matter
+    bal, fired = standing_balance(v, profile)
+    L += ["", f"  STANDING WITNESS PATTERN (natal nodes on the matter) — "
+          f"net balance = {bal:+.2f} "
+          f"({'PRO/blessed ⇒ tends to upgrade not break' if bal >= 1.0 else ('afflicted ⇒ loss possible' if bal < 0 else 'mixed')}):"]
+    for nm, c in sorted(fired, key=lambda x: -abs(x[1])):
+        L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
           "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
