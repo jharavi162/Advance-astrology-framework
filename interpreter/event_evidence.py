@@ -73,14 +73,15 @@ class Witness:
     name: str
     layer: str                 # "standing" (natal, time-independent) | "timing"
     weight: float
-    vote: object               # callable(v, profile) -> float in [-1, +1]
+    vote: object               # standing: callable(v, profile); timing: callable(window)
+    shared: bool = False        # timing node shared across domains (e.g. Lagna)
 
 
 WITNESSES: list[Witness] = []
 
 
-def register_witness(name, layer, weight, vote) -> Witness:
-    w = Witness(name, layer, weight, vote)
+def register_witness(name, layer, weight, vote, shared=False) -> Witness:
+    w = Witness(name, layer, weight, vote, shared)
     WITNESSES.append(w)
     return w
 
@@ -381,29 +382,58 @@ class WindowEvidence:
     chara_ad: str
     sudarshana_hit: bool
 
-    def _domain_votes(self) -> int:
-        v = 0
-        v += 1 if self.kp_fulfil > 0 and self.kp_fulfil >= self.kp_negate else 0
-        v += 1 if self.karaka_in_chain or self.karaka_sukshma else 0
-        v += 1 if self.lagnesh_in_chain else 0
-        v += 1 if self.house_double_transit or self.lord_double_transit else 0
-        v += 1 if self.saham_double_transit else 0
-        v += 1 if self.bnn else 0
-        v += 1 if self.kakshya else 0
-        v += 1 if self.varshaphal_muntha else 0
-        v += 1 if self.sudarshana_hit else 0
-        return v
+    def firing_nodes(self, shared=None) -> list:
+        """The timing witnesses that fire for this window, with their votes.
+        Every timekeeper — the daśā included — is just one node here."""
+        out = []
+        for w in WITNESSES:
+            if w.layer != "timing":
+                continue
+            if shared is not None and w.shared != shared:
+                continue
+            c = w.weight * w.vote(self)
+            if abs(c) > 1e-9:
+                out.append((w.name, round(c, 2)))
+        return out
 
     @property
-    def domain_score(self) -> int:
-        """Convergence EXCLUDING the shared Lagna-activation vote — used to rank
-        different domains against each other (the Lagna is the same for all)."""
-        return self._domain_votes()
+    def domain_score(self):
+        """Convergence of the per-window timing NODES, EXCLUDING the shared Lagna
+        node (the Lagna is the same for every domain). The daśā is simply two of
+        these nodes — never the privileged judge."""
+        return round(sum(c for _, c in self.firing_nodes(shared=False)), 2)
 
     @property
-    def convergence(self) -> int:
-        """Within-domain window ranking (adds the Lagna materialization vote)."""
-        return self._domain_votes() + (1 if self.lagna_activators else 0)
+    def convergence(self):
+        """Within-domain window ranking (adds the shared Lagna node)."""
+        return round(self.domain_score
+                     + sum(c for _, c in self.firing_nodes(shared=True)), 2)
+
+
+# --- seed TIMING witnesses — every timekeeper is one node; the daśā is NOT
+# privileged, it is simply two of these among many. -------------------------- #
+register_witness("daśā: kāraka in MD>AD>PD", "timing", 1.0,
+                 lambda w: 1.0 if w.karaka_in_chain else 0.0)
+register_witness("daśā: kāraka at sūkṣma (micro-trigger)", "timing", 1.0,
+                 lambda w: 1.0 if w.karaka_sukshma else 0.0)
+register_witness("KP fulfilment ≥ negation", "timing", 1.0,
+                 lambda w: 1.0 if (w.kp_fulfil > 0 and w.kp_fulfil >= w.kp_negate) else 0.0)
+register_witness("Lagneśa in daśā", "timing", 1.0,
+                 lambda w: 1.0 if w.lagnesh_in_chain else 0.0)
+register_witness("double-transit (house/lord)", "timing", 1.0,
+                 lambda w: 1.0 if (w.house_double_transit or w.lord_double_transit) else 0.0)
+register_witness("domain Saham double-transit", "timing", 1.0,
+                 lambda w: 1.0 if w.saham_double_transit else 0.0)
+register_witness("BNN degree-trigger", "timing", 1.0,
+                 lambda w: 1.0 if w.bnn else 0.0)
+register_witness("Kakṣyā window", "timing", 1.0,
+                 lambda w: 1.0 if w.kakshya else 0.0)
+register_witness("Varṣaphal Muntha", "timing", 1.0,
+                 lambda w: 1.0 if w.varshaphal_muntha else 0.0)
+register_witness("Sudarśana wheel", "timing", 1.0,
+                 lambda w: 1.0 if w.sudarshana_hit else 0.0)
+register_witness("Lagna materialization", "timing", 1.0,
+                 lambda w: 1.0 if w.lagna_activators else 0.0, shared=True)
 
 
 def _slow_on_sign(tr, sign, when, planets=(Planet.JUPITER, Planet.SATURN)):
@@ -654,11 +684,15 @@ def render_domain(v, profile, start, end) -> str:
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.convergence, x.start))[:5]
-    L += ["", "  TOP-RANKED WINDOWS (independent-system convergence):"]
+    L += ["", "  TOP-RANKED WINDOWS (convergence of the timing NODES — the daśā is "
+          "only one of them):"]
     for r in top:
         L.append(f"    {r.start:%Y-%m-%d} {'>'.join(r.chain):<9} conv={r.convergence}"
                  f"  KP {r.kp_fulfil}/{r.kp_negate}  Lagna[{','.join(r.lagna_activators) or '—'}]"
                  f"  chara {r.chara_ad}")
+    if top:
+        L.append(f"    nodes firing at {top[0].start:%Y-%m-%d}: "
+                 + ", ".join(n for n, _ in top[0].firing_nodes()))
 
     # Reversal as its OWN event (separators + dark Lagna + reversal saham)
     primary = profile.houses[0]
