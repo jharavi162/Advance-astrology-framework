@@ -11,6 +11,28 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-22 — Distinguish CHANGE/UPGRADE from LOSS/BREAK in the reversal
+
+- **Change:** The reversal block of `event_evidence.py` no longer labels every
+  6/8/12-from-the-house (dusthāna-from-matter) activation a "loss." It now
+  classifies each window: **CHANGE/UPGRADE** when the fulfilment signature
+  co-occurs, **LOSS/BREAK** only when fulfilment is absent and the Lagna is dark
+  under malefics/nodes. Fulfilment co-occurrence is read from the TIMING lords
+  (AD/PD), not the standing mahādaśā (else a domain-lord MD masks everything).
+  Added the matching descriptive rule to `AI_TRIANGULATION_PROMPT.md` Track B and
+  two regression tests.
+- **Why (śāstra):** Leaving a thing and bettering a thing share the "end of the
+  present state" signature — a job-change to a superior post, a move to a better
+  home, or a remarriage activate the same 6/8/12-from-house as a job-loss,
+  eviction or divorce. KP times a *change of service* by the 5th/9th (end of
+  current job) together with the 10th/11th/6th (the new, better job); the
+  fulfilment houses are the discriminator between an upgrade and a loss.
+- **Source:** KP service-change doctrine (6th/10th/11th vs 5th/9th); BPHS
+  bhāvāt-bhāvam (house-from-house) reckoning.
+- **Failure-mode addressed:** Discrimination — a real upward job-change for this
+  native was being mislabelled a "career loss/break"; the fulfilment test fixes
+  it while still flagging the genuine divorce (Feb-2026) as a LOSS/BREAK.
+
 ## 2026-06-22 — Learning-routing process recorded in CLAUDE.md
 
 - **Change:** Added a root `CLAUDE.md` (auto-loaded every session) that fixes

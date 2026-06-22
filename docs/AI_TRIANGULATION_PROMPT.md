@@ -217,6 +217,25 @@ For each hot theme run BOTH:
 State the **texture**: clean manifestation / friction / **fixed-then-cancelled** /
 blocked — with evidence.
 
+⚠️ **A transition through the 6/8/12-FROM-the-matter's-house is NOT automatically
+a loss — disambiguate a positive CHANGE/UPGRADE from a true LOSS/BREAK.** The
+dusthāna-from-the-house (the houses that *end the present instance* of the matter)
+lights up for BOTH outcomes, because leaving a thing and bettering a thing share
+the same "ending of the current state" signature: a job-change to a superior post,
+a move to a better home, or a remarriage all activate exactly the houses a job-
+loss, an eviction or a divorce would. The decider is whether the matter's
+**fulfilment signature co-occurs in the same window** — read from the *timing*
+lords (the antara/pratyantara/sūkṣma), NOT from a standing mahādaśā that may be the
+matter's own lord and therefore permanently lit. When the rupture houses AND the
+fulfilment houses are *both* lit, the event is a **CHANGE/UPGRADE** (the old ended
+and something better was gained); when the rupture houses are lit while fulfilment
+is **absent** and the Lagna is dark under malefics/nodes, it is a genuine
+**LOSS/BREAK**. Never report the dusthāna activation as a loss without first
+checking for this co-occurrence — calling a promotion-by-job-change a "career
+loss," or a divorce-and-remarriage a permanent "end of marriage," is the same
+single-signature error in another costume. Time the reversal as its own event,
+but label its *nature* by this fulfilment test.
+
 ### 4C. Multi-Paddhati Confirmation & Timing — ALL SIX ARE MANDATORY
 1. **Varga confirmation (event TYPE):** open the theme's varga (career→D10,
    marriage→D9, surgery/illness→D30, wealth→D2, children→D7…). Active daśā lord
