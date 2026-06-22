@@ -345,12 +345,28 @@ class ReversalRow:
     break_house_dt: bool
     reversal_saham_dt: bool
     lagna_dark_with_malefic: bool
+    kp_fulfil: int = 0                     # manifestation lit in the SAME window?
 
     @property
     def rupture_score(self) -> int:
         return (int(self.kp_rupture >= 2) + int(self.separators_running)
                 + int(self.break_house_dt) + int(self.reversal_saham_dt)
                 + int(self.lagna_dark_with_malefic))
+
+    @property
+    def kind(self) -> str:
+        """Disambiguate a dusthāna-from-the-house activation. The 6/8/12-from-H
+        houses light up BOTH for leaving the matter (loss) AND for upgrading it
+        (a job-change to a better post, a move to a better home). The decider is
+        whether the FULFILMENT signature co-occurs: rupture WITH fulfilment ⇒ a
+        positive CHANGE/UPGRADE (old ended, better gained); rupture WITHOUT
+        fulfilment (and a dark Lagna under malefics) ⇒ a true LOSS/BREAK."""
+        if self.rupture_score >= 2 and self.kp_fulfil >= 2:
+            return "CHANGE/UPGRADE"
+        if (self.rupture_score >= 3 and self.kp_fulfil < 2
+                and self.lagna_dark_with_malefic):
+            return "LOSS/BREAK"
+        return "transition-watch"
 
 
 def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
@@ -379,12 +395,18 @@ def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
         if tuple(chain) != last:
             last = tuple(chain)
             kp = sum(len(set(kps.planet_signifies(l)) & rupture_houses) for l in chain)
+            # judge fulfilment co-occurrence from the TIMING lords (AD+PD), not the
+            # mahādaśā — else a domain-lord MD (e.g. the 7th-lord running for 20y)
+            # permanently inflates fulfilment and masks a real loss.
+            fulfil = sum(len(set(kps.planet_signifies(l)) & profile.fulfil_houses)
+                         for l in chain[1:])
             dark = not _slow_on_sign(tr, lagna, d)
             rows.append(ReversalRow(
                 start=d, chain=[c.value[:2] for c in chain], kp_rupture=kp,
                 separators_running=any(l in separators for l in chain),
                 break_house_dt=_in(d, bh_dt), reversal_saham_dt=_in(d, saham_dt),
-                lagna_dark_with_malefic=dark and any(l in nodes_sat for l in chain)))
+                lagna_dark_with_malefic=dark and any(l in nodes_sat for l in chain),
+                kp_fulfil=fulfil))
         d += timedelta(days=step_days)
     return rows
 
@@ -510,24 +532,30 @@ def render_domain(v, profile, start, end) -> str:
     primary = profile.houses[0]
     break_house = (primary - 1 + 6 - 1) % 12 + 1
     rev = reversal_map(v, profile, start, end)
-    rtop = sorted(rev, key=lambda x: (-x.rupture_score, x.start))[:3]
-    L += ["", f"  REVERSAL / CANCELLATION timed as its OWN event "
-          f"(6/8/12-from-H{primary}; separators Saturn+nodes+H{break_house}-lord"
+    losses = sorted([r for r in rev if r.kind == "LOSS/BREAK"],
+                    key=lambda x: (-x.rupture_score, x.start))
+    changes = sorted([r for r in rev if r.kind == "CHANGE/UPGRADE"],
+                     key=lambda x: (-x.rupture_score, x.start))
+    L += ["", f"  TRANSITION / REVERSAL of the matter (6/8/12-from-H{primary}; "
+          f"separators Saturn+nodes+H{break_house}-lord"
           + (f"; saham {profile.reversal_saham}" if profile.reversal_saham else "")
-          + ") — top windows:"]
-    for r in rtop:
-        flags = []
-        if r.separators_running:
-            flags.append("separator-daśā")
-        if r.lagna_dark_with_malefic:
-            flags.append("dark-Lagna+malefic")
-        if r.break_house_dt:
-            flags.append("break-house dbl-transit")
-        if r.reversal_saham_dt:
-            flags.append("reversal-saham")
-        L.append(f"    {r.start:%Y-%m-%d} {'>'.join(r.chain):<9} "
-                 f"rupture-score={r.rupture_score}  KP-rupture={r.kp_rupture}  "
-                 f"[{', '.join(flags) or '—'}]")
+          + "):"]
+    L.append("    A dusthāna-from-the-house activation is a LOSS only if the "
+             "fulfilment signature is ABSENT; if fulfilment co-occurs it is a "
+             "positive CHANGE/UPGRADE (old ended, better gained).")
+    if losses:
+        L.append("    ▸ true LOSS/BREAK windows (rupture, fulfilment absent, dark Lagna):")
+        for r in losses[:3]:
+            L.append(f"        {r.start:%Y-%m-%d} {'>'.join(r.chain):<9} "
+                     f"rupture={r.rupture_score} fulfil={r.kp_fulfil}")
+    else:
+        L.append("    ▸ NO pure LOSS/BREAK window — the dusthāna activations all "
+                 "co-occur with fulfilment ⇒ CHANGE/UPGRADE, not loss.")
+    if changes:
+        L.append("    ▸ CHANGE/UPGRADE windows (leaving old + gaining better):")
+        for r in changes[:3]:
+            L.append(f"        {r.start:%Y-%m-%d} {'>'.join(r.chain):<9} "
+                     f"rupture={r.rupture_score} fulfil={r.kp_fulfil}")
 
     L += ["", "  NB: EVIDENCE, not verdict. Read it MULTIVALENTLY — a node colours "
           "the TYPE (sudden/court/unconventional), a dark Lagna lowers "

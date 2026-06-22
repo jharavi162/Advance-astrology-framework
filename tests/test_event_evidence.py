@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart
 from interpreter.event_evidence import (
-    DOMAIN_PROFILES, candidate_map, render_domain, scan_domains,
+    DOMAIN_PROFILES, candidate_map, render_domain, reversal_map, scan_domains,
 )
 
 UTC = timezone.utc
@@ -57,6 +57,35 @@ def test_remarriage_caught_despite_dark_lagna():
     best = max(venus_pd, key=lambda r: r.domain_score)
     assert best.domain_score >= 3
     assert best.karaka_sukshma  # Venus also surfacing at sūkṣma
+
+
+def test_career_dusthana_is_change_not_loss():
+    """This native NEVER had a job loss/break — only changes upward. A
+    6/8/12-from-10th activation must classify as CHANGE/UPGRADE (fulfilment
+    co-occurs), never a pure LOSS/BREAK."""
+    v = _chart()
+    rev = reversal_map(v, DOMAIN_PROFILES["career"],
+                       datetime(2019, 1, 1, tzinfo=UTC),
+                       datetime(2024, 12, 31, tzinfo=UTC))
+    assert not [r for r in rev if r.kind == "LOSS/BREAK"], \
+        "career wrongly flagged a loss — there was none"
+    assert [r for r in rev if r.kind == "CHANGE/UPGRADE"], \
+        "the 2021-22 upward job-change should register as CHANGE/UPGRADE"
+
+
+def test_marriage_divorce_is_loss_remarriage_is_change():
+    """The Feb-2026 divorce is a genuine LOSS/BREAK; the Jan-2027 remarriage is a
+    CHANGE/UPGRADE — judged from the timing (AD/PD) lords, not the standing MD."""
+    v = _chart()
+    rev = reversal_map(v, DOMAIN_PROFILES["marriage"],
+                       datetime(2025, 1, 1, tzinfo=UTC),
+                       datetime(2027, 3, 1, tzinfo=UTC))
+    losses = [r for r in rev if r.kind == "LOSS/BREAK"]
+    assert any(r.start.year == 2026 or (r.start.year == 2025 and r.start.month >= 8)
+               for r in losses), "the divorce window must surface as LOSS/BREAK"
+    jan27 = [r for r in rev if r.start.year == 2027 and r.start.month == 1]
+    assert jan27 and any(r.kind == "CHANGE/UPGRADE" for r in jan27), \
+        "the remarriage must surface as CHANGE/UPGRADE, not loss"
 
 
 def test_render_and_scan_are_strings():
