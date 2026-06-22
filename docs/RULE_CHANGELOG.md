@@ -11,6 +11,48 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-22 — Learning-routing process recorded in CLAUDE.md
+
+- **Change:** Added a root `CLAUDE.md` (auto-loaded every session) that fixes
+  WHERE each new learning goes: deterministic checks → CODE
+  (`interpreter/event_evidence.py`) + a regression test; new life-area or its
+  houses/kāraka/saham → DATA (`DOMAIN_PROFILES` / `register_domain`);
+  interpretive judgment → PROMPT (`AI_TRIANGULATION_PROMPT.md`); a true known
+  event → TEST fixture. No engine math altered.
+- **Why (method):** Repeated prompt-only patches do not guarantee correctness
+  and bloat the director file. Routing the *mechanical* half to code (always
+  computed, never forgotten) while keeping only genuine judgment in the prompt
+  is what gives a guarantee and keeps the prompt lean. Every code-learning is
+  locked with a test.
+- **Source:** This project's own miss-analysis (a wedding date missed because
+  the AI fixated on single rules and skipped computations); the Architectural
+  Playbook's engine-vs-AI division of labour.
+- **Failure-mode addressed:** Process — prevents future learnings from landing
+  in the wrong layer (the root cause of single-rule fixation and prompt bloat).
+
+## 2026-06-22 — Domain-general event-evidence engine + interpretive-stance rules
+
+- **Change:** Added `interpreter/event_evidence.py` — a domain-agnostic
+  triangulation builder (Promise & Tempo from Ṣaḍbala/Iṣṭa-Kaṣṭa/Avasthā/varga/
+  Argala/SAV; a full-span per-window ledger of KP, sūkṣma kāraka, Lagna/Lagnesh
+  materialization, Jupiter+Saturn double-transit on house AND lord, BNN, Kakṣyā,
+  Saham, Sudarśana, Varṣaphal-Muntha; and the reversal timed as its own event).
+  Domains are an open `dict`. Added the "interpretive stance" rules to the prompt
+  (no single factor is a veto; significations are multivalent — TYPE not yes/no;
+  each paddhati answers a different sub-question; separate event from aftermath;
+  full-span lord double-transit; soften the KP gate). `build_matrix --events`.
+- **Why (śāstra):** A prediction is valid only when several independent systems
+  converge; the matter materialises through the Lagna/Lagnesh, is desired by the
+  Moon, and is promised by its house/kāraka — and a malefic/node shapes an
+  event's TYPE rather than denying it. A reversal (divorce/job-loss) is a
+  positively-timed event with its own significators, not the mere absence of the
+  first.
+- **Source:** BPHS (Ṣaḍbala, Avasthā, Vargas, Sahams); KP significator theory;
+  classical double-transit (Gochara) doctrine; Jaimini (Arudha, chara-kāraka).
+- **Failure-mode addressed:** Coverage (whole toolkit now always computed) and
+  discrimination (multivalent reading + reversal-as-own-event stop single-rule
+  fixation). Limitation logged: cross-domain `scan` normalisation is v1.
+
 ## 2026-06-19 — Wire Argala + Indu Lagna witnesses into the matrix
 
 - **Change:** Surface Jaimini Argala (intervention) per bhava and Indu Lagna
