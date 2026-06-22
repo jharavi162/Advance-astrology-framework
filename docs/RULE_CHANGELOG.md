@@ -11,6 +11,29 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-22 — Witness/Node registry: upgrade-vs-loss as multi-nodal convergence
+
+- **Change:** Added an open `Witness` registry to `event_evidence.py` — each node
+  is a declarative testimony that votes a signed strength × weight, and a verdict
+  is their weighted convergence, never one rule. Seeded STANDING (natal) witnesses
+  on the matter's house: benefic/malefic dṛṣṭi, lord dignity+strength, rāja-yoga
+  (lord dignified in kendra/trikoṇa), occupant nature, Argala net, SAV. The
+  loss-vs-upgrade `kind` now folds this `standing_balance` in: a natally *blessed*
+  house (e.g. exalted Jupiter aspecting the 10th + Śaśa yoga, balance +1.60 here)
+  upgrades through a dusthāna window rather than breaking; an afflicted one
+  (marriage, −0.40) can truly break. `register_witness(...)` makes nodes dynamic.
+  Prompt updated; tests + changelog added.
+- **Why (śāstra):** Manifestation/cancellation is decided by the *aggregate* of a
+  house's testimony — occupants, aspects, lord, yogas, Argala, Aṣṭakavarga — not
+  by a single significator or the daśā alone. A house blessed by benefic dṛṣṭi and
+  a dignified lord/rāja-yoga resists destruction (BPHS bhāva-bala and yoga
+  doctrine); the running daśā then merely *times* a change within that blessing.
+- **Source:** BPHS (bhāva-bala, graha-dṛṣṭi, Pañca-Mahāpuruṣa/Rāja yogas,
+  Aṣṭakavarga); Jaimini Argala.
+- **Failure-mode addressed:** Discrimination — upgrade-vs-loss was resting on too
+  few nodes (KP-centric); it is now the convergence of the full standing pattern,
+  and the node-set is an open registry (extensible without code rewrites).
+
 ## 2026-06-22 — Distinguish CHANGE/UPGRADE from LOSS/BREAK in the reversal
 
 - **Change:** The reversal block of `event_evidence.py` no longer labels every

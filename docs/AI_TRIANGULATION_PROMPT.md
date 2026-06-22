@@ -235,6 +235,16 @@ checking for this co-occurrence — calling a promotion-by-job-change a "career
 loss," or a divorce-and-remarriage a permanent "end of marriage," is the same
 single-signature error in another costume. Time the reversal as its own event,
 but label its *nature* by this fulfilment test.
+Crucially, upgrade-vs-loss is a **multi-nodal pattern, not a daśā verdict**: weigh
+the matter's whole STANDING natal testimony together — every benefic and malefic
+*dṛṣṭi* on the house (e.g. an exalted Jupiter aspecting the 10th), the lord's
+dignity and strength, any rāja/dhana yoga on the house or its lord, the Argala and
+the SAV — as a balance of independent witnesses. A house that is natally *blessed*
+(benefics aspecting, a dignified lord, a rāja-yoga) rarely *breaks* — it upgrades
+through the same dusthāna window — whereas an afflicted one can truly break. Read
+the convergence of all these nodes, never one. (The engine's `event_evidence`
+witness-registry computes this standing balance for you; add a node as one
+`register_witness(...)` entry rather than hard-coding.)
 
 ### 4C. Multi-Paddhati Confirmation & Timing — ALL SIX ARE MANDATORY
 1. **Varga confirmation (event TYPE):** open the theme's varga (career→D10,

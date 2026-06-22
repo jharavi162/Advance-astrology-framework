@@ -5,7 +5,8 @@ from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart
 from interpreter.event_evidence import (
-    DOMAIN_PROFILES, candidate_map, render_domain, reversal_map, scan_domains,
+    DOMAIN_PROFILES, WITNESSES, candidate_map, register_witness, render_domain,
+    reversal_map, scan_domains, standing_balance,
 )
 
 UTC = timezone.utc
@@ -86,6 +87,30 @@ def test_marriage_divorce_is_loss_remarriage_is_change():
     jan27 = [r for r in rev if r.start.year == 2027 and r.start.month == 1]
     assert jan27 and any(r.kind == "CHANGE/UPGRADE" for r in jan27), \
         "the remarriage must surface as CHANGE/UPGRADE, not loss"
+
+
+def test_standing_witness_pattern_is_multinodal():
+    """Loss-vs-upgrade must be a multi-nodal NATAL pattern, not dasha alone. The
+    career house is natally blessed (exalted Jupiter aspects the 10th, Śaśa
+    rāja-yoga, strong lord) ⇒ strongly PRO; marriage is more afflicted ⇒ lower."""
+    v = _chart()
+    career, _ = standing_balance(v, DOMAIN_PROFILES["career"])
+    marriage, fired = standing_balance(v, DOMAIN_PROFILES["marriage"])
+    assert career >= 1.0, "blessed career house should read PRO/upgrade"
+    assert career > marriage, "career should out-bless marriage natally"
+    # the benefic-dṛṣṭi node (Jupiter aspecting the 10th) must be among the firing
+    cnames = [n for n, _ in standing_balance(v, DOMAIN_PROFILES["career"])[1]]
+    assert any("benefic-dṛṣṭi" in n for n in cnames)
+
+
+def test_witness_registry_is_dynamic():
+    """A new node = one register_witness() call (no logic rewrite)."""
+    before = len(WITNESSES)
+    register_witness("unit-test-node", "standing", 0.1, lambda v, p: 0.0)
+    try:
+        assert len(WITNESSES) == before + 1
+    finally:
+        WITNESSES.pop()  # keep global state clean for other tests
 
 
 def test_render_and_scan_are_strings():
