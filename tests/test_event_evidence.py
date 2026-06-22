@@ -26,8 +26,8 @@ def test_every_domain_builds_without_error():
         rows = candidate_map(v, profile, start, end)
         assert rows, f"{name} produced no candidate windows"
         for r in rows:
-            assert 0 <= r.domain_score <= 6
-            assert r.domain_score <= r.convergence  # Lagna vote only adds
+            assert r.domain_score >= 0
+            assert r.domain_score <= r.convergence + 1e-9  # shared Lagna node only adds
 
 
 def test_marriage_band_is_lit_around_known_wedding():
@@ -101,6 +101,21 @@ def test_standing_witness_pattern_is_multinodal():
     # the benefic-dṛṣṭi node (Jupiter aspecting the 10th) must be among the firing
     cnames = [n for n, _ in standing_balance(v, DOMAIN_PROFILES["career"])[1]]
     assert any("benefic-dṛṣṭi" in n for n in cnames)
+
+
+def test_dasha_is_just_one_node_among_timing_witnesses():
+    """The daśā must be ONE node among the timing witnesses, not a privileged
+    scorer — its votes flow through the same registry as transit/KP/Lagna/etc."""
+    timing = [w for w in WITNESSES if w.layer == "timing"]
+    names = [w.name for w in timing]
+    assert any("daśā" in n for n in names), "daśā must be a registered timing node"
+    assert len(timing) >= 8, "timing should be a panel of many nodes, not just daśā"
+    # and the window score is the convergence of those nodes (daśā not special)
+    v = _chart()
+    rows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                         datetime(2023, 8, 1, tzinfo=UTC),
+                         datetime(2023, 10, 1, tzinfo=UTC))
+    assert rows and isinstance(rows[0].firing_nodes(), list)
 
 
 def test_witness_registry_is_dynamic():

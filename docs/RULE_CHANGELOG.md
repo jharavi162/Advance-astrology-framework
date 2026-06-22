@@ -11,6 +11,26 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-22 — Unify TIMING factors (daśā included) into the witness registry
+
+- **Change:** The per-window scoring no longer uses a hard-coded vote formula; the
+  timing factors are now **registered timing-witnesses** in the same open registry
+  as the standing nodes — the daśā (kāraka-in-chain, kāraka-at-sūkṣma), KP, the
+  double-transit, BNN, Kakṣyā, Saham, Sudarśana, Varṣaphal and the (shared) Lagna
+  node. `WindowEvidence.domain_score`/`convergence` are the weighted convergence of
+  these nodes, and the output lists the firing nodes for the top window. The daśā
+  is thus literally *one node among many*, not a privileged scorer. Prompt's
+  Cardinal Rule updated to say so; tests + changelog added.
+- **Why (śāstra):** No single timekeeper decides an event — Parāśara/Jaimini hold
+  the daśā as one pramāṇa that must be corroborated by gochara, the vargas, KP,
+  Aṣṭakavarga and the bhāva's own standing strength. Privileging the daśā is the
+  cardinal mistake the playbook already forbids; this makes the *code* honour it.
+- **Source:** BPHS (daśā as one of many pramāṇas; gochara/aṣṭakavarga corroboration
+  doctrine); the project's Cardinal Rule.
+- **Failure-mode addressed:** Discrimination/architecture — the daśā was still a
+  separate hard-coded path; it is now one entry in the same node registry, so the
+  verdict is a true multi-nodal convergence and nodes stay fully extensible.
+
 ## 2026-06-22 — Witness/Node registry: upgrade-vs-loss as multi-nodal convergence
 
 - **Change:** Added an open `Witness` registry to `event_evidence.py` — each node

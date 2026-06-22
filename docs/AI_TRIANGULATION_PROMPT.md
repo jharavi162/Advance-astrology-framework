@@ -65,6 +65,17 @@ is **INVALID**, however plausible it sounds. A prediction is valid only when
 *raise* a candidate; **Jaimini + Gochara + Varga + KP + Aṣṭakavarga + Varṣaphal**
 must *confirm or kill* it.
 
+Treat **every** timekeeper and every factor — including the **daśā** — as just
+**one node among many**, never a privileged judge. The daśā does not *decide* an
+event; it is one witness whose vote joins those of the gochara double-transit, the
+KP significators, the Lagna/Lagnesh materialization, the BNN and Kakṣyā triggers,
+the Saham, the Sudarśana, the Varṣaphal, AND the standing natal pattern (the
+benefic/malefic dṛṣṭi on the house, the lord's dignity, the rāja-yogas, Argala,
+Aṣṭakavarga). The verdict is the *weighted convergence of all these nodes*. The
+engine's `event_evidence` registry holds them as one open list of witnesses
+(`register_witness(...)`), the daśā included — so add or re-weight a node as data,
+and never let the daśā, or any single node, pronounce the answer alone.
+
 ---
 
 ## PHASE 1 — UNDERSTAND THE QUESTION
