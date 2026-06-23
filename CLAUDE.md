@@ -17,6 +17,22 @@ Rule: push as much as possible into CODE+DATA (guarantee); PROMPT only for genui
 judgment; every code-learning gets a test. Log each change in
 `docs/RULE_CHANGELOG.md`.
 
+## Evolve the engine yourself — don't work around a missing piece (EVERY SESSION)
+If a question needs a **domain** or a **node/witness** that the engine does not yet
+have, **add it to the engine and merge it to `main`** — never hand-wave around the
+gap or answer from a missing capability. Two cases, two approval levels:
+- **DOMAIN missing** (a new life-area or its houses/kāraka/saham/varga — e.g.
+  `relocation`): add the one `DOMAIN_PROFILES` / `register_domain()` data row
+  **autonomously** (no approval needed), then run the pack and answer.
+- **NODE/WITNESS or mechanical check missing** (a new `register_witness(...)`, a new
+  deterministic check, a new timing factor in `event_evidence.py`): **ask the user
+  for approval FIRST** (it changes how every chart is judged), then add it **with a
+  regression test**.
+- **Always**: after adding either, **merge the change into `main`** (do not leave
+  engine evolution stranded on a feature branch) and **log it in
+  `docs/RULE_CHANGELOG.md`** with its śāstra justification. No calibration/hindsight
+  — add the piece because the śāstra/question needs it, never to fit a known date.
+
 ## Procedure for any astrology question
 1. Run the mechanical pack FIRST:
    `python -m interpreter.event_evidence --domain <matter|scan> --when ... --start ... --end ...`
