@@ -11,6 +11,31 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Add `relocation` (change-of-residence / base) life-area as DATA
+
+- **Change:** Registered a new `relocation` domain row in `event_evidence.py`
+  `_SEED` (no engine math touched, per the CLAUDE.md routing table — a new
+  life-area is DATA): `houses=[4]` (the base/home bhāva), `fulfil_houses=[3,4,11,12]`
+  (3 = movement/short relocation, 4 = the new dwelling, 11 = settling/gain, 12 =
+  leaving the native place / distant residence), `negate_houses=[1,6,8]` (staying
+  rooted / obstacles to a move), `karakas=["Matrikaraka"]`, `natural_karaka=Moon`
+  (mind/dwelling/changes-of-place), `arudhas=["A4"]` (the perceived home), `varga=4`
+  (Chaturthāṃśa — home/fixed-residence). No Saham (the engine's Saham set has no
+  residence/travel point — left `None`).
+- **Why (śāstra):** The 4th bhāva is sukha-sthāna / vāsa-sthāna — home, base, fixed
+  residence and native land; the Moon is its movable kāraka (mind, dwelling,
+  restlessness, changes of place) and the Matṛkāraka the Jaimini significator of
+  the 4th. A change of base is read as the 4th's bhāvāt-bhāvam transition — leaving
+  the present dwelling lights 3/8/12-from-the-4th while the new base + gain are the
+  4th, 11th and 12th (distance) — exactly the reversal block's CHANGE/UPGRADE test.
+  The Chaturthāṃśa (D4) is the classical varga confirming residence/property.
+- **Source:** BPHS bhāva significations (4th = sukha/vāsa, Moon kāraka); Jaimini
+  Matṛkāraka; KP change-of-residence house doctrine (3/9/12 with 4/11); D4 varga.
+- **Failure-mode addressed:** Coverage — relocation questions previously had no
+  domain row and could only be answered via the generic `scan`; now the full
+  triangulation pack (promise/tempo, ledger, double-transit on the 4th and its
+  lord, reversal-as-change) is computed for residence changes like any other matter.
+
 ## 2026-06-22 — Unify TIMING factors (daśā included) into the witness registry
 
 - **Change:** The per-window scoring no longer uses a hard-coded vote formula; the

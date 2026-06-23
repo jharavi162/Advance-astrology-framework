@@ -249,6 +249,9 @@ _SEED = {
                       arudhas=["A6"], saham="Roga", varga=30),
     "education": dict(houses=[4, 5, 9], fulfil_houses=[4, 5, 9, 11], negate_houses=[6, 8, 12],
                       natural_karaka=Planet.MERCURY, arudhas=["A5"], saham="Vidya", varga=24),
+    "relocation": dict(houses=[4], fulfil_houses=[3, 4, 11, 12], negate_houses=[1, 6, 8],
+                       karakas=["Matrikaraka"], natural_karaka=Planet.MOON,
+                       arudhas=["A4"], varga=4),
 }
 for _n, _s in _SEED.items():
     register_domain(_n, **_s)
