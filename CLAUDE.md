@@ -33,6 +33,14 @@ gap or answer from a missing capability. Two cases, two approval levels:
   them to the user for approval FIRST** (a node changes how every chart is judged).
   Only after approval, add it **with a regression test**. The node must stay
   domain-general (read the domain's houses/kāraka, never hard-code a native).
+- **COVERAGE matrix is the anti-miss guard.** A "node miss" is usually a
+  *computed-but-unwired* quantity (the engine calculates it, but no witness reads
+  it). `interpreter/coverage.py` is the single source of truth (technique × wired?);
+  two tests keep it in sync with the live panel (no wired-claim without a witness; no
+  witness without a matrix entry), and every pack prints `coverage_summary()` with
+  the RED gaps. **Whenever you add an engine capability or a witness, update the
+  matrix** — and prefer closing a RED item (wire a computed-but-unwired quantity)
+  over inventing a brand-new computation.
 - **Always**: after adding either, **merge the change into `main`** (do not leave
   engine evolution stranded on a feature branch) and **log it in
   `docs/RULE_CHANGELOG.md`** with its śāstra justification. No calibration/hindsight
@@ -52,5 +60,7 @@ gap or answer from a missing capability. Two cases, two approval levels:
   `salience` ranks windows (convergence-gating + information-weighting).
 - `interpreter/significators.py` — the DICTIONARY: `resolve(word)` maps any theme
   word (Hinglish ok) to a `DomainProfile`, so the CLI takes `--domain <any word>`.
+- `interpreter/coverage.py` — the COVERAGE MATRIX (technique × wired?) + completeness
+  gate; keeps misses visible as RED items. Update it when adding capabilities/nodes.
 - `interpreter/build_matrix.py` — natal+period dump (`--events` appends the pack).
 - `advance_astrology/vedic/chart.py` — `VedicChart`, the single calculation door.

@@ -11,6 +11,34 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — COVERAGE MATRIX + completeness gate (anti-miss machinery)
+
+- **Change:** Added `interpreter/coverage.py` — the single source of truth mapping
+  every classical technique to whether a witness reads it (`wired` / `red` /
+  `interpretive`). `coverage_summary()` is now printed at the top of every event
+  pack, naming the RED (computed-but-unwired) gaps; `audit()` cross-checks the matrix
+  against the live `build_panel` BOTH ways. Two tests enforce sync:
+  `test_every_wired_claim_has_a_live_witness` (no wired-claim without a witness) and
+  `test_every_witness_is_documented_in_the_matrix` (no witness without a matrix
+  entry). CLAUDE.md now instructs every session to update the matrix when adding a
+  capability/node and to prefer closing a RED item over inventing new computation.
+- **Why (the root-cause fix):** the recurring "node miss" was a *silent* gap — a
+  quantity the engine computed but no witness consumed (e.g. the Arudha-axis, then
+  avasthā/Vaiśeṣikāṃśa/maraka/Bhṛgu-Bindu). Silence looked identical to "absent".
+  The matrix converts unknown-unknowns into a **visible RED checklist**, and the
+  two-way audit makes any future drift fail a test instead of mis-predicting. This is
+  the structural answer to "ideally a node should never be missed".
+- **Current state:** 31 wired · 2 interpretive · **10 RED** (now visible, not silent):
+  Nārāyaṇa daśā, Sudasā daśā, Bhāva-Chalit shift, Sade-Sati (Saturn-from-Moon),
+  functional benefic/malefic weighting, full yoga-engine mapping, Bhinnāṣṭakavarga,
+  Indu Lagna/special lagnas, Karakāṃśa, kala-vela upagrahas. Each is a candidate to
+  wire next (with approval + a mechanical test), no longer a silent miss.
+- **Source:** method (single-source-of-truth coverage register; the framework's own
+  MANDATORY COVERAGE CHECKLIST, now made mechanical).
+- **Failure-mode addressed:** Coverage/process — the *class* of silent misses, not a
+  single node. No calibration: the matrix records techniques and wiring, asserts no
+  known date.
+
 ## 2026-06-23 — Wire more computed-but-unwired quantities (avasthā · Vaiśeṣikāṃśa · maraka · Bhṛgu Bindu)
 
 - **Change (NODES, user-approved batch):** Continuing the "computed ⇒ must be wired"

@@ -1027,6 +1027,9 @@ def render_domain(v, profile, start, end) -> str:
          f"negate={sorted(profile.negate_houses)} kāraka={profile.karakas}"
          f"+{profile.natural_karaka.value if profile.natural_karaka else '-'} "
          f"Saham={profile.saham} Varga=D{profile.varga}", ""]
+    # completeness gate — every pack declares its own coverage + the known RED gaps
+    from interpreter.coverage import coverage_summary
+    L += [coverage_summary(), ""]
     L += _fmt_tempo(pt)
     # STANDING WITNESS PATTERN — the natal multi-nodal weight on the matter
     bal, fired = standing_balance(v, profile)
