@@ -1042,8 +1042,13 @@ def main() -> None:
     elif args.domain in DOMAIN_PROFILES:
         print(render_domain(v, DOMAIN_PROFILES[args.domain], start, end))
     else:
-        raise SystemExit(f"unknown domain {args.domain!r}; registered: "
-                         f"{list(DOMAIN_PROFILES)} (or 'scan')")
+        # not a registered domain — resolve the word via the significator dictionary
+        from interpreter.significators import resolve
+        try:
+            profile = resolve(args.domain)
+        except ValueError as e:
+            raise SystemExit(str(e))
+        print(render_domain(v, profile, start, end))
 
 
 if __name__ == "__main__":

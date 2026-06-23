@@ -11,6 +11,34 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Significator DICTIONARY: pick a domain from any word (Phase 2)
+
+- **Change (DATA):** Added `interpreter/significators.py` — a lexicon that maps any
+  life-theme word (English or Hindi/Hinglish) to a `DomainProfile`, so the engine
+  can answer a question about *anything* without the domain being hand-registered.
+  `resolve(word)` does three-tier matching: (1) an already-registered domain, (2) a
+  curated `THEME_LEXICON` spec (vehicle, property, romance, business, foreign,
+  litigation, debt, inheritance, spirituality, fame, surgery…), (3) a last-resort
+  DERIVATION from classical bhāva/graha/varga significations (`HOUSE_THEMES`,
+  `KARAKA_THEMES`, `VARGA_THEMES`) for a truly unknown word. The resolved profile is
+  registered and then judged by the full generative panel like any other matter.
+  `event_evidence` CLI now accepts any word for `--domain` (e.g. `--domain vahan`).
+- **Why (śāstra):** Every theme a human can name has significators in the chart —
+  a bhāva, a kāraka, a varga (BPHS bhāva-significations; the natural kārakas;
+  the ṣoḍaśavarga). Encoding that mapping as DATA is what lets one question-word be
+  turned into the right house/kāraka/varga bundle automatically, instead of a
+  human picking it each time. No engine math; routing is DATA per CLAUDE.md.
+- **Source:** BPHS (bhāva significations, kāraka scheme, ṣoḍaśavarga); Phaladeepika.
+- **Failure-mode addressed:** Coverage/usability — questions previously required a
+  pre-registered domain; now "is vehicle / foreign move / litigation … kab hoga?"
+  resolves to a full triangulation pack directly. Synonyms cover Hinglish input.
+- **Tests:** `tests/test_significators.py` — synonyms → seeded domains, lexicon
+  themes build complete profiles, unknown words derive from house significations,
+  unmappable words raise. (5 tests; 139 total collected.)
+- **Limitation (logged):** tier-3 derivation's fulfil/negate is a documented
+  heuristic (house ∪ 11; 6/8/12-from-house), not the curated KP sets — fine as a
+  fallback; promote a frequently-asked theme into THEME_LEXICON for a tuned spec.
+
 ## 2026-06-23 — Decision rule: convergence-gating + information-weighting (Phase 1, slices 3+4)
 
 - **Change (SCORING):** Added a principled ranking metric `salience` to

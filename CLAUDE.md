@@ -47,5 +47,10 @@ gap or answer from a missing capability. Two cases, two approval levels:
 ## Key files
 - `docs/AI_TRIANGULATION_PROMPT.md` — the analysis director (interpretive).
 - `interpreter/event_evidence.py` — domain-general mechanical evidence builder.
+  Nodes are an open registry; `register_family`/`build_panel` generate the whole
+  element×technique panel per domain; `DASHA_SYSTEMS` is the daśā catalogue;
+  `salience` ranks windows (convergence-gating + information-weighting).
+- `interpreter/significators.py` — the DICTIONARY: `resolve(word)` maps any theme
+  word (Hinglish ok) to a `DomainProfile`, so the CLI takes `--domain <any word>`.
 - `interpreter/build_matrix.py` — natal+period dump (`--events` appends the pack).
 - `advance_astrology/vedic/chart.py` — `VedicChart`, the single calculation door.
