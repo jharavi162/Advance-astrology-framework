@@ -388,6 +388,7 @@ class WindowEvidence:
     fulfil_house_dt: bool = False          # double-transit on the OTHER fulfilment houses + lords
     kp_star_transit: bool = False          # slow planet transiting a fulfilment-significator's star
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
+    mudda_sig: bool = False                # Muddā (Varṣa-Vimśottari) daśā significator running
 
     def firing_nodes(self, shared=None) -> list:
         """The timing witnesses that fire for this window, with their votes.
@@ -454,6 +455,10 @@ register_witness("KP transit: slow planet in significator's star", "timing", 0.7
                  lambda w: 1.0 if w.kp_star_transit else 0.0)
 register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6,
                  lambda w: 1.0 if w.tajika_sig else 0.0)
+# First entry of the DAŚĀ-SYSTEM CATALOGUE (systems-as-data): a non-Vimśottari
+# daśā whose running lord signifies the matter is one more independent witness.
+register_witness("Muddā (Varṣa-Vimśottari) daśā: significator running", "timing", 0.6,
+                 lambda w: 1.0 if w.mudda_sig else 0.0)
 
 
 # Vimśottari nakṣatra-lord cycle (KP star-lord), from Aśvinī = Ketu.
@@ -657,6 +662,30 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 return True
         return False
 
+    # --- node: Muddā (Varṣa-Vimśottari) annual daśā — significator running ----
+    # First entry of the daśā-system catalogue; annual periods cached per year.
+    from advance_astrology.dasha import current_dasha as _current_dasha
+    from advance_astrology.vedic.varshaphal import solar_return_time
+    _mudda_cache, _sr_cache = {}, {}
+
+    def _sr(y):
+        if y not in _sr_cache:
+            _sr_cache[y] = solar_return_time(v, y)
+        return _sr_cache[y]
+
+    def _signifies_matter(lord) -> bool:
+        return bool(set(kps.planet_signifies(lord)) & profile.fulfil_houses) \
+            or lord in karakas
+
+    def _mudda_hit(when) -> bool:
+        y = when.year
+        if when < _sr(y):
+            y -= 1
+        if y not in _mudda_cache:
+            _mudda_cache[y] = v.mudda_dasha(y, levels=3)
+        return any(_signifies_matter(c.lord)
+                   for c in _current_dasha(_mudda_cache[y], when))
+
     rows, d, last = [], start, None
     while d < end:
         chain = _chain_lords(v, d, levels=3)
@@ -691,6 +720,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 fulfil_house_dt=_in(d, fulfil_dt),
                 kp_star_transit=_kp_star_hit(d),
                 tajika_sig=tajika.get(d.year, False),
+                mudda_sig=_mudda_hit(d),
             ))
         d += timedelta(days=step_days)
     return rows
@@ -728,7 +758,8 @@ def _row_line(r: WindowEvidence) -> str:
             f"{'Y' if r.varshaphal_muntha else '-'}  "
             f"{'Y' if r.sudarshana_hit else '-'} "
             f"{'Y' if r.gochara_from_moon else '-'}{'Y' if r.fulfil_house_dt else '-'}"
-            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}  "
+            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}"
+            f"{'Y' if r.mudda_sig else '-'}  "
             f"{r.convergence}")
 
 
@@ -753,7 +784,7 @@ def render_domain(v, profile, start, end) -> str:
         L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
           "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · "
-          "[Moon-gochara·Fulfil-dt·KPstar·Tājika] · conv):"]
+          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Muddā] · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.convergence, x.start))[:5]

@@ -131,6 +131,29 @@ class VedicChart:
         return jaimini.sudasa_dasha(sree_sign, self.signs,
                                     self.when_utc, **kwargs)
 
+    def mudda_dasha(self, year: int, levels: int = 3) -> list[DashaPeriod]:
+        """Muddā / Varṣa-Vimśottari daśā for the Tājika year *year*: the
+        Vimśottari ring compressed into one solar year, seeded from the annual
+        chart's Moon. (Tājika Nīlakaṇṭhī.)"""
+        from .varshaphal import solar_return_time
+        ac = self.varshaphal(year)
+        year_days = (solar_return_time(self, year + 1)
+                     - ac.solar_return).total_seconds() / 86400.0
+        moon_lon = ac.chart.longitudes[Planet.MOON]
+        return dasha_systems.mudda(moon_lon, ac.solar_return, year_days,
+                                   levels=levels)
+
+    def current_mudda_dasha(self, when: datetime | None = None,
+                            levels: int = 3) -> list[DashaPeriod]:
+        """Active Muddā chain at *when* — picks the Tājika year whose solar
+        return precedes *when*, then drills the annual daśā."""
+        from .varshaphal import solar_return_time
+        when = when or datetime.now(timezone.utc)
+        y = when.year
+        if when < solar_return_time(self, y):
+            y -= 1
+        return current_dasha(self.mudda_dasha(y, levels=levels), when)
+
     # -- Jaimini -------------------------------------------------------- #
     def chara_karakas(self, scheme: int = 8) -> dict[str, Planet]:
         return jaimini.chara_karakas(self.longitudes, scheme)

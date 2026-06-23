@@ -11,6 +11,33 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Muddā (Varṣa-Vimśottari) annual daśā + first daśā-system-catalogue node (Phase 1, slice 1)
+
+- **Change (ENGINE):** Added `dashas.mudda(...)` and `VedicChart.mudda_dasha(year)` /
+  `VedicChart.current_mudda_dasha(when)`. Muddā is the Vimśottari ring compressed
+  into one solar year (solar-return → next solar-return), seeded from the **annual
+  chart's Moon** nakṣatra with the usual elapsed-balance, in exact Vimśottari
+  proportions. Engine test `test_mudda_dasha_spans_one_year_in_vimshottari_proportion`.
+- **Change (NODE):** Registered `Muddā (Varṣa-Vimśottari) daśā: significator
+  running` as a timing witness (weight 0.6) — fires when a lord in the active Muddā
+  chain signifies the domain's fulfilment houses or is a domain kāraka. This is the
+  **first entry of the daśā-system catalogue** (systems-as-data): the panel can now
+  carry any non-Vimśottari daśā as one more independent witness. Annual periods are
+  cached per Tājika year in `candidate_map`. Ledger gains a Muddā column.
+- **Why (śāstra):** The Muddā / Varṣa-Vimśottari daśā is the classical timekeeper
+  *inside* the Tājika annual chart — it resolves the year into planet-ruled
+  sub-periods and is an independent vote alongside Vimśottari, the Jaimini rāśi
+  daśās and gochara. (Previously deferred in the 2026-06-19 Varṣaphal entry; now
+  built, user-approved.)
+- **Source:** Tājika Nīlakaṇṭhī (Muddā / Varṣa-Vimśottari daśā); Vimśottari
+  proportions (BPHS).
+- **Failure-mode addressed:** Coverage — the annual chart had Muntha/Varṣeśa but no
+  annual *daśā*; the year's internal timing was invisible to triangulation.
+- **Architecture note:** This is the first concrete step of the **generative-panel**
+  direction — daśā systems become catalogue entries the panel iterates, rather than
+  hand-wired one-offs. Convergence-gating + information-weighting (the safeguards
+  that make a wide node-set raise rather than lower accuracy) are the next slices.
+
 ## 2026-06-23 — Four user-approved timing NODES (gochara-from-Moon, fulfil-house DT, KP star-transit, Tājika Varṣeśa/Muntha)
 
 - **Change:** Added four new TIMING witnesses to `event_evidence.py` (each one

@@ -134,7 +134,7 @@ def test_new_timing_nodes_registered_and_computed():
     timing witnesses and populated on every candidate window."""
     names = [w.name for w in WITNESSES if w.layer == "timing"]
     for needle in ("gochara from Moon", "fulfilment-houses double-transit",
-                   "KP transit:", "Tājika Varṣeśa/Muntha"):
+                   "KP transit:", "Tājika Varṣeśa/Muntha", "Muddā"):
         assert any(needle in n for n in names), f"missing node: {needle}"
     v = _chart()
     rows = candidate_map(v, DOMAIN_PROFILES["relocation"],
@@ -146,6 +146,7 @@ def test_new_timing_nodes_registered_and_computed():
         assert isinstance(r.fulfil_house_dt, bool)
         assert isinstance(r.kp_star_transit, bool)
         assert isinstance(r.tajika_sig, bool)
+        assert isinstance(r.mudda_sig, bool)
     # nodes that fire in this relocation band (not dead code)
     assert any(r.fulfil_house_dt for r in rows)
     assert any(r.kp_star_transit for r in rows)

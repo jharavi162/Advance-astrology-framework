@@ -161,6 +161,25 @@ def test_sudasa_dasha_twelve_signs(vchart):
     assert SIGNS[sree_sign] == sd[0].note
 
 
+def test_mudda_dasha_spans_one_year_in_vimshottari_proportion(vchart):
+    """Muddā / Varṣa-Vimśottari: the 120-year ring compressed into one solar
+    year, seeded from the annual-chart Moon."""
+    from advance_astrology.constants import Planet
+    md = vchart.mudda_dasha(2025, levels=2)
+    cycle = md[:9]                                   # first pass = 9 mahādaśās
+    assert len({p.lord for p in cycle}) == 9         # all nine grahas, no repeat
+    total = sum((p.end - p.start).total_seconds() for p in cycle) / 86400.0
+    assert 360 <= total <= 370                        # one solar year
+    # proportions follow Vimśottari (Venus 20/120 ≈ 60.8d, Sun 6/120 ≈ 18.2d)
+    span = {p.lord: (p.end - p.start).total_seconds() / 86400.0 for p in cycle}
+    assert abs(span[Planet.VENUS] - total * 20 / 120) < 1.0
+    assert abs(span[Planet.SUN] - total * 6 / 120) < 1.0
+    # active chain resolves and is three deep
+    chain = vchart.current_mudda_dasha(
+        datetime(2025, 6, 15, tzinfo=timezone.utc), levels=3)
+    assert len(chain) == 3
+
+
 # --------------------------------------------------------------------------- #
 # Arudha
 # --------------------------------------------------------------------------- #

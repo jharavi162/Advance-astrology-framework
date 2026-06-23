@@ -108,6 +108,45 @@ def vimshottari(moon_sidereal_longitude: float, birth: datetime,
 
 
 # --------------------------------------------------------------------------- #
+# Muddā / Varṣa-Vimśottari (Tājika annual daśā)
+# --------------------------------------------------------------------------- #
+
+def mudda(annual_moon_longitude: float, solar_return: datetime,
+          year_days: float, levels: int = 2, cycles: int = 2) -> list[DashaPeriod]:
+    """Muddā (Varṣa-Vimśottari) daśā for one Tājika year.
+
+    Same Vimśottari proportions, but the WHOLE 120-year ring is compressed into a
+    single solar year (``year_days`` = this solar return → the next), and the
+    start lord is taken from the **annual chart's Moon** nakṣatra (not the natal
+    Moon). ``cycles`` ≥ 2 so the year is fully covered after the elapsed-balance
+    shift. Source: Tājika Nīlakaṇṭhī (Muddā / Varṣa-Vimśottari).
+    """
+    nak = nakshatra_of(annual_moon_longitude)
+    start_index = nak.index % 9
+    total_years = sum(y for _, y in VIMSHOTTARI_RING)
+    _, start_years = VIMSHOTTARI_RING[start_index]
+    elapsed_days = nak.fraction_traversed * (start_years / total_years) * year_days
+    cursor = solar_return - timedelta(days=elapsed_days)
+
+    n = len(VIMSHOTTARI_RING)
+    periods: list[DashaPeriod] = []
+    for _c in range(cycles):
+        for k in range(n):
+            idx = (start_index + k) % n
+            lord, years = VIMSHOTTARI_RING[idx]
+            span = year_days * years / total_years
+            end = cursor + timedelta(days=span)
+            maha = DashaPeriod(lord, cursor, end, level=1)
+            if levels >= 2:
+                maha.sub_periods = _subdivide(
+                    VIMSHOTTARI_RING, idx, total_years, cursor, span, 2, levels
+                )
+            periods.append(maha)
+            cursor = end
+    return periods
+
+
+# --------------------------------------------------------------------------- #
 # Ashtottari (108 years)
 # --------------------------------------------------------------------------- #
 
