@@ -11,6 +11,38 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Wire more computed-but-unwired quantities (avasthā · Vaiśeṣikāṃśa · maraka · Bhṛgu Bindu)
+
+- **Change (NODES, user-approved batch):** Continuing the "computed ⇒ must be wired"
+  audit, registered four witnesses that read quantities the engine already computed
+  but no node consumed:
+  - **avasthā affliction** (standing, Track-B): occupants/lords/kārakas of the matter
+    in a dead/troubled avasthā (Mṛta/Vṛddha baladi, Khala/Vikala/Dukhita dīptādi, or
+    combust) → negative. (BPHS Avasthā.)
+  - **Vaiśeṣikāṃśa grade** (standing, promise): the multi-varga strength grade
+    (Adhama…Śrīdhāma) of the matter's lords/kārakas → +/−. (Vaiśeṣikāṃśa scale.)
+  - **maraka afflicts the matter** (standing): a maraka graha is the matter's
+    lord/kāraka → negative — **scoped to adverse-longevity matters only** (primary
+    house ∩ {6,8}), so it does not mis-penalise marriage/career. (BPHS maraka.)
+  - **Bhṛgu Bindu activation** (timing, own paddhati `nadi`): the Moon–Rāhu midpoint
+    lit by a slow mover (Jupiter/Saturn occupation or dṛṣṭi). (Nāḍī / KN Rao.)
+  Restricted the avasthā scan to the nine grahas (outer planets have no dignity).
+- **Why (the lesson):** same class as the Arudha-axis miss — the engine computed
+  `avasthas`, `vaiseshikamsa`, `marakas`, `bhrigu_bindu`, but **no witness read
+  them**, so they never reached triangulation. Wiring them widens coverage; the
+  decision rule's information-weighting + convergence-gating keep the wider node-set
+  from adding noise (low-discrimination nodes self-attenuate).
+- **Source:** BPHS (Avasthā, maraka), Vaiśeṣikāṃśa scale, Nāḍī Bhṛgu Bindu.
+- **Failure-mode addressed:** Coverage — four more computed-but-unwired witnesses
+  closed. Standing invariant preserved (career +1.80 ≥ 1.0 > marriage; the new
+  nodes shift absolutes but not the structural ordering).
+- **NO calibration:** tests are mechanical (nodes registered, compute, maraka scoped
+  to 6/8, Bhṛgu Bindu is its own paddhati). No known date asserted. Test:
+  `test_newly_wired_computed_quantities_are_nodes`.
+- **Still open (proposed):** the formal COVERAGE MATRIX + mechanical completeness-gate
+  so remaining gaps (bhāva-chalit shift, functional-nature weighting, kala-vela
+  upagrahas, full yoga-engine mapping) become RED checklist items, not silent misses.
+
 ## 2026-06-23 — Jaimini Arudha-axis gochara node (a computed-but-UNWIRED quantity)
 
 - **Change (NODE, user-approved):** Added a domain-general timing witness "Jaimini

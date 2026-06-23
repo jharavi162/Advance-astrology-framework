@@ -221,6 +221,26 @@ def test_arudha_axis_node_registered_and_independent_paddhati():
     assert any(r.arudha_axis for r in rows)           # fires (not dead code)
 
 
+def test_newly_wired_computed_quantities_are_nodes():
+    """Coverage: quantities the engine computed but no witness READ are now wired.
+    MECHANICAL — registered + compute + (for the standing affliction ones) behave
+    sensibly; no native's date is asserted."""
+    snames = [w.name for w in WITNESSES if w.layer == "standing"]
+    tnames = [w.name for w in WITNESSES if w.layer == "timing"]
+    for needle in ("avasthā affliction", "Vaiśeṣikāṃśa", "maraka"):
+        assert any(needle in n for n in snames), f"standing node missing: {needle}"
+    assert any("Bhṛgu Bindu" in n for n in tnames)
+    assert _paddhati("Bhṛgu Bindu activation (Nāḍī)") == "nadi"
+    v = _chart()
+    # maraka node is scoped to adverse-longevity matters (primary 6/8) only
+    from interpreter.event_evidence import _w_maraka
+    assert _w_maraka(v, DOMAIN_PROFILES["career"]) == 0.0      # not a 6/8 matter
+    rows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                         datetime(2016, 8, 1, tzinfo=UTC),
+                         datetime(2017, 2, 1, tzinfo=UTC))
+    assert rows and all(isinstance(r.bb_active, bool) for r in rows)
+
+
 def test_decision_rule_convergence_gate_and_information_weighting():
     """Slices 3+4: salience = info-weighted votes grouped by independent paddhati,
     gated on ≥2 systems converging — NOT a flat sum."""

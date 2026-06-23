@@ -196,6 +196,54 @@ register_witness("argala-net", "standing", 0.8, _w_argala)
 register_witness("SAV-of-house", "standing", 0.8, _w_sav)
 
 
+# --- standing witnesses for previously-COMPUTED-BUT-UNWIRED quantities -------
+# (avasthā moods, Vaiśeṣikāṃśa multi-varga grade, maraka) — each reads the
+# matter's lords/kārakas, domain-general, never a native.
+_VAISESHIKAMSA_RANK = {"Adhama": 1, "Parijata": 2, "Uttama": 3, "Gopura": 4,
+                       "Simhasana": 5, "Paravata": 6, "Devaloka": 7,
+                       "Brahmaloka": 8, "Airavata": 9, "Sridhama": 10}
+
+
+def _matter_planets(v, p):
+    """The matter's significating grahas: house-lords + kārakas."""
+    return {v.house_lord(h) for h in p.houses} | _karaka_planets(v, p)
+
+
+def _w_avastha_affliction(v, p):
+    """Track-B: occupants/lords/kārakas in a dead/troubled avasthā (BPHS)."""
+    bad_bala, bad_deepta = {"Mrita", "Vriddha"}, {"Khala", "Vikala", "Dukhita"}
+    nine = _NAT_BENEFIC | _NAT_MALEFIC                 # the 9 grahas (no outer planets)
+    planets = set(_matter_planets(v, p))
+    for h in p.houses:
+        planets |= set(v.planets_in_house(h))
+    hit = sum(1 for pl in (planets & nine)
+              if v.avasthas(pl).get("baladi") in bad_bala
+              or v.avasthas(pl).get("deeptadi") in bad_deepta
+              or v.avasthas(pl).get("combust") == "Yes")
+    return -min(1.0, 0.5 * hit)
+
+
+def _w_vaiseshikamsa(v, p):
+    """Promise: multi-varga (Vaiśeṣikāṃśa) grade of the matter's lords/kārakas."""
+    ranks = [_VAISESHIKAMSA_RANK.get(v.vaiseshikamsa(pl), 1)
+             for pl in _matter_planets(v, p)]
+    if not ranks:
+        return 0.0
+    return max(-1.0, min(1.0, (sum(ranks) / len(ranks) - 5) / 4))
+
+
+def _w_maraka(v, p):
+    """Maraka affliction — only for adverse-longevity matters (primary 6/8)."""
+    if not ({6, 8} & set(p.houses)):
+        return 0.0
+    return -1.0 if (set(v.marakas()) & _matter_planets(v, p)) else 0.0
+
+
+register_witness("avasthā affliction (Mṛta/Khala/combust)", "standing", 0.8, _w_avastha_affliction)
+register_witness("Vaiśeṣikāṃśa grade (multi-varga strength)", "standing", 1.0, _w_vaiseshikamsa)
+register_witness("maraka afflicts the matter", "standing", 0.8, _w_maraka)
+
+
 def standing_balance(v, profile):
     """Net natal pro/anti pattern on the matter + the list of firing nodes."""
     total = 0.0
@@ -420,6 +468,7 @@ class WindowEvidence:
     kp_star_transit: bool = False          # slow planet transiting a fulfilment-significator's star
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
     arudha_axis: bool = False              # slow benefic/kāraka activating the Arudha axis (UL/2nd-from-UL …)
+    bb_active: bool = False                # Bhṛgu Bindu activated by a slow mover (Nāḍī timing)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
     systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
@@ -498,6 +547,10 @@ register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6
 # computed-but-UNWIRED quantity (arudhas existed in the profile, no node read them).
 register_witness("Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)", "timing", 0.8,
                  lambda w: 1.0 if w.arudha_axis else 0.0)
+# Bhṛgu Bindu (Moon–Rāhu midpoint) — a Nāḍī sensitive point; slow-transit activation
+# marks event-timing. Computed by the engine but previously unwired. Own paddhati.
+register_witness("Bhṛgu Bindu activation (Nāḍī)", "timing", 0.5,
+                 lambda w: 1.0 if w.bb_active else 0.0)
 
 
 # ---------------------------------------------------------------------------- #
@@ -794,6 +847,16 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 return True
         return False
 
+    # --- node: Bhṛgu Bindu (Moon–Rāhu midpoint) activated by a slow mover -----
+    bb_sign = int(v.bhrigu_bindu() // 30)
+
+    def _bb_hit(when) -> bool:
+        for p in (Planet.JUPITER, Planet.SATURN):
+            ps = tr.transit_sign(when, p)
+            if ps == bb_sign or any((ps + a) % 12 == bb_sign for a in _ASPECT_OFFSETS[p]):
+                return True
+        return False
+
     # --- DAŚĀ-SYSTEM CATALOGUE: instantiate each system's active-significator
     # lookup ONCE (per-system caching lives inside the adapter), then per window
     # set a generic signal the family-generated node reads. Adding a system =
@@ -845,6 +908,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 kp_star_transit=_kp_star_hit(d),
                 tajika_sig=tajika.get(d.year, False),
                 arudha_axis=_arudha_axis_hit(d),
+                bb_active=_bb_hit(d),
                 signals=sig,
             )
             we.panel = panel
@@ -873,6 +937,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
 _PADDHATI_RULES = [
     ("daśā", "dasha"), ("Lagneśa", "dasha"),
     ("Arudha", "jaimini"), ("Upapada", "jaimini"),
+    ("Bhṛgu Bindu", "nadi"),
     ("KP", "kp"),
     ("double-transit", "gochara"), ("gochara", "gochara"),
     ("Lagna materialization", "gochara"), ("BNN", "gochara"),
@@ -946,7 +1011,7 @@ def _row_line(r: WindowEvidence) -> str:
             f"{'Y' if r.sudarshana_hit else '-'} "
             f"{'Y' if r.gochara_from_moon else '-'}{'Y' if r.fulfil_house_dt else '-'}"
             f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}"
-            f"{'Y' if r.arudha_axis else '-'}  "
+            f"{'Y' if r.arudha_axis else '-'}{'Y' if r.bb_active else '-'}  "
             f"D:{sum(1 for x in r.signals.values() if x)}/{len(r.signals)}  "
             f"{r.convergence}")
 
@@ -972,7 +1037,7 @@ def render_domain(v, profile, start, end) -> str:
         L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
           "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · "
-          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Arudha-axis] · D:daśā-catalogue/n · conv):"]
+          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Arudha-axis·BhṛguBindu] · D:daśā-catalogue/n · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.salience, x.start))[:5]
