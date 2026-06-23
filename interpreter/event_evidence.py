@@ -419,6 +419,7 @@ class WindowEvidence:
     fulfil_house_dt: bool = False          # double-transit on the OTHER fulfilment houses + lords
     kp_star_transit: bool = False          # slow planet transiting a fulfilment-significator's star
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
+    arudha_axis: bool = False              # slow benefic/kāraka activating the Arudha axis (UL/2nd-from-UL …)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
     systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
@@ -490,6 +491,13 @@ register_witness("KP transit: slow planet in significator's star", "timing", 0.7
                  lambda w: 1.0 if w.kp_star_transit else 0.0)
 register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6,
                  lambda w: 1.0 if w.tajika_sig else 0.0)
+# Jaimini Arudha-axis gochara (user-approved 2026-06-23). Domain-general: the
+# matter's Arudha (for marriage UL) and the 2nd-from-it (sustenance) lit by a slow
+# benefic (Jupiter/Saturn occupation OR dṛṣṭi) or the domain kāraka (conjunction).
+# Source: Jaimini Sūtras / BPHS Upapada doctrine; Common-Timing-Miss #3. This was a
+# computed-but-UNWIRED quantity (arudhas existed in the profile, no node read them).
+register_witness("Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)", "timing", 0.8,
+                 lambda w: 1.0 if w.arudha_axis else 0.0)
 
 
 # ---------------------------------------------------------------------------- #
@@ -766,6 +774,26 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 return True
         return False
 
+    # --- node: Jaimini Arudha-axis gochara (the matter's Arudha + 2nd-from-it) ---
+    ar = v.arudhas()
+    axis_signs = set()
+    for k in profile.arudhas:
+        s = ar.get(k)
+        if s is not None:
+            axis_signs.add(s)
+            axis_signs.add((s + 1) % 12)            # 2nd-from-the-Arudha (sustenance)
+
+    def _arudha_axis_hit(when) -> bool:
+        for p in (Planet.JUPITER, Planet.SATURN):   # slow benefic: occupation OR dṛṣṭi
+            ps = tr.transit_sign(when, p)
+            if ps in axis_signs or any((ps + a) % 12 in axis_signs
+                                       for a in _ASPECT_OFFSETS[p]):
+                return True
+        for p in karakas:                            # domain kāraka (e.g. DK): conjunction
+            if tr.transit_sign(when, p) in axis_signs:
+                return True
+        return False
+
     # --- DAŚĀ-SYSTEM CATALOGUE: instantiate each system's active-significator
     # lookup ONCE (per-system caching lives inside the adapter), then per window
     # set a generic signal the family-generated node reads. Adding a system =
@@ -816,6 +844,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 fulfil_house_dt=_in(d, fulfil_dt),
                 kp_star_transit=_kp_star_hit(d),
                 tajika_sig=tajika.get(d.year, False),
+                arudha_axis=_arudha_axis_hit(d),
                 signals=sig,
             )
             we.panel = panel
@@ -843,6 +872,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
 # ---------------------------------------------------------------------------- #
 _PADDHATI_RULES = [
     ("daśā", "dasha"), ("Lagneśa", "dasha"),
+    ("Arudha", "jaimini"), ("Upapada", "jaimini"),
     ("KP", "kp"),
     ("double-transit", "gochara"), ("gochara", "gochara"),
     ("Lagna materialization", "gochara"), ("BNN", "gochara"),
@@ -915,7 +945,8 @@ def _row_line(r: WindowEvidence) -> str:
             f"{'Y' if r.varshaphal_muntha else '-'}  "
             f"{'Y' if r.sudarshana_hit else '-'} "
             f"{'Y' if r.gochara_from_moon else '-'}{'Y' if r.fulfil_house_dt else '-'}"
-            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}  "
+            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}"
+            f"{'Y' if r.arudha_axis else '-'}  "
             f"D:{sum(1 for x in r.signals.values() if x)}/{len(r.signals)}  "
             f"{r.convergence}")
 
@@ -941,7 +972,7 @@ def render_domain(v, profile, start, end) -> str:
         L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
           "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · "
-          "[Moon-gochara·Fulfil-dt·KPstar·Tājika] · D:daśā-catalogue/n · conv):"]
+          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Arudha-axis] · D:daśā-catalogue/n · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.salience, x.start))[:5]

@@ -11,6 +11,38 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Jaimini Arudha-axis gochara node (a computed-but-UNWIRED quantity)
+
+- **Change (NODE, user-approved):** Added a domain-general timing witness "Jaimini
+  Arudha-axis activation (UL / 2nd-from-Arudha)" to `event_evidence.py`. For the
+  matter's Arudha(s) (`profile.arudhas`, e.g. UL for marriage) and the 2nd-from-each
+  (sustenance), it fires when a slow benefic (Jupiter/Saturn) touches the axis by
+  **occupation OR dṛṣṭi**, or the domain kāraka (e.g. Darakāraka) touches it by
+  **conjunction**. Registered as its OWN paddhati (`jaimini`) so convergence-gating
+  counts it as an independent system.
+- **Why this node MISSED before (the real lesson, not the date):** the Upapada/Arudha
+  was *computed* by the engine (`v.arudhas()`; the marriage profile even lists
+  `arudhas=["A7","UL"]`) but **no witness READ it** — `candidate_map`'s double-transit
+  ran only on `profile.houses` + lord. So the evidence existed inside the engine yet
+  never reached triangulation: a **computed-but-unwired** gap. This is a class, not a
+  one-off (Bhrigu Bindu, special lagnas, upagrahas, Tājika ithāsāla are candidates to
+  audit next).
+- **Why (śāstra):** Jaimini Upapada = the spouse / formal union; the 2nd-from-UL =
+  its sustenance. A slow benefic or the Darakāraka activating that axis is a classic
+  vivāha trigger (Common-Timing-Miss #3 in `AI_TRIANGULATION_PROMPT.md`). The node is
+  domain-general — it reads whatever Arudha the domain declares.
+- **Source:** Jaimini Sūtras / BPHS Upapada doctrine; the framework's own
+  Common-Timing-Miss #3.
+- **Failure-mode addressed:** Coverage — closes one computed-but-unwired witness.
+- **NO calibration:** the regression test is **mechanical** — it asserts the node is
+  registered, computes a bool on every window, is its own paddhati, and FIRES when
+  the slow movers work the axis. It does **NOT** assert any native's known date ranks
+  top (that would be hindsight). Test:
+  `test_arudha_axis_node_registered_and_independent_paddhati`.
+- **Open systematic fix (proposed, not yet built):** a COVERAGE MATRIX (technique ×
+  wired?) + a "computed ⇒ must be wired" audit + a mechanical completeness-gate, so
+  missing nodes become known RED gaps instead of silent misses.
+
 ## 2026-06-23 — Significator DICTIONARY: pick a domain from any word (Phase 2)
 
 - **Change (DATA):** Added `interpreter/significators.py` — a lexicon that maps any

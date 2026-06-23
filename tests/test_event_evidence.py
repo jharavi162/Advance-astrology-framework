@@ -201,6 +201,26 @@ def test_window_scores_use_the_full_panel_including_families():
     assert any("daśā[" in n for n in fired)
 
 
+def test_arudha_axis_node_registered_and_independent_paddhati():
+    """Jaimini Arudha-axis gochara (the previously computed-but-UNWIRED Upapada
+    axis) is now a registered, domain-general timing node and an INDEPENDENT
+    paddhati. MECHANICAL test only — asserts the node exists, computes, fires when
+    the slow movers touch the axis, and is its own system. No date is asserted
+    (that would be calibration)."""
+    names = [w.name for w in WITNESSES if w.layer == "timing"]
+    assert any("Arudha-axis" in n for n in names), "Arudha-axis node not registered"
+    assert _paddhati("Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)") == "jaimini"
+    v = _chart()
+    # 2016-08..2017-01: Jupiter+Saturn work the marriage UL-axis (Scorpio/Sagittarius)
+    rows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                         datetime(2016, 8, 1, tzinfo=UTC),
+                         datetime(2017, 2, 1, tzinfo=UTC))
+    assert rows
+    for r in rows:
+        assert isinstance(r.arudha_axis, bool)        # computed, not left None
+    assert any(r.arudha_axis for r in rows)           # fires (not dead code)
+
+
 def test_decision_rule_convergence_gate_and_information_weighting():
     """Slices 3+4: salience = info-weighted votes grouped by independent paddhati,
     gated on ≥2 systems converging — NOT a flat sum."""
