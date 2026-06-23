@@ -384,6 +384,10 @@ class WindowEvidence:
     varshaphal_muntha: bool
     chara_ad: str
     sudarshana_hit: bool
+    gochara_from_moon: bool = False        # Jup+Sat double-transit reckoned from the Moon
+    fulfil_house_dt: bool = False          # double-transit on the OTHER fulfilment houses + lords
+    kp_star_transit: bool = False          # slow planet transiting a fulfilment-significator's star
+    tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
 
     def firing_nodes(self, shared=None) -> list:
         """The timing witnesses that fire for this window, with their votes.
@@ -437,6 +441,28 @@ register_witness("Sudarśana wheel", "timing", 1.0,
                  lambda w: 1.0 if w.sudarshana_hit else 0.0)
 register_witness("Lagna materialization", "timing", 1.0,
                  lambda w: 1.0 if w.lagna_activators else 0.0, shared=True)
+
+# --- nodes added 2026-06-23 (user-approved): classical residence-change /
+# timing witnesses the panel was missing. Domain-general — each reads the
+# domain's houses/fulfil set, never a native. (RULE_CHANGELOG documents sources
+# and weights.) ------------------------------------------------------------- #
+register_witness("gochara from Moon (Chandra-lagna double-transit)", "timing", 1.0,
+                 lambda w: 1.0 if w.gochara_from_moon else 0.0)
+register_witness("fulfilment-houses double-transit (+lords)", "timing", 0.7,
+                 lambda w: 1.0 if w.fulfil_house_dt else 0.0)
+register_witness("KP transit: slow planet in significator's star", "timing", 0.7,
+                 lambda w: 1.0 if w.kp_star_transit else 0.0)
+register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6,
+                 lambda w: 1.0 if w.tajika_sig else 0.0)
+
+
+# Vimśottari nakṣatra-lord cycle (KP star-lord), from Aśvinī = Ketu.
+_NAK_LORDS = [Planet.KETU, Planet.VENUS, Planet.SUN, Planet.MOON, Planet.MARS,
+              Planet.RAHU, Planet.JUPITER, Planet.SATURN, Planet.MERCURY]
+
+
+def _nakshatra_lord(lon: float) -> Planet:
+    return _NAK_LORDS[int((lon % 360) / (360 / 27)) % 9]
 
 
 def _slow_on_sign(tr, sign, when, planets=(Planet.JUPITER, Planet.SATURN)):
@@ -595,6 +621,42 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
     kak_w = _kakshya_windows(tr, start, end)
     muntha = {y: v.varshaphal(y).muntha_house for y in range(start.year, end.year + 1)}
 
+    # --- node: gochara reckoned FROM THE MOON (classical Janma-rāśi gochara) ---
+    moon_sign = v.signs[Planet.MOON]
+    moon_dt = []
+    for h in profile.houses:
+        sgn = (moon_sign + h - 1) % 12
+        moon_dt += _dt_windows(tr, (sgn - lagna_sign) % 12 + 1, start, end)
+
+    # --- node: double-transit on the OTHER fulfilment houses + their lords -----
+    # (the primary house + its lord are already covered by the Lagna-based node)
+    fulfil_dt = []
+    for h in sorted(profile.fulfil_houses):
+        if h in profile.houses:
+            continue
+        fulfil_dt += _dt_windows(tr, h, start, end)
+        flord = v.house_lord(h)
+        fulfil_dt += _dt_windows(tr, (v.signs[flord] - lagna_sign) % 12 + 1, start, end)
+
+    # --- node: Tājika Varṣeśa / Muntha-lord signifies the matter (per year) ----
+    tajika = {}
+    for y in range(start.year, end.year + 1):
+        vp = v.varshaphal(y)
+        hit = vp.muntha_house in profile.fulfil_houses
+        for lord in (vp.lagna_lord, vp.muntha_lord):
+            if lord and set(kps.planet_signifies(lord)) & profile.fulfil_houses:
+                hit = True
+        tajika[y] = hit
+
+    def _kp_star_hit(when) -> bool:
+        """KP: a slow planet transiting the star of a fulfilment-significator."""
+        pos = tr.positions(when, [Planet.JUPITER, Planet.SATURN])
+        for p in (Planet.JUPITER, Planet.SATURN):
+            nl = _nakshatra_lord(pos[p])
+            if set(kps.planet_signifies(nl)) & profile.fulfil_houses:
+                return True
+        return False
+
     rows, d, last = [], start, None
     while d < end:
         chain = _chain_lords(v, d, levels=3)
@@ -625,6 +687,10 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 sudarshana_hit=any(s in dom_signs for s in
                                    (su.lagna_month_sign, su.moon_month_sign,
                                     su.lagna_year_sign, su.moon_year_sign)),
+                gochara_from_moon=_in(d, moon_dt),
+                fulfil_house_dt=_in(d, fulfil_dt),
+                kp_star_transit=_kp_star_hit(d),
+                tajika_sig=tajika.get(d.year, False),
             ))
         d += timedelta(days=step_days)
     return rows
@@ -660,7 +726,10 @@ def _row_line(r: WindowEvidence) -> str:
             f"{'Y' if r.saham_double_transit else '-'} "
             f"{'Y' if r.bnn else '-'} {'Y' if r.kakshya else '-'} "
             f"{'Y' if r.varshaphal_muntha else '-'}  "
-            f"{'Y' if r.sudarshana_hit else '-'}  {r.convergence}")
+            f"{'Y' if r.sudarshana_hit else '-'} "
+            f"{'Y' if r.gochara_from_moon else '-'}{'Y' if r.fulfil_house_dt else '-'}"
+            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}  "
+            f"{r.convergence}")
 
 
 def render_domain(v, profile, start, end) -> str:
@@ -683,7 +752,8 @@ def render_domain(v, profile, start, end) -> str:
     for nm, c in sorted(fired, key=lambda x: -abs(x[1])):
         L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
-          "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · conv):"]
+          "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · "
+          "[Moon-gochara·Fulfil-dt·KPstar·Tājika] · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.convergence, x.start))[:5]

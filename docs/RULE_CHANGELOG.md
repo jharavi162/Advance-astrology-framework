@@ -11,6 +11,50 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Four user-approved timing NODES (gochara-from-Moon, fulfil-house DT, KP star-transit, Tājika Varṣeśa/Muntha)
+
+- **Change:** Added four new TIMING witnesses to `event_evidence.py` (each one
+  `register_witness(...)` + a populated `WindowEvidence` field + a ledger column;
+  domain-general, reading the domain's houses/fulfil-set, never a native):
+  1. **Gochara from the Moon (Chandra-lagna double-transit)** — the Jupiter+Saturn
+     joint activation of the matter's house reckoned **from the natal Moon**, not
+     only from the Lagna. Weight 1.0.
+  2. **Fulfilment-houses double-transit (+lords)** — the double-transit run on the
+     domain's *other* fulfilment houses and their lords (e.g. the 3rd & 12th for
+     relocation), not the primary house alone. Weight 0.7.
+  3. **KP transit: slow planet in a significator's star** — Jupiter/Saturn
+     transiting a nakṣatra whose star-lord signifies the domain's fulfilment houses
+     (KP transit theory; nakṣatra-lord computed from the Vimśottari cycle). Weight 0.7.
+  4. **Tājika Varṣeśa/Muntha signifies the matter** — the annual chart's Muntha in a
+     fulfilment house OR the Varṣeśa (year-lord) / Muntha-lord signifying the
+     matter's houses. Weight 0.6.
+  These were **proposed by the AI and approved by the user** per the CLAUDE.md node
+  policy (a node changes how every chart is judged ⇒ approval first). Regression
+  test `test_new_timing_nodes_registered_and_computed` added; existing invariants
+  (`domain_score ≥ 0`, `≤ convergence`) preserved (new nodes vote pro-only).
+- **Why (śāstra):** (1) Classical gochara phala is judged primarily **from the
+  Janma Rāśi (Moon)** — Phaladeepika and Saravali state transit results from the
+  Moon; the engine previously reckoned the double-transit only from the Lagna, an
+  incomplete reading (the Moon is also the relocation kāraka). (2) A change of
+  residence is bhāvāt-bhāvam — leaving the 4th lights the 3rd (movement) and 12th
+  (distant/native-place exit); these fulfilment houses deserve the same
+  double-transit test as the primary. (3) KP times an event when a planet transits
+  the **sign and star of a favourable significator** (Krishnamurti); the slow
+  planets set the broad band. (4) Tājika reads the year through the Muntha and the
+  Varṣeśa (Nīlakaṇṭha's *Tājika Nīlakaṇṭhī*).
+- **Source:** Phaladeepika & Saravali (Gochara from the Moon); BPHS bhāvāt-bhāvam;
+  KP Readers IV–VI (transit-of-significators / star theory); Tājika Nīlakaṇṭhī.
+- **Failure-mode addressed:** Coverage/discrimination — the panel was Lagna-only
+  for the double-transit and ignored the Moon-based gochara, the fulfilment-house
+  movers, the KP star-transit and the annual Varṣeśa. (Surfaced by a relocation
+  retrodiction whose true date sat outside the Lagna-only double-transit band.)
+  **No calibration:** nodes added because the śāstra prescribes them, not to fit
+  the known date; the new nodes do not, by themselves, relabel that window.
+- **Deferred (logged, engine lacks it):** the **Muddā (Tājika varṣa) daśā** — the
+  annual sub-period system — is not yet implemented in the engine; the Tājika node
+  uses Muntha/Varṣeśa significations for now. Add Muddā daśā as its own entry when
+  built (would need user approval as a new daśā computation).
+
 ## 2026-06-23 — Add `relocation` (change-of-residence / base) life-area as DATA
 
 - **Change:** Registered a new `relocation` domain row in `event_evidence.py`

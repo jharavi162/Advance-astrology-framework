@@ -128,6 +128,35 @@ def test_witness_registry_is_dynamic():
         WITNESSES.pop()  # keep global state clean for other tests
 
 
+def test_new_timing_nodes_registered_and_computed():
+    """The four user-approved nodes (gochara-from-Moon, fulfilment-house
+    double-transit, KP star-transit, Tājika Varṣeśa/Muntha) must be registered
+    timing witnesses and populated on every candidate window."""
+    names = [w.name for w in WITNESSES if w.layer == "timing"]
+    for needle in ("gochara from Moon", "fulfilment-houses double-transit",
+                   "KP transit:", "Tājika Varṣeśa/Muntha"):
+        assert any(needle in n for n in names), f"missing node: {needle}"
+    v = _chart()
+    rows = candidate_map(v, DOMAIN_PROFILES["relocation"],
+                         datetime(2024, 5, 1, tzinfo=UTC),
+                         datetime(2025, 2, 1, tzinfo=UTC))
+    assert rows
+    for r in rows:  # every new field is a real bool, computed (not left None)
+        assert isinstance(r.gochara_from_moon, bool)
+        assert isinstance(r.fulfil_house_dt, bool)
+        assert isinstance(r.kp_star_transit, bool)
+        assert isinstance(r.tajika_sig, bool)
+    # nodes that fire in this relocation band (not dead code)
+    assert any(r.fulfil_house_dt for r in rows)
+    assert any(r.kp_star_transit for r in rows)
+    # gochara-FROM-MOON (Janma-rāśi double-transit) fires in a confirmed window —
+    # marriage 7th-from-Moon gets the Jup+Sat joint hit Aug-2016..Jan-2017
+    mrows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                          datetime(2016, 8, 1, tzinfo=UTC),
+                          datetime(2016, 12, 1, tzinfo=UTC))
+    assert any(r.gochara_from_moon for r in mrows)
+
+
 def test_render_and_scan_are_strings():
     v = _chart()
     s = datetime(2024, 1, 1, tzinfo=UTC)
