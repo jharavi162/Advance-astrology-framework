@@ -421,6 +421,8 @@ class WindowEvidence:
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
+    systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
+    salience: float = 0.0                         # convergence-gated, information-weighted rank score
 
     def firing_nodes(self, shared=None) -> list:
         """The timing witnesses that fire for this window, with their votes.
@@ -819,7 +821,66 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             we.panel = panel
             rows.append(we)
         d += timedelta(days=step_days)
+    _score_rows(rows)
     return rows
+
+
+# ---------------------------------------------------------------------------- #
+# The DECISION RULE — convergence-gating + information-weighting (slices 3+4)
+#
+# Why not just sum the votes: with a wide node-set, a flat sum lets many trivial
+# nodes drown the few high-information ones, and "everything lights up". Two
+# principled fixes (NEITHER is calibration to a native's history):
+#   • INFORMATION-WEIGHTING — weight a firing node by its specificity 1−p, where p
+#     is how often it fires across the span. A node that fires on every window
+#     carries no discriminating information (weight→0); a rare one carries a lot.
+#   • CONVERGENCE-GATING — group nodes into INDEPENDENT paddhatis (daśā, KP,
+#     gochara, Saham, Sudarśana, Varṣaphal, Aṣṭakavarga, …) and require ≥2 distinct
+#     systems to agree; a lone-system window is discounted. (The project's Cardinal
+#     Rule, made mechanical.)
+# The result is `salience` — the ranking metric. `domain_score`/`convergence` stay
+# the raw transparent sums.
+# ---------------------------------------------------------------------------- #
+_PADDHATI_RULES = [
+    ("daśā", "dasha"), ("Lagneśa", "dasha"),
+    ("KP", "kp"),
+    ("double-transit", "gochara"), ("gochara", "gochara"),
+    ("Lagna materialization", "gochara"), ("BNN", "gochara"),
+    ("Saham", "saham"),
+    ("Sudarśana", "sudarshana"),
+    ("Muntha", "varshaphal"), ("Varṣeśa", "varshaphal"), ("Tājika", "varshaphal"),
+    ("Kakṣyā", "ashtakavarga"),
+]
+
+
+def _paddhati(name: str) -> str:
+    """Map a node name to its independent astrological SYSTEM (for the gate)."""
+    for needle, group in _PADDHATI_RULES:
+        if needle in name:
+            return group
+    return "misc"
+
+
+def _score_rows(rows: list) -> None:
+    """Set `salience` and `systems_firing` on each row: info-weighted votes,
+    grouped by independent paddhati, gated on ≥2 systems converging."""
+    if not rows:
+        return
+    total = len(rows)
+    fire: dict = {}
+    for r in rows:
+        for n, _ in r.firing_nodes():
+            fire[n] = fire.get(n, 0) + 1
+    for r in rows:
+        groups: dict = {}
+        for n, c in r.firing_nodes():
+            info = 1.0 - fire[n] / total            # specificity (rare ⇒ ~1)
+            grp = _paddhati(n)
+            groups[grp] = groups.get(grp, 0.0) + abs(c) * info
+        n_systems = len(groups)
+        gate = 1.0 if n_systems >= 2 else 0.4       # convergence requirement
+        r.systems_firing = n_systems
+        r.salience = round(sum(groups.values()) * gate, 3)
 
 
 # ---------------------------------------------------------------------------- #
@@ -883,11 +944,12 @@ def render_domain(v, profile, start, end) -> str:
           "[Moon-gochara·Fulfil-dt·KPstar·Tājika] · D:daśā-catalogue/n · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
-    top = sorted(rows, key=lambda x: (-x.convergence, x.start))[:5]
-    L += ["", "  TOP-RANKED WINDOWS (convergence of the timing NODES — the daśā is "
-          "only one of them):"]
+    top = sorted(rows, key=lambda x: (-x.salience, x.start))[:5]
+    L += ["", "  TOP-RANKED WINDOWS (by SALIENCE = info-weighted votes, gated on ≥2 "
+          "independent systems agreeing — the daśā is only one of them):"]
     for r in top:
-        L.append(f"    {r.start:%Y-%m-%d} {'>'.join(r.chain):<9} conv={r.convergence}"
+        L.append(f"    {r.start:%Y-%m-%d} {'>'.join(r.chain):<9} "
+                 f"salience={r.salience} ({r.systems_firing} systems) conv={r.convergence}"
                  f"  KP {r.kp_fulfil}/{r.kp_negate}  Lagna[{','.join(r.lagna_activators) or '—'}]"
                  f"  chara {r.chara_ad}")
     if top:
@@ -934,19 +996,19 @@ def render_domain(v, profile, start, end) -> str:
 def scan_domains(v, start, end) -> str:
     """Open question: which life-area STANDS OUT most across [start, end]?
 
-    Ranked by stand-out = peak domain-score minus that domain's own mean score
+    Ranked by stand-out = peak SALIENCE minus that domain's own mean salience
     over the window, so a broad-significator area cannot win merely by running a
-    high background — it must genuinely spike."""
+    high background — it must genuinely spike (and on ≥2 converging systems)."""
     L = ["# DOMAIN MACRO-SCAN (open question) — life-areas by stand-out spike"]
     ranked = []
     for name, profile in DOMAIN_PROFILES.items():
         rows = candidate_map(v, profile, start, end)
         if not rows:
             continue
-        scores = [r.domain_score for r in rows]
-        peak_row = max(rows, key=lambda x: x.domain_score)
-        standout = peak_row.domain_score - (sum(scores) / len(scores))
-        ranked.append((round(standout, 2), peak_row.domain_score, name, peak_row))
+        scores = [r.salience for r in rows]
+        peak_row = max(rows, key=lambda x: x.salience)
+        standout = peak_row.salience - (sum(scores) / len(scores))
+        ranked.append((round(standout, 2), peak_row.salience, name, peak_row))
     for standout, peak, name, row in sorted(ranked, reverse=True):
         L.append(f"  {name:<10} stand-out=+{standout:<4} (peak {peak} around "
                  f"{row.start:%Y-%m}, M>A>P {'>'.join(row.chain)})")

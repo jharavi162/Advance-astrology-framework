@@ -5,9 +5,9 @@ from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart
 from interpreter.event_evidence import (
-    DASHA_SYSTEMS, DOMAIN_PROFILES, FAMILIES, WITNESSES, build_panel,
-    candidate_map, register_witness, render_domain, reversal_map, scan_domains,
-    standing_balance,
+    DASHA_SYSTEMS, DOMAIN_PROFILES, FAMILIES, WITNESSES, Witness, WindowEvidence,
+    _paddhati, _score_rows, build_panel, candidate_map, register_witness,
+    render_domain, reversal_map, scan_domains, standing_balance,
 )
 
 UTC = timezone.utc
@@ -193,10 +193,46 @@ def test_window_scores_use_the_full_panel_including_families():
         assert r.panel is not None and len(r.panel) == len(WITNESSES) + len(DASHA_SYSTEMS)
         # one signal per catalogue system, each a 0/1 float
         assert set(r.signals) == {f"dasha::{n}" for n in DASHA_SYSTEMS}
+        # slices 3+4: every row scored with salience + independent-system count
+        assert isinstance(r.salience, float) and isinstance(r.systems_firing, int)
     # the generated daśā nodes actually fire somewhere (not dead code) and show up
     # among the firing nodes of some window
     fired = {n for r in rows for n, _ in r.firing_nodes()}
     assert any("daśā[" in n for n in fired)
+
+
+def test_decision_rule_convergence_gate_and_information_weighting():
+    """Slices 3+4: salience = info-weighted votes grouped by independent paddhati,
+    gated on ≥2 systems converging — NOT a flat sum."""
+    assert _paddhati("daśā[yogini]: significator running") == "dasha"
+    assert _paddhati("KP fulfilment ≥ negation") == "kp"
+    assert _paddhati("double-transit (house/lord)") == "gochara"
+
+    w_dasha = Witness("daśā[x]: significator running", "timing", 1.0,
+                      lambda w: 1.0 if w.signals.get("a") else 0.0)
+    w_kp = Witness("KP fulfilment ≥ negation", "timing", 1.0,
+                   lambda w: 1.0 if w.signals.get("b") else 0.0)
+    panel = [w_dasha, w_kp]
+
+    def mk(sig):
+        we = WindowEvidence(
+            start=datetime(2024, 1, 1, tzinfo=UTC), chain=["Ve"], kp_fulfil=0,
+            kp_negate=0, karaka_in_chain=False, karaka_sukshma=False,
+            lagnesh_in_chain=False, lagna_activators=[], house_double_transit=False,
+            lord_double_transit=False, saham_double_transit=False, bnn=False,
+            kakshya=False, varshaphal_muntha=False, chara_ad="",
+            sudarshana_hit=False, signals=sig)
+        we.panel = panel
+        return we
+
+    both, one = mk({"a": 1, "b": 1}), mk({"a": 1, "b": 0})
+    _score_rows([both, one])
+    # convergence gate: two independent systems firing vs one
+    assert both.systems_firing == 2 and one.systems_firing == 1
+    assert both.salience > one.salience
+    # information-weighting: w_dasha fires in BOTH rows (base-rate 1.0 ⇒ weight 0),
+    # so the single-system row is gated to ~0 — a ubiquitous node carries no signal
+    assert one.salience == 0.0
 
 
 def test_render_and_scan_are_strings():

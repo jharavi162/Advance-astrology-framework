@@ -11,6 +11,44 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Decision rule: convergence-gating + information-weighting (Phase 1, slices 3+4)
+
+- **Change (SCORING):** Added a principled ranking metric `salience` to
+  `event_evidence.py` (with `systems_firing`), computed by `_score_rows(rows)` over
+  the full candidate ledger and used to rank both the per-domain TOP-RANKED windows
+  and the open-question `scan` stand-out. Two mechanisms:
+  - **Information-weighting** — each firing node is weighted by its *specificity*
+    `1 − p`, where `p` is how often it fires across the span. A node that lights on
+    every window carries no discriminating information (weight → 0); a rare,
+    selective node carries the signal.
+  - **Convergence-gating** — nodes are grouped into INDEPENDENT paddhatis
+    (`_paddhati`: daśā · KP · gochara · Saham · Sudarśana · Varṣaphal · Aṣṭakavarga),
+    and a window is full-weight only when **≥ 2 distinct systems** fire; a
+    single-system window is discounted (×0.4).
+  The raw `domain_score` / `convergence` (transparent weighted sums) are unchanged,
+  so all prior invariants hold; `salience` is the new decision metric layered on top.
+- **Why (method + śāstra):** A wide node-set scored by a flat sum drowns the few
+  high-information nodes under many trivial ones and makes "everything light up"
+  (the discrimination failure this engine has fought from the start). Specificity-
+  weighting and an independent-convergence requirement are the standard
+  signal-vs-noise fixes — and convergence across independent systems is exactly the
+  project's Cardinal Rule, now mechanical in the ranking. **Neither is calibration**:
+  no weight is fit to any native's outcome — specificity is read from the node's own
+  firing rate over the span, and the gate is a fixed structural rule.
+- **Source:** The project's Cardinal Rule (independent-system convergence);
+  standard information-theoretic specificity weighting (rare event ⇒ high
+  information). No external chart data used (no-hindsight preserved).
+- **Failure-mode addressed:** Discrimination — lets the generative panel grow WIDE
+  (slice 2) while accuracy RISES rather than degrades, because adding noisy nodes
+  no longer dilutes the verdict (low specificity ⇒ low weight; lone systems gated).
+- **Tests:** `test_decision_rule_convergence_gate_and_information_weighting`
+  (a ubiquitous node contributes ~0; a 2-system window outranks a 1-system one);
+  full panel rows now carry `salience`/`systems_firing`.
+- **Phase 1 status:** generative panel COMPLETE — families (slice 2) + daśā-system
+  catalogue (slice 1) + convergence-gating & information-weighting (slices 3+4).
+  Next: Phase 2 (significator dictionary → domain auto-pick), then Files B/C
+  (open-combinations validator; ML validator, data-pending).
+
 ## 2026-06-23 — Generative witness FAMILIES + daśā-system catalogue (Phase 1, slice 2)
 
 - **Change (ARCHITECTURE):** Introduced a generative node layer in
