@@ -25,9 +25,14 @@ gap or answer from a missing capability. Two cases, two approval levels:
   `relocation`): add the one `DOMAIN_PROFILES` / `register_domain()` data row
   **autonomously** (no approval needed), then run the pack and answer.
 - **NODE/WITNESS or mechanical check missing** (a new `register_witness(...)`, a new
-  deterministic check, a new timing factor in `event_evidence.py`): **ask the user
-  for approval FIRST** (it changes how every chart is judged), then add it **with a
-  regression test**.
+  deterministic check, a new timing factor in `event_evidence.py`): it is the AI's
+  **standing responsibility to proactively IDENTIFY** — from astrological research
+  and the best classical texts (BPHS, Phaladeepika, Saravali, Jaimini Sūtras,
+  Tājika, KP/Krishnamurti, Sanjay Rath/K.N. Rao) — which additional node(s) a given
+  assessment genuinely needs, **name the classical source for each**, and **present
+  them to the user for approval FIRST** (a node changes how every chart is judged).
+  Only after approval, add it **with a regression test**. The node must stay
+  domain-general (read the domain's houses/kāraka, never hard-code a native).
 - **Always**: after adding either, **merge the change into `main`** (do not leave
   engine evolution stranded on a feature branch) and **log it in
   `docs/RULE_CHANGELOG.md`** with its śāstra justification. No calibration/hindsight
