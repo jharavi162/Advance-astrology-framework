@@ -5,8 +5,9 @@ from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart
 from interpreter.event_evidence import (
-    DOMAIN_PROFILES, WITNESSES, candidate_map, register_witness, render_domain,
-    reversal_map, scan_domains, standing_balance,
+    DASHA_SYSTEMS, DOMAIN_PROFILES, FAMILIES, WITNESSES, build_panel,
+    candidate_map, register_witness, render_domain, reversal_map, scan_domains,
+    standing_balance,
 )
 
 UTC = timezone.utc
@@ -134,7 +135,7 @@ def test_new_timing_nodes_registered_and_computed():
     timing witnesses and populated on every candidate window."""
     names = [w.name for w in WITNESSES if w.layer == "timing"]
     for needle in ("gochara from Moon", "fulfilment-houses double-transit",
-                   "KP transit:", "Tājika Varṣeśa/Muntha", "Muddā"):
+                   "KP transit:", "Tājika Varṣeśa/Muntha"):
         assert any(needle in n for n in names), f"missing node: {needle}"
     v = _chart()
     rows = candidate_map(v, DOMAIN_PROFILES["relocation"],
@@ -146,7 +147,6 @@ def test_new_timing_nodes_registered_and_computed():
         assert isinstance(r.fulfil_house_dt, bool)
         assert isinstance(r.kp_star_transit, bool)
         assert isinstance(r.tajika_sig, bool)
-        assert isinstance(r.mudda_sig, bool)
     # nodes that fire in this relocation band (not dead code)
     assert any(r.fulfil_house_dt for r in rows)
     assert any(r.kp_star_transit for r in rows)
@@ -156,6 +156,47 @@ def test_new_timing_nodes_registered_and_computed():
                           datetime(2016, 8, 1, tzinfo=UTC),
                           datetime(2016, 12, 1, tzinfo=UTC))
     assert any(r.gochara_from_moon for r in mrows)
+
+
+def test_generative_dasha_family_is_data_driven():
+    """Slice 2: the daśā-system catalogue is a generative FAMILY — build_panel
+    adds one node per catalogue system on top of the static WITNESSES, and adding
+    a system is pure data (one DASHA_SYSTEMS entry), no node hand-registration."""
+    assert FAMILIES, "no witness families registered"
+    prof = DOMAIN_PROFILES["relocation"]
+    panel = build_panel(prof)
+    # every static witness is still present, plus one node per catalogue system
+    assert len(panel) == len(WITNESSES) + len(DASHA_SYSTEMS)
+    pnames = [w.name for w in panel]
+    for sysname in DASHA_SYSTEMS:
+        assert any(f"daśā[{sysname}]" in n for n in pnames), f"no node for {sysname}"
+    # adding a system is data-only: build_panel grows by exactly one, no code change
+    import interpreter.event_evidence as ee
+    ee._PANEL_CACHE.clear()
+    DASHA_SYSTEMS["__unit_test__"] = ee._ring_system("vimshottari")
+    try:
+        assert len(build_panel(prof)) == len(WITNESSES) + len(DASHA_SYSTEMS)
+    finally:
+        DASHA_SYSTEMS.pop("__unit_test__")
+        ee._PANEL_CACHE.clear()
+
+
+def test_window_scores_use_the_full_panel_including_families():
+    """The per-window scoring must iterate the domain's full panel (families
+    included), and the catalogue signals must be computed on each window."""
+    v = _chart()
+    rows = candidate_map(v, DOMAIN_PROFILES["relocation"],
+                         datetime(2024, 5, 1, tzinfo=UTC),
+                         datetime(2025, 2, 1, tzinfo=UTC))
+    assert rows
+    for r in rows:
+        assert r.panel is not None and len(r.panel) == len(WITNESSES) + len(DASHA_SYSTEMS)
+        # one signal per catalogue system, each a 0/1 float
+        assert set(r.signals) == {f"dasha::{n}" for n in DASHA_SYSTEMS}
+    # the generated daśā nodes actually fire somewhere (not dead code) and show up
+    # among the firing nodes of some window
+    fired = {n for r in rows for n, _ in r.firing_nodes()}
+    assert any("daśā[" in n for n in fired)
 
 
 def test_render_and_scan_are_strings():

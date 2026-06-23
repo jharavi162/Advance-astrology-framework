@@ -11,6 +11,45 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Generative witness FAMILIES + daśā-system catalogue (Phase 1, slice 2)
+
+- **Change (ARCHITECTURE):** Introduced a generative node layer in
+  `event_evidence.py`: `register_family(name, builder)` where
+  `builder(profile) -> list[Witness]`, a `FAMILIES` registry, and
+  `build_panel(profile)` = the static `WITNESSES` **plus** every family's nodes
+  materialised for that domain (cached per domain). Scoring now iterates the
+  domain's full panel: `standing_balance` uses `build_panel`, and each
+  `WindowEvidence` carries a generic `signals` bag + its `panel`, so
+  `firing_nodes`/`domain_score`/`convergence` converge over families too. One
+  family entry can therefore instantiate a whole element × technique cross-product
+  for whatever the question points at — **adding a technique/system becomes DATA,
+  not a hand-registered node every time.**
+- **First family — DAŚĀ-SYSTEM CATALOGUE (`DASHA_SYSTEMS`):** an open dict of
+  adapters `build(v, profile, start, end) -> active(when)->set[Planet]`; the family
+  turns the whole catalogue into one "significator running" timing node **per
+  system**. Seeded with **Yoginī, Aṣṭottarī, Muddā, Chara** (Vimśottari keeps its
+  own detailed kāraka/sūkṣma nodes, so it is excluded to avoid double-counting).
+  Muddā's slice-1 hand-node is now subsumed by the catalogue (removed). The ledger
+  shows a compact `D:k/n` (catalogue systems firing) instead of per-system columns,
+  so rendering stays bounded as the catalogue grows.
+- **Why (śāstra + method):** No single timekeeper decides an event; multiple
+  independent daśā systems are independent pramāṇas whose agreement is the signal
+  (the project's Cardinal Rule). Making them data-driven means every domain is
+  judged by every system automatically — the "system is ready for any question"
+  goal — while keeping each node domain-general (reads the matter's houses/kārakas).
+- **Source:** BPHS / Jaimini (multiple daśās as parallel pramāṇas); the project's
+  Cardinal Rule (independent-system convergence).
+- **Failure-mode addressed:** Process/coverage — the panel previously grew only by
+  hand-registering one node at a time; families generate the cross-product, so new
+  life-areas and new systems light up the whole toolkit without per-node edits.
+- **Tests:** `test_generative_dasha_family_is_data_driven` (build_panel = static +
+  one node/system; adding a system is data-only),
+  `test_window_scores_use_the_full_panel_including_families` (signals computed,
+  panel attached, generated nodes fire). Existing invariants preserved.
+- **Next slices:** (3) convergence-gating in the scoring core; (4)
+  information-weighting (specificity/rarity, not fitted weights) — the safeguards
+  that make a wide node-set raise rather than lower accuracy.
+
 ## 2026-06-23 — Muddā (Varṣa-Vimśottari) annual daśā + first daśā-system-catalogue node (Phase 1, slice 1)
 
 - **Change (ENGINE):** Added `dashas.mudda(...)` and `VedicChart.mudda_dasha(year)` /

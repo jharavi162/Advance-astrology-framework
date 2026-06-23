@@ -38,7 +38,7 @@ Saham/kāraka-lit event, a strong benefic does not veto a converged reversal).
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -84,6 +84,37 @@ def register_witness(name, layer, weight, vote, shared=False) -> Witness:
     w = Witness(name, layer, weight, vote, shared)
     WITNESSES.append(w)
     return w
+
+
+# ---------------------------------------------------------------------------- #
+# WITNESS FAMILIES — generative nodes. A family is a builder(profile) -> list of
+# Witnesses, so one entry instantiates the WHOLE element × technique cross-product
+# for whatever the question points at (e.g. one "significator running" node per
+# daśā system in the catalogue). This is how the panel covers any domain WITHOUT
+# hand-registering a node each time: add a system/technique as DATA, and every
+# domain gets it for free. build_panel(profile) = the static WITNESSES plus all
+# family-generated witnesses for that domain.
+# ---------------------------------------------------------------------------- #
+FAMILIES: list = []
+
+
+def register_family(name, builder) -> None:
+    """builder(profile) -> list[Witness]; called once per domain to materialise
+    the family's concrete nodes for that matter."""
+    FAMILIES.append((name, builder))
+
+
+_PANEL_CACHE: dict = {}
+
+
+def build_panel(profile) -> list:
+    """All witnesses judging this matter = static nodes + every family's nodes."""
+    if profile.name not in _PANEL_CACHE:
+        panel = list(WITNESSES)
+        for _name, builder in FAMILIES:
+            panel.extend(builder(profile))
+        _PANEL_CACHE[profile.name] = panel
+    return _PANEL_CACHE[profile.name]
 
 
 def _house_signs(v, profile):
@@ -169,7 +200,7 @@ def standing_balance(v, profile):
     """Net natal pro/anti pattern on the matter + the list of firing nodes."""
     total = 0.0
     fired = []
-    for w in WITNESSES:
+    for w in build_panel(profile):
         if w.layer != "standing":
             continue
         c = w.vote(v, profile) * w.weight
@@ -388,13 +419,15 @@ class WindowEvidence:
     fulfil_house_dt: bool = False          # double-transit on the OTHER fulfilment houses + lords
     kp_star_transit: bool = False          # slow planet transiting a fulfilment-significator's star
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
-    mudda_sig: bool = False                # Muddā (Varṣa-Vimśottari) daśā significator running
+    signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
+    panel: object = None                          # the domain's full witness panel (families incl.)
 
     def firing_nodes(self, shared=None) -> list:
         """The timing witnesses that fire for this window, with their votes.
-        Every timekeeper — the daśā included — is just one node here."""
+        Every timekeeper — the daśā included — is just one node here. Iterates the
+        domain's full panel (static nodes + family-generated nodes) when attached."""
         out = []
-        for w in WITNESSES:
+        for w in (self.panel or WITNESSES):
             if w.layer != "timing":
                 continue
             if shared is not None and w.shared != shared:
@@ -455,10 +488,79 @@ register_witness("KP transit: slow planet in significator's star", "timing", 0.7
                  lambda w: 1.0 if w.kp_star_transit else 0.0)
 register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6,
                  lambda w: 1.0 if w.tajika_sig else 0.0)
-# First entry of the DAŚĀ-SYSTEM CATALOGUE (systems-as-data): a non-Vimśottari
-# daśā whose running lord signifies the matter is one more independent witness.
-register_witness("Muddā (Varṣa-Vimśottari) daśā: significator running", "timing", 0.6,
-                 lambda w: 1.0 if w.mudda_sig else 0.0)
+
+
+# ---------------------------------------------------------------------------- #
+# DAŚĀ-SYSTEM CATALOGUE (systems-as-data) + its generative FAMILY.
+# Each entry is an adapter: build(v, profile, start, end) -> active(when)->set[Planet]
+# (the significators a system has running at a moment). The family turns the whole
+# catalogue into one "significator running" timing node PER system — so adding a
+# daśā system is a single dict entry, never a code change. Vimśottari keeps its own
+# detailed kāraka/sūkṣma nodes above, so it is excluded here to avoid double count.
+# ---------------------------------------------------------------------------- #
+def _ring_system(system: str, cycles: int = 3):
+    def build(v, profile, start, end):
+        from advance_astrology.dasha import current_dasha as _cd
+        periods = v.dasha(system, levels=3, cycles=cycles)
+        return lambda when: {c.lord for c in _cd(periods, when)}
+    return build
+
+
+def _mudda_system():
+    def build(v, profile, start, end):
+        from advance_astrology.dasha import current_dasha as _cd
+        from advance_astrology.vedic.varshaphal import solar_return_time
+        md_cache, sr_cache = {}, {}
+
+        def _sr(y):
+            if y not in sr_cache:
+                sr_cache[y] = solar_return_time(v, y)
+            return sr_cache[y]
+
+        def active(when):
+            y = when.year
+            if when < _sr(y):
+                y -= 1
+            if y not in md_cache:
+                md_cache[y] = v.mudda_dasha(y, levels=3)
+            return {c.lord for c in _cd(md_cache[y], when)}
+        return active
+    return build
+
+
+def _chara_system():
+    def build(v, profile, start, end):
+        def active(when):
+            out = set()
+            for c in v.current_chara_dasha(when, levels=2):
+                if c.note in SIGNS:
+                    out.add(_SIGN_RULER[SIGNS.index(c.note)])
+            return out
+        return active
+    return build
+
+
+# Open dict — add a system = one entry; every domain gets the node automatically.
+DASHA_SYSTEMS: dict = {
+    "yogini": _ring_system("yogini"),
+    "ashtottari": _ring_system("ashtottari"),
+    "muddā": _mudda_system(),
+    "chara": _chara_system(),
+}
+
+
+def _dasha_family(profile) -> list:
+    """One 'significator running' timing node per catalogue daśā system."""
+    out = []
+    for name in DASHA_SYSTEMS:
+        key = f"dasha::{name}"
+        out.append(Witness(
+            f"daśā[{name}]: significator running", "timing", 0.6,
+            (lambda k: (lambda w: 1.0 if w.signals.get(k) else 0.0))(key)))
+    return out
+
+
+register_family("daśā-system catalogue", _dasha_family)
 
 
 # Vimśottari nakṣatra-lord cycle (KP star-lord), from Aśvinī = Ketu.
@@ -662,29 +764,18 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 return True
         return False
 
-    # --- node: Muddā (Varṣa-Vimśottari) annual daśā — significator running ----
-    # First entry of the daśā-system catalogue; annual periods cached per year.
-    from advance_astrology.dasha import current_dasha as _current_dasha
-    from advance_astrology.vedic.varshaphal import solar_return_time
-    _mudda_cache, _sr_cache = {}, {}
-
-    def _sr(y):
-        if y not in _sr_cache:
-            _sr_cache[y] = solar_return_time(v, y)
-        return _sr_cache[y]
+    # --- DAŚĀ-SYSTEM CATALOGUE: instantiate each system's active-significator
+    # lookup ONCE (per-system caching lives inside the adapter), then per window
+    # set a generic signal the family-generated node reads. Adding a system =
+    # one DASHA_SYSTEMS entry; no change here.
+    panel = build_panel(profile)
 
     def _signifies_matter(lord) -> bool:
         return bool(set(kps.planet_signifies(lord)) & profile.fulfil_houses) \
             or lord in karakas
 
-    def _mudda_hit(when) -> bool:
-        y = when.year
-        if when < _sr(y):
-            y -= 1
-        if y not in _mudda_cache:
-            _mudda_cache[y] = v.mudda_dasha(y, levels=3)
-        return any(_signifies_matter(c.lord)
-                   for c in _current_dasha(_mudda_cache[y], when))
+    dasha_lookups = {name: build(v, profile, start, end)
+                     for name, build in DASHA_SYSTEMS.items()}
 
     rows, d, last = [], start, None
     while d < end:
@@ -699,7 +790,10 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             deep = v.current_dasha("vimshottari", d, levels=5)
             su = v.sudarshana(d)
             chara = v.current_chara_dasha(d, levels=2)
-            rows.append(WindowEvidence(
+            sig = {f"dasha::{name}":
+                   (1.0 if any(_signifies_matter(p) for p in look(d)) else 0.0)
+                   for name, look in dasha_lookups.items()}
+            we = WindowEvidence(
                 start=d, chain=[c.value[:2] for c in chain],
                 kp_fulfil=f, kp_negate=n,
                 karaka_in_chain=any(l in karakas for l in chain),
@@ -720,8 +814,10 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 fulfil_house_dt=_in(d, fulfil_dt),
                 kp_star_transit=_kp_star_hit(d),
                 tajika_sig=tajika.get(d.year, False),
-                mudda_sig=_mudda_hit(d),
-            ))
+                signals=sig,
+            )
+            we.panel = panel
+            rows.append(we)
         d += timedelta(days=step_days)
     return rows
 
@@ -758,8 +854,8 @@ def _row_line(r: WindowEvidence) -> str:
             f"{'Y' if r.varshaphal_muntha else '-'}  "
             f"{'Y' if r.sudarshana_hit else '-'} "
             f"{'Y' if r.gochara_from_moon else '-'}{'Y' if r.fulfil_house_dt else '-'}"
-            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}"
-            f"{'Y' if r.mudda_sig else '-'}  "
+            f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}  "
+            f"D:{sum(1 for x in r.signals.values() if x)}/{len(r.signals)}  "
             f"{r.convergence}")
 
 
@@ -784,7 +880,7 @@ def render_domain(v, profile, start, end) -> str:
         L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
           "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · "
-          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Muddā] · conv):"]
+          "[Moon-gochara·Fulfil-dt·KPstar·Tājika] · D:daśā-catalogue/n · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.convergence, x.start))[:5]
