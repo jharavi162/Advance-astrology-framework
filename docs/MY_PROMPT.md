@@ -25,14 +25,14 @@ timing window + confidence).
 
 ---
 
-## ✅ Ready example (Ramgarh native — copy as-is to test)
+## ✅ Ready example (fill in any birth — copy-template)
 
 ```
 docs/AI_TRIANGULATION_PROMPT.md ko follow karke is native ka analysis karo.
 
 Native   : Native
-Birth    : 1991-04-04 06:23, Asia/Kolkata, Ramgarh (Jharkhand)
-Coords   : lat 23.62, lon 85.48
+Birth    : YYYY-MM-DD HH:MM, Asia/Kolkata, <City (State)>
+Coords   : lat <LAT>, lon <LON>
 Ayanamsa : lahiri
 
 Sawaal / Period: 2024 mein sabse bada key event kya tha?

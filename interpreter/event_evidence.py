@@ -31,8 +31,8 @@ TYPE, a dark Lagna lowers materialization-INTENSITY rather than denying a
 Saham/kāraka-lit event, a strong benefic does not veto a converged reversal).
 
     python -m interpreter.event_evidence --domain marriage \
-        --when "1991-04-04 06:23" --lat 23.63 --lon 85.52 \
-        --start 2023-01-01 --end 2027-12-31
+        --when "YYYY-MM-DD HH:MM" --lat <LAT> --lon <LON> \
+        --start <START> --end <END>
 """
 
 from __future__ import annotations

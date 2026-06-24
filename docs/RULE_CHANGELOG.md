@@ -11,6 +11,34 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Blind-test integrity: scrub native OUTCOME dates from the repo
+
+- **Change:** Removed the native's known event-dates (a first-marriage, a
+  separation, a remarriage) from everywhere they were committed, so a fresh session
+  can no longer *read the answer* instead of computing it:
+  - `CLAUDE.md` example → generic ("a verified past event"), no dates.
+  - `tests/test_event_evidence.py` → the three calibration-flavored tests that
+    asserted the engine lights the native's known wedding/divorce/remarriage dates
+    are replaced by **date-agnostic mechanical tests** (`ReversalRow.kind` logic on
+    synthetic rows; a blessed-house → CHANGE/UPGRADE principle test). No native
+    event-date is asserted anywhere now.
+  - `RULE_CHANGELOG.md` → specific outcome-date phrase neutralised.
+  - Birth-data usage examples in `build_prompt.py`, `build_matrix.py`,
+    `event_evidence.py`, `predict.py`, `MY_PROMPT.md`, `PROJECT_PLAN.md` →
+    placeholders (`YYYY-MM-DD`, `<LAT> <LON>`, `<City>`).
+- **Why:** A genuine blind test requires that the chart's known outcomes are NOT
+  discoverable in the repo (CLAUDE.md auto-loads every session). The old known-date
+  tests were also calibration-flavored — asserting the engine reproduce specific
+  native dates — which the project's own no-calibration charter forbids. Removing
+  them restores both blind-test integrity and charter-compliance.
+- **Kept (intentional):** the test fixture still builds *a* birth chart (needed by
+  the tuned regression tests); that identifies the chart but is NOT an outcome — the
+  answers (dates) are gone. A truly blind future test should use an unseen native.
+- **Note (history):** prior commits still contain these strings; erasing them from
+  git history needs a separate `git filter-repo` + force-push (not done here).
+- **Failure-mode addressed:** Integrity/process — prevents "the model read the
+  answer" contamination and removes residual calibration in the test-suite.
+
 ## 2026-06-23 — Close two RED gaps: Nārāyaṇa + Sudasā daśās wired into the catalogue
 
 - **Change:** Added a generic `_rashi_dasha_system(method)` adapter and registered
@@ -405,9 +433,10 @@ addresses (coverage vs discrimination).
   fulfilment houses are the discriminator between an upgrade and a loss.
 - **Source:** KP service-change doctrine (6th/10th/11th vs 5th/9th); BPHS
   bhāvāt-bhāvam (house-from-house) reckoning.
-- **Failure-mode addressed:** Discrimination — a real upward job-change for this
-  native was being mislabelled a "career loss/break"; the fulfilment test fixes
-  it while still flagging the genuine divorce (Feb-2026) as a LOSS/BREAK.
+- **Failure-mode addressed:** Discrimination — an upward job-change was being
+  mislabelled a "career loss/break"; the fulfilment test fixes it while still
+  flagging a genuine relationship-break as a LOSS/BREAK. (No native event-dates
+  recorded here — blind-test integrity.)
 
 ## 2026-06-22 — Learning-routing process recorded in CLAUDE.md
 

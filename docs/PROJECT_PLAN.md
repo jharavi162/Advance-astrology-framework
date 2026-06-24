@@ -96,8 +96,8 @@ The triangulation is now done by the **AI**, not by Python:
 ## How to run (quick reference)
 ```bash
 # Blind prediction (timeline + aggregate dossier)
-python -m interpreter.predict --when "1991-04-04 06:23" --tz Asia/Kolkata \
-  --lat 23.62 --lon 85.48 --place "Ramgarh" --name Native --years 6 --asof 2026-06-19
+python -m interpreter.predict --when "YYYY-MM-DD HH:MM" --tz Asia/Kolkata \
+  --lat <LAT> --lon <LON> --place "<City>" --name Native --years 6 --asof <YYYY-MM-DD>
 
 # Regenerate the playbook PDF after editing interpreter/playbook.txt
 python scripts/make_playbook_pdf.py

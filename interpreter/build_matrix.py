@@ -6,9 +6,9 @@ playbook (Section 2) depends on and renders it as a clean, deterministic
 text block suitable for feeding to an interpretation layer.
 
     python -m interpreter.build_matrix \
-        --when "1991-04-04 06:23" --tz Asia/Kolkata \
-        --lat 23.63 --lon 85.52 --place "Ramgarh, Jharkhand" \
-        --sex male --name "Native"
+        --when "YYYY-MM-DD HH:MM" --tz Asia/Kolkata \
+        --lat <LAT> --lon <LON> --place "<City, State>" \
+        --sex <m/f> --name "Native"
 """
 
 from __future__ import annotations

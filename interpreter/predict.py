@@ -6,8 +6,8 @@ This is the harness for the no-calibration blind test: run it, read the engine's
 committed calls, and compare against real life events yourself.
 
     python -m interpreter.predict \
-        --when "1991-04-04 06:23" --tz Asia/Kolkata \
-        --lat 23.62 --lon 85.48 --place "Ramgarh" --name Native \
+        --when "YYYY-MM-DD HH:MM" --tz Asia/Kolkata \
+        --lat <LAT> --lon <LON> --place "<City>" --name Native \
         --years 6
 """
 

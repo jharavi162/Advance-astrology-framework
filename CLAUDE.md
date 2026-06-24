@@ -11,7 +11,7 @@
 | Mechanical/deterministic check the engine can compute | **CODE** `interpreter/event_evidence.py` (+ a regression TEST) | Lagna materialization, sūkṣma drill, double-transit, BNN, reversal |
 | New life-area, or its houses/kāraka/saham/varga | **DATA** `DOMAIN_PROFILES` / `register_domain()` — one row | adding a domain |
 | "How to INTERPRET" judgment, not reducible to a bool | **PROMPT** `docs/AI_TRIANGULATION_PROMPT.md` (descriptive, event-agnostic) | node = TYPE; dark Lagna = intensity; don't fixate on one rule |
-| A true known event to never regress | **TEST** `tests/` fixture | Jan-2024 / Feb-2026 / Jan-2027 |
+| A true known event to never regress | **TEST** `tests/` fixture (mechanical, **no native dates** — blind-test integrity) | a verified past event |
 
 Rule: push as much as possible into CODE+DATA (guarantee); PROMPT only for genuine
 judgment; every code-learning gets a test. Log each change in

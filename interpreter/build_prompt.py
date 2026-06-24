@@ -8,8 +8,8 @@ adapter later.
 
     python -m interpreter.build_prompt \
         --playbook playbook.txt \
-        --when "1991-04-04 06:23" --tz Asia/Kolkata \
-        --lat 23.63 --lon 85.52 --place "Ramgarh, Jharkhand" --sex male \
+        --when "YYYY-MM-DD HH:MM" --tz Asia/Kolkata \
+        --lat <LAT> --lon <LON> --place "<City, State>" --sex <m/f> \
         --query "Analyse the last 5 years of major life events" \
         --out dryrun_prompt.txt
 """
