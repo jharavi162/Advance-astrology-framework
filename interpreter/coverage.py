@@ -69,9 +69,9 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Aṣṭottarī daśā", "dasha('ashtottari')", "daśā[ashtottari]", "wired"),
     CoverageItem("Muddā (Varṣa-Vimśottari) daśā", "mudda_dasha", "daśā[muddā]", "wired"),
     CoverageItem("Chara (Jaimini rāśi) daśā", "current_chara_dasha", "daśā[chara]", "wired"),
+    CoverageItem("Nārāyaṇa daśā", "narayana_dasha", "daśā[nārāyaṇa]", "wired"),
+    CoverageItem("Sudasā (Śrī) daśā", "sudasa_dasha", "daśā[sudasā]", "wired"),
     # ---- RED — engine computes it, NO witness reads it yet ----------------- #
-    CoverageItem("Nārāyaṇa daśā", "narayana_dasha", "", "red"),
-    CoverageItem("Sudasā (Śrī) daśā", "sudasa_dasha", "", "red"),
     CoverageItem("Bhāva-Chalit result-house shift", "bhava_chalit", "", "red"),
     CoverageItem("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)", "transits.sade_sati", "", "red"),
     CoverageItem("Functional benefic/malefic weighting", "functional_nature", "", "red"),

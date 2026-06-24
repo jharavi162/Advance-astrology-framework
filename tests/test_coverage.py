@@ -32,6 +32,6 @@ def test_matrix_statuses_are_valid_and_red_is_acknowledged():
 def test_coverage_summary_names_the_red_gaps():
     s = coverage_summary()
     assert "COVERAGE" in s and "RED" in s
-    # a couple of the known gaps must be named so they're visible in every pack
-    assert "Nārāyaṇa daśā" in s
-    assert "Bhāva-Chalit" in s or "Sade-Sati" in s
+    # a couple of the still-RED gaps must be named so they're visible in every pack
+    assert "Bhāva-Chalit" in s
+    assert "Karakāṃśa" in s or "Sade-Sati" in s

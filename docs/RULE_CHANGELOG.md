@@ -11,6 +11,23 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — Close two RED gaps: Nārāyaṇa + Sudasā daśās wired into the catalogue
+
+- **Change:** Added a generic `_rashi_dasha_system(method)` adapter and registered
+  **Nārāyaṇa** and **Sudasā (Śrī)** daśās as `DASHA_SYSTEMS` entries — the daśā
+  family auto-generates their "significator running" nodes (active rāśi → ruler).
+  The catalogue is now Yoginī · Aṣṭottarī · Muddā · Chara · Nārāyaṇa · Sudasā.
+  Flipped both from RED → wired in `coverage.py`; the two-way audit stays clean.
+- **Why (śāstra):** Nārāyaṇa and Sudasā are independent Jaimini rāśi daśās — extra
+  independent pramāṇas for the convergence vote (Sudasā seeded from the Śrī Lagna is
+  the classical prosperity timeline; Nārāyaṇa the general rāśi timeline). Both were
+  computed by the engine but unwired (RED on the matrix); now consumed.
+- **Source:** Jaimini Sūtras; Sanjay Rath / K.N. Rao on Nārāyaṇa & Sudasā daśās.
+- **Failure-mode addressed:** Coverage — two more computed-but-unwired daśās closed;
+  RED gaps 10 → 8, wired 31 → 33. Span verified (both cover 1991→2073, cycles=1).
+- **NO calibration:** the existing data-driven family test covers them (one node per
+  catalogue system); no known date asserted.
+
 ## 2026-06-23 — KP nodes computed on the KP-ayanāṃśa / Placidus chart (paddhati fidelity)
 
 - **Change:** Added `_kp_view(v)` in `event_evidence.py` — builds (and caches per

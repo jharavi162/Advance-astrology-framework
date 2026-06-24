@@ -616,12 +616,31 @@ def _chara_system():
     return build
 
 
+def _rashi_dasha_system(method: str):
+    """Generic adapter for a Jaimini rāśi daśā (Nārāyaṇa, Sudasā…): precompute the
+    sign-periods once, then map the active sign(s) → their rulers as significators."""
+    def build(v, profile, start, end):
+        from advance_astrology.dasha import current_dasha as _cd
+        periods = getattr(v, method)(levels=2)
+
+        def active(when):
+            out = set()
+            for c in _cd(periods, when):
+                if c.note in SIGNS:
+                    out.add(_SIGN_RULER[SIGNS.index(c.note)])
+            return out
+        return active
+    return build
+
+
 # Open dict — add a system = one entry; every domain gets the node automatically.
 DASHA_SYSTEMS: dict = {
     "yogini": _ring_system("yogini"),
     "ashtottari": _ring_system("ashtottari"),
     "muddā": _mudda_system(),
     "chara": _chara_system(),
+    "nārāyaṇa": _rashi_dasha_system("narayana_dasha"),
+    "sudasā": _rashi_dasha_system("sudasa_dasha"),
 }
 
 
