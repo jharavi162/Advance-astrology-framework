@@ -371,17 +371,30 @@ def _argala_net_on_house(v, house: int) -> int:
     return net
 
 
+_KP_VIEW_CACHE: dict = {}
+
+
+def _kp_view(v):
+    """KP must be judged on the **Krishnamurti (KP) ayanāṃśa** with **Placidus**
+    cusps — not the main (Lahiri/whole-sign) chart. Build that KP sub-chart once
+    per native and cache it; returns (kp_chart, KPSignificators)."""
+    key = id(v)
+    if key not in _KP_VIEW_CACHE:
+        vkp = VedicChart.create(when=v.when_utc, latitude=v.natal.latitude,
+                                longitude=v.natal.longitude, ayanamsa="kp")
+        _KP_VIEW_CACHE[key] = (vkp, vkp.kp_significators())
+    return _KP_VIEW_CACHE[key]
+
+
 def promise_and_tempo(v, profile: DomainProfile) -> PromiseTempo:
-    kps = v.kp_significators()
+    _, kps = _kp_view(v)                       # KP significators on the KP-ayanāṃśa chart
     tr = v.transits()
     sav = v.sarvashtakavarga()
     sb = v.shadbala()
     ik = v.ishta_kashta()
     primary = profile.houses[0]
-    cusp_sign = (v.ascendant_sign + primary - 1) % 12
-    cusp_lon = (cusp_sign * 30) + ((v.ascendant % 30))
     from advance_astrology.vedic.kp import kp_chain
-    cusp_sub = kp_chain(cusp_lon).sub_lord
+    cusp_sub = kp_chain(kps.cusps[primary]).sub_lord   # TRUE Placidus cusp (not equal-house)
     cusp_sig = kps.planet_signifies(cusp_sub)
     promised = bool(set(cusp_sig) & profile.fulfil_houses)
 
@@ -728,7 +741,7 @@ def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
     6th-from-house lord), the reversal Saham, the double-transit on the breaking
     house, and a DARK Lagna under a malefic/node daśā (de-materialization)."""
     tr = v.transits()
-    kps = v.kp_significators()
+    _, kps = _kp_view(v)                       # KP on the KP-ayanāṃśa / Placidus chart
     lagna = v.ascendant_sign
     primary = profile.houses[0]
     rupture_houses = {(primary - 1 + off - 1) % 12 + 1 for off in (6, 8, 12)}
@@ -768,7 +781,7 @@ def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
 def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
     """Full-span candidate ledger for the matter's MANIFESTATION."""
     tr = v.transits()
-    kps = v.kp_significators()
+    _, kps = _kp_view(v)                       # KP on the KP-ayanāṃśa / Placidus chart
     lagnesh = v.house_lord(1)
     lagna_sign = v.ascendant_sign
     karakas = _karaka_planets(v, profile)

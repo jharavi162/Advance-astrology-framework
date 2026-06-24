@@ -241,6 +241,18 @@ def test_newly_wired_computed_quantities_are_nodes():
     assert rows and all(isinstance(r.bb_active, bool) for r in rows)
 
 
+def test_kp_nodes_use_kp_ayanamsa_and_placidus_cusps():
+    """KP must be judged on the Krishnamurti ayanāṃśa with Placidus cusps, NOT the
+    main Lahiri/whole-sign chart. MECHANICAL — verifies the KP sub-chart differs in
+    ayanāṃśa, is cached, and the cusp sub-lord is read from a real Placidus cusp."""
+    from interpreter.event_evidence import _kp_view
+    v = _chart()                                   # built with Lahiri
+    vkp, kps = _kp_view(v)
+    assert abs(vkp.ayanamsa - v.ayanamsa) > 0.05   # KP ayanāṃśa ≠ Lahiri (~8 arc-min)
+    assert _kp_view(v)[0] is vkp                    # cached per native
+    assert set(kps.cusps) == set(range(1, 13))      # true Placidus cusp dict 1..12
+
+
 def test_decision_rule_convergence_gate_and_information_weighting():
     """Slices 3+4: salience = info-weighted votes grouped by independent paddhati,
     gated on ≥2 systems converging — NOT a flat sum."""

@@ -11,6 +11,29 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-06-23 — KP nodes computed on the KP-ayanāṃśa / Placidus chart (paddhati fidelity)
+
+- **Change:** Added `_kp_view(v)` in `event_evidence.py` — builds (and caches per
+  native) a **Krishnamurti-ayanāṃśa** chart and its `KPSignificators` (Placidus
+  cusps), and routed ALL three KP call sites (`promise_and_tempo`, `candidate_map`,
+  `reversal_map`) through it. The cusp sub-lord now reads the **true Placidus cusp**
+  (`kps.cusps[primary]`) instead of the old equal-house approximation
+  (`sign*30 + ascendant%30`).
+- **Why (śāstra/method):** KP is its own paddhati with its own frame — the
+  Krishnamurti ayanāṃśa and Placidus house cusps. Previously the whole pack ran on
+  one (Lahiri, whole-sign) chart and computed KP sub-lords on it, mixing frames; the
+  KP ayanāṃśa differs from Lahiri by ~8 arc-min, enough to flip a sub-lord near a
+  boundary and change the KP verdict. Other paddhatis (Jaimini, vargas, daśās,
+  Aṣṭakavarga) correctly stay on the rāśi/whole-sign Lahiri chart — only KP needed
+  its own view.
+- **Source:** Krishnamurti Paddhati (KP ayanāṃśa + Placidus cusp sub-lord theory).
+- **Failure-mode addressed:** Discrimination/fidelity — KP, the engine's decider
+  node, was being read on the wrong ayanāṃśa and an equal-house cusp.
+- **NO calibration:** mechanical test only (`test_kp_nodes_use_kp_ayanamsa_and_placidus_cusps`)
+  — asserts the KP chart's ayanāṃśa differs, is cached, and uses a Placidus cusp
+  dict; no known date asserted. (For this native the 7th sub-lord stays Venus; the
+  fix matters for borderline cusps/other houses/other charts.)
+
 ## 2026-06-23 — COVERAGE MATRIX + completeness gate (anti-miss machinery)
 
 - **Change:** Added `interpreter/coverage.py` — the single source of truth mapping

@@ -50,7 +50,7 @@ COVERAGE: list[CoverageItem] = [
     # ---- TIMING ----------------------------------------------------------- #
     CoverageItem("Vimśottari daśā (kāraka in chain)", "current_dasha", "kāraka in MD", "wired"),
     CoverageItem("Vimśottari sūkṣma drill", "current_dasha levels=5", "kāraka at sūkṣma", "wired"),
-    CoverageItem("KP cusp/period significators", "kp_significators", "KP fulfilment", "wired"),
+    CoverageItem("KP cusp/period significators", "kp_significators (KP-ayanāṃśa, Placidus)", "KP fulfilment", "wired"),
     CoverageItem("Lagneśa in daśā", "house_lord+current_dasha", "Lagneśa in daśā", "wired"),
     CoverageItem("Jupiter+Saturn double-transit (house/lord)", "transits.double_transit_*", "double-transit (house/lord)", "wired"),
     CoverageItem("Domain Saham double-transit", "sahams", "domain Saham", "wired"),
