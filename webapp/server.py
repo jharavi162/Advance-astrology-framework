@@ -65,19 +65,20 @@ def _varga(v, n):
     return dict(asc=int(vc.ascendant_sign), cells=cells)
 
 
-def _vimshottari(v, asof):
-    maha = [dict(lord=d.lord.value, start=d.start.date().isoformat(),
-                 end=d.end.date().isoformat()) for d in v.dasha("vimshottari", levels=1)]
-    chain = [dict(lord=c.lord.value, level=c.level,
-                  start=c.start.date().isoformat(), end=c.end.date().isoformat())
-             for c in v.current_dasha("vimshottari", asof, levels=4)]
-    return dict(maha=maha, current=chain)
+def _dasha_tree(v):
+    """Full-life Vimśottari: every mahādaśā with its antardaśās (no as-of cut)."""
+    out = []
+    for m in v.dasha("vimshottari", levels=2):
+        out.append(dict(
+            lord=m.lord.value, start=m.start.date().isoformat(),
+            end=m.end.date().isoformat(),
+            sub=[dict(lord=a.lord.value, start=a.start.date().isoformat(),
+                      end=a.end.date().isoformat()) for a in (m.sub_periods or [])]))
+    return out
 
 
 def natal_json(q):
     v, when = _chart(q)
-    asof = datetime.strptime(q.get("asof", [datetime.now().strftime("%Y-%m-%d")])[0],
-                             "%Y-%m-%d").replace(tzinfo=timezone.utc)
     cells = [[] for _ in range(12)]
     for p in GRAHAS:
         cells[int(v.signs[p])].append(ABBR[p])
@@ -91,12 +92,27 @@ def natal_json(q):
         d1=dict(asc=int(v.ascendant_sign), cells=cells),
         planets=_planets(v),
         house_lords={h: v.house_lord(h).value for h in range(1, 13)},
-        vimshottari=_vimshottari(v, asof),
+        dasha=_dasha_tree(v),
         vargas={str(n): _varga(v, n) for n in (9, 10, 2, 4, 7)},
         panchanga=dict(tithi=getattr(pan.tithi, "name", str(pan.tithi)),
                        nakshatra=str(pan.nakshatra), yoga=str(pan.yoga),
                        karana=str(pan.karana), vara=str(pan.vara)),
     )
+
+
+def _summary(pack):
+    """Hide the per-window CANDIDATE LEDGER (Multi-system toggle OFF)."""
+    out, skip = [], False
+    for ln in pack.splitlines():
+        if "CANDIDATE LEDGER" in ln:
+            skip = True
+            out.append("  [per-window ledger hidden — Multi-system OFF]")
+            continue
+        if "TOP-RANKED WINDOWS" in ln:
+            skip = False
+        if not skip:
+            out.append(ln)
+    return "\n".join(out)
 
 
 def events_json(q):
@@ -106,7 +122,10 @@ def events_json(q):
     prof = resolve(q["domain"][0])
     start = datetime.strptime(q["start"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
     end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    return dict(domain=prof.name, pack=render_domain(v, prof, start, end))
+    pack = render_domain(v, prof, start, end)
+    if q.get("mode", ["full"])[0] != "full":
+        pack = _summary(pack)
+    return dict(domain=prof.name, pack=pack)
 
 
 class H(BaseHTTPRequestHandler):

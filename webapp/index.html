@@ -37,6 +37,9 @@
   pre{white-space:pre-wrap;background:#0b0d12;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11.5px;overflow:auto;max-height:520px}
   .row{display:flex;gap:16px;flex-wrap:wrap} .muted{color:var(--mut)} .sub{font-size:11px;color:var(--mut)}
   .pill{font-size:11px;background:#0d0f15;border:1px solid var(--line);border-radius:20px;padding:2px 9px;margin-right:6px}
+  .geo{position:absolute;top:100%;left:0;right:0;z-index:20;background:#0d0f15;border:1px solid var(--line);border-radius:8px;max-height:220px;overflow:auto;display:none}
+  .geo.on{display:block} .geo-it{padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12px} .geo-it:active,.geo-it:hover{background:#283042}
+  tr.mhd{cursor:pointer} tr.mhd td:first-child{color:#cfe3ff}
   /* ---- mobile (iPhone / iPad) ---- */
   @media (max-width:860px){
     .wrap{padding:10px}
@@ -54,11 +57,14 @@
 <div class="wrap">
   <form id="f">
     <label>Date & time<input name="when" value="1990-01-01 12:00" size="16"></label>
-    <label>Timezone<input name="tz" value="Asia/Kolkata" size="12"></label>
+    <label style="position:relative;flex:1 1 200px">Place (search → auto lat/lon)
+      <input id="place" placeholder="city, e.g. Ramgarh" autocomplete="off">
+      <div id="geo" class="geo"></div>
+    </label>
     <label>Latitude<input name="lat" value="28.61" size="7"></label>
     <label>Longitude<input name="lon" value="77.20" size="7"></label>
+    <label>Timezone<input name="tz" value="Asia/Kolkata" size="14"></label>
     <label>Ayanāṃśa<select name="ayanamsa"><option>lahiri</option><option>kp</option><option>raman</option></select></label>
-    <label>As-of (daśā)<input name="asof" value="2026-06-25" size="11"></label>
     <button type="submit">Load chart</button>
   </form>
 
@@ -85,10 +91,8 @@
         <div id="lords" class="sub" style="margin-top:8px"></div>
       </div>
       <div class="card" style="margin-top:16px">
-        <h2>Vimśottari Daśā</h2>
-        <div class="muted sub">Active chain (as-of):</div>
-        <div id="chain" class="chain"></div>
-        <div class="muted sub" style="margin-top:8px">Mahādaśā timeline:</div>
+        <h2>Vimśottari Daśā — full life</h2>
+        <div class="muted sub">Mahādaśā par tap karo → antardaśā khulegi.</div>
         <table id="maha"><tbody></tbody></table>
       </div>
       <div class="card" style="margin-top:16px">
@@ -98,6 +102,9 @@
           <input id="st" value="2018-01-01" size="11"><input id="en" value="2028-01-01" size="11">
           <button class="sec" onclick="runEvents()">Analyze</button>
         </div>
+        <label class="sub" style="flex-direction:row;align-items:center;gap:6px;margin-bottom:8px">
+          <input type="checkbox" id="multi" checked style="width:auto"> Multi-system triangulation (full salience ledger — all paddhatis)
+        </label>
         <pre id="pack" class="muted">Domain + range chunkar "Analyze" dabao. (Compute thoda time leta hai.)</pre>
       </div>
     </div>
@@ -137,10 +144,15 @@ async function load(ev){
   j.planets.forEach(p=>{tb.insertAdjacentHTML('beforeend',
     `<tr><td>${p.name}${p.retro?' <span class="retro">℞</span>':''}</td><td>${p.sign_name}</td><td>${p.deg}</td><td>${p.house}</td><td>${p.nak}</td><td>${p.dignity}</td></tr>`);});
   document.getElementById('lords').innerHTML='House lords: '+Object.entries(j.house_lords).map(([h,l])=>`<span class="pill">${h}:${l}</span>`).join('');
-  // dasha
-  document.getElementById('chain').innerHTML=j.vimshottari.current.map(c=>`<span>${c.lord}<br><span class="sub">L${c.level} ${c.start}</span></span>`).join(' › ');
+  // dasha — full life: mahādaśā rows, tap to expand antardaśā
   const mt=document.querySelector('#maha tbody'); mt.innerHTML="";
-  j.vimshottari.maha.forEach(m=>mt.insertAdjacentHTML('beforeend',`<tr><td>${m.lord}</td><td class="sub">${m.start}</td><td class="sub">${m.end}</td></tr>`));
+  j.dasha.forEach((m,i)=>{
+    mt.insertAdjacentHTML('beforeend',`<tr class="mhd" data-i="${i}"><td>▸ ${m.lord}</td><td class="sub">${m.start}</td><td class="sub">${m.end}</td></tr>`);
+    (m.sub||[]).forEach(a=>mt.insertAdjacentHTML('beforeend',`<tr class="ad ad${i}" style="display:none"><td class="sub" style="padding-left:24px">↳ ${a.lord}</td><td class="sub">${a.start}</td><td class="sub">${a.end}</td></tr>`));
+  });
+  mt.querySelectorAll('.mhd').forEach(r=>r.onclick=()=>{const i=r.dataset.i;
+    r.querySelector('td').textContent=(r.querySelector('td').textContent.startsWith('▸')?'▾ ':'▸ ')+j.dasha[i].lord;
+    mt.querySelectorAll('.ad'+i).forEach(x=>x.style.display=x.style.display==='none'?'':'none');});
   // panchanga
   const p=j.panchanga; document.getElementById('pan').innerHTML=
     ['tithi','nakshatra','yoga','karana','vara'].map(k=>`<span class="pill">${k}: ${p[k]}</span>`).join('');
@@ -153,12 +165,43 @@ async function load(ev){
 
 async function runEvents(){
   const pre=document.getElementById('pack'); pre.textContent='Computing… (10–60s)';
+  const mode=document.getElementById('multi').checked?'full':'summary';
   const u='/api/events?'+qstr()+'&domain='+encodeURIComponent(document.getElementById('dom').value)
-    +'&start='+document.getElementById('st').value+'&end='+document.getElementById('en').value;
+    +'&start='+document.getElementById('st').value+'&end='+document.getElementById('en').value+'&mode='+mode;
   try{const r=await fetch(u);const j=await r.json();pre.textContent=j.error?('ERROR: '+j.error):j.pack;}
   catch(e){pre.textContent='ERROR: '+e;}
 }
 document.getElementById('f').addEventListener('submit',load);
+
+// ---- Location search → auto lat/lon/timezone (Open-Meteo geocoding, free, CORS) ----
+const placeEl=document.getElementById('place'), geoEl=document.getElementById('geo');
+let gtimer;
+placeEl.addEventListener('input',()=>{
+  clearTimeout(gtimer); const q=placeEl.value.trim();
+  if(q.length<2){geoEl.className='geo';geoEl.innerHTML='';return;}
+  gtimer=setTimeout(async()=>{
+    try{
+      const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&format=json&name='+encodeURIComponent(q));
+      const j=await r.json(); geoEl.innerHTML='';
+      (j.results||[]).forEach(p=>{
+        const d=document.createElement('div'); d.className='geo-it';
+        d.textContent=`${p.name}${p.admin1?', '+p.admin1:''}, ${p.country_code||p.country||''}  (${p.latitude.toFixed(2)}, ${p.longitude.toFixed(2)})`;
+        d.onclick=()=>{
+          document.querySelector('[name=lat]').value=p.latitude.toFixed(4);
+          document.querySelector('[name=lon]').value=p.longitude.toFixed(4);
+          if(p.timezone) document.querySelector('[name=tz]').value=p.timezone;
+          placeEl.value=p.name; geoEl.className='geo'; geoEl.innerHTML='';
+        };
+        geoEl.appendChild(d);
+      });
+      geoEl.className=geoEl.children.length?'geo on':'geo';
+    }catch(e){
+      geoEl.innerHTML='<div class="geo-it">geocoding unavailable — lat/lon manually bhar do</div>';
+      geoEl.className='geo on';
+    }
+  },300);
+});
+document.addEventListener('click',e=>{if(!e.target.closest('label')) geoEl.className='geo';});
 </script>
 </body>
 </html>
