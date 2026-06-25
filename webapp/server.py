@@ -125,6 +125,14 @@ class H(BaseHTTPRequestHandler):
             if u.path in ("/", "/index.html"):
                 with open(os.path.join(HERE, "index.html"), "rb") as f:
                     return self._send(200, f.read(), "text/html; charset=utf-8")
+            # static assets (PWA manifest + icons) — served from the webapp dir
+            if u.path in ("/manifest.json", "/icon-192.png", "/icon-512.png",
+                          "/apple-touch-icon.png"):
+                fn = os.path.basename(u.path)
+                ctype = ("application/manifest+json" if fn.endswith(".json")
+                         else "image/png")
+                with open(os.path.join(HERE, fn), "rb") as f:
+                    return self._send(200, f.read(), ctype)
             if u.path == "/api/natal":
                 return self._send(200, json.dumps(natal_json(q)))
             if u.path == "/api/events":
