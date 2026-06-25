@@ -12,8 +12,8 @@
   .wrap{max-width:1180px;margin:0 auto;padding:16px}
   form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;background:var(--card);padding:12px;border:1px solid var(--line);border-radius:10px}
   label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--mut)}
-  input,select{background:#0d0f15;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:7px 8px;font-size:13px}
-  button{background:var(--acc);color:#1a1a1a;border:0;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer}
+  input,select{background:#0d0f15;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:9px 10px;font-size:16px}
+  button{background:var(--acc);color:#1a1a1a;border:0;border-radius:7px;padding:10px 16px;font-weight:600;cursor:pointer;font-size:15px;min-height:42px}
   button.sec{background:#283042;color:var(--ink)}
   .grid{display:grid;grid-template-columns:360px 1fr;gap:16px;margin-top:16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
@@ -30,6 +30,16 @@
   pre{white-space:pre-wrap;background:#0b0d12;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11.5px;overflow:auto;max-height:520px}
   .row{display:flex;gap:16px;flex-wrap:wrap} .muted{color:var(--mut)} .sub{font-size:11px;color:var(--mut)}
   .pill{font-size:11px;background:#0d0f15;border:1px solid var(--line);border-radius:20px;padding:2px 9px;margin-right:6px}
+  /* ---- mobile (iPhone / iPad) ---- */
+  @media (max-width:860px){
+    .wrap{padding:10px}
+    .grid{grid-template-columns:1fr}                 /* stack: chart+calcs on top */
+    .chart{grid-template-rows:repeat(4,minmax(56px,15vw))}
+    form{gap:6px} label{flex:1 1 44%} button{flex:1 1 100%}
+    pre{max-height:340px}
+    header h1{font-size:15px}
+  }
+  @media (max-width:480px){ .cell{font-size:11px} .cell .sg{font-size:8px} }
 </style>
 </head>
 <body>
