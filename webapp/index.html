@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Advance Astrology — Chart & Daśā</title>
+<style>
+  :root{--bg:#0f1117;--card:#171a23;--ink:#e7e9ee;--mut:#9aa3b2;--acc:#e0a82e;--line:#2a2f3a;--good:#39d98a;--bad:#ff6b6b}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
+  header{padding:14px 18px;background:#12141c;border-bottom:1px solid var(--line)}
+  h1{font-size:17px;margin:0;color:var(--acc)} h2{font-size:14px;margin:0 0 8px;color:var(--acc)}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px}
+  form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;background:var(--card);padding:12px;border:1px solid var(--line);border-radius:10px}
+  label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--mut)}
+  input,select{background:#0d0f15;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:7px 8px;font-size:13px}
+  button{background:var(--acc);color:#1a1a1a;border:0;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer}
+  button.sec{background:#283042;color:var(--ink)}
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:16px;margin-top:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .chart{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,68px);gap:3px}
+  .cell{border:1px solid var(--line);border-radius:6px;padding:4px;position:relative;background:#0d0f15;font-size:12px}
+  .cell .sg{position:absolute;top:2px;right:5px;font-size:9px;color:var(--mut)}
+  .cell .pl{font-weight:600;color:#cfe3ff} .cell.asc{outline:2px solid var(--acc)}
+  .center{grid-column:2/4;grid-row:2/4;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);border-radius:6px;color:var(--mut);text-align:center;font-size:11px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px} th,td{text-align:left;padding:5px 7px;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600} .retro{color:var(--acc)}
+  .tabs{display:flex;gap:6px;margin:2px 0 10px;flex-wrap:wrap} .tabs button{background:#283042;color:var(--ink);padding:5px 10px;font-weight:500}
+  .tabs button.on{background:var(--acc);color:#1a1a1a}
+  .chain span{display:inline-block;background:#0d0f15;border:1px solid var(--line);border-radius:6px;padding:3px 8px;margin:2px}
+  pre{white-space:pre-wrap;background:#0b0d12;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11.5px;overflow:auto;max-height:520px}
+  .row{display:flex;gap:16px;flex-wrap:wrap} .muted{color:var(--mut)} .sub{font-size:11px;color:var(--mut)}
+  .pill{font-size:11px;background:#0d0f15;border:1px solid var(--line);border-radius:20px;padding:2px 9px;margin-right:6px}
+</style>
+</head>
+<body>
+<header><h1>🔱 Advance Astrology — Chart · Daśā · Systems</h1></header>
+<div class="wrap">
+  <form id="f">
+    <label>Date & time<input name="when" value="1990-01-01 12:00" size="16"></label>
+    <label>Timezone<input name="tz" value="Asia/Kolkata" size="12"></label>
+    <label>Latitude<input name="lat" value="28.61" size="7"></label>
+    <label>Longitude<input name="lon" value="77.20" size="7"></label>
+    <label>Ayanāṃśa<select name="ayanamsa"><option>lahiri</option><option>kp</option><option>raman</option></select></label>
+    <label>As-of (daśā)<input name="asof" value="2026-06-25" size="11"></label>
+    <button type="submit">Load chart</button>
+  </form>
+
+  <div id="out" class="grid" style="display:none">
+    <div>
+      <div class="card">
+        <h2>Rāśi (D1) — South-Indian</h2>
+        <div id="d1" class="chart"></div>
+        <div id="meta" class="sub" style="margin-top:8px"></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Divisional charts</h2>
+        <div class="tabs" id="vtabs"></div>
+        <div id="varga" class="chart"></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Pañcāṅga</h2><div id="pan" class="sub"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Planets</h2>
+        <table id="ptab"><thead><tr><th>Graha</th><th>Sign</th><th>°</th><th>House</th><th>Nakṣatra</th><th>Dignity</th></tr></thead><tbody></tbody></table>
+        <div id="lords" class="sub" style="margin-top:8px"></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Vimśottari Daśā</h2>
+        <div class="muted sub">Active chain (as-of):</div>
+        <div id="chain" class="chain"></div>
+        <div class="muted sub" style="margin-top:8px">Mahādaśā timeline:</div>
+        <table id="maha"><tbody></tbody></table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Event evidence (domain · salience ledger)</h2>
+        <div class="row" style="margin-bottom:8px">
+          <input id="dom" placeholder="domain / word (e.g. marriage, vahan, career)" value="marriage" style="flex:1;min-width:160px">
+          <input id="st" value="2018-01-01" size="11"><input id="en" value="2028-01-01" size="11">
+          <button class="sec" onclick="runEvents()">Analyze</button>
+        </div>
+        <pre id="pack" class="muted">Domain + range chunkar "Analyze" dabao. (Compute thoda time leta hai.)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+// South-Indian fixed cell index (0..15 in 4x4) for each sign 0..11
+const CELL={11:0,0:1,1:2,2:3,3:7,4:11,5:15,6:14,7:13,8:12,9:8,10:4};
+let DATA=null;
+
+function qstr(){const fd=new FormData(document.getElementById('f'));return new URLSearchParams(fd).toString();}
+
+function drawChart(el,info){
+  el.innerHTML="";
+  const cellEls=Array(16).fill(null);
+  for(let s=0;s<12;s++){
+    const idx=CELL[s], d=document.createElement('div'); d.className='cell'+(s===info.asc?' asc':'');
+    d.style.gridArea=`${Math.floor(idx/4)+1} / ${idx%4+1}`;
+    d.innerHTML=`<span class="sg">${SIGNS[s].slice(0,3)}</span><span class="pl">${(info.cells[s]||[]).join(' ')}</span>${s===info.asc?'<span class="sg" style="left:5px;right:auto;color:var(--acc)">Asc</span>':''}`;
+    el.appendChild(d);
+  }
+  const c=document.createElement('div'); c.className='center'; c.textContent='Lagna: '+SIGNS[info.asc]; el.appendChild(c);
+}
+
+async function load(ev){
+  if(ev)ev.preventDefault();
+  const out=document.getElementById('out'); out.style.display='none';
+  const r=await fetch('/api/natal?'+qstr()); const j=await r.json();
+  if(j.error){alert(j.error);return;}
+  DATA=j; out.style.display='grid';
+  drawChart(document.getElementById('d1'), j.d1);
+  document.getElementById('meta').innerHTML=`<span class="pill">Lagna ${j.lagna_name}</span><span class="pill">Lagnesh ${j.lagnesh}</span><span class="pill">Ayan ${j.input.ayanamsa}</span>`;
+  // planets
+  const tb=document.querySelector('#ptab tbody'); tb.innerHTML="";
+  j.planets.forEach(p=>{tb.insertAdjacentHTML('beforeend',
+    `<tr><td>${p.name}${p.retro?' <span class="retro">℞</span>':''}</td><td>${p.sign_name}</td><td>${p.deg}</td><td>${p.house}</td><td>${p.nak}</td><td>${p.dignity}</td></tr>`);});
+  document.getElementById('lords').innerHTML='House lords: '+Object.entries(j.house_lords).map(([h,l])=>`<span class="pill">${h}:${l}</span>`).join('');
+  // dasha
+  document.getElementById('chain').innerHTML=j.vimshottari.current.map(c=>`<span>${c.lord}<br><span class="sub">L${c.level} ${c.start}</span></span>`).join(' › ');
+  const mt=document.querySelector('#maha tbody'); mt.innerHTML="";
+  j.vimshottari.maha.forEach(m=>mt.insertAdjacentHTML('beforeend',`<tr><td>${m.lord}</td><td class="sub">${m.start}</td><td class="sub">${m.end}</td></tr>`));
+  // panchanga
+  const p=j.panchanga; document.getElementById('pan').innerHTML=
+    ['tithi','nakshatra','yoga','karana','vara'].map(k=>`<span class="pill">${k}: ${p[k]}</span>`).join('');
+  // vargas
+  const vt=document.getElementById('vtabs'); vt.innerHTML="";
+  Object.keys(j.vargas).forEach((n,i)=>{const b=document.createElement('button');b.textContent='D'+n;b.className=i===0?'on':'';
+    b.onclick=()=>{[...vt.children].forEach(x=>x.className='');b.className='on';drawChart(document.getElementById('varga'),j.vargas[n]);};vt.appendChild(b);});
+  drawChart(document.getElementById('varga'), j.vargas[Object.keys(j.vargas)[0]]);
+}
+
+async function runEvents(){
+  const pre=document.getElementById('pack'); pre.textContent='Computing… (10–60s)';
+  const u='/api/events?'+qstr()+'&domain='+encodeURIComponent(document.getElementById('dom').value)
+    +'&start='+document.getElementById('st').value+'&end='+document.getElementById('en').value;
+  try{const r=await fetch(u);const j=await r.json();pre.textContent=j.error?('ERROR: '+j.error):j.pack;}
+  catch(e){pre.textContent='ERROR: '+e;}
+}
+document.getElementById('f').addEventListener('submit',load);
+</script>
+</body>
+</html>
