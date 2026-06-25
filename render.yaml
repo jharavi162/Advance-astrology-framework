@@ -1,0 +1,10 @@
+# One-click deploy on Render (free). Phone se: render.com → New → Blueprint →
+# is GitHub repo ko connect karo → Apply. Render $PORT set karta hai; server use padhta hai.
+services:
+  - type: web
+    name: advance-astrology
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m webapp.server
+    autoDeploy: true
