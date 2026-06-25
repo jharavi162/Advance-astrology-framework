@@ -3,109 +3,142 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Advance Astrology — Chart & Daśā</title>
+<title>Advance Astrology — Kundalī · Daśā</title>
 <link rel="manifest" href="/manifest.json"/>
-<meta name="theme-color" content="#0f1117"/>
+<meta name="theme-color" content="#0e0b14"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Astrology"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <style>
-  :root{--bg:#0f1117;--card:#171a23;--ink:#e7e9ee;--mut:#9aa3b2;--acc:#e0a82e;--line:#2a2f3a;--good:#39d98a;--bad:#ff6b6b}
-  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
-  header{padding:14px 18px;background:#12141c;border-bottom:1px solid var(--line)}
-  h1{font-size:17px;margin:0;color:var(--acc)} h2{font-size:14px;margin:0 0 8px;color:var(--acc)}
-  .wrap{max-width:1180px;margin:0 auto;padding:16px}
-  form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;background:var(--card);padding:12px;border:1px solid var(--line);border-radius:10px}
-  label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--mut)}
-  input,select{background:#0d0f15;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:9px 10px;font-size:16px}
-  button{background:var(--acc);color:#1a1a1a;border:0;border-radius:7px;padding:10px 16px;font-weight:600;cursor:pointer;font-size:15px;min-height:42px}
-  button.sec{background:#283042;color:var(--ink)}
-  .grid{display:grid;grid-template-columns:360px 1fr;gap:16px;margin-top:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
-  .chart{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,68px);gap:3px}
-  .cell{border:1px solid var(--line);border-radius:6px;padding:4px;position:relative;background:#0d0f15;font-size:12px}
-  .cell .sg{position:absolute;top:2px;right:5px;font-size:9px;color:var(--mut)}
-  .cell .pl{font-weight:600;color:#cfe3ff} .cell.asc{outline:2px solid var(--acc)}
-  .center{grid-column:2/4;grid-row:2/4;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);border-radius:6px;color:var(--mut);text-align:center;font-size:11px}
-  table{width:100%;border-collapse:collapse;font-size:12.5px} th,td{text-align:left;padding:5px 7px;border-bottom:1px solid var(--line)}
-  th{color:var(--mut);font-weight:600} .retro{color:var(--acc)}
-  .tabs{display:flex;gap:6px;margin:2px 0 10px;flex-wrap:wrap} .tabs button{background:#283042;color:var(--ink);padding:5px 10px;font-weight:500}
-  .tabs button.on{background:var(--acc);color:#1a1a1a}
-  .chain span{display:inline-block;background:#0d0f15;border:1px solid var(--line);border-radius:6px;padding:3px 8px;margin:2px}
-  pre{white-space:pre-wrap;background:#0b0d12;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11.5px;overflow:auto;max-height:520px}
-  .row{display:flex;gap:16px;flex-wrap:wrap} .muted{color:var(--mut)} .sub{font-size:11px;color:var(--mut)}
-  .pill{font-size:11px;background:#0d0f15;border:1px solid var(--line);border-radius:20px;padding:2px 9px;margin-right:6px}
-  .geo{position:absolute;top:100%;left:0;right:0;z-index:20;background:#0d0f15;border:1px solid var(--line);border-radius:8px;max-height:220px;overflow:auto;display:none}
-  .geo.on{display:block} .geo-it{padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12px} .geo-it:active,.geo-it:hover{background:#283042}
-  tr.mhd{cursor:pointer} tr.mhd td:first-child{color:#cfe3ff}
-  /* ---- mobile (iPhone / iPad) ---- */
-  @media (max-width:860px){
-    .wrap{padding:10px}
-    .grid{grid-template-columns:1fr}                 /* stack: chart+calcs on top */
-    .chart{grid-template-rows:repeat(4,minmax(56px,15vw))}
-    form{gap:6px} label{flex:1 1 44%} button{flex:1 1 100%}
-    pre{max-height:340px}
-    header h1{font-size:15px}
+  :root{
+    --bg:#0e0b14; --bg2:#15101f; --card:#1a1426; --ink:#f0ecf6; --mut:#a99fc0;
+    --acc:#e6b450; --acc2:#c98bff; --line:#2c2440; --good:#5fe3a1; --bad:#ff7a8a;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
   }
-  @media (max-width:480px){ .cell{font-size:11px} .cell .sg{font-size:8px} }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#241a36 0%,var(--bg) 60%);color:var(--ink);
+       font:14.5px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+  header{padding:18px 20px;text-align:center;border-bottom:1px solid var(--line);
+         background:linear-gradient(180deg,#1b1430,transparent)}
+  header h1{font:600 22px/1.2 var(--serif);margin:0;letter-spacing:.5px;
+            background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  header p{margin:4px 0 0;color:var(--mut);font-size:12px}
+  .wrap{max-width:1240px;margin:0 auto;padding:18px}
+  h2{font:600 14px var(--serif);margin:0 0 10px;color:var(--acc);letter-spacing:.4px;text-transform:uppercase}
+  .card{background:linear-gradient(180deg,var(--card),#160f22);border:1px solid var(--line);
+        border-radius:16px;padding:16px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
+  form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+  label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--mut);font-weight:600}
+  input,select{background:#0c0913;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 11px;font-size:16px}
+  input:focus,select:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 3px rgba(201,139,255,.15)}
+  .timebox{display:flex;gap:5px} .timebox input,.timebox select{width:58px;text-align:center;padding:10px 4px}
+  button{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0;border-radius:10px;
+         padding:11px 18px;font-weight:700;cursor:pointer;font-size:15px;min-height:44px}
+  button.sec{background:#2a2140;color:var(--ink);border:1px solid var(--line)}
+  .grid{display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:18px;margin-top:18px}
+  .col{display:flex;flex-direction:column;gap:18px}
+  /* North-Indian chart */
+  .nwrap{display:flex;flex-direction:column;align-items:center}
+  .nchart{width:100%;max-width:360px;aspect-ratio:1;display:block}
+  .nchart line,.nchart polygon,.nchart rect{stroke:var(--acc);opacity:.85}
+  .nsign{font-size:8.5px;fill:var(--acc);opacity:.65;text-anchor:middle}
+  .npl{font-size:10.5px;fill:#dDeBff;text-anchor:middle;font-weight:600}
+  .nasc{font-size:9px;fill:var(--acc2);text-anchor:middle;font-weight:700}
+  .multi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+  .multi .nchart{max-width:240px}
+  .ttl{text-align:center;font:600 12px var(--serif);color:var(--acc2);margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase}
+  .retro{color:var(--acc)} tr.mhd{cursor:pointer} tr.mhd td:first-child{color:#cfe3ff;font-weight:600}
+  .tabs{display:flex;gap:7px;margin:0 0 12px;flex-wrap:wrap}
+  .tabs button{background:#2a2140;color:var(--ink);padding:6px 13px;font-weight:600;font-size:13px;border:1px solid var(--line)}
+  .tabs button.on{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0}
+  pre{white-space:pre-wrap;background:#0a0710;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:11.5px;overflow:auto;max-height:540px;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .pill{display:inline-block;font-size:11px;background:#0c0913;border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0}
+  .pill b{color:var(--acc)}
+  .sub{font-size:11.5px;color:var(--mut)} .row{display:flex;gap:10px;flex-wrap:wrap}
+  .geo{position:absolute;top:100%;left:0;right:0;z-index:30;background:#0c0913;border:1px solid var(--line);border-radius:12px;max-height:230px;overflow:auto;display:none;margin-top:4px}
+  .geo.on{display:block} .geo-it{padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12.5px}
+  .geo-it:active,.geo-it:hover{background:#2a2140}
+  .chk{flex-direction:row;align-items:center;gap:7px;color:var(--ink);font-size:12.5px}
+  .chk input{width:auto}
+  @media (max-width:880px){
+    .wrap{padding:11px} .grid{grid-template-columns:1fr} label{flex:1 1 30%} button{flex:1 1 100%}
+    header h1{font-size:19px}
+  }
 </style>
 </head>
 <body>
-<header><h1>🔱 Advance Astrology — Chart · Daśā · Systems</h1></header>
+<header><h1>🔱 Advance Astrology</h1><p>Kundalī · Daśā · Divisional charts · Multi-system triangulation</p></header>
 <div class="wrap">
-  <form id="f">
-    <label>Date & time<input name="when" value="1990-01-01 12:00" size="16"></label>
-    <label style="position:relative;flex:1 1 200px">Place (search → auto lat/lon)
-      <input id="place" placeholder="city, e.g. Ramgarh" autocomplete="off">
-      <div id="geo" class="geo"></div>
-    </label>
-    <label>Latitude<input name="lat" value="28.61" size="7"></label>
-    <label>Longitude<input name="lon" value="77.20" size="7"></label>
-    <label>Timezone<input name="tz" value="Asia/Kolkata" size="14"></label>
-    <label>Ayanāṃśa<select name="ayanamsa"><option>lahiri</option><option>kp</option><option>raman</option></select></label>
-    <button type="submit">Load chart</button>
-  </form>
+  <div class="card">
+    <form id="f">
+      <label>Date<input id="date" type="date" value="1990-01-01"></label>
+      <label>Time
+        <div class="timebox">
+          <input id="hh" type="number" min="1" max="12" value="12">
+          <input id="mm" type="number" min="0" max="59" value="00">
+          <select id="ap"><option>AM</option><option selected>PM</option></select>
+        </div>
+      </label>
+      <label style="position:relative;flex:1 1 200px">Place (search)
+        <input id="place" placeholder="city, e.g. Ramgarh" autocomplete="off">
+        <div id="geo" class="geo"></div>
+      </label>
+      <label>Latitude<input name="lat" value="28.61" size="7"></label>
+      <label>Longitude<input name="lon" value="77.20" size="7"></label>
+      <label>Timezone<input name="tz" value="Asia/Kolkata" size="13"></label>
+      <label>System (ayanāṃśa)
+        <select id="ay">
+          <option value="lahiri">Lahiri</option>
+          <option value="kp">KP</option>
+          <option value="raman">Raman</option>
+          <option value="multi">Multi (all 3)</option>
+        </select>
+      </label>
+      <button type="submit">Cast chart</button>
+    </form>
+  </div>
 
   <div id="out" class="grid" style="display:none">
-    <div>
+    <div class="col">
       <div class="card">
-        <h2>Rāśi (D1) — South-Indian</h2>
-        <div id="d1" class="chart"></div>
-        <div id="meta" class="sub" style="margin-top:8px"></div>
+        <h2 id="d1title">Rāśi (D1)</h2>
+        <div id="d1area"></div>
+        <div id="meta" style="margin-top:10px"></div>
       </div>
-      <div class="card" style="margin-top:16px">
+      <div class="card">
         <h2>Divisional charts</h2>
         <div class="tabs" id="vtabs"></div>
-        <div id="varga" class="chart"></div>
+        <div class="nwrap"><svg id="varga" class="nchart"></svg></div>
+        <div id="vmeta" class="sub" style="text-align:center;margin-top:6px"></div>
       </div>
-      <div class="card" style="margin-top:16px">
-        <h2>Pañcāṅga</h2><div id="pan" class="sub"></div>
+      <div class="card">
+        <h2>Pañcāṅga</h2><div id="pan"></div>
       </div>
     </div>
-    <div>
+    <div class="col">
       <div class="card">
-        <h2>Planets</h2>
+        <h2>Grahas</h2>
         <table id="ptab"><thead><tr><th>Graha</th><th>Sign</th><th>°</th><th>House</th><th>Nakṣatra</th><th>Dignity</th></tr></thead><tbody></tbody></table>
-        <div id="lords" class="sub" style="margin-top:8px"></div>
+        <div id="lords" style="margin-top:10px"></div>
       </div>
-      <div class="card" style="margin-top:16px">
+      <div class="card">
         <h2>Vimśottari Daśā — full life</h2>
-        <div class="muted sub">Mahādaśā par tap karo → antardaśā khulegi.</div>
+        <div class="sub">Mahādaśā par tap karo → antardaśā khulegi.</div>
         <table id="maha"><tbody></tbody></table>
       </div>
-      <div class="card" style="margin-top:16px">
-        <h2>Event evidence (domain · salience ledger)</h2>
-        <div class="row" style="margin-bottom:8px">
-          <input id="dom" placeholder="domain / word (e.g. marriage, vahan, career)" value="marriage" style="flex:1;min-width:160px">
+      <div class="card">
+        <h2>Event evidence — multi-system triangulation</h2>
+        <div class="row" style="margin-bottom:9px">
+          <input id="dom" placeholder="domain / word (marriage, vahan, career…)" value="marriage" style="flex:1;min-width:150px">
           <input id="st" value="2018-01-01" size="11"><input id="en" value="2028-01-01" size="11">
           <button class="sec" onclick="runEvents()">Analyze</button>
         </div>
-        <label class="sub" style="flex-direction:row;align-items:center;gap:6px;margin-bottom:8px">
-          <input type="checkbox" id="multi" checked style="width:auto"> Multi-system triangulation (full salience ledger — all paddhatis)
-        </label>
-        <pre id="pack" class="muted">Domain + range chunkar "Analyze" dabao. (Compute thoda time leta hai.)</pre>
+        <label class="chk" style="margin-bottom:9px"><input type="checkbox" id="multi" checked> Multi-system triangulation (full salience ledger — all paddhatis)</label>
+        <pre id="pack" class="sub">Domain + range chunkar "Analyze" dabao. (Compute 10–60s.)</pre>
       </div>
     </div>
   </div>
@@ -113,95 +146,114 @@
 
 <script>
 const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
-// South-Indian fixed cell index (0..15 in 4x4) for each sign 0..11
-const CELL={11:0,0:1,1:2,2:3,3:7,4:11,5:15,6:14,7:13,8:12,9:8,10:4};
-let DATA=null;
+const SIGN3=SIGNS.map(s=>s.slice(0,3));
+// North-Indian house polygons (1..12) on a 300×300 box + label centroids
+const NH=[[[150,0],[225,75],[150,150],[75,75]],[[0,0],[150,0],[75,75]],[[0,0],[75,75],[0,150]],
+  [[0,150],[75,75],[150,150],[75,225]],[[0,150],[75,225],[0,300]],[[0,300],[75,225],[150,300]],
+  [[150,300],[75,225],[150,150],[225,225]],[[150,300],[225,225],[300,300]],[[300,300],[225,225],[300,150]],
+  [[300,150],[225,225],[150,150],[225,75]],[[300,150],[225,75],[300,0]],[[300,0],[225,75],[150,0]]];
+const NC=[[150,82],[75,30],[30,75],[78,150],[30,225],[75,270],[150,218],[225,270],[270,225],[222,150],[270,75],[225,30]];
 
-function qstr(){const fd=new FormData(document.getElementById('f'));return new URLSearchParams(fd).toString();}
-
-function drawChart(el,info){
-  el.innerHTML="";
-  const cellEls=Array(16).fill(null);
-  for(let s=0;s<12;s++){
-    const idx=CELL[s], d=document.createElement('div'); d.className='cell'+(s===info.asc?' asc':'');
-    d.style.gridArea=`${Math.floor(idx/4)+1} / ${idx%4+1}`;
-    d.innerHTML=`<span class="sg">${SIGNS[s].slice(0,3)}</span><span class="pl">${(info.cells[s]||[]).join(' ')}</span>${s===info.asc?'<span class="sg" style="left:5px;right:auto;color:var(--acc)">Asc</span>':''}`;
-    el.appendChild(d);
+function drawNorth(svg, ascSign, cells){
+  let s='<rect x="1.5" y="1.5" width="297" height="297" fill="none" stroke-width="1.5"/>'
+    +'<polygon points="150,1.5 298.5,150 150,298.5 1.5,150" fill="none" stroke-width="1"/>'
+    +'<line x1="1.5" y1="1.5" x2="298.5" y2="298.5" stroke-width="1"/><line x1="298.5" y1="1.5" x2="1.5" y2="298.5" stroke-width="1"/>';
+  for(let h=1;h<=12;h++){
+    const sign=(ascSign+h-1)%12,[cx,cy]=NC[h-1],lab=cells[sign]||[];
+    s+=`<text class="nsign" x="${cx}" y="${cy-(lab.length*5)-4}">${sign+1}·${SIGN3[sign]}</text>`;
+    if(h===1) s+=`<text class="nasc" x="${cx}" y="${cy-(lab.length*5)-14}">Asc</text>`;
+    lab.forEach((t,i)=>{s+=`<text class="npl" x="${cx}" y="${cy+i*11-(lab.length-1)*5.5+4}">${t}</text>`;});
   }
-  const c=document.createElement('div'); c.className='center'; c.textContent='Lagna: '+SIGNS[info.asc]; el.appendChild(c);
+  svg.innerHTML=s;
 }
+function d1Cells(j){const c=Array.from({length:12},()=>[]);
+  j.planets.forEach(p=>c[p.sign].push(p.ab+' '+Math.round(p.deg)+'°'+(p.retro?'℞':'')));return c;}
+
+function params(extra){
+  const d=document.getElementById('date').value;
+  let hh=+document.getElementById('hh').value%12; if(document.getElementById('ap').value==='PM')hh+=12;
+  const when=`${d} ${String(hh).padStart(2,'0')}:${String(+document.getElementById('mm').value).padStart(2,'0')}`;
+  const p=new URLSearchParams({when,tz:document.querySelector('[name=tz]').value,
+    lat:document.querySelector('[name=lat]').value,lon:document.querySelector('[name=lon]').value,
+    ayanamsa:extra||document.getElementById('ay').value});
+  return p;
+}
+async function natal(ay){const p=params(ay);const r=await fetch('/api/natal?'+p);return r.json();}
 
 async function load(ev){
   if(ev)ev.preventDefault();
-  const out=document.getElementById('out'); out.style.display='none';
-  const r=await fetch('/api/natal?'+qstr()); const j=await r.json();
-  if(j.error){alert(j.error);return;}
-  DATA=j; out.style.display='grid';
-  drawChart(document.getElementById('d1'), j.d1);
-  document.getElementById('meta').innerHTML=`<span class="pill">Lagna ${j.lagna_name}</span><span class="pill">Lagnesh ${j.lagnesh}</span><span class="pill">Ayan ${j.input.ayanamsa}</span>`;
-  // planets
+  const out=document.getElementById('out'); const ay=document.getElementById('ay').value;
+  const area=document.getElementById('d1area');
+  if(ay==='multi'){
+    document.getElementById('d1title').textContent='Rāśi (D1) — all systems';
+    const sys=['lahiri','kp','raman']; const res=await Promise.all(sys.map(natal));
+    if(res[0].error){alert(res[0].error);return;}
+    area.innerHTML='<div class="multi">'+sys.map((s,i)=>
+      `<div><div class="ttl">${s.toUpperCase()} · Lagna ${res[i].lagna_name}</div><svg class="nchart" id="ms${i}"></svg></div>`).join('')+'</div>';
+    sys.forEach((s,i)=>drawNorth(document.getElementById('ms'+i),res[i].lagna,d1Cells(res[i])));
+    renderDetails(res[0]); out.style.display='grid';
+  }else{
+    document.getElementById('d1title').textContent='Rāśi (D1)';
+    const j=await natal(ay); if(j.error){alert(j.error);return;}
+    area.innerHTML='<div class="nwrap"><svg class="nchart" id="d1"></svg></div>';
+    drawNorth(document.getElementById('d1'),j.lagna,d1Cells(j));
+    renderDetails(j); out.style.display='grid';
+  }
+}
+
+function renderDetails(j){
+  document.getElementById('meta').innerHTML=
+    `<span class="pill">Lagna <b>${j.lagna_name}</b></span><span class="pill">Lagneśa <b>${j.lagnesh}</b></span><span class="pill">Ayan <b>${j.input.ayanamsa}</b></span>`;
   const tb=document.querySelector('#ptab tbody'); tb.innerHTML="";
-  j.planets.forEach(p=>{tb.insertAdjacentHTML('beforeend',
-    `<tr><td>${p.name}${p.retro?' <span class="retro">℞</span>':''}</td><td>${p.sign_name}</td><td>${p.deg}</td><td>${p.house}</td><td>${p.nak}</td><td>${p.dignity}</td></tr>`);});
-  document.getElementById('lords').innerHTML='House lords: '+Object.entries(j.house_lords).map(([h,l])=>`<span class="pill">${h}:${l}</span>`).join('');
-  // dasha — full life: mahādaśā rows, tap to expand antardaśā
+  j.planets.forEach(p=>tb.insertAdjacentHTML('beforeend',
+    `<tr><td>${p.name}${p.retro?' <span class="retro">℞</span>':''}</td><td>${p.sign_name}</td><td>${p.deg}</td><td>${p.house}</td><td>${p.nak}</td><td>${p.dignity}</td></tr>`));
+  document.getElementById('lords').innerHTML=Object.entries(j.house_lords).map(([h,l])=>`<span class="pill">${h} <b>${l}</b></span>`).join('');
   const mt=document.querySelector('#maha tbody'); mt.innerHTML="";
   j.dasha.forEach((m,i)=>{
     mt.insertAdjacentHTML('beforeend',`<tr class="mhd" data-i="${i}"><td>▸ ${m.lord}</td><td class="sub">${m.start}</td><td class="sub">${m.end}</td></tr>`);
     (m.sub||[]).forEach(a=>mt.insertAdjacentHTML('beforeend',`<tr class="ad ad${i}" style="display:none"><td class="sub" style="padding-left:24px">↳ ${a.lord}</td><td class="sub">${a.start}</td><td class="sub">${a.end}</td></tr>`));
   });
   mt.querySelectorAll('.mhd').forEach(r=>r.onclick=()=>{const i=r.dataset.i;
-    r.querySelector('td').textContent=(r.querySelector('td').textContent.startsWith('▸')?'▾ ':'▸ ')+j.dasha[i].lord;
+    r.querySelector('td').textContent=(r.querySelector('td').textContent[0]==='▸'?'▾ ':'▸ ')+j.dasha[i].lord;
     mt.querySelectorAll('.ad'+i).forEach(x=>x.style.display=x.style.display==='none'?'':'none');});
-  // panchanga
   const p=j.panchanga; document.getElementById('pan').innerHTML=
-    ['tithi','nakshatra','yoga','karana','vara'].map(k=>`<span class="pill">${k}: ${p[k]}</span>`).join('');
-  // vargas
-  const vt=document.getElementById('vtabs'); vt.innerHTML="";
-  Object.keys(j.vargas).forEach((n,i)=>{const b=document.createElement('button');b.textContent='D'+n;b.className=i===0?'on':'';
-    b.onclick=()=>{[...vt.children].forEach(x=>x.className='');b.className='on';drawChart(document.getElementById('varga'),j.vargas[n]);};vt.appendChild(b);});
-  drawChart(document.getElementById('varga'), j.vargas[Object.keys(j.vargas)[0]]);
+    ['tithi','nakshatra','yoga','karana','vara'].map(k=>`<span class="pill">${k} <b>${p[k]}</b></span>`).join('');
+  // vargas (North-Indian)
+  const vt=document.getElementById('vtabs'); vt.innerHTML=""; const keys=Object.keys(j.vargas);
+  const show=n=>{[...vt.children].forEach(x=>x.className=x.textContent==='D'+n?'on':'');
+    drawNorth(document.getElementById('varga'),j.vargas[n].asc,j.vargas[n].cells);
+    document.getElementById('vmeta').textContent='D'+n+' · Lagna '+SIGNS[j.vargas[n].asc];};
+  keys.forEach(n=>{const b=document.createElement('button');b.textContent='D'+n;b.onclick=()=>show(n);vt.appendChild(b);});
+  show(keys[0]);
 }
 
 async function runEvents(){
   const pre=document.getElementById('pack'); pre.textContent='Computing… (10–60s)';
+  let ay=document.getElementById('ay').value; if(ay==='multi')ay='lahiri';
   const mode=document.getElementById('multi').checked?'full':'summary';
-  const u='/api/events?'+qstr()+'&domain='+encodeURIComponent(document.getElementById('dom').value)
+  const u='/api/events?'+params(ay)+'&domain='+encodeURIComponent(document.getElementById('dom').value)
     +'&start='+document.getElementById('st').value+'&end='+document.getElementById('en').value+'&mode='+mode;
   try{const r=await fetch(u);const j=await r.json();pre.textContent=j.error?('ERROR: '+j.error):j.pack;}
   catch(e){pre.textContent='ERROR: '+e;}
 }
 document.getElementById('f').addEventListener('submit',load);
 
-// ---- Location search → auto lat/lon/timezone (Open-Meteo geocoding, free, CORS) ----
-const placeEl=document.getElementById('place'), geoEl=document.getElementById('geo');
-let gtimer;
-placeEl.addEventListener('input',()=>{
-  clearTimeout(gtimer); const q=placeEl.value.trim();
-  if(q.length<2){geoEl.className='geo';geoEl.innerHTML='';return;}
-  gtimer=setTimeout(async()=>{
-    try{
-      const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&format=json&name='+encodeURIComponent(q));
-      const j=await r.json(); geoEl.innerHTML='';
-      (j.results||[]).forEach(p=>{
-        const d=document.createElement('div'); d.className='geo-it';
-        d.textContent=`${p.name}${p.admin1?', '+p.admin1:''}, ${p.country_code||p.country||''}  (${p.latitude.toFixed(2)}, ${p.longitude.toFixed(2)})`;
-        d.onclick=()=>{
-          document.querySelector('[name=lat]').value=p.latitude.toFixed(4);
-          document.querySelector('[name=lon]').value=p.longitude.toFixed(4);
-          if(p.timezone) document.querySelector('[name=tz]').value=p.timezone;
-          placeEl.value=p.name; geoEl.className='geo'; geoEl.innerHTML='';
-        };
-        geoEl.appendChild(d);
-      });
-      geoEl.className=geoEl.children.length?'geo on':'geo';
-    }catch(e){
-      geoEl.innerHTML='<div class="geo-it">geocoding unavailable — lat/lon manually bhar do</div>';
-      geoEl.className='geo on';
-    }
-  },300);
-});
-document.addEventListener('click',e=>{if(!e.target.closest('label')) geoEl.className='geo';});
+// location search → lat/lon/timezone (Open-Meteo, free, CORS)
+const placeEl=document.getElementById('place'),geoEl=document.getElementById('geo');let gt;
+placeEl.addEventListener('input',()=>{clearTimeout(gt);const q=placeEl.value.trim();
+  if(q.length<2){geoEl.className='geo';return;}
+  gt=setTimeout(async()=>{try{
+    const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&format=json&name='+encodeURIComponent(q));
+    const j=await r.json();geoEl.innerHTML='';
+    (j.results||[]).forEach(p=>{const d=document.createElement('div');d.className='geo-it';
+      d.textContent=`${p.name}${p.admin1?', '+p.admin1:''}, ${p.country_code||''} (${p.latitude.toFixed(2)}, ${p.longitude.toFixed(2)})`;
+      d.onclick=()=>{document.querySelector('[name=lat]').value=p.latitude.toFixed(4);
+        document.querySelector('[name=lon]').value=p.longitude.toFixed(4);
+        if(p.timezone)document.querySelector('[name=tz]').value=p.timezone;
+        placeEl.value=p.name;geoEl.className='geo';};geoEl.appendChild(d);});
+    geoEl.className=geoEl.children.length?'geo on':'geo';
+  }catch(e){geoEl.innerHTML='<div class="geo-it">geocoding unavailable — lat/lon manually bharo</div>';geoEl.className='geo on';}},300);});
+document.addEventListener('click',e=>{if(!e.target.closest('label'))geoEl.className='geo';});
 </script>
 </body>
 </html>
