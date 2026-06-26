@@ -246,12 +246,16 @@ CHAT_SYSTEM = (
     "You are an expert Vedic (Jyotish) astrologer and analyst. A deterministic "
     "engine has ALREADY computed the chart given below as JSON — treat every "
     "position, degree, lord, daśā date, cusp sub-lord, bala, yoga and saham in it "
-    "as ground truth. NEVER invent or recompute a position/degree/date; reason "
-    "ONLY from the supplied numbers. Be specific, multivalent and concise: cite "
-    "houses, lords, kārakas, cusp sub-lords, Ṣaḍbala and daśā when you reason. For "
-    "timing, work from the Vimśottari mahādaśā chain plus the relevant Sahams. If "
-    "the chart JSON doesn't contain something, say so rather than guessing. "
-    "Answer in the user's language (Hinglish is fine)."
+    "as GROUND TRUTH. NEVER recompute, override or contradict those numbers, and "
+    "never invent a position/degree/date that isn't given. Be specific, multivalent "
+    "and concise: cite houses, lords, kārakas, cusp sub-lords, Ṣaḍbala and daśā when "
+    "you reason. For timing, work from the Vimśottari mahādaśā chain plus the "
+    "relevant Sahams. "
+    "You MAY use Google Search to look up astrological PRINCIPLES, classical-text "
+    "references (BPHS, Phaladeepika, Saravali, Jaimini Sūtras, KP, etc.) and "
+    "general interpretation — but only to interpret the engine's numbers, never to "
+    "fetch or replace the chart's own positions/dates. When you use a web source, "
+    "briefly name it. Answer in the user's language (Hinglish is fine)."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -276,6 +280,12 @@ def chat_json(body):
     payload = dict(system_instruction=dict(parts=[dict(text=sys)]),
                    contents=contents,
                    generationConfig=dict(maxOutputTokens=1600, temperature=0.6))
+    if body.get("web", True):
+        # Grounding with Google Search — gives Gemini live internet access. The
+        # tool name differs between the 1.5 and 2.x model families.
+        payload["tools"] = [{"google_search_retrieval": {}}
+                            if model.startswith("gemini-1.5")
+                            else {"google_search": {}}]
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{model}:generateContent")
     req = urllib.request.Request(
@@ -290,11 +300,18 @@ def chat_json(body):
     except Exception as e:
         return dict(error=f"{type(e).__name__}: {e}")
     try:
-        parts = j["candidates"][0]["content"]["parts"]
+        cand = j["candidates"][0]
+        parts = cand["content"]["parts"]
         text = "".join(p.get("text", "") for p in parts).strip()
     except Exception:
-        text = ""
-    return dict(text=text or "(empty response — model ne kuch return nahi kiya)")
+        cand, text = {}, ""
+    sources = []
+    for ch in (cand.get("groundingMetadata", {}).get("groundingChunks") or []):
+        w = ch.get("web") or {}
+        if w.get("title") or w.get("uri"):
+            sources.append(dict(title=w.get("title", ""), uri=w.get("uri", "")))
+    return dict(text=text or "(empty response — model ne kuch return nahi kiya)",
+                sources=sources)
 
 
 class H(BaseHTTPRequestHandler):

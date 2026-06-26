@@ -65,6 +65,7 @@
   .chat-msgs{max-height:400px;overflow:auto;display:flex;flex-direction:column;gap:8px;background:#0a0710;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:80px}
   .msg{padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55}
   .msg.user{background:#2a2140;align-self:flex-end;max-width:88%}.msg.ai{background:#100a1c;border:1px solid var(--line);max-width:95%;white-space:pre-wrap}
+  .srcs{margin-top:7px;padding-top:6px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}.srcs a{color:var(--acc2);text-decoration:none}
   .lgnd{font-size:10px;color:var(--mut);text-align:center;margin-top:6px}
   @media (max-width:880px){.wrap{padding:11px}.grid{grid-template-columns:1fr}label{flex:1 1 30%}form button{flex:1 1 100%}header h1{font-size:19px}}
 </style>
@@ -122,13 +123,14 @@
     <div class="col">
       <div class="card">
         <h2>Analysis chat — Gemini</h2>
-        <div class="sub" style="margin-bottom:9px">Key server par (GEMINI_API_KEY env) — browser me nahi. Yahi engine-computed chart hi context hai; model invent nahi karega.</div>
-        <div class="row" style="margin-bottom:7px">
+        <div class="sub" style="margin-bottom:9px">Key server par (GEMINI_API_KEY env) — browser me nahi. Engine ke numbers = ground truth; 🌐 ON ho to interpretation/classical refs net se dekh sakta hai.</div>
+        <div class="row" style="margin-bottom:7px;align-items:center">
           <select id="cmodel" style="flex:1">
             <option value="gemini-2.0-flash">Gemini 2.0 Flash (fast, free)</option>
             <option value="gemini-2.5-flash">Gemini 2.5 Flash (capable)</option>
             <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </select>
+          <label style="flex-direction:row;align-items:center;gap:6px;font-size:12px;color:var(--ink)"><input type="checkbox" id="cweb" checked style="width:auto;min-height:0"> 🌐 Web</label>
         </div>
         <div id="chat" class="chat-msgs"></div>
         <div class="row" style="margin-top:8px">
@@ -340,10 +342,14 @@ async function sendChat(){const ctx=chatCtx();
   addMsg('user',txt);inp.value='';HIST.push({role:'user',content:txt});
   const ai=addMsg('ai','…');
   try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({messages:HIST,context:ctx,model:document.getElementById('cmodel').value})});
+    body:JSON.stringify({messages:HIST,context:ctx,model:document.getElementById('cmodel').value,
+      web:document.getElementById('cweb').checked})});
     const j=await r.json();
     if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
     ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
+    if(j.sources&&j.sources.length){const s=document.createElement('div');s.className='srcs';
+      s.innerHTML='🌐 '+j.sources.map(x=>x.uri?`<a href="${x.uri}" target="_blank" rel="noopener">${x.title||x.uri}</a>`:x.title).join(' · ');
+      ai.appendChild(s);}
   }catch(e){ai.textContent='Network error: '+e;HIST.pop();}}
 document.getElementById('cin').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();sendChat();}});
