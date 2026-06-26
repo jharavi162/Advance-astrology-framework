@@ -127,6 +127,20 @@ def natal_json(q):
     )
 
 
+def transit_json(q):
+    """Gochar: transiting planet positions on a chosen date, to plot from the
+    natal Lagna."""
+    v, _ = _chart(q)
+    d = (q.get("date", [""])[0] or datetime.now().strftime("%Y-%m-%d"))
+    when = datetime.strptime(d, "%Y-%m-%d").replace(hour=12, tzinfo=timezone.utc)
+    pos = v.transits().positions(when)
+    pl = []
+    for p in GRAHAS:
+        lon = float(pos[p]); s = int(lon // 30) % 12
+        pl.append(dict(ab=ABBR[p], sign=s, sign_name=SIGNS[s], deg=round(lon % 30, 2)))
+    return dict(date=d, lagna=int(v.ascendant_sign), planets=pl)
+
+
 def dasha_json(q):
     """Lazy daśā drill: path = dot-separated indices (maha.antar.pratyantar).
     Returns the children of the node at that path (antar / pratyantar / sūkṣma)."""
@@ -197,6 +211,8 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(natal_json(q)))
             if u.path == "/api/dasha":
                 return self._send(200, json.dumps(dasha_json(q)))
+            if u.path == "/api/transit":
+                return self._send(200, json.dumps(transit_json(q)))
             if u.path == "/api/events":
                 return self._send(200, json.dumps(events_json(q)))
             return self._send(404, json.dumps({"error": "not found"}))
