@@ -42,6 +42,14 @@
   .narudha{font-size:9px;fill:var(--acc);text-anchor:middle;font-weight:700}
   .nupa{font-size:9px;fill:#7fe0c0;text-anchor:middle}
   .ntr{font-size:10px;fill:#ff9bb0;text-anchor:middle;font-weight:600}
+  .npt{font-size:9px;fill:#ff9bb0;text-anchor:middle;font-weight:700}
+  .nsah{font-size:8.5px;fill:#f0a0d0;text-anchor:middle}
+  .nsav{font-size:9px;fill:#9fb6e8;text-anchor:middle;font-weight:700}
+  .bar{position:relative;background:#0c0913;border:1px solid var(--line);border-radius:6px;height:16px;margin:3px 0;overflow:hidden}
+  .bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--acc2),var(--acc));opacity:.55}
+  .bar b{position:absolute;left:7px;top:0;font-size:11px;line-height:16px;color:var(--ink);font-weight:600}
+  .bar span{position:absolute;right:7px;top:0;font-size:10px;line-height:16px;color:var(--mut)}
+  .bar.strong i{background:linear-gradient(90deg,#5fd0a0,#9fe0c0)}
   .multi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
   .multi .nchart{max-width:240px}.ttl{text-align:center;font:600 12px var(--serif);color:var(--acc2);margin-bottom:4px}
   table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
@@ -85,10 +93,12 @@
           <button class="on" data-l="grahas">Grahas</button>
           <button data-l="arudhas">Arudhas + UL/AL</button>
           <button data-l="upa">Upagrahas</button>
+          <button data-l="points">Points (BB/IL/Saham)</button>
+          <button data-l="sav">Aṣṭakavarga</button>
         </div>
         <div id="d1area"></div>
         <div id="meta" style="margin-top:8px"></div>
-        <div class="lgnd"><span style="color:#bdd9ff">●</span> graha &nbsp; <span style="color:var(--acc)">●</span> arudha &nbsp; <span style="color:#7fe0c0">●</span> upagraha</div>
+        <div class="lgnd"><span style="color:#bdd9ff">●</span> graha &nbsp; <span style="color:var(--acc)">●</span> arudha &nbsp; <span style="color:#7fe0c0">●</span> upagraha &nbsp; <span style="color:#ff9bb0">●</span> point &nbsp; <span style="color:#9fb6e8">⊙</span> SAV bindu</div>
       </div>
       <div class="card">
         <h2>Gochar (transit)</h2>
@@ -121,22 +131,23 @@
         <table id="maha"><tbody></tbody></table>
       </div>
       <div class="card">
-        <h2>Claude — is chart ko analyse karo</h2>
-        <input id="akey" type="password" placeholder="Anthropic API key (sk-ant-…)" style="width:100%;margin-bottom:7px">
-        <div class="row" style="margin-bottom:7px">
-          <select id="cmodel" style="flex:1">
-            <option value="claude-sonnet-4-6">Sonnet 4.6 (balanced)</option>
-            <option value="claude-opus-4-8">Opus 4.8 (most capable)</option>
-            <option value="claude-haiku-4-5-20251001">Haiku 4.5 (fast)</option>
-          </select>
-          <button class="sec" onclick="saveKey()">Save key</button>
-        </div>
-        <div class="sub" style="margin-bottom:9px">Key sirf browser me; calls seedha Anthropic ko. (claude.ai subscription nahi — <b>API key</b> chahiye: console.anthropic.com.)</div>
-        <div id="chat" class="chat-msgs"></div>
-        <div class="row" style="margin-top:8px">
-          <textarea id="cin" rows="2" placeholder="Poocho… (e.g. shaadi ka yog kab? career?)" style="flex:1"></textarea>
-          <button onclick="sendChat()">Send</button>
-        </div>
+        <h2>Bhāva &amp; cusps (KP)</h2>
+        <div class="sub" style="margin-bottom:8px">Placidus cusp · sign · sign/star/sub lord per house.</div>
+        <table id="cusptab"><thead><tr><th>Bh</th><th>Cusp</th><th>Rāśi-L</th><th>Star-L</th><th>Sub-L</th></tr></thead><tbody></tbody></table>
+        <div id="chalit" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h2>Bala &amp; yogas</h2>
+        <div class="grp"><div class="lbl">Ṣaḍbala (rūpa / required)</div><div id="shad"></div></div>
+        <div class="grp"><div class="lbl">Iṣṭa vs Kaṣṭa phala</div><div id="ishta"></div></div>
+        <div class="grp"><div class="lbl">Yogas</div><div id="yogas"></div></div>
+        <div class="grp"><div class="lbl">Avasthās</div><div id="avtab"></div></div>
+      </div>
+      <div class="card">
+        <h2>Jaimini &amp; sensitive points</h2>
+        <div class="grp"><div class="lbl">Chara kārakas (AK→DK)</div><div id="ckar"></div></div>
+        <div class="grp"><div class="lbl">Sensitive points</div><div id="pts"></div></div>
+        <div class="grp"><div class="lbl">Sahams (Tājika)</div><div id="sahams"></div></div>
       </div>
     </div>
   </div>
@@ -147,7 +158,8 @@ const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio",
 const SIGN3=SIGNS.map(s=>s.slice(0,3));
 const NC=[[150,82],[75,30],[30,75],[78,150],[30,225],[75,270],[150,218],[225,270],[270,225],[222,150],[270,75],[225,30]];
 const UPA={Dhuma:'Dh',Vyatipata:'Vy',Parivesha:'Pv',Indrachapa:'Ic',Upaketu:'Uk'};
-const L={grahas:true,arudhas:false,upa:false};
+const SAH={Vivaha:'Vv',Punarvivaha:'2V',Punya:'Py',Vidya:'Vd',Karma:'Km',Yasas:'Ys'};
+const L={grahas:true,arudhas:false,upa:false,points:false,sav:false};
 
 function drawNorth(svg,ascSign,cells){
   svg.setAttribute('viewBox','0 0 300 300');svg.setAttribute('preserveAspectRatio','xMidYMid meet');
@@ -166,9 +178,14 @@ const emptyCells=()=>Array.from({length:12},()=>[]);
 function addGrahas(c,j){j.planets.forEach(p=>c[p.sign].push({t:p.ab+Math.round(p.deg)+'°'+(p.retro?'℞':''),cls:'npl'}));}
 function addArudhas(c,j){for(const k in j.arudhas)c[j.arudhas[k].sign].push({t:k,cls:'narudha'});}
 function addUpa(c,j){for(const k in j.upagrahas)c[j.upagrahas[k].sign].push({t:UPA[k]||k.slice(0,2),cls:'nupa'});}
+function addPoints(c,j){const p=j.points;c[p.bhrigu_bindu.sign].push({t:'BB',cls:'npt'});
+  c[p.indu_lagna.sign].push({t:'IL',cls:'npt'});
+  for(const k in p.sahams)c[p.sahams[k].sign].push({t:SAH[k]||k.slice(0,2),cls:'nsah'});}
+function addSav(c,j){j.sarva.forEach((b,s)=>c[s].push({t:'⊙'+b,cls:'nsav'}));}
 
 function drawD1(){const j=window.NATAL;if(!j)return;const c=emptyCells();
   if(L.grahas)addGrahas(c,j);if(L.arudhas)addArudhas(c,j);if(L.upa)addUpa(c,j);
+  if(L.points)addPoints(c,j);if(L.sav)addSav(c,j);
   document.getElementById('d1area').innerHTML='<div class="nwrap"><svg class="nchart" id="d1"></svg></div>';
   drawNorth(document.getElementById('d1'),j.lagna,c);}
 
@@ -215,10 +232,7 @@ function renderDetails(j){
     `<div class="grp"><span class="pill">Lagna <b>${j.lagna_name}</b></span><span class="pill">Lagneśa <b>${j.lagnesh}</b></span><span class="pill">Moon nakṣatra <b>${moon?moon.nak:''}</b></span></div>`
    +`<div class="grp"><div class="lbl">Pañcāṅga</div>`+['vara','tithi','nakshatra','yoga','karana'].map(k=>`<span class="pill">${k} <b>${j.panchanga[k]}</b></span>`).join('')+`</div>`
    +`<div class="grp"><div class="lbl">Special lagnas</div>`+Object.entries(j.special).map(([k,a])=>`<span class="pill">${k} <b>${a.sign_name.slice(0,3)} ${Math.round(a.deg)}°</b></span>`).join('')+`</div>`;
-  // chat context (compact)
-  window.CTX={birth:j.input,lagna:j.lagna_name,lagnesh:j.lagnesh,planets:j.planets,house_lords:j.house_lords,
-    vimshottari_maha:j.dasha,arudhas:j.arudhas,upagrahas:j.upagrahas,special_lagnas:j.special,
-    panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10']};
+  renderCusps(j);renderStrengths(j);renderJaimini(j);
   // vargas (North-Indian, all D2..D60)
   const vt=document.getElementById('vtabs');vt.innerHTML="";const keys=Object.keys(j.vargas);
   const show=n=>{[...vt.children].forEach(x=>x.className=x.textContent==='D'+n?'on':'');
@@ -228,6 +242,43 @@ function renderDetails(j){
     document.getElementById('vmeta').textContent='D'+n+' · Lagna '+SIGNS[vc.asc];};
   keys.forEach(n=>{const b=document.createElement('button');b.textContent='D'+n;b.onclick=()=>show(n);vt.appendChild(b);});
   show(keys[0]);
+}
+
+function renderCusps(j){
+  const tb=document.querySelector('#cusptab tbody');tb.innerHTML="";
+  j.cusps.forEach(c=>tb.insertAdjacentHTML('beforeend',
+    `<tr><td>${c.house}</td><td>${c.sign_name.slice(0,3)} ${c.deg}°</td><td>${c.sign_lord}</td><td>${c.star_lord}</td><td><b style="color:var(--acc)">${c.sub_lord}</b></td></tr>`));
+  document.getElementById('chalit').innerHTML=
+    `<div class="lbl">Bhāva-Chalit shifts</div>`+(j.chalit.length
+      ?j.chalit.map(c=>`<span class="pill">${c.planet} <b>H${c.rashi}→H${c.chalit}</b></span>`).join('')
+      :`<span class="sub">koi graha shift nahi (rāśi = chalit).</span>`);
+}
+function renderStrengths(j){
+  const s=j.strengths;
+  document.getElementById('shad').innerHTML=s.shadbala.map(b=>{
+    const w=Math.min(100,Math.round(b.rupa/Math.max(b.req,b.rupa)*100));
+    return `<div class="bar${b.strong?' strong':''}"><i style="width:${w}%"></i><b>${b.planet}</b><span>${b.rupa} / ${b.req} rūpa</span></div>`;}).join('');
+  document.getElementById('ishta').innerHTML=s.ishta_kashta.map(x=>{
+    const tot=x.ishta+x.kashta||1,w=Math.round(x.ishta/tot*100);
+    return `<div class="bar"><i style="width:${w}%"></i><b>${x.planet}</b><span>Iṣṭa ${x.ishta} · Kaṣṭa ${x.kashta}</span></div>`;}).join('');
+  document.getElementById('yogas').innerHTML=s.yogas.length
+    ?s.yogas.map(y=>`<span class="pill" title="${y.desc}">${y.name} <b>${y.kind}</b></span>`).join('')
+    :`<span class="sub">koi major yoga detect nahi.</span>`;
+  document.getElementById('avtab').innerHTML=
+    `<table><thead><tr><th>Gr</th><th>Bālādi</th><th>Jāgradādi</th><th>Dīptādi</th><th>Astha</th></tr></thead><tbody>`
+    +Object.entries(s.avasthas).map(([ab,a])=>`<tr><td>${ab}</td><td>${a.baladi}</td><td>${a.jagradadi}</td><td>${a.deeptadi}</td><td>${a.combust}</td></tr>`).join('')
+    +`</tbody></table>`;
+}
+function renderJaimini(j){
+  const ROLE={Atmakaraka:'AK',Amatyakaraka:'AmK',Bhratrikaraka:'BK',Matrikaraka:'MK',Pitrikaraka:'PiK',Putrakaraka:'PK',Gnatikaraka:'GK',Darakaraka:'DK'};
+  document.getElementById('ckar').innerHTML=Object.entries(j.points.chara_karakas)
+    .map(([r,p])=>`<span class="pill">${ROLE[r]||r} <b>${p}</b></span>`).join('');
+  const pt=j.points;
+  document.getElementById('pts').innerHTML=
+    `<span class="pill">Bhṛgu Bindu <b>${pt.bhrigu_bindu.sign_name.slice(0,3)} ${pt.bhrigu_bindu.deg}°</b></span>`
+   +`<span class="pill">Indu Lagna <b>${pt.indu_lagna.sign_name}</b></span>`;
+  document.getElementById('sahams').innerHTML=Object.entries(pt.sahams)
+    .map(([k,s])=>`<span class="pill">${k} <b>${s.sign_name.slice(0,3)} ${s.deg}°</b> (${s.lord})</span>`).join('');
 }
 
 document.getElementById('layers').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
@@ -255,28 +306,7 @@ async function toggleDasha(tr,level,path){const cell=tr.querySelector('td');
     (j.sub||[]).forEach((c,i)=>{const cr=dRow(c,level+1,path+'.'+i);after.after(cr);after=cr;});tr._open=true;
   }catch(e){cell.textContent=cell.textContent.replace('▾','▸');}}
 
-// Claude chat
-let HIST=[];
-function addMsg(role,txt){const d=document.createElement('div');d.className='msg '+role;d.textContent=txt;
-  const c=document.getElementById('chat');c.appendChild(d);c.scrollTop=1e9;return d;}
-function saveKey(){const k=document.getElementById('akey').value.trim();
-  if(k){localStorage.setItem('akey',k);document.getElementById('akey').value='';document.getElementById('akey').placeholder='key saved ✓';}}
-async function sendChat(){const key=localStorage.getItem('akey');
-  if(!key){alert('Pehle Anthropic API key daalo + Save key.');return;}
-  if(!window.CTX){alert('Pehle Cast chart karo.');return;}
-  const inp=document.getElementById('cin'),txt=inp.value.trim();if(!txt)return;
-  addMsg('user',txt);inp.value='';HIST.push({role:'user',content:txt});
-  const sys="You are an expert Vedic (Jyotish) astrologer + analyst. Analyse STRICTLY from the engine-computed chart JSON below — never invent positions/degrees/daśā dates. Be specific, multivalent, concise; cite houses/lords/kārakas. For timing, reason from the Vimśottari mahādaśā + significators provided.\n\nCHART (engine-computed):\n"+JSON.stringify(window.CTX);
-  const ai=addMsg('ai','…');
-  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-    headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:document.getElementById('cmodel').value,max_tokens:1400,system:sys,messages:HIST})});
-    const j=await r.json();if(j.error){ai.textContent='API error: '+(j.error.message||JSON.stringify(j.error));HIST.pop();return;}
-    const out=(j.content||[]).map(c=>c.text||'').join('').trim()||'(empty)';ai.textContent=out;HIST.push({role:'assistant',content:out});
-  }catch(e){ai.textContent='Network/CORS error: '+e;HIST.pop();}}
-
 document.getElementById('f').addEventListener('submit',load);
-window.addEventListener('load',()=>{if(localStorage.getItem('akey'))document.getElementById('akey').placeholder='key saved ✓';});
 
 // location search → lat/lon/timezone
 const placeEl=document.getElementById('place'),geoEl=document.getElementById('geo');let gt;

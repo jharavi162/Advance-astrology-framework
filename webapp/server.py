@@ -100,6 +100,61 @@ def _dasha_top(v):
             for d in v.dasha("vimshottari", levels=1)]
 
 
+def _kp_cusps(v):
+    """KP bhāva table: Placidus cusp · sign · sign/star/sub lord per house."""
+    from advance_astrology.vedic.chalit import placidus_cusps_sidereal
+    from advance_astrology.vedic.kp import kp_chain
+    cu = placidus_cusps_sidereal(v)
+    out = []
+    for h in range(1, 13):
+        lon = float(cu[h]); s = int(lon // 30) % 12; kc = kp_chain(lon)
+        out.append(dict(house=h, sign=s, sign_name=SIGNS[s], deg=round(lon % 30, 2),
+                        sign_lord=kc.sign_lord.value, star_lord=kc.star_lord.value,
+                        sub_lord=kc.sub_lord.value))
+    return out
+
+
+def _chalit(v):
+    """Planets whose Placidus (Chalit) house differs from the Rāśi house."""
+    out = []
+    for p, c in v.bhava_chalit().items():
+        if c.shifted and p in ABBR:
+            out.append(dict(ab=ABBR[p], planet=p.value,
+                            rashi=c.rashi_house, chalit=c.chalit_house))
+    return out
+
+
+def _points(v):
+    """Sensitive points to plot/show: Bhṛgu Bindu, Indu Lagna, Sahams, kārakas."""
+    bb = v.bhrigu_bindu(); il = int(v.indu_lagna()) % 12
+    sah = {k: dict(sign=int(s.sign_index) % 12,
+                   sign_name=SIGNS[int(s.sign_index) % 12],
+                   deg=round(float(s.longitude) % 30, 2), lord=s.lord.value)
+           for k, s in v.sahams().items()}
+    ck = {role: p.value for role, p in v.chara_karakas().items()}
+    return dict(bhrigu_bindu=_pt(bb),
+                indu_lagna=dict(sign=il, sign_name=SIGNS[il]),
+                sahams=sah, chara_karakas=ck)
+
+
+def _strengths(v):
+    """Ṣaḍbala (rūpa/ratio), Iṣṭa-Kaṣṭa, avasthās, and detected yogas."""
+    sb = v.shadbala(); ik = v.ishta_kashta()
+    bal = [dict(ab=ABBR[p], planet=p.value, rupa=round(s.total_rupa, 2),
+                req=round(s.required_rupa, 2), pct=round(s.ratio * 100),
+                strong=bool(s.is_strong)) for p, s in sb.items()]
+    iks = [dict(ab=ABBR[p], planet=p.value, ishta=round(x.ishta, 1),
+                kashta=round(x.kashta, 1)) for p, x in ik.items()]
+    av = {}
+    for p in GRAHAS:
+        try:
+            av[ABBR[p]] = v.avasthas(p)
+        except Exception:
+            pass
+    yg = [dict(name=y.name, kind=y.kind, desc=y.description) for y in v.yogas()]
+    return dict(shadbala=bal, ishta_kashta=iks, avasthas=av, yogas=yg)
+
+
 VARGAS = (2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60)
 
 
@@ -121,6 +176,8 @@ def natal_json(q):
         dasha=_dasha_top(v),
         arudhas=_arudhas(v), upagrahas=_upagrahas(v), special=_special_lagnas(v),
         vargas={str(n): _varga(v, n) for n in VARGAS},
+        cusps=_kp_cusps(v), chalit=_chalit(v), sarva=v.sarvashtakavarga(),
+        points=_points(v), strengths=_strengths(v),
         panchanga=dict(tithi=getattr(pan.tithi, "name", str(pan.tithi)),
                        nakshatra=str(pan.nakshatra), yoga=str(pan.yoga),
                        karana=str(pan.karana), vara=str(pan.vara)),

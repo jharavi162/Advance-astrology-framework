@@ -20,16 +20,20 @@ future session continues the same way (read this before changing `webapp/`).
 - Rule: a backend change should require touching at most (a) the relevant
   `*_json()` builder in `server.py` and (b) its render function in `index.html`.
 
-## NOTE 2 — Target layout: chart/calcs on the LEFT, CHAT with Claude on the RIGHT
-- The destination UX is **two-pane**: left = chart + all calculations (what we have
-  now); right = a **chat space** where the user talks to Claude to *understand and
-  analyse the calculations shown on the left*.
-- The chat must be **context-aware of the left pane**: the current chart's natal
-  JSON + the visible event-ledger should be passed to the model as context so the
-  conversation is grounded in the exact numbers on screen (not a generic chat).
-- Implementation when we get there: **React or Flask is fine** (no need to stay on
-  stdlib). Likely React front + a small API that (a) serves the engine JSON and
-  (b) proxies a chat endpoint to Claude with the left-pane context injected.
+## NOTE 2 — In-browser Claude chat was DROPPED (see why) → deterministic panels instead
+- We tried an in-browser chat to Claude. **Blocker:** a direct browser call needs a
+  paid Anthropic **API key** (`sk-ant-…`) — a claude.ai *subscription* cannot drive
+  it. So the chat is not usable for the owner and was removed.
+- **Replacement (shipped):** the right pane is now all-deterministic, engine-only
+  panels (no external calls, no key): **Bhāva & cusps (KP)** table (Placidus cusp ·
+  sign · sign/star/sub lord + Bhāva-Chalit shifts), **Bala & yogas** (Ṣaḍbala bars ·
+  Iṣṭa/Kaṣṭa · detected yogas · avasthās), **Jaimini & sensitive points** (chara
+  kārakas · Bhṛgu Bindu · Indu Lagna · Sahams). Plus chart layer toggles for
+  Arudhas, Upagrahas, Points (BB/IL/Saham) and Aṣṭakavarga bindus.
+- If a chat is ever revived, the honest options are: (a) a small server-side proxy
+  that holds the key and injects the left-pane JSON as context (React/Flask fine),
+  or (b) running the engine's own `triangulate()`/`event_evidence` pack as a
+  deterministic "Praśna" panel — no LLM, fully grounded in the on-screen numbers.
 
 ## Phase backlog (rough order)
 1. **Phase 1 — two-pane shell + chat:** add the right-side chat pane; wire it to an
