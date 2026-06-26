@@ -30,10 +30,14 @@ future session continues the same way (read this before changing `webapp/`).
   Iṣṭa/Kaṣṭa · detected yogas · avasthās), **Jaimini & sensitive points** (chara
   kārakas · Bhṛgu Bindu · Indu Lagna · Sahams). Plus chart layer toggles for
   Arudhas, Upagrahas, Points (BB/IL/Saham) and Aṣṭakavarga bindus.
-- If a chat is ever revived, the honest options are: (a) a small server-side proxy
-  that holds the key and injects the left-pane JSON as context (React/Flask fine),
-  or (b) running the engine's own `triangulate()`/`event_evidence` pack as a
-  deterministic "Praśna" panel — no LLM, fully grounded in the on-screen numbers.
+- **Chat is back via a free provider (shipped):** option (a) above, with **Google
+  Gemini** (free tier, key from aistudio.google.com). The key is a **server-side env
+  var `GEMINI_API_KEY`** (never in the browser); `POST /api/chat` (`chat_json` in
+  server.py) proxies to Gemini and injects the chart JSON as grounding so the model
+  reasons only from engine-computed numbers. The deterministic panels stay — chat is
+  additive. Set the key in Render → Environment (see `render.yaml` envVars).
+- Alternative still open: option (b), the engine's own `triangulate()`/
+  `event_evidence` pack as a deterministic "Praśna" panel (no LLM at all).
 
 ## Phase backlog (rough order)
 1. **Phase 1 — two-pane shell + chat:** add the right-side chat pane; wire it to an

@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
@@ -240,6 +242,61 @@ def events_json(q):
     return dict(domain=prof.name, pack=pack)
 
 
+CHAT_SYSTEM = (
+    "You are an expert Vedic (Jyotish) astrologer and analyst. A deterministic "
+    "engine has ALREADY computed the chart given below as JSON — treat every "
+    "position, degree, lord, daśā date, cusp sub-lord, bala, yoga and saham in it "
+    "as ground truth. NEVER invent or recompute a position/degree/date; reason "
+    "ONLY from the supplied numbers. Be specific, multivalent and concise: cite "
+    "houses, lords, kārakas, cusp sub-lords, Ṣaḍbala and daśā when you reason. For "
+    "timing, work from the Vimśottari mahādaśā chain plus the relevant Sahams. If "
+    "the chart JSON doesn't contain something, say so rather than guessing. "
+    "Answer in the user's language (Hinglish is fine)."
+)
+GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
+
+
+def chat_json(body):
+    """Server-side proxy to Google Gemini. The API key lives in the GEMINI_API_KEY
+    env var (never in the browser); the chart JSON is injected as grounding."""
+    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not key:
+        return dict(error="GEMINI_API_KEY server par set nahi hai. Render → "
+                          "Environment me GEMINI_API_KEY daalo (aistudio.google.com "
+                          "se free key).")
+    model = body.get("model") or "gemini-2.0-flash"
+    if model not in GEMINI_MODELS:
+        model = "gemini-2.0-flash"
+    ctx = body.get("context") or {}
+    messages = body.get("messages") or []
+    sys = CHAT_SYSTEM + "\n\nCHART (engine-computed, ground truth):\n" + json.dumps(ctx)
+    contents = [dict(role=("user" if m.get("role") == "user" else "model"),
+                     parts=[dict(text=str(m.get("content", "")))])
+                for m in messages]
+    payload = dict(system_instruction=dict(parts=[dict(text=sys)]),
+                   contents=contents,
+                   generationConfig=dict(maxOutputTokens=1600, temperature=0.6))
+    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+           f"{model}:generateContent")
+    req = urllib.request.Request(
+        url, data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", "x-goog-api-key": key},
+        method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            j = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        return dict(error=f"Gemini HTTP {e.code}: {e.read().decode()[:300]}")
+    except Exception as e:
+        return dict(error=f"{type(e).__name__}: {e}")
+    try:
+        parts = j["candidates"][0]["content"]["parts"]
+        text = "".join(p.get("text", "") for p in parts).strip()
+    except Exception:
+        text = ""
+    return dict(text=text or "(empty response — model ne kuch return nahi kiya)")
+
+
 class H(BaseHTTPRequestHandler):
     def _send(self, code, body, ctype="application/json"):
         b = body.encode() if isinstance(body, str) else body
@@ -248,6 +305,17 @@ class H(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(b)))
         self.end_headers()
         self.wfile.write(b)
+
+    def do_POST(self):
+        u = urlparse(self.path)
+        try:
+            if u.path == "/api/chat":
+                n = int(self.headers.get("Content-Length", "0") or "0")
+                body = json.loads(self.rfile.read(n) or b"{}")
+                return self._send(200, json.dumps(chat_json(body)))
+            return self._send(404, json.dumps({"error": "not found"}))
+        except Exception as e:
+            return self._send(500, json.dumps({"error": f"{type(e).__name__}: {e}"}))
 
     def do_GET(self):
         u = urlparse(self.path)

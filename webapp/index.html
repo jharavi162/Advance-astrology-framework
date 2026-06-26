@@ -121,6 +121,22 @@
     </div>
     <div class="col">
       <div class="card">
+        <h2>Analysis chat — Gemini</h2>
+        <div class="sub" style="margin-bottom:9px">Key server par (GEMINI_API_KEY env) — browser me nahi. Yahi engine-computed chart hi context hai; model invent nahi karega.</div>
+        <div class="row" style="margin-bottom:7px">
+          <select id="cmodel" style="flex:1">
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash (fast, free)</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (capable)</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          </select>
+        </div>
+        <div id="chat" class="chat-msgs"></div>
+        <div class="row" style="margin-top:8px">
+          <textarea id="cin" rows="2" placeholder="Poocho… (e.g. shaadi ka yog kab? career kaisa?)" style="flex:1"></textarea>
+          <button onclick="sendChat()">Send</button>
+        </div>
+      </div>
+      <div class="card">
         <h2>Grahas</h2>
         <table id="ptab"><thead><tr><th>Graha</th><th>Sign</th><th>°</th><th>House</th><th>Nakṣatra</th><th>Dignity</th></tr></thead><tbody></tbody></table>
         <div id="lords" style="margin-top:10px"></div>
@@ -307,6 +323,30 @@ async function toggleDasha(tr,level,path){const cell=tr.querySelector('td');
   }catch(e){cell.textContent=cell.textContent.replace('▾','▸');}}
 
 document.getElementById('f').addEventListener('submit',load);
+
+// Analysis chat (Gemini via backend proxy — key stays on server)
+let HIST=[];
+function addMsg(role,txt){const d=document.createElement('div');d.className='msg '+role;d.textContent=txt;
+  const c=document.getElementById('chat');c.appendChild(d);c.scrollTop=1e9;return d;}
+function chatCtx(){const j=window.NATAL;if(!j)return null;
+  return {birth:j.input,lagna:j.lagna_name,lagnesh:j.lagnesh,planets:j.planets,
+    house_lords:j.house_lords,vimshottari_maha:j.dasha,cusps:j.cusps,chalit:j.chalit,
+    arudhas:j.arudhas,upagrahas:j.upagrahas,special_lagnas:j.special,points:j.points,
+    strengths:{shadbala:j.strengths.shadbala,ishta_kashta:j.strengths.ishta_kashta,yogas:j.strengths.yogas},
+    sarvashtakavarga:j.sarva,panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10']};}
+async function sendChat(){const ctx=chatCtx();
+  if(!ctx){alert('Pehle Cast chart karo.');return;}
+  const inp=document.getElementById('cin'),txt=inp.value.trim();if(!txt)return;
+  addMsg('user',txt);inp.value='';HIST.push({role:'user',content:txt});
+  const ai=addMsg('ai','…');
+  try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({messages:HIST,context:ctx,model:document.getElementById('cmodel').value})});
+    const j=await r.json();
+    if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
+    ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
+  }catch(e){ai.textContent='Network error: '+e;HIST.pop();}}
+document.getElementById('cin').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();sendChat();}});
 
 // location search → lat/lon/timezone
 const placeEl=document.getElementById('place'),geoEl=document.getElementById('geo');let gt;

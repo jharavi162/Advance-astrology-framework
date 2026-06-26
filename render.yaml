@@ -8,3 +8,8 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python -m webapp.server
     autoDeploy: true
+    envVars:
+      # Free Gemini key from aistudio.google.com — powers the Analysis chat.
+      # sync:false → Render prompts for the value on deploy; never committed here.
+      - key: GEMINI_API_KEY
+        sync: false
