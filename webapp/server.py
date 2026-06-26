@@ -77,6 +77,32 @@ def _dasha_tree(v):
     return out
 
 
+def _pt(lon):
+    s = int(lon // 30) % 12
+    return dict(sign=s, sign_name=SIGNS[s], deg=round(lon % 30, 2))
+
+
+def _arudhas(v):
+    return {k: dict(sign=s, sign_name=SIGNS[s % 12]) for k, s in v.arudhas().items()}
+
+
+def _upagrahas(v):
+    return {k: _pt(float(x)) for k, x in v.calculated_upagrahas().items()}
+
+
+def _special_lagnas(v):
+    return {k: _pt(float(x)) for k, x in v.special_lagnas().items()}
+
+
+def _dasha_top(v):
+    return [dict(lord=d.lord.value, start=d.start.date().isoformat(),
+                 end=d.end.date().isoformat())
+            for d in v.dasha("vimshottari", levels=1)]
+
+
+VARGAS = (2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60)
+
+
 def natal_json(q):
     v, when = _chart(q)
     cells = [[] for _ in range(12)]
@@ -92,12 +118,27 @@ def natal_json(q):
         d1=dict(asc=int(v.ascendant_sign), cells=cells),
         planets=_planets(v),
         house_lords={h: v.house_lord(h).value for h in range(1, 13)},
-        dasha=_dasha_tree(v),
-        vargas={str(n): _varga(v, n) for n in (9, 10, 2, 4, 7)},
+        dasha=_dasha_top(v),
+        arudhas=_arudhas(v), upagrahas=_upagrahas(v), special=_special_lagnas(v),
+        vargas={str(n): _varga(v, n) for n in VARGAS},
         panchanga=dict(tithi=getattr(pan.tithi, "name", str(pan.tithi)),
                        nakshatra=str(pan.nakshatra), yoga=str(pan.yoga),
                        karana=str(pan.karana), vara=str(pan.vara)),
     )
+
+
+def dasha_json(q):
+    """Lazy daśā drill: path = dot-separated indices (maha.antar.pratyantar).
+    Returns the children of the node at that path (antar / pratyantar / sūkṣma)."""
+    v, _ = _chart(q)
+    raw = q.get("path", [""])[0]
+    path = [int(x) for x in raw.split(".") if x.strip() != ""]
+    periods = v.dasha("vimshottari", levels=len(path) + 1)
+    lst = periods
+    for idx in path:
+        lst = lst[idx].sub_periods or []
+    return dict(sub=[dict(lord=d.lord.value, start=d.start.date().isoformat(),
+                          end=d.end.date().isoformat()) for d in lst])
 
 
 def _summary(pack):
@@ -154,6 +195,8 @@ class H(BaseHTTPRequestHandler):
                     return self._send(200, f.read(), ctype)
             if u.path == "/api/natal":
                 return self._send(200, json.dumps(natal_json(q)))
+            if u.path == "/api/dasha":
+                return self._send(200, json.dumps(dasha_json(q)))
             if u.path == "/api/events":
                 return self._send(200, json.dumps(events_json(q)))
             return self._send(404, json.dumps({"error": "not found"}))
