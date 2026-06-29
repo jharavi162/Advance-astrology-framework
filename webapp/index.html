@@ -149,8 +149,19 @@
         <table id="maha"><tbody></tbody></table>
       </div>
       <div class="card">
-        <h2>Bhāva &amp; cusps (KP)</h2>
-        <div class="sub" style="margin-bottom:8px">Placidus cusp · sign · sign/star/sub lord per house.</div>
+        <h2>Bhāva &amp; cusps</h2>
+        <div class="row" style="align-items:center;margin-bottom:8px">
+          <label style="flex-direction:row;align-items:center;gap:7px;font-size:12px;color:var(--ink)">House system
+            <select id="hsys" style="padding:6px 9px">
+              <option value="placidus">Placidus (KP)</option>
+              <option value="whole_sign">Whole sign</option>
+              <option value="equal">Equal</option>
+              <option value="porphyry">Porphyry</option>
+              <option value="regiomontanus">Regiomontanus</option>
+            </select>
+          </label>
+        </div>
+        <div class="sub" style="margin-bottom:8px">Cusp · sign · sign/star/sub lord per house.</div>
         <table id="cusptab"><thead><tr><th>Bh</th><th>Cusp</th><th>Rāśi-L</th><th>Star-L</th><th>Sub-L</th></tr></thead><tbody></tbody></table>
         <div id="chalit" style="margin-top:10px"></div>
       </div>
@@ -250,7 +261,7 @@ function renderDetails(j){
     `<div class="grp"><span class="pill">Lagna <b>${j.lagna_name}</b></span><span class="pill">Lagneśa <b>${j.lagnesh}</b></span><span class="pill">Moon nakṣatra <b>${moon?moon.nak:''}</b></span></div>`
    +`<div class="grp"><div class="lbl">Pañcāṅga</div>`+['vara','tithi','nakshatra','yoga','karana'].map(k=>`<span class="pill">${k} <b>${j.panchanga[k]}</b></span>`).join('')+`</div>`
    +`<div class="grp"><div class="lbl">Special lagnas</div>`+Object.entries(j.special).map(([k,a])=>`<span class="pill">${k} <b>${a.sign_name.slice(0,3)} ${Math.round(a.deg)}°</b></span>`).join('')+`</div>`;
-  renderCusps(j);renderStrengths(j);renderJaimini(j);
+  reloadCusps();renderStrengths(j);renderJaimini(j);
   // vargas (North-Indian, all D2..D60)
   const vt=document.getElementById('vtabs');vt.innerHTML="";const keys=Object.keys(j.vargas);
   const show=n=>{[...vt.children].forEach(x=>x.className=x.textContent==='D'+n?'on':'');
@@ -262,15 +273,21 @@ function renderDetails(j){
   show(keys[0]);
 }
 
-function renderCusps(j){
+function renderCusps(d){
   const tb=document.querySelector('#cusptab tbody');tb.innerHTML="";
-  j.cusps.forEach(c=>tb.insertAdjacentHTML('beforeend',
+  d.cusps.forEach(c=>tb.insertAdjacentHTML('beforeend',
     `<tr><td>${c.house}</td><td>${c.sign_name.slice(0,3)} ${c.deg}°</td><td>${c.sign_lord}</td><td>${c.star_lord}</td><td><b style="color:var(--acc)">${c.sub_lord}</b></td></tr>`));
   document.getElementById('chalit').innerHTML=
-    `<div class="lbl">Bhāva-Chalit shifts</div>`+(j.chalit.length
-      ?j.chalit.map(c=>`<span class="pill">${c.planet} <b>H${c.rashi}→H${c.chalit}</b></span>`).join('')
+    `<div class="lbl">Bhāva-Chalit shifts</div>`+(d.chalit.length
+      ?d.chalit.map(c=>`<span class="pill">${c.planet} <b>H${c.rashi}→H${c.chalit}</b></span>`).join('')
       :`<span class="sub">koi graha shift nahi (rāśi = chalit).</span>`);
 }
+async function reloadCusps(){const j=window.NATAL;if(!j)return;
+  const sys=document.getElementById('hsys').value;
+  if(sys==='placidus'){renderCusps(j);return;}  // natal payload already has placidus
+  try{const d=await(await fetch('/api/cusps?'+params()+'&houses='+sys)).json();
+    if(!d.error)renderCusps(d);}catch(e){}}
+document.getElementById('hsys').addEventListener('change',reloadCusps);
 function renderStrengths(j){
   const s=j.strengths;
   document.getElementById('shad').innerHTML=s.shadbala.map(b=>{

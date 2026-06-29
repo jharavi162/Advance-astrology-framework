@@ -102,11 +102,14 @@ def _dasha_top(v):
             for d in v.dasha("vimshottari", levels=1)]
 
 
-def _kp_cusps(v):
-    """KP bhāva table: Placidus cusp · sign · sign/star/sub lord per house."""
-    from advance_astrology.vedic.chalit import placidus_cusps_sidereal
+HOUSE_SYSTEMS = ("placidus", "whole_sign", "equal", "porphyry", "regiomontanus")
+
+
+def _kp_cusps(v, system="placidus"):
+    """Bhāva table for the chosen house system: cusp · sign · sign/star/sub lord."""
+    from advance_astrology.vedic.chalit import sidereal_cusps
     from advance_astrology.vedic.kp import kp_chain
-    cu = placidus_cusps_sidereal(v)
+    cu = sidereal_cusps(v, system)
     out = []
     for h in range(1, 13):
         lon = float(cu[h]); s = int(lon // 30) % 12; kc = kp_chain(lon)
@@ -116,14 +119,31 @@ def _kp_cusps(v):
     return out
 
 
-def _chalit(v):
-    """Planets whose Placidus (Chalit) house differs from the Rāśi house."""
+def _chalit(v, system="placidus"):
+    """Planets whose cusp-based (Chalit) house differs from the Rāśi house, for
+    the chosen house system."""
+    from advance_astrology.vedic.chalit import sidereal_cusps
+    from advance_astrology.houses import house_of
+    from advance_astrology.angles import to_zodiac
+    cu = sidereal_cusps(v, system)
     out = []
-    for p, c in v.bhava_chalit().items():
-        if c.shifted and p in ABBR:
-            out.append(dict(ab=ABBR[p], planet=p.value,
-                            rashi=c.rashi_house, chalit=c.chalit_house))
+    for p in GRAHAS:
+        lon = float(v.longitudes[p])
+        rashi = (to_zodiac(lon).sign_index - v.ascendant_sign) % 12 + 1
+        ch = house_of(lon, cu)
+        if ch != rashi:
+            out.append(dict(ab=ABBR[p], planet=p.value, rashi=rashi, chalit=ch))
     return out
+
+
+def cusps_json(q):
+    """Bhāva table + Chalit shifts for a chosen house system (/api/cusps)."""
+    v, _ = _chart(q)
+    system = q.get("houses", ["placidus"])[0]
+    if system not in HOUSE_SYSTEMS:
+        system = "placidus"
+    return dict(system=system, cusps=_kp_cusps(v, system),
+                chalit=_chalit(v, system))
 
 
 def _points(v):
@@ -355,6 +375,8 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(dasha_json(q)))
             if u.path == "/api/transit":
                 return self._send(200, json.dumps(transit_json(q)))
+            if u.path == "/api/cusps":
+                return self._send(200, json.dumps(cusps_json(q)))
             if u.path == "/api/events":
                 return self._send(200, json.dumps(events_json(q)))
             return self._send(404, json.dumps({"error": "not found"}))

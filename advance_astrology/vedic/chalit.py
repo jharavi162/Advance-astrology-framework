@@ -28,12 +28,25 @@ class ChalitPlacement:
         return f"{self.planet.value:<8} Rāśi H{self.rashi_house}{arrow}"
 
 
-def placidus_cusps_sidereal(chart) -> dict[int, float]:
-    """Sidereal Placidus cusps for a VedicChart."""
+def sidereal_cusps(chart, system: str = "placidus") -> dict[int, float]:
+    """Sidereal house cusps for a VedicChart in any supported house system
+    (placidus, whole_sign, equal, porphyry, regiomontanus)."""
     natal = chart.natal
-    cusps, _ = compute_cusps("placidus", natal.ramc, natal.obliquity,
-                             natal.latitude)
+    system_n = system.lower().replace("-", "_").replace(" ", "_")
+    if system_n == "whole_sign":
+        # Whole-sign snaps to sign boundaries, which must happen in the SIDEREAL
+        # zodiac — so build from the sidereal ascendant, not tropical-then-shift.
+        from ..houses import ascendant, whole_sign_cusps
+        asc_sid = norm360(ascendant(natal.ramc, natal.obliquity, natal.latitude)
+                          - chart.ayanamsa)
+        return whole_sign_cusps(asc_sid)
+    cusps, _ = compute_cusps(system, natal.ramc, natal.obliquity, natal.latitude)
     return {h: norm360(c - chart.ayanamsa) for h, c in cusps.items()}
+
+
+def placidus_cusps_sidereal(chart) -> dict[int, float]:
+    """Sidereal Placidus cusps for a VedicChart (KP uses Placidus by doctrine)."""
+    return sidereal_cusps(chart, "placidus")
 
 
 def bhava_chalit(chart) -> dict[Planet, ChalitPlacement]:
