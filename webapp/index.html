@@ -66,6 +66,7 @@
   .msg{padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55}
   .msg.user{background:#2a2140;align-self:flex-end;max-width:88%}.msg.ai{background:#100a1c;border:1px solid var(--line);max-width:95%;white-space:pre-wrap}
   .srcs{margin-top:7px;padding-top:6px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}.srcs a{color:var(--acc2);text-decoration:none}
+  .refrow{font-size:12px;color:var(--ink);padding:4px 0;border-bottom:1px solid var(--line)}.refrow b{color:var(--acc)}
   .lgnd{font-size:10px;color:var(--mut);text-align:center;margin-top:6px}
   @media (max-width:880px){.wrap{padding:11px}.grid{grid-template-columns:1fr}label{flex:1 1 30%}form button{flex:1 1 100%}header h1{font-size:19px}}
 </style>
@@ -178,6 +179,23 @@
         <div class="grp"><div class="lbl">Sensitive points</div><div id="pts"></div></div>
         <div class="grp"><div class="lbl">Sahams (Tājika)</div><div id="sahams"></div></div>
       </div>
+      <div class="card">
+        <h2>Bhāva lords &amp; occupants</h2>
+        <div class="sub" style="margin-bottom:8px">Har bhāva: us par baithi rāśi, uska swāmī, aur usme baithe grahas.</div>
+        <table id="hltab"><thead><tr><th>Bh</th><th>Rāśi</th><th>Swāmī</th><th>Grahas</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="card">
+        <h2>Planetary aspects (Graha dṛṣṭi)</h2>
+        <div class="sub" style="margin-bottom:8px">Special: Maṅgal 4/8 · Guru 5/9 · Śani 3/10 · Rāhu/Ketu 5/9 — sab 7th.</div>
+        <table id="asptab"><thead><tr><th>Graha</th><th>Dekhta hai (bhāva · rāśi)</th><th>Grahon par</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="card">
+        <h2>Reference — kāraka · rāśi-lord · bhāva</h2>
+        <div class="sub" style="margin-bottom:8px">Universal (har kundali me same) — ek glossary.</div>
+        <div class="grp"><div class="lbl">Naisargika kārakas (graha → kis cheez ka kāraka)</div><div id="refkar"></div></div>
+        <div class="grp"><div class="lbl">Rāśi lords (rāśi → swāmī)</div><div id="refrl"></div></div>
+        <div class="grp"><div class="lbl">Bhāva significations (ghar → kya darśāta hai)</div><div id="refbh"></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -189,6 +207,19 @@ const NC=[[150,82],[75,30],[30,75],[78,150],[30,225],[75,270],[150,218],[225,270
 const UPA={Dhuma:'Dh',Vyatipata:'Vy',Parivesha:'Pv',Indrachapa:'Ic',Upaketu:'Uk'};
 const SAH={Vivaha:'Vv',Punarvivaha:'2V',Punya:'Py',Vidya:'Vd',Karma:'Km',Yasas:'Ys'};
 const L={grahas:true,arudhas:false,upa:false,points:false,sav:false};
+// Universal reference (same for every chart)
+const RASHI_LORD=["Mars","Venus","Mercury","Moon","Sun","Mercury","Venus","Mars","Jupiter","Saturn","Saturn","Jupiter"];
+const KARAKA={Sun:"Ātmā, pitā, authority, health, vitality",Moon:"Man, mātā, emotions, fluids, public",
+  Mars:"Sāhas, bhāī, bhūmi, energy, blood, weapons",Mercury:"Buddhi, vāṇī, learning, trade, logic",
+  Jupiter:"Gyān, santān, dhan, guru, dharma, husband",Venus:"Patnī/jīvansāthī, prem, sukh, vāhan, kalā",
+  Saturn:"Āyu, anushāsan, duḥkh, śram, karma, delay",Rahu:"Videsh, obsession, māyā, sudden gain, taboo",
+  Ketu:"Vairāgya, mokṣa, past-life, mysticism, loss"};
+const BHAVA=["Self, sharīr, vyaktitva, vitality","Dhan, kuṭumb, vāṇī, food, values",
+  "Sāhas, chhote bhāī-bahan, effort, short trips","Ghar, mātā, sukh, property, heart, vehicles",
+  "Santān, buddhi, romance, mantra, creativity","Rog, ṛṇ, śatru, service, obstacles, daily work",
+  "Vivāha, jīvansāthī, partnership, vyāpār","Āyu, transformation, gupt, inheritance, occult",
+  "Bhāgya, dharma, pitā, guru, higher learning","Karma, pratiṣṭhā, status, authority, fame",
+  "Lābh, āy, baḍe bhāī-bahan, desires fulfilled","Vyay, hāni, mokṣa, videsh, isolation, śayan-sukh"];
 
 function drawNorth(svg,ascSign,cells){
   svg.setAttribute('viewBox','0 0 300 300');svg.setAttribute('preserveAspectRatio','xMidYMid meet');
@@ -262,6 +293,7 @@ function renderDetails(j){
    +`<div class="grp"><div class="lbl">Pañcāṅga</div>`+['vara','tithi','nakshatra','yoga','karana'].map(k=>`<span class="pill">${k} <b>${j.panchanga[k]}</b></span>`).join('')+`</div>`
    +`<div class="grp"><div class="lbl">Special lagnas</div>`+Object.entries(j.special).map(([k,a])=>`<span class="pill">${k} <b>${a.sign_name.slice(0,3)} ${Math.round(a.deg)}°</b></span>`).join('')+`</div>`;
   reloadCusps();renderStrengths(j);renderJaimini(j);
+  renderHouseLords(j);renderAspects(j);renderReference();
   // vargas (North-Indian, all D2..D60)
   const vt=document.getElementById('vtabs');vt.innerHTML="";const keys=Object.keys(j.vargas);
   const show=n=>{[...vt.children].forEach(x=>x.className=x.textContent==='D'+n?'on':'');
@@ -314,6 +346,27 @@ function renderJaimini(j){
    +`<span class="pill">Indu Lagna <b>${pt.indu_lagna.sign_name}</b></span>`;
   document.getElementById('sahams').innerHTML=Object.entries(pt.sahams)
     .map(([k,s])=>`<span class="pill">${k} <b>${s.sign_name.slice(0,3)} ${s.deg}°</b> (${s.lord})</span>`).join('');
+}
+function renderHouseLords(j){
+  const tb=document.querySelector('#hltab tbody');tb.innerHTML="";
+  for(let h=1;h<=12;h++){const sign=(j.lagna+h-1)%12;
+    const occ=j.planets.filter(p=>p.house===h).map(p=>p.ab).join(' ')||'—';
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${h}</td><td>${SIGN3[sign]}</td><td>${j.house_lords[h]}</td><td>${occ}</td></tr>`);}
+}
+function renderAspects(j){
+  const tb=document.querySelector('#asptab tbody');tb.innerHTML="";
+  j.aspects.forEach(a=>{
+    const tgt=a.casts.map(c=>`H${c.bhava} ${SIGN3[c.sign]}(${c.dist})`).join(', ');
+    const on=[...new Set(a.casts.flatMap(c=>c.on))].join(' ')||'—';
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${a.planet}</td><td class="sub">${tgt}</td><td>${on}</td></tr>`);});
+}
+function renderReference(){
+  document.getElementById('refkar').innerHTML=Object.entries(KARAKA)
+    .map(([p,d])=>`<div class="refrow"><b>${p}</b> — ${d}</div>`).join('');
+  document.getElementById('refrl').innerHTML=RASHI_LORD
+    .map((l,s)=>`<span class="pill">${SIGN3[s]} <b>${l}</b></span>`).join('');
+  document.getElementById('refbh').innerHTML=BHAVA
+    .map((d,i)=>`<div class="refrow"><b>H${i+1}</b> — ${d}</div>`).join('');
 }
 
 document.getElementById('layers').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;

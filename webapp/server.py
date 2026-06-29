@@ -136,6 +136,26 @@ def _chalit(v, system="placidus"):
     return out
 
 
+def _aspects(v):
+    """Graha dṛṣṭi: each graha's aspected rāśis/bhāvas (with its special aspects)
+    and which grahas fall under that aspect."""
+    from advance_astrology.vedic.aspects import graha_aspect_houses
+    asc = int(v.ascendant_sign)
+    sign_of = {p: int(v.signs[p]) for p in GRAHAS}
+    out = []
+    for p in GRAHAS:
+        src = sign_of[p]
+        casts = []
+        for dist in graha_aspect_houses(p):
+            tgt = (src + dist - 1) % 12
+            bhava = (tgt - asc) % 12 + 1
+            on = [ABBR[q] for q in GRAHAS if sign_of[q] == tgt and q != p]
+            casts.append(dict(dist=dist, sign=tgt, sign_name=SIGNS[tgt],
+                              bhava=bhava, on=on))
+        out.append(dict(ab=ABBR[p], planet=p.value, casts=casts))
+    return out
+
+
 def cusps_json(q):
     """Bhāva table + Chalit shifts for a chosen house system (/api/cusps)."""
     v, _ = _chart(q)
@@ -199,7 +219,7 @@ def natal_json(q):
         arudhas=_arudhas(v), upagrahas=_upagrahas(v), special=_special_lagnas(v),
         vargas={str(n): _varga(v, n) for n in VARGAS},
         cusps=_kp_cusps(v), chalit=_chalit(v), sarva=v.sarvashtakavarga(),
-        points=_points(v), strengths=_strengths(v),
+        points=_points(v), strengths=_strengths(v), aspects=_aspects(v),
         panchanga=dict(tithi=getattr(pan.tithi, "name", str(pan.tithi)),
                        nakshatra=str(pan.nakshatra), yoga=str(pan.yoga),
                        karana=str(pan.karana), vara=str(pan.vara)),
