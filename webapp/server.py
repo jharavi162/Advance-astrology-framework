@@ -300,9 +300,31 @@ CHAT_SYSTEM = (
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
 
+def _gemini_post(model, payload, key):
+    """POST to Gemini; returns (True, json) or (False, (http_code, message))."""
+    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+           f"{model}:generateContent")
+    req = urllib.request.Request(
+        url, data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", "x-goog-api-key": key},
+        method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return True, json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        return False, (e.code, e.read().decode()[:400])
+    except Exception as e:
+        return False, (0, f"{type(e).__name__}: {e}")
+
+
 def chat_json(body):
     """Server-side proxy to Google Gemini. The API key lives in the GEMINI_API_KEY
-    env var (never in the browser); the chart JSON is injected as grounding."""
+    env var (never in the browser); the chart JSON is injected as grounding.
+
+    Web search (Google Search grounding) is OFF by default — on the free tier it
+    has a separate, tiny quota and a pure AI-Studio key (no billing) often rejects
+    it outright. When the caller opts in and the grounded call fails, we retry once
+    WITHOUT the tool so the chat still answers."""
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
         return dict(error="GEMINI_API_KEY server par set nahi hai. Render → "
@@ -320,25 +342,24 @@ def chat_json(body):
     payload = dict(system_instruction=dict(parts=[dict(text=sys)]),
                    contents=contents,
                    generationConfig=dict(maxOutputTokens=1600, temperature=0.6))
-    if body.get("web", True):
-        # Grounding with Google Search — gives Gemini live internet access. The
-        # tool name differs between the 1.5 and 2.x model families.
+    note = ""
+    if body.get("web", False):
+        # Grounding with Google Search; tool name differs between 1.5 and 2.x.
         payload["tools"] = [{"google_search_retrieval": {}}
                             if model.startswith("gemini-1.5")
                             else {"google_search": {}}]
-    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
-           f"{model}:generateContent")
-    req = urllib.request.Request(
-        url, data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json", "x-goog-api-key": key},
-        method="POST")
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            j = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        return dict(error=f"Gemini HTTP {e.code}: {e.read().decode()[:300]}")
-    except Exception as e:
-        return dict(error=f"{type(e).__name__}: {e}")
+    ok, res = _gemini_post(model, payload, key)
+    if not ok and "tools" in payload:
+        # Web search likely unavailable / over its free-tier quota — drop it and
+        # answer from the model's own knowledge + the engine chart.
+        payload.pop("tools", None)
+        note = ("🌐 web search free-tier me unavailable/quota-over tha — bina web ke "
+                "(sirf chart + model knowledge se) answer diya.")
+        ok, res = _gemini_post(model, payload, key)
+    if not ok:
+        code, msg = res
+        return dict(error=f"Gemini HTTP {code}: {msg}")
+    j = res
     try:
         cand = j["candidates"][0]
         parts = cand["content"]["parts"]
@@ -351,7 +372,7 @@ def chat_json(body):
         if w.get("title") or w.get("uri"):
             sources.append(dict(title=w.get("title", ""), uri=w.get("uri", "")))
     return dict(text=text or "(empty response — model ne kuch return nahi kiya)",
-                sources=sources)
+                sources=sources, note=note)
 
 
 class H(BaseHTTPRequestHandler):

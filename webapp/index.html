@@ -124,14 +124,14 @@
     <div class="col">
       <div class="card">
         <h2>Analysis chat — Gemini</h2>
-        <div class="sub" style="margin-bottom:9px">Key server par (GEMINI_API_KEY env) — browser me nahi. Engine ke numbers = ground truth; 🌐 ON ho to interpretation/classical refs net se dekh sakta hai.</div>
+        <div class="sub" style="margin-bottom:9px">Key server par (GEMINI_API_KEY env) — browser me nahi. Engine ke numbers = ground truth. 🌐 Web OFF rakho = free tier; ON karoge to Google Search quota lagta hai (free key pe aksar fail → bina web ke fallback).</div>
         <div class="row" style="margin-bottom:7px;align-items:center">
           <select id="cmodel" style="flex:1">
             <option value="gemini-2.0-flash">Gemini 2.0 Flash (fast, free)</option>
             <option value="gemini-2.5-flash">Gemini 2.5 Flash (capable)</option>
             <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </select>
-          <label style="flex-direction:row;align-items:center;gap:6px;font-size:12px;color:var(--ink)"><input type="checkbox" id="cweb" checked style="width:auto;min-height:0"> 🌐 Web</label>
+          <label style="flex-direction:row;align-items:center;gap:6px;font-size:12px;color:var(--ink)"><input type="checkbox" id="cweb" style="width:auto;min-height:0"> 🌐 Web</label>
         </div>
         <div id="chat" class="chat-msgs"></div>
         <div class="row" style="margin-top:8px">
@@ -417,6 +417,7 @@ async function sendChat(){const ctx=chatCtx();
     const j=await r.json();
     if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
     ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
+    if(j.note){const n=document.createElement('div');n.className='srcs';n.textContent=j.note;ai.appendChild(n);}
     if(j.sources&&j.sources.length){const s=document.createElement('div');s.className='srcs';
       s.innerHTML='🌐 '+j.sources.map(x=>x.uri?`<a href="${x.uri}" target="_blank" rel="noopener">${x.title||x.uri}</a>`:x.title).join(' · ');
       ai.appendChild(s);}
