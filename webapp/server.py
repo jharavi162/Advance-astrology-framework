@@ -290,12 +290,10 @@ CHAT_SYSTEM = (
     "never invent a position/degree/date that isn't given. Be specific, multivalent "
     "and concise: cite houses, lords, kārakas, cusp sub-lords, Ṣaḍbala and daśā when "
     "you reason. For timing, work from the Vimśottari mahādaśā chain plus the "
-    "relevant Sahams. "
-    "You MAY use Google Search to look up astrological PRINCIPLES, classical-text "
-    "references (BPHS, Phaladeepika, Saravali, Jaimini Sūtras, KP, etc.) and "
-    "general interpretation — but only to interpret the engine's numbers, never to "
-    "fetch or replace the chart's own positions/dates. When you use a web source, "
-    "briefly name it. Answer in the user's language (Hinglish is fine)."
+    "relevant Sahams. Draw on your own classical knowledge (BPHS, Phaladeepika, "
+    "Saravali, Jaimini Sūtras, KP, etc.) to interpret — but if the chart JSON "
+    "doesn't contain something, say so rather than guessing. "
+    "Answer in the user's language (Hinglish is fine)."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -344,12 +342,9 @@ def _explain_gemini_error(code, msg):
 
 def chat_json(body):
     """Server-side proxy to Google Gemini. The API key lives in the GEMINI_API_KEY
-    env var (never in the browser); the chart JSON is injected as grounding.
-
-    Web search (Google Search grounding) is OFF by default — on the free tier it
-    has a separate, tiny quota and a pure AI-Studio key (no billing) often rejects
-    it outright. When the caller opts in and the grounded call fails, we retry once
-    WITHOUT the tool so the chat still answers."""
+    env var (never in the browser); the engine-computed chart JSON is injected as
+    grounding. No web search — the model reasons from its own knowledge + the chart
+    (Google Search grounding isn't usable on the free tier)."""
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
         return dict(error="GEMINI_API_KEY server par set nahi hai. Render → "
@@ -368,42 +363,23 @@ def chat_json(body):
                    contents=contents,
                    generationConfig=dict(maxOutputTokens=1600, temperature=0.6))
     note = ""
-    if body.get("web", False):
-        # Grounding with Google Search; tool name differs between 1.5 and 2.x.
-        payload["tools"] = [{"google_search_retrieval": {}}
-                            if model.startswith("gemini-1.5")
-                            else {"google_search": {}}]
     ok, res = _gemini_post(model, payload, key)
-    if not ok and "tools" in payload:
-        # Web search likely unavailable / over its free-tier quota — drop it and
-        # answer from the model's own knowledge + the engine chart.
-        payload.pop("tools", None)
-        note = ("🌐 web search free-tier me unavailable/quota-over tha — bina web ke "
-                "(sirf chart + model knowledge se) answer diya.")
-        ok, res = _gemini_post(model, payload, key)
     if not ok and res[0] == 429 and model != "gemini-2.0-flash":
         # Chosen model's free quota is exhausted — 2.0-flash has the most generous
         # free tier, so try it once before giving up.
-        note = (note + " " if note else "") + \
-            f"{model} ki free quota khatam thi — gemini-2.0-flash se answer diya."
+        note = f"{model} ki free quota khatam thi — gemini-2.0-flash se answer diya."
         ok, res = _gemini_post("gemini-2.0-flash", payload, key)
     if not ok:
         code, msg = res
         return dict(error=_explain_gemini_error(code, msg))
     j = res
     try:
-        cand = j["candidates"][0]
-        parts = cand["content"]["parts"]
+        parts = j["candidates"][0]["content"]["parts"]
         text = "".join(p.get("text", "") for p in parts).strip()
     except Exception:
-        cand, text = {}, ""
-    sources = []
-    for ch in (cand.get("groundingMetadata", {}).get("groundingChunks") or []):
-        w = ch.get("web") or {}
-        if w.get("title") or w.get("uri"):
-            sources.append(dict(title=w.get("title", ""), uri=w.get("uri", "")))
+        text = ""
     return dict(text=text or "(empty response — model ne kuch return nahi kiya)",
-                sources=sources, note=note)
+                note=note)
 
 
 class H(BaseHTTPRequestHandler):

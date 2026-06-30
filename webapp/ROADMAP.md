@@ -36,6 +36,11 @@ future session continues the same way (read this before changing `webapp/`).
   server.py) proxies to Gemini and injects the chart JSON as grounding so the model
   reasons only from engine-computed numbers. The deterministic panels stay — chat is
   additive. Set the key in Render → Environment (see `render.yaml` envVars).
+- **No web search.** We tried Google Search grounding but the free tier gives it a
+  separate, tiny quota and a pure AI-Studio key (no billing) rejects it — so it was
+  removed; the model interprets from its own knowledge + the chart only. (NOTE: a
+  429 is then a *plain model* free-tier rate/daily limit, not a search issue —
+  `chat_json` explains RPM vs RPD and falls back to gemini-2.0-flash on 429.)
 - Alternative still open: option (b), the engine's own `triangulate()`/
   `event_evidence` pack as a deterministic "Praśna" panel (no LLM at all).
 
