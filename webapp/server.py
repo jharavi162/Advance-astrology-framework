@@ -336,7 +336,7 @@ def _explain_gemini_error(code, msg):
         m = re.search(r'retryDelay"?:?\s*"?(\d+)s', msg)
         if m:
             tip += f" (Google suggests ~{m.group(1)}s wait.)"
-        return f"Gemini 429 — {scope}. {tip}"
+        return f"Gemini 429 — {scope}. {tip}  [Google: {detail}]"
     return f"Gemini HTTP {code}: {detail}"
 
 
@@ -362,13 +362,22 @@ def chat_json(body):
     payload = dict(system_instruction=dict(parts=[dict(text=sys)]),
                    contents=contents,
                    generationConfig=dict(maxOutputTokens=1600, temperature=0.6))
+    # On a 429 (free-tier quota), try the other free models before giving up —
+    # different models have separate quotas. Stop on success or a non-429 error.
     note = ""
-    ok, res = _gemini_post(model, payload, key)
-    if not ok and res[0] == 429 and model != "gemini-2.0-flash":
-        # Chosen model's free quota is exhausted — 2.0-flash has the most generous
-        # free tier, so try it once before giving up.
-        note = f"{model} ki free quota khatam thi — gemini-2.0-flash se answer diya."
-        ok, res = _gemini_post("gemini-2.0-flash", payload, key)
+    ok = res = None
+    tried = []
+    for mdl in (model, "gemini-2.5-flash", "gemini-2.0-flash"):
+        if mdl in tried:
+            continue
+        tried.append(mdl)
+        ok, res = _gemini_post(mdl, payload, key)
+        if ok:
+            if mdl != model:
+                note = f"{model} pe 429 (quota) — {mdl} se answer diya."
+            break
+        if res[0] != 429:
+            break  # non-quota error (e.g. bad key) — other models won't help
     if not ok:
         code, msg = res
         return dict(error=_explain_gemini_error(code, msg))
