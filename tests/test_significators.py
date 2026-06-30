@@ -35,6 +35,14 @@ def test_every_lexicon_theme_is_resolvable_and_complete():
         assert 1 <= prof.varga <= 60
 
 
+def test_freeform_question_matches_words_not_substrings():
+    # A full-sentence question resolves on word boundaries: "career" must NOT be
+    # mis-mapped to vehicle via the substring "car", and the right domain wins.
+    assert resolve("career kaisa rahega").name == "career"
+    assert resolve("is native ki shaadi kab hui").name == "marriage"
+    assert resolve("property kab milegi").name == "property"
+
+
 def test_unknown_word_derives_from_house_significations():
     # 'scandal' is not curated, but the 8th-house significations catch it
     prof = resolve("scandal")

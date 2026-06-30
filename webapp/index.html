@@ -405,13 +405,15 @@ function chatCtx(){const j=window.NATAL;if(!j)return null;
     arudhas:j.arudhas,upagrahas:j.upagrahas,special_lagnas:j.special,points:j.points,
     strengths:{shadbala:j.strengths.shadbala,ishta_kashta:j.strengths.ishta_kashta,yogas:j.strengths.yogas},
     sarvashtakavarga:j.sarva,panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10']};}
+function chartParams(){const P=params();let ay=P.get('ayanamsa');if(ay==='multi')ay='lahiri';
+  return {when:P.get('when'),tz:P.get('tz'),lat:P.get('lat'),lon:P.get('lon'),ayanamsa:ay};}
 async function sendChat(){const ctx=chatCtx();
   if(!ctx){alert('Pehle Cast chart karo.');return;}
   const inp=document.getElementById('cin'),txt=inp.value.trim();if(!txt)return;
   addMsg('user',txt);inp.value='';HIST.push({role:'user',content:txt});
   const ai=addMsg('ai','…');
   try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({messages:HIST,context:ctx,model:document.getElementById('cmodel').value})});
+    body:JSON.stringify({messages:HIST,context:ctx,chart:chartParams(),model:document.getElementById('cmodel').value})});
     const j=await r.json();
     if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
     ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});

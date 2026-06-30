@@ -295,7 +295,63 @@ CHAT_SYSTEM = (
     "doesn't contain something, say so rather than guessing. "
     "Answer in the user's language (Hinglish is fine)."
 )
+CHAT_NARRATOR = (
+    "ENGINE TRIANGULATION MODE: for this question the engine has ALREADY resolved "
+    "the matter's significators and committed a deterministic read below — its net "
+    "STANDING-WITNESS balance (blessed vs afflicted), the exact nodes that fired "
+    "with weights, the PROMISE verdict, and the TEMPO (early / late / with-friction). "
+    "Treat this as ground truth and build your answer on it: state whether the matter "
+    "is promised and blessed or afflicted, WHY (name the fired nodes), and the tempo. "
+    "For 'kab' (timing), reason from the Vimśottari mahādaśā chain in the chart "
+    "together with this tempo, and give an INDICATIVE window — clearly flagged as "
+    "indicative, since the precise date-by-date salience scan is a separate heavy "
+    "step not run here. Do NOT invent nodes, yogas or exact dates beyond what the "
+    "engine read and the daśā give you."
+)
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
+
+
+def _chart_from(c):
+    """Rebuild a VedicChart from the chat request's chart params (safe/None)."""
+    if not c or not c.get("when"):
+        return None
+    try:
+        return _chart({k: [str(c.get(k, ""))]
+                       for k in ("when", "tz", "lat", "lon", "ayanamsa")})[0]
+    except Exception:
+        return None
+
+
+def _engine_read(v, question):
+    """Fast deterministic triangulation read for a question's domain — the natal
+    standing-witness balance + fired nodes + promise/tempo (NO slow timeline scan).
+    Returns (domain_name, text) or (None, None) if the question maps to no domain."""
+    try:
+        from interpreter.significators import resolve
+        prof = resolve(question)
+    except Exception:
+        return None, None
+    try:
+        from interpreter.event_evidence import (standing_balance,
+                                                promise_and_tempo, _fmt_tempo)
+        bal, fired = standing_balance(v, prof)
+        pt = promise_and_tempo(v, prof)
+    except Exception:
+        return None, None
+    verdict = ("blessed/PRO (tends to upgrade, not break)" if bal >= 1.0
+               else "afflicted (loss/obstruction possible)" if bal < 0 else "mixed")
+    nk = prof.natural_karaka.value if prof.natural_karaka else "-"
+    lines = [f"domain={prof.name} | houses={prof.houses} karakas={prof.karakas}+{nk} "
+             f"saham={prof.saham} varga=D{prof.varga}",
+             f"STANDING-WITNESS net balance = {bal:+.2f} → {verdict}",
+             "fired nodes (node: weight):"]
+    for nm, c in sorted(fired, key=lambda x: -abs(x[1])):
+        lines.append(f"  {'+' if c > 0 else '-'} {nm}: {c:+.2f}")
+    lines += _fmt_tempo(pt)
+    # A tier-3 derived domain is named after the raw query — show a tidy label.
+    label = prof.name if len(prof.name) <= 20 else "house " + "/".join(
+        str(h) for h in prof.houses)
+    return label, "\n".join(lines)
 
 
 def _gemini_post(model, payload, key):
@@ -356,6 +412,19 @@ def chat_json(body):
     ctx = body.get("context") or {}
     messages = body.get("messages") or []
     sys = CHAT_SYSTEM + "\n\nCHART (engine-computed, ground truth):\n" + json.dumps(ctx)
+    # Fast engine-triangulation grounding: if the latest question maps to a domain,
+    # run the cheap standing-witness + promise/tempo read and switch to narrator mode.
+    engine_domain = ""
+    last_user = next((m.get("content", "") for m in reversed(messages)
+                      if m.get("role") == "user"), "")
+    v = _chart_from(body.get("chart"))
+    if v is not None and last_user:
+        dom, read = _engine_read(v, last_user)
+        if read:
+            engine_domain = dom
+            sys += ("\n\n" + CHAT_NARRATOR
+                    + "\n\nENGINE TRIANGULATION (ground truth — narrate, don't "
+                    f"recompute):\n{read}")
     contents = [dict(role=("user" if m.get("role") == "user" else "model"),
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
@@ -387,6 +456,9 @@ def chat_json(body):
         text = "".join(p.get("text", "") for p in parts).strip()
     except Exception:
         text = ""
+    if engine_domain:
+        tag = f"🧩 engine triangulation use hui — domain: {engine_domain}"
+        note = (note + " · " + tag) if note else tag
     return dict(text=text or "(empty response — model ne kuch return nahi kiya)",
                 note=note)
 

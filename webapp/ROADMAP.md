@@ -41,6 +41,20 @@ future session continues the same way (read this before changing `webapp/`).
   removed; the model interprets from its own knowledge + the chart only. (NOTE: a
   429 is then a *plain model* free-tier rate/daily limit, not a search issue —
   `chat_json` explains RPM vs RPD and falls back to gemini-2.0-flash on 429.)
+- **Engine-grounded chat (shipped, hybrid):** the chat is now wired to the
+  engine's own triangulation. The frontend sends the chart params with each
+  message; `chat_json` resolves the question to a domain (`significators.resolve`)
+  and, if it maps, runs the **fast** deterministic read — `standing_balance` (net
+  pro/anti witness pattern + the exact fired nodes & weights) + `promise_and_tempo`
+  (promise verdict, tempo early/late/friction, kāraka strength). That read is
+  injected as GROUND TRUTH and the system prompt switches to NARRATOR mode (explain
+  the engine's verdict + daśā; don't invent nodes/dates). Non-domain questions
+  (e.g. "personality") fall back to plain chart interpretation.
+  - **Why not the full salience timeline:** `render_domain`/`candidate_map` is a
+    weekly sliding scan — ~45 s for 3 yrs, too slow for a synchronous chat turn.
+    The standing-witness + tempo read is ~0.2 s and carries the triangulation
+    *verdict* (blessed/afflicted, fired nodes, tempo); precise date windows stay a
+    separate heavy step (`/api/events`) if ever surfaced behind a spinner.
 - Alternative still open: option (b), the engine's own `triangulate()`/
   `event_evidence` pack as a deterministic "Praśna" panel (no LLM at all).
 

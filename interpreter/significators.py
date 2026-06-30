@@ -206,10 +206,18 @@ def resolve(query: str):
     idx = _synonym_index()
     canon = idx.get(key)
 
-    # word not directly indexed: try a loose contains-match against synonyms
+    # Phrase/word-boundary match against synonyms (so a multi-word query like
+    # "career kaisa rahega" matches the WORD "career", not the substring "car"
+    # inside it — naive substring matching mis-maps career→vehicle).
     if canon is None:
+        import re
+        tokens = set(re.findall(r"[a-z]+", key))
         for word, c in idx.items():
-            if word in key or key in word:
+            if " " in word:                # multi-word synonym → phrase match
+                if word in key:
+                    canon = c
+                    break
+            elif word in tokens:           # single word → whole-word match
                 canon = c
                 break
 

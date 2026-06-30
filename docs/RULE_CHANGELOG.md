@@ -726,3 +726,17 @@ addresses (coverage vs discrimination).
   Vimśottari sub-period structure (Sūkṣma/Prāṇa).
 - **Tests:** `test_current_dasha_drills_to_sukshma`,
   `test_house_lord_and_house_lords`, `test_transit_aspects_and_aspects_house`.
+
+## 2026-06-30 — significators: word-boundary matching (no substring mis-maps)
+
+- **Change:** `interpreter.significators.resolve()` loose fallback now matches on
+  word boundaries — single-word synonyms must equal a whole token of the query,
+  multi-word synonyms match as a phrase — instead of naive two-way substring
+  containment. Direct/exact lookups are unchanged.
+- **Why:** Free-form questions (the new engine-grounded chat passes the whole
+  sentence to `resolve`) mis-mapped via substrings: "career kaisa rahega" matched
+  the vehicle synonym "car" inside "**car**eer" → wrong domain. Word-boundary
+  matching makes domain detection correct for full questions. This is DATA/lexicon
+  logic, not a triangulation rule — no node added.
+- **Tests:** `test_freeform_question_matches_words_not_substrings`
+  (career→career, shaadi→marriage, property→property).
