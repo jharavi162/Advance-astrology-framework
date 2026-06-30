@@ -62,8 +62,8 @@
   .grp{margin-bottom:9px}.grp .lbl{color:var(--acc2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
   .geo{position:absolute;top:100%;left:0;right:0;z-index:30;background:#0c0913;border:1px solid var(--line);border-radius:12px;max-height:230px;overflow:auto;display:none;margin-top:4px}
   .geo.on{display:block}.geo-it{padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12.5px}.geo-it:active,.geo-it:hover{background:#2a2140}
-  .chat-msgs{max-height:400px;overflow:auto;display:flex;flex-direction:column;gap:8px;background:#0a0710;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:80px}
-  .msg{padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55}
+  .chat-msgs{height:min(60vh,480px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;resize:vertical;display:flex;flex-direction:column;gap:8px;background:#0a0710;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
+  .msg{flex:0 0 auto;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
   .msg.user{background:#2a2140;align-self:flex-end;max-width:88%}.msg.ai{background:#100a1c;border:1px solid var(--line);max-width:95%;white-space:pre-wrap}
   .srcs{margin-top:7px;padding-top:6px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}.srcs a{color:var(--acc2);text-decoration:none}
   .refrow{font-size:12px;color:var(--ink);padding:4px 0;border-bottom:1px solid var(--line)}.refrow b{color:var(--acc)}
@@ -415,9 +415,12 @@ async function sendChat(){const ctx=chatCtx();
   try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify({messages:HIST,context:ctx,chart:chartParams(),model:document.getElementById('cmodel').value})});
     const j=await r.json();
-    if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
+    const chat=document.getElementById('chat');
+    const toTop=()=>{chat.scrollTop+=ai.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;};
+    if(j.error){ai.textContent='⚠ '+j.error;toTop();HIST.pop();return;}
     ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
     if(j.note){const n=document.createElement('div');n.className='srcs';n.textContent=j.note;ai.appendChild(n);}
+    toTop();  // bring the start of the new answer to the top so it reads from the beginning
   }catch(e){ai.textContent='Network error: '+e;HIST.pop();}}
 document.getElementById('cin').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();sendChat();}});
