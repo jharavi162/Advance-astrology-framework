@@ -312,9 +312,34 @@ def _gemini_post(model, payload, key):
         with urllib.request.urlopen(req, timeout=60) as r:
             return True, json.loads(r.read())
     except urllib.error.HTTPError as e:
-        return False, (e.code, e.read().decode()[:400])
+        return False, (e.code, e.read().decode()[:800])
     except Exception as e:
         return False, (0, f"{type(e).__name__}: {e}")
+
+
+def _explain_gemini_error(code, msg):
+    """Turn a raw Gemini error into a short, actionable Hinglish message."""
+    detail = msg
+    try:
+        detail = json.loads(msg).get("error", {}).get("message", msg)
+    except Exception:
+        pass
+    if code == 429:
+        if "PerDay" in msg or "per day" in msg.lower():
+            scope = "daily (RPD) free-tier limit khatam"
+            tip = "Kal try karo, ya AI Studio me billing enable karke higher quota lo."
+        elif "PerMinute" in msg or "per minute" in msg.lower():
+            scope = "per-minute (RPM) limit hit"
+            tip = "~1 minute ruk ke dobara bhejo."
+        else:
+            scope = "free-tier quota/rate limit"
+            tip = "Thodi der baad ya doosre model se try karo."
+        import re
+        m = re.search(r'retryDelay"?:?\s*"?(\d+)s', msg)
+        if m:
+            tip += f" (Google suggests ~{m.group(1)}s wait.)"
+        return f"Gemini 429 — {scope}. {tip}"
+    return f"Gemini HTTP {code}: {detail}"
 
 
 def chat_json(body):
@@ -356,9 +381,15 @@ def chat_json(body):
         note = ("🌐 web search free-tier me unavailable/quota-over tha — bina web ke "
                 "(sirf chart + model knowledge se) answer diya.")
         ok, res = _gemini_post(model, payload, key)
+    if not ok and res[0] == 429 and model != "gemini-2.0-flash":
+        # Chosen model's free quota is exhausted — 2.0-flash has the most generous
+        # free tier, so try it once before giving up.
+        note = (note + " " if note else "") + \
+            f"{model} ki free quota khatam thi — gemini-2.0-flash se answer diya."
+        ok, res = _gemini_post("gemini-2.0-flash", payload, key)
     if not ok:
         code, msg = res
-        return dict(error=f"Gemini HTTP {code}: {msg}")
+        return dict(error=_explain_gemini_error(code, msg))
     j = res
     try:
         cand = j["candidates"][0]
