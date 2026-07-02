@@ -132,6 +132,13 @@
             <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </select>
         </div>
+        <div class="row" style="margin-bottom:7px;align-items:center;gap:6px">
+          <span class="sub">🔮 Salience scan</span>
+          <input id="scanFrom" type="number" style="width:70px;padding:8px 6px" title="from year">
+          <span class="sub">–</span>
+          <input id="scanTo" type="number" style="width:70px;padding:8px 6px" title="to year">
+          <button class="sec" onclick="runScan()" id="scanBtn">Scan dates</button>
+        </div>
         <div id="chat" class="chat-msgs"></div>
         <div class="row" style="margin-top:8px">
           <textarea id="cin" rows="2" placeholder="Poocho… (e.g. shaadi ka yog kab? career kaisa?)" style="flex:1"></textarea>
@@ -276,6 +283,9 @@ async function load(ev){
 }
 function finishLoad(j){renderDetails(j);document.getElementById('out').style.display='grid';
   if(!document.getElementById('tdate').value)document.getElementById('tdate').value=new Date().toISOString().slice(0,10);
+  const y=new Date().getFullYear();
+  if(!document.getElementById('scanFrom').value)document.getElementById('scanFrom').value=y;
+  if(!document.getElementById('scanTo').value)document.getElementById('scanTo').value=y+5;
   showTransit();}
 
 function renderDetails(j){
@@ -404,7 +414,8 @@ function chatCtx(){const j=window.NATAL;if(!j)return null;
     house_lords:j.house_lords,vimshottari_maha:j.dasha,cusps:j.cusps,chalit:j.chalit,
     arudhas:j.arudhas,upagrahas:j.upagrahas,special_lagnas:j.special,points:j.points,
     strengths:{shadbala:j.strengths.shadbala,ishta_kashta:j.strengths.ishta_kashta,yogas:j.strengths.yogas},
-    sarvashtakavarga:j.sarva,panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10']};}
+    sarvashtakavarga:j.sarva,panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10'],
+    ...(window.LASTSCAN?{last_salience_scan:window.LASTSCAN}:{})};}
 function chartParams(){const P=params();let ay=P.get('ayanamsa');if(ay==='multi')ay='lahiri';
   return {when:P.get('when'),tz:P.get('tz'),lat:P.get('lat'),lon:P.get('lon'),ayanamsa:ay};}
 async function sendChat(){const ctx=chatCtx();
@@ -424,6 +435,36 @@ async function sendChat(){const ctx=chatCtx();
   }catch(e){ai.textContent='Network error: '+e;HIST.pop();}}
 document.getElementById('cin').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();sendChat();}});
+
+// Salience date-scan (heavy engine timeline) — background job + polling
+async function runScan(){
+  if(!window.NATAL){alert('Pehle Cast chart karo.');return;}
+  const domain=(document.getElementById('cin').value.trim()
+    || [...HIST].reverse().find(m=>m.role==='user')?.content || 'marriage');
+  const fy=+document.getElementById('scanFrom').value, ty=+document.getElementById('scanTo').value;
+  if(!fy||!ty||ty<fy){alert('Sahi from–to year daalo.');return;}
+  if(ty-fy>6){alert('Zyada se zyada 6 saal ka span (scan slow hai).');return;}
+  const btn=document.getElementById('scanBtn');btn.disabled=true;const ob=btn.textContent;btn.textContent='Scanning…';
+  const msg=addMsg('ai',`🔮 Salience scan: "${domain}" ${fy}–${ty} … (engine timeline, ~1–2 min, ruko)`);
+  const chat=document.getElementById('chat');chat.scrollTop=chat.scrollHeight;
+  const P=chartParams();const qs=new URLSearchParams({...P,domain,start:fy+'-01-01',end:ty+'-12-31',step:'30'});
+  try{
+    const s=await(await fetch('/api/scan?'+qs)).json();
+    if(s.error){msg.textContent='⚠ '+s.error;return;}
+    const job=s.job;let tries=0,res=null;
+    while(tries++<50){await new Promise(r=>setTimeout(r,3000));
+      res=await(await fetch('/api/scan_status?job='+job)).json();
+      if(res.status==='done'||res.status==='error')break;
+      msg.textContent=`🔮 Scanning "${domain}" ${fy}–${ty} … ${tries*3}s`;chat.scrollTop=chat.scrollHeight;}
+    if(!res||res.status!=='done'){msg.textContent='⚠ Scan '+(res?res.status:'timeout')+(res&&res.error?': '+res.error:'');return;}
+    window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
+    let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows scanned · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
+    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
+    html+=`<div class="srcs">🧩 engine salience scan · niche chat me "in windows ko samjhao" poochho — Gemini inhi ko narrate karega.</div>`;
+    msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;
+  }catch(e){msg.textContent='⚠ Scan error: '+e;}
+  finally{btn.disabled=false;btn.textContent=ob;}
+}
 
 // location search → lat/lon/timezone
 const placeEl=document.getElementById('place'),geoEl=document.getElementById('geo');let gt;

@@ -12,8 +12,11 @@ from __future__ import annotations
 
 import json
 import os
+import threading
+import time
 import urllib.error
 import urllib.request
+import uuid
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
@@ -154,6 +157,65 @@ def _aspects(v):
                               bhava=bhava, on=on))
         out.append(dict(ab=ABBR[p], planet=p.value, casts=casts))
     return out
+
+
+# --------------------------------------------------------------------------- #
+# Salience date-scan (the heavy triangulation timeline) — run as a background job
+# because candidate_map is ~2s/window (a multi-year span takes 1–2 min), far too
+# slow for a synchronous request. Client starts a job and polls for the result.
+# --------------------------------------------------------------------------- #
+_SCANS: dict = {}
+
+
+def _scan_worker(job, params, domain, start, end, step_days):
+    try:
+        from interpreter.event_evidence import candidate_map
+        from interpreter.significators import resolve
+        v = _chart_from(params)
+        if v is None:
+            raise ValueError("chart params invalid")
+        prof = resolve(domain)
+        rows = candidate_map(v, prof, start, end, step_days=step_days)
+        top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
+        windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
+                        salience=round(r.salience, 3), systems=r.systems_firing,
+                        convergence=round(r.convergence, 1),
+                        kp=f"{r.kp_fulfil}/{r.kp_negate}",
+                        nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
+        _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
+                           scanned=len(rows), ts=time.time())
+    except Exception as e:
+        _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
+                           ts=time.time())
+
+
+def scan_start(q):
+    """Kick off a salience date-scan; returns a job id to poll."""
+    domain = (q.get("domain", [""])[0] or "").strip()
+    if not domain:
+        return dict(error="domain missing")
+    try:
+        start = datetime.strptime(q["start"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    except Exception:
+        return dict(error="start/end (YYYY-MM-DD) required")
+    step = max(15, min(60, int(q.get("step", ["30"])[0] or "30")))
+    params = {k: q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa")}
+    job = uuid.uuid4().hex[:12]
+    _SCANS[job] = dict(status="running", ts=time.time())
+    # prune old finished jobs (keep the store small)
+    for j, s in list(_SCANS.items()):
+        if s.get("status") != "running" and time.time() - s.get("ts", 0) > 900:
+            _SCANS.pop(j, None)
+    threading.Thread(target=_scan_worker,
+                     args=(job, params, domain, start, end, step),
+                     daemon=True).start()
+    return dict(job=job)
+
+
+def scan_status(q):
+    job = q.get("job", [""])[0]
+    return _SCANS.get(job, dict(status="unknown"))
 
 
 def cusps_json(q):
@@ -533,6 +595,10 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(transit_json(q)))
             if u.path == "/api/cusps":
                 return self._send(200, json.dumps(cusps_json(q)))
+            if u.path == "/api/scan":
+                return self._send(200, json.dumps(scan_start(q)))
+            if u.path == "/api/scan_status":
+                return self._send(200, json.dumps(scan_status(q)))
             if u.path == "/api/events":
                 return self._send(200, json.dumps(events_json(q)))
             return self._send(404, json.dumps({"error": "not found"}))
