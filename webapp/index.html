@@ -132,13 +132,7 @@
             <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </select>
         </div>
-        <div class="row" style="margin-bottom:7px;align-items:center;gap:6px">
-          <span class="sub">🔮 Salience scan</span>
-          <input id="scanFrom" type="number" style="width:70px;padding:8px 6px" title="from year">
-          <span class="sub">–</span>
-          <input id="scanTo" type="number" style="width:70px;padding:8px 6px" title="to year">
-          <button class="sec" onclick="runScan()" id="scanBtn">Scan dates</button>
-        </div>
+        <div class="sub" style="margin-bottom:7px">🔮 Timing-sawaal pe engine date-scan apne aap chalta hai — "kab hui" → past, "kab hogi" → future, aur saal likho ("2015 se 2018 me…") toh wahi range scan hota hai.</div>
         <div id="chat" class="chat-msgs"></div>
         <div class="row" style="margin-top:8px">
           <textarea id="cin" rows="2" placeholder="Poocho… (e.g. shaadi ka yog kab? career kaisa?)" style="flex:1"></textarea>
@@ -283,9 +277,6 @@ async function load(ev){
 }
 function finishLoad(j){renderDetails(j);document.getElementById('out').style.display='grid';
   if(!document.getElementById('tdate').value)document.getElementById('tdate').value=new Date().toISOString().slice(0,10);
-  const y=new Date().getFullYear();
-  if(!document.getElementById('scanFrom').value)document.getElementById('scanFrom').value=y;
-  if(!document.getElementById('scanTo').value)document.getElementById('scanTo').value=y+2;
   showTransit();}
 
 function renderDetails(j){
@@ -450,27 +441,6 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
   let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
   html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
   msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}
-async function runScan(){
-  if(!window.NATAL){alert('Pehle Cast chart karo.');return;}
-  const domain=(document.getElementById('cin').value.trim()
-    || [...HIST].reverse().find(m=>m.role==='user')?.content || 'marriage');
-  const fy=+document.getElementById('scanFrom').value, ty=+document.getElementById('scanTo').value;
-  if(!fy||!ty||ty<fy){alert('Sahi from–to year daalo.');return;}
-  if(ty-fy>3){alert('Span chhota rakho (max 4 saal) — scan ki cost span ke saath badhti hai; bade range ke liye 2-3 chhote scans karo.');return;}
-  const btn=document.getElementById('scanBtn');btn.disabled=true;const ob=btn.textContent;btn.textContent='Scanning…';
-  const msg=addMsg('ai',`🔮 Salience scan: "${domain}" ${fy}–${ty} … (engine timeline, ruko)`);
-  document.getElementById('chat').scrollTop=1e9;
-  const P=chartParams();const qs=new URLSearchParams({...P,domain,start:fy+'-01-01',end:ty+'-12-31',step:'30'});
-  try{
-    const s=await(await fetch('/api/scan?'+qs)).json();
-    if(s.error){msg.textContent='⚠ '+s.error;return;}
-    const res=await pollScan(s.job,msg,`"${domain}" ${fy}–${ty}`);
-    if(!res||res.status==='error'){msg.textContent='⚠ Scan error: '+((res&&res.error)||'unknown');return;}
-    if(res.status!=='done'){msg.textContent=`⚠ Scan abhi bhi chal raha hai (job ${s.job}) — thodi der baad chhota span try karo.`;return;}
-    renderScan(res,fy,ty,msg);
-  }catch(e){msg.textContent='⚠ Scan error: '+e;}
-  finally{btn.disabled=false;btn.textContent=ob;}
-}
 // AUTO scan: timing-sawaal par backend khud scan kick karta hai; result aate hi
 // engine-windows render + Gemini se ek follow-up narration.
 async function autoScan(scan){

@@ -430,10 +430,18 @@ _TIMING_RE = re.compile(
 _PAST_RE = re.compile(
     r"(hui|hua|ho\s+(gaya|gayi|chuk\w*)|chuki|chuka|\btha\b|\bthi\b|already|"
     r"when\s+did|happened)", re.I)
+_YEAR_RE = re.compile(r"\b(19\d{2}|20\d{2})\b")
 
 
 def _auto_scan_window(question, today):
-    """(start, end) for the auto scan: past-tense → last 4 yrs, else next 3 yrs."""
+    """(start, end) for the auto scan. Explicit years in the question win
+    ("2015 se 2018", "2024 me…" → that range, span capped at 6 yrs); otherwise
+    tense decides: past-tense → last 4 yrs, else next 3 yrs."""
+    years = sorted(int(y) for y in _YEAR_RE.findall(question))
+    if years:
+        y0, y1 = years[0], min(years[-1], years[0] + 6)
+        return (datetime(y0, 1, 1, tzinfo=timezone.utc),
+                datetime(y1, 12, 31, tzinfo=timezone.utc))
     if _PAST_RE.search(question):
         return today - timedelta(days=4 * 365), today
     return today, today + timedelta(days=3 * 365)
@@ -558,12 +566,16 @@ def chat_json(body):
             # AUTO salience scan for timing questions: kick (or reuse) the heavy
             # dated-window scan in the background; the frontend polls the job and
             # asks for a follow-up narration once the engine windows land.
-            prev = ((ctx or {}).get("last_salience_scan") or {}).get("domain")
-            if _TIMING_RE.search(last_user) and prev != dom:
+            # Explicit years in the question also count as a timing ask.
+            if _TIMING_RE.search(last_user) or _YEAR_RE.search(last_user):
                 s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
-                job = _kick_scan(body.get("chart") or {}, dom, s0, e0)
-                scan_meta = dict(job=job, domain=dom,
-                                 from_y=s0.year, to_y=e0.year)
+                prev = (ctx or {}).get("last_salience_scan") or {}
+                same = (prev.get("domain") == dom
+                        and prev.get("range") == f"{s0.year}–{e0.year}")
+                if not same:   # a new domain OR a new range → fresh scan
+                    job = _kick_scan(body.get("chart") or {}, dom, s0, e0)
+                    scan_meta = dict(job=job, domain=dom,
+                                     from_y=s0.year, to_y=e0.year)
     contents = [dict(role=("user" if m.get("role") == "user" else "model"),
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
