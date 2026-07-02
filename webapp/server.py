@@ -364,12 +364,16 @@ CHAT_NARRATOR = (
     "with weights, the PROMISE verdict, and the TEMPO (early / late / with-friction). "
     "Treat this as ground truth and build your answer on it: state whether the matter "
     "is promised and blessed or afflicted, WHY (name the fired nodes), and the tempo. "
-    "For 'kab' (timing), reason from the engine-exact Vimśottari mahā→antar list "
-    "given below together with this tempo, and give an INDICATIVE window — clearly "
-    "flagged as indicative, since the precise date-by-date salience scan is a "
-    "separate heavy step not run here. Cite daśā/antardaśā ONLY using the exact "
-    "dates in that list — never write a daśā date that isn't in it. Do NOT invent "
-    "nodes, yogas or exact dates beyond what the engine read and the daśā give you."
+    "IMPORTANT: this fast read carries the PROMISE and TEMPO but NO event date — it "
+    "does not tell you WHEN. So for 'kab' (timing) do NOT present a single confident "
+    "dated window as if it were computed. Instead: (a) name the daśā/antardaśā "
+    "periods that are astrologically SUPPORTIVE (using ONLY the exact dates in the "
+    "Vimśottari list below — never a date not in it), respecting past-vs-future per "
+    "the TIME CONTEXT, and (b) tell the user that the actual ranked dated windows "
+    "come from the 🔮 Salience scan (and to scan PAST years if the event may already "
+    "have happened). Do NOT invent nodes, yogas or exact dates beyond the engine "
+    "read and the daśā list. If a Salience-scan result is present in the context, "
+    "narrate THOSE ranked windows as the timing answer."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -492,6 +496,15 @@ def chat_json(body):
     last_user = next((m.get("content", "") for m in reversed(messages)
                       if m.get("role") == "user"), "")
     v = _chart_from(body.get("chart"))
+    if v is not None:
+        today = datetime.now(timezone.utc).date()
+        born = v.when_utc.date()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        sys += (f"\n\nTIME CONTEXT: today = {today.isoformat()}; native born "
+                f"{born.isoformat()} (~{age} years old NOW). A past-tense question "
+                "(\"kab hui / kab hua\") means the event may ALREADY have happened — "
+                "weigh past daśā windows up to today and do NOT default to the "
+                "future; a future-tense question looks ahead from today.")
     if v is not None and last_user:
         dom, read = _engine_read(v, last_user)
         if read:

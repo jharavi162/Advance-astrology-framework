@@ -452,11 +452,12 @@ async function runScan(){
     const s=await(await fetch('/api/scan?'+qs)).json();
     if(s.error){msg.textContent='⚠ '+s.error;return;}
     const job=s.job;let tries=0,res=null;
-    while(tries++<50){await new Promise(r=>setTimeout(r,3000));
-      res=await(await fetch('/api/scan_status?job='+job)).json();
+    while(tries++<130){await new Promise(r=>setTimeout(r,3000));   // ~6.5 min budget (free instance slow)
+      try{res=await(await fetch('/api/scan_status?job='+job)).json();}catch(e){continue;}
       if(res.status==='done'||res.status==='error')break;
-      msg.textContent=`🔮 Scanning "${domain}" ${fy}–${ty} … ${tries*3}s`;chat.scrollTop=chat.scrollHeight;}
-    if(!res||res.status!=='done'){msg.textContent='⚠ Scan '+(res?res.status:'timeout')+(res&&res.error?': '+res.error:'');return;}
+      msg.textContent=`🔮 Scanning "${domain}" ${fy}–${ty} … ${tries*3}s (engine timeline, ruko)`;chat.scrollTop=chat.scrollHeight;}
+    if(!res||res.status==='error'){msg.textContent='⚠ Scan error: '+((res&&res.error)||'unknown');return;}
+    if(res.status!=='done'){msg.textContent=`⚠ Scan abhi bhi chal raha hai (job ${job}) — thodi der baad chhota span try karo.`;return;}
     window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
     let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows scanned · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
     html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
