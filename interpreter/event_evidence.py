@@ -244,6 +244,50 @@ register_witness("Vaiśeṣikāṃśa grade (multi-varga strength)", "standing",
 register_witness("maraka afflicts the matter", "standing", 0.8, _w_maraka)
 
 
+# --- OUTCOME-precision witnesses (user-approved 2026-07-02; see RULE_CHANGELOG).
+# Domain-general: each reads the matter's Arudha / lords / kārakas, never a native.
+def _w_arudha_sustenance(v, p):
+    """2nd-from-Arudha sustenance (Jaimini Sūtras 1.4; Rath, Crux of Vedic
+    Astrology): benefics in/aspecting the 2nd from the matter's Arudha SUSTAIN it
+    (for UL: the marriage); malefics there make it break-prone."""
+    if not p.arudhas:
+        return 0.0
+    ar = v.arudhas()
+    score = 0.0
+    for key in p.arudhas:
+        s = ar.get(key)
+        if s is None:
+            continue
+        second = (s + 1) % 12
+        occ = {pl for pl, sg in v.signs.items()
+               if sg == second and pl in (_NAT_BENEFIC | _NAT_MALEFIC)}
+        asp = set(_aspectors(v, {second}))
+        for pl in occ | asp:
+            score += 0.4 if pl in _NAT_BENEFIC else -0.4
+    return max(-1.0, min(1.0, score))
+
+
+def _w_retro_significator(v, p):
+    """Vakri significator (Phaladeepika; KP Readers): the matter's lord/kāraka
+    retrograde → reversal / repeat / comes-back texture on the outcome. The nodes
+    are excluded (Rāhu/Ketu are always vakri — no information)."""
+    seven = (_NAT_BENEFIC | _NAT_MALEFIC) - {Planet.RAHU, Planet.KETU}
+    hits = 0
+    for pl in _matter_planets(v, p) & seven:
+        try:
+            if v.natal.placements[pl].retrograde:
+                hits += 1
+        except Exception:
+            pass
+    return -min(1.0, 0.4 * hits)
+
+
+register_witness("2nd-from-Arudha sustenance (Jaimini)", "standing", 0.8,
+                 _w_arudha_sustenance)
+register_witness("vakri (retrograde) significator", "standing", 0.6,
+                 _w_retro_significator)
+
+
 def standing_balance(v, profile):
     """Net natal pro/anti pattern on the matter + the list of firing nodes."""
     total = 0.0
@@ -482,6 +526,7 @@ class WindowEvidence:
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
     arudha_axis: bool = False              # slow benefic/kāraka activating the Arudha axis (UL/2nd-from-UL …)
     bb_active: bool = False                # Bhṛgu Bindu activated by a slow mover (Nāḍī timing)
+    func_valence: float = 0.0              # signed: chain lords functional benefic(+) vs malefic/māraka(−)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
     systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
@@ -553,6 +598,13 @@ register_witness("KP transit: slow planet in significator's star", "timing", 0.7
                  lambda w: 1.0 if w.kp_star_transit else 0.0)
 register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6,
                  lambda w: 1.0 if w.tajika_sig else 0.0)
+# Outcome valence (user-approved 2026-07-02): the window's daśā lords' FUNCTIONAL
+# nature for this lagna signs the outcome (Laghu Pārāśarī: functional benefic
+# daśā favours, functional malefic / māraka daśā adverses). Signed vote — the
+# sign shows the direction in the ledger; salience uses |vote| so it cannot
+# inflate rank, and the "daśā" name keeps it inside the dasha paddhati group.
+register_witness("daśā-lord functional valence (Laghu Pārāśarī)", "timing", 0.8,
+                 lambda w: w.func_valence)
 # Jaimini Arudha-axis gochara (user-approved 2026-06-23). Domain-general: the
 # matter's Arudha (for marriage UL) and the 2nd-from-it (sustenance) lit by a slow
 # benefic (Jupiter/Saturn occupation OR dṛṣṭi) or the domain kāraka (conjunction).
@@ -902,6 +954,19 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
     dasha_lookups = {name: build(v, profile, start, end)
                      for name, build in DASHA_SYSTEMS.items()}
 
+    # Outcome valence of the daśā lords (functional nature for THIS lagna).
+    fnature = v.functional_nature()
+    fmarakas = set(v.marakas())
+
+    def _chain_valence(lords) -> float:
+        sc = 0.0
+        for l in lords:
+            nat = fnature.get(l, "")
+            sc += 1.0 if nat == "Benefic" else (-1.0 if nat == "Malefic" else 0.0)
+            if l in fmarakas:
+                sc -= 0.5
+        return max(-1.0, min(1.0, sc / max(1, len(lords))))
+
     rows, d, last = [], start, None
     while d < end:
         chain = _chain_lords(v, d, levels=3)
@@ -941,6 +1006,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 tajika_sig=tajika.get(d.year, False),
                 arudha_axis=_arudha_axis_hit(d),
                 bb_active=_bb_hit(d),
+                func_valence=_chain_valence(chain),
                 signals=sig,
             )
             we.panel = panel

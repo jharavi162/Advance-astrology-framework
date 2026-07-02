@@ -168,6 +168,24 @@ def _aspects(v):
 _SCANS: dict = {}
 
 
+def _outcome_reads(v, prof, start, end, step_days):
+    """The engine's OUTCOME machinery for a domain over a window: the standing
+    verdict (blessed/afflicted) + a date→kind lookup from the reversal map
+    (CHANGE/UPGRADE · LOSS/BREAK · transition-watch)."""
+    from interpreter.event_evidence import reversal_map, standing_balance
+    bal, _ = standing_balance(v, prof)
+    verdict = ("blessed/PRO" if bal >= 1.0
+               else "afflicted" if bal < 0 else "mixed")
+    rrows = reversal_map(v, prof, start, end, step_days=step_days)
+
+    def kind_at(when):
+        if not rrows:
+            return None
+        row = min(rrows, key=lambda r: abs((r.start - when).days))
+        return row.kind
+    return round(bal, 2), verdict, kind_at
+
+
 def _scan_worker(job, params, domain, start, end, step_days):
     try:
         from interpreter.event_evidence import candidate_map
@@ -187,12 +205,15 @@ def _scan_worker(job, params, domain, start, end, step_days):
                     continue
                 scores = [r.salience for r in rows]
                 peak = max(rows, key=lambda x: x.salience)
+                bal, verdict, kind_at = _outcome_reads(v, prof, start, end,
+                                                       step_days)
                 ranked.append(dict(
                     domain=name,
                     standout=round(peak.salience - sum(scores) / len(scores), 2),
                     salience=round(peak.salience, 3),
                     date=peak.start.strftime("%Y-%m-%d"),
                     chain=">".join(peak.chain), systems=peak.systems_firing,
+                    outcome=kind_at(peak.start), standing=bal, verdict=verdict,
                     nodes=[n for n, _ in peak.firing_nodes()][:5]))
             ranked.sort(key=lambda r: -r["standout"])
             _SCANS[job] = dict(status="done", macro=True, domain="macro",
@@ -202,13 +223,16 @@ def _scan_worker(job, params, domain, start, end, step_days):
         prof = resolve(domain)
         rows = candidate_map(v, prof, start, end, step_days=step_days)
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
+        bal, verdict, kind_at = _outcome_reads(v, prof, start, end, step_days)
         windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
                         salience=round(r.salience, 3), systems=r.systems_firing,
                         convergence=round(r.convergence, 1),
                         kp=f"{r.kp_fulfil}/{r.kp_negate}",
+                        outcome=kind_at(r.start),
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
-                           scanned=len(rows), step=step_days, ts=time.time())
+                           scanned=len(rows), step=step_days,
+                           standing=bal, verdict=verdict, ts=time.time())
     except Exception as e:
         _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
                            ts=time.time())
@@ -419,7 +443,12 @@ CHAT_NARRATOR = (
     "come from the 🔮 Salience scan (and to scan PAST years if the event may already "
     "have happened). Do NOT invent nodes, yogas or exact dates beyond the engine "
     "read and the daśā list. If a Salience-scan result is present in the context, "
-    "narrate THOSE ranked windows as the timing answer."
+    "narrate THOSE ranked windows as the timing answer. Each scan window may carry "
+    "the engine's OUTCOME-READ ('outcome': CHANGE/UPGRADE · LOSS/BREAK · "
+    "transition-watch, plus a domain 'verdict' blessed/afflicted/mixed): state the "
+    "outcome TYPE from it — e.g. upgrade-type vs loss/break-type event — but never "
+    "assert a concrete real-world outcome (like 'divorce happened') beyond that "
+    "type."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -610,9 +639,11 @@ def chat_json(body):
                 "children, wealth, mother, father, illness, education, relocation) "
                 "by stand-out salience spike in the background. If the context has "
                 "a last_salience_scan with per-domain entries, answer FROM it: name "
-                "the top areas, their peak month and daśā chain — say the AREA and "
-                "WHEN, but never assert a specific outcome (e.g. don't declare "
-                "'divorce happened'); the engine ranks areas, not outcomes. If the "
+                "the top areas, their peak month, daśā chain AND each area's "
+                "engine outcome-read ('outcome' CHANGE/UPGRADE · LOSS/BREAK · "
+                "transition-watch + 'verdict' blessed/afflicted) — say the AREA, "
+                "WHEN and the outcome TYPE, but never assert a concrete real-world "
+                "outcome (e.g. don't declare 'divorce happened'). If the "
                 "scan hasn't landed yet, say the multi-domain scan is running and "
                 "give only a brief chart-level overview — do NOT guess events."
                 + "\n\nVIMŚOTTARI DAŚĀ (engine-exact mahā→antar — use ONLY these "

@@ -47,6 +47,8 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Avasthā moods", "avasthas", "avasthā affliction", "wired"),
     CoverageItem("Vaiśeṣikāṃśa multi-varga grade", "vaiseshikamsa/all_vargas", "Vaiśeṣikāṃśa", "wired"),
     CoverageItem("Maraka affliction", "marakas", "maraka", "wired"),
+    CoverageItem("2nd-from-Arudha sustenance (Jaimini)", "arudhas+graha_aspects", "2nd-from-Arudha sustenance", "wired"),
+    CoverageItem("Vakri (retrograde) significator", "placements.retrograde", "vakri (retrograde)", "wired"),
     # ---- TIMING ----------------------------------------------------------- #
     CoverageItem("Vimśottari daśā (kāraka in chain)", "current_dasha", "kāraka in MD", "wired"),
     CoverageItem("Vimśottari sūkṣma drill", "current_dasha levels=5", "kāraka at sūkṣma", "wired"),
@@ -74,7 +76,7 @@ COVERAGE: list[CoverageItem] = [
     # ---- RED — engine computes it, NO witness reads it yet ----------------- #
     CoverageItem("Bhāva-Chalit result-house shift", "bhava_chalit", "", "red"),
     CoverageItem("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)", "transits.sade_sati", "", "red"),
-    CoverageItem("Functional benefic/malefic weighting", "functional_nature", "", "red"),
+    CoverageItem("Functional benefic/malefic weighting", "functional_nature", "daśā-lord functional valence", "wired"),
     CoverageItem("Full yoga-engine mapping (beyond rāja-yoga)", "yogas", "", "red"),
     CoverageItem("Bhinnāṣṭakavarga of house/lord", "bhinnashtakavarga", "", "red"),
     CoverageItem("Indu Lagna / special lagnas", "special_lagnas/indu_lagna", "", "red"),

@@ -263,3 +263,52 @@ def test_render_and_scan_are_strings():
     e = datetime(2024, 6, 1, tzinfo=UTC)
     assert "EVENT-EVIDENCE PACK" in render_domain(v, DOMAIN_PROFILES["career"], s, e)
     assert "MACRO-SCAN" in scan_domains(v, s, e)
+
+
+# --- outcome-precision witnesses (approved 2026-07-02) ----------------------- #
+def test_outcome_witnesses_registered_and_bounded():
+    names = {w.name for w in WITNESSES}
+    assert "2nd-from-Arudha sustenance (Jaimini)" in names
+    assert "vakri (retrograde) significator" in names
+    assert "daśā-lord functional valence (Laghu Pārāśarī)" in names
+    v = _chart()
+    for w in WITNESSES:
+        if w.layer != "standing":
+            continue
+        if "Arudha sustenance" in w.name or "vakri" in w.name:
+            for prof in DOMAIN_PROFILES.values():
+                val = w.vote(v, prof)
+                assert -1.0 <= val <= 1.0, f"{w.name}/{prof.name} out of range"
+
+
+def test_arudha_sustenance_needs_arudhas():
+    # A profile without arudhas must vote 0 (no fabricated testimony).
+    v = _chart()
+    w = next(x for x in WITNESSES if "Arudha sustenance" in x.name)
+    prof = next((p for p in DOMAIN_PROFILES.values() if not p.arudhas), None)
+    if prof is not None:
+        assert w.vote(v, prof) == 0.0
+
+
+def test_vakri_witness_never_positive():
+    # Retrogradation is a reversal/friction texture — the vote is 0 or negative.
+    v = _chart()
+    w = next(x for x in WITNESSES if "vakri" in x.name)
+    for prof in DOMAIN_PROFILES.values():
+        assert w.vote(v, prof) <= 0.0
+
+
+def test_functional_valence_flows_into_windows():
+    # candidate_map sets a signed func_valence in [-1, 1] on every window, and the
+    # timing witness surfaces it in the ledger (sign = outcome direction).
+    v = _chart()
+    rows = candidate_map(v, DOMAIN_PROFILES["career"],
+                         datetime(2024, 1, 1, tzinfo=UTC),
+                         datetime(2025, 1, 1, tzinfo=UTC), step_days=45)
+    assert rows
+    assert all(-1.0 <= r.func_valence <= 1.0 for r in rows)
+    w = next(x for x in WITNESSES if "functional valence" in x.name)
+    for r in rows:
+        assert w.vote(r) == r.func_valence
+    # the node groups inside the dasha paddhati (not a fake independent system)
+    assert _paddhati(w.name) == "dasha"

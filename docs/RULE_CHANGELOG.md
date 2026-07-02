@@ -766,3 +766,32 @@ addresses (coverage vs discrimination).
 - **Why:** The chat's open "kaun-se bade events hue?" question needs the engine's
   `scan_domains`-style multi-domain ranking interactively.
 - **Tests:** `test_transits_instance_is_shared`; full vedic suite (82) green.
+
+## 2026-07-02 — OUTCOME layer: 3 user-approved witnesses + outcome-read in scans
+
+- **Change (nodes, user-approved):**
+  1. `daśā-lord functional valence (Laghu Pārāśarī)` — TIMING, weight 0.8, signed:
+     the window's daśā lords' functional nature for THIS lagna (+ functional
+     benefic, − functional malefic, extra − for māraka). Sign = outcome direction
+     in the ledger; salience uses |vote| (and the "daśā" name keeps it inside the
+     dasha paddhati group) so it cannot inflate rank. Closes the coverage-matrix
+     RED item "Functional benefic/malefic weighting".
+  2. `2nd-from-Arudha sustenance (Jaimini)` — STANDING, weight 0.8: benefics
+     in/aspecting the 2nd from the matter's Arudha (UL for marriage) sustain the
+     matter; malefics there make it break-prone. Source: Jaimini Sūtras (Upapada
+     doctrine), Sanjay Rath (Crux of Vedic Astrology).
+  3. `vakri (retrograde) significator` — STANDING, weight 0.6, ≤0 only: the
+     matter's lords/kārakas retrograde ⇒ reversal/repeat texture. Nodes excluded
+     (always vakri). Source: Phaladeepika; KP Readers.
+- **Change (wiring):** the webapp scans now surface the ENGINE's existing outcome
+  machinery: every scan window carries an `outcome` read from `reversal_map`
+  (CHANGE/UPGRADE · LOSS/BREAK · transition-watch) and every domain a standing
+  `verdict` (blessed/afflicted/mixed); the macro-scan shows both per life-area.
+  The chat narrator states the outcome TYPE only — never a concrete real-world
+  outcome. (Wiring of computed-but-unwired machinery; no rule change.)
+- **Why:** "Most probable outcome" the way professionals commit it — KP house-
+  groups + separative testimony + natal promise + functional valence — as a
+  multi-nodal TYPE verdict, never a single rule and never an asserted event.
+- **Tests:** `test_outcome_witnesses_registered_and_bounded`,
+  `test_arudha_sustenance_needs_arudhas`, `test_vakri_witness_never_positive`,
+  `test_functional_valence_flows_into_windows`; coverage-matrix sync tests green.
