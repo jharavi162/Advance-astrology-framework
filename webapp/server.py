@@ -12,12 +12,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import time
 import urllib.error
 import urllib.request
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 from zoneinfo import ZoneInfo
@@ -189,6 +190,36 @@ def _scan_worker(job, params, domain, start, end, step_days):
                            ts=time.time())
 
 
+_SCAN_KEYS: dict = {}
+
+
+def _kick_scan(params, domain, start, end, step_hint=30):
+    """Start (or REUSE) a salience scan; returns the job id. Identical requests
+    within ~15 min share one job, so repeated chat questions don't pile up
+    duplicate CPU-heavy scans."""
+    key = (tuple(params.get(k, "") for k in ("when", "tz", "lat", "lon", "ayanamsa")),
+           domain.lower(), start.date().isoformat(), end.date().isoformat())
+    old = _SCAN_KEYS.get(key)
+    if old and old in _SCANS and _SCANS[old].get("status") in ("running", "done"):
+        return old
+    # The scan's cost scales with the span (each node scans the ephemeris across
+    # it), so ADAPT the step: sample ~24 points max so the job stays bounded.
+    span_days = max(1, (end - start).days)
+    step = max(step_hint, span_days // 24)
+    step = max(15, min(120, step))
+    job = uuid.uuid4().hex[:12]
+    _SCANS[job] = dict(status="running", ts=time.time())
+    _SCAN_KEYS[key] = job
+    # prune old finished jobs (keep the store small)
+    for j, s in list(_SCANS.items()):
+        if s.get("status") != "running" and time.time() - s.get("ts", 0) > 900:
+            _SCANS.pop(j, None)
+    threading.Thread(target=_scan_worker,
+                     args=(job, params, domain, start, end, step),
+                     daemon=True).start()
+    return job
+
+
 def scan_start(q):
     """Kick off a salience date-scan; returns a job id to poll."""
     domain = (q.get("domain", [""])[0] or "").strip()
@@ -199,24 +230,9 @@ def scan_start(q):
         end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
     except Exception:
         return dict(error="start/end (YYYY-MM-DD) required")
-    # The scan's cost ≈ number of distinct pratyantar-daśā periods sampled, and
-    # each is skyfield-heavy. On a slow (free) instance a fine step over a multi-year
-    # span never finishes. So ADAPT the step to the span: sample ~24 points max,
-    # which bounds the work (coarser dates, but the scan actually completes).
-    span_days = max(1, (end - start).days)
-    step = max(int(q.get("step", ["30"])[0] or "30"), span_days // 24)
-    step = max(15, min(120, step))
     params = {k: q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa")}
-    job = uuid.uuid4().hex[:12]
-    _SCANS[job] = dict(status="running", ts=time.time())
-    # prune old finished jobs (keep the store small)
-    for j, s in list(_SCANS.items()):
-        if s.get("status") != "running" and time.time() - s.get("ts", 0) > 900:
-            _SCANS.pop(j, None)
-    threading.Thread(target=_scan_worker,
-                     args=(job, params, domain, start, end, step),
-                     daemon=True).start()
-    return dict(job=job)
+    step_hint = int(q.get("step", ["30"])[0] or "30")
+    return dict(job=_kick_scan(params, domain, start, end, step_hint))
 
 
 def scan_status(q):
@@ -406,6 +422,23 @@ def _dasha_tree_text(v):
     return "\n".join(lines)
 
 
+# Timing-question detection for the chat's AUTO salience scan: does the question
+# ask WHEN, and does its tense point at the past (event may already have happened)?
+_TIMING_RE = re.compile(
+    r"(kab|when|kis\s+(saal|varsh|year)|timing|window|date|hogi|hoga|hui|hua|"
+    r"milegi|milega|banega|banegi)", re.I)
+_PAST_RE = re.compile(
+    r"(hui|hua|ho\s+(gaya|gayi|chuk\w*)|chuki|chuka|\btha\b|\bthi\b|already|"
+    r"when\s+did|happened)", re.I)
+
+
+def _auto_scan_window(question, today):
+    """(start, end) for the auto scan: past-tense → last 4 yrs, else next 3 yrs."""
+    if _PAST_RE.search(question):
+        return today - timedelta(days=4 * 365), today
+    return today, today + timedelta(days=3 * 365)
+
+
 def _engine_read(v, question):
     """Fast deterministic triangulation read for a question's domain — the natal
     standing-witness balance + fired nodes + promise/tempo (NO slow timeline scan).
@@ -511,6 +544,7 @@ def chat_json(body):
                 "(\"kab hui / kab hua\") means the event may ALREADY have happened — "
                 "weigh past daśā windows up to today and do NOT default to the "
                 "future; a future-tense question looks ahead from today.")
+    scan_meta = None
     if v is not None and last_user:
         dom, read = _engine_read(v, last_user)
         if read:
@@ -521,6 +555,15 @@ def chat_json(body):
                     + "\n\nVIMŚOTTARI DAŚĀ (engine-exact mahā→antar — use ONLY "
                     "these dates for any daśā/antardaśā you cite; never state a "
                     f"daśā date not in this list):\n{_dasha_tree_text(v)}")
+            # AUTO salience scan for timing questions: kick (or reuse) the heavy
+            # dated-window scan in the background; the frontend polls the job and
+            # asks for a follow-up narration once the engine windows land.
+            prev = ((ctx or {}).get("last_salience_scan") or {}).get("domain")
+            if _TIMING_RE.search(last_user) and prev != dom:
+                s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
+                job = _kick_scan(body.get("chart") or {}, dom, s0, e0)
+                scan_meta = dict(job=job, domain=dom,
+                                 from_y=s0.year, to_y=e0.year)
     contents = [dict(role=("user" if m.get("role") == "user" else "model"),
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
@@ -568,7 +611,7 @@ def chat_json(body):
         tag = f"🧩 engine triangulation use hui — domain: {engine_domain}"
         note = (note + " · " + tag) if note else tag
     return dict(text=text or "(empty response — model ne kuch return nahi kiya)",
-                note=note)
+                note=note, scan=scan_meta)
 
 
 class H(BaseHTTPRequestHandler):

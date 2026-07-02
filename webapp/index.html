@@ -432,11 +432,24 @@ async function sendChat(){const ctx=chatCtx();
     ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
     if(j.note){const n=document.createElement('div');n.className='srcs';n.textContent=j.note;ai.appendChild(n);}
     toTop();  // bring the start of the new answer to the top so it reads from the beginning
+    if(j.scan)autoScan(j.scan);  // timing question → engine date-scan chal raha hai; result aane par follow-up
   }catch(e){ai.textContent='Network error: '+e;HIST.pop();}}
 document.getElementById('cin').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();sendChat();}});
 
 // Salience date-scan (heavy engine timeline) — background job + polling
+async function pollScan(job,msg,label){const chat=document.getElementById('chat');
+  let tries=0,res=null;
+  while(tries++<130){await new Promise(r=>setTimeout(r,3000));   // ~6.5 min budget
+    try{res=await(await fetch('/api/scan_status?job='+job)).json();}catch(e){continue;}
+    if(res.status==='done'||res.status==='error')break;
+    msg.textContent=`🔮 Scanning ${label} … ${tries*3}s (engine timeline, ruko)`;chat.scrollTop=chat.scrollHeight;}
+  return res;}
+function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
+  window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
+  let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
+  html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
+  msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}
 async function runScan(){
   if(!window.NATAL){alert('Pehle Cast chart karo.');return;}
   const domain=(document.getElementById('cin').value.trim()
@@ -445,26 +458,38 @@ async function runScan(){
   if(!fy||!ty||ty<fy){alert('Sahi from–to year daalo.');return;}
   if(ty-fy>3){alert('Span chhota rakho (max 4 saal) — scan ki cost span ke saath badhti hai; bade range ke liye 2-3 chhote scans karo.');return;}
   const btn=document.getElementById('scanBtn');btn.disabled=true;const ob=btn.textContent;btn.textContent='Scanning…';
-  const msg=addMsg('ai',`🔮 Salience scan: "${domain}" ${fy}–${ty} … (engine timeline; free instance pe ~2–4 min lag sakta hai, ruko)`);
-  const chat=document.getElementById('chat');chat.scrollTop=chat.scrollHeight;
+  const msg=addMsg('ai',`🔮 Salience scan: "${domain}" ${fy}–${ty} … (engine timeline, ruko)`);
+  document.getElementById('chat').scrollTop=1e9;
   const P=chartParams();const qs=new URLSearchParams({...P,domain,start:fy+'-01-01',end:ty+'-12-31',step:'30'});
   try{
     const s=await(await fetch('/api/scan?'+qs)).json();
     if(s.error){msg.textContent='⚠ '+s.error;return;}
-    const job=s.job;let tries=0,res=null;
-    while(tries++<130){await new Promise(r=>setTimeout(r,3000));   // ~6.5 min budget (free instance slow)
-      try{res=await(await fetch('/api/scan_status?job='+job)).json();}catch(e){continue;}
-      if(res.status==='done'||res.status==='error')break;
-      msg.textContent=`🔮 Scanning "${domain}" ${fy}–${ty} … ${tries*3}s (engine timeline, ruko)`;chat.scrollTop=chat.scrollHeight;}
+    const res=await pollScan(s.job,msg,`"${domain}" ${fy}–${ty}`);
     if(!res||res.status==='error'){msg.textContent='⚠ Scan error: '+((res&&res.error)||'unknown');return;}
-    if(res.status!=='done'){msg.textContent=`⚠ Scan abhi bhi chal raha hai (job ${job}) — thodi der baad chhota span try karo.`;return;}
-    window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
-    let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
-    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
-    html+=`<div class="srcs">🧩 engine salience scan · niche chat me "in windows ko samjhao" poochho — Gemini inhi ko narrate karega.</div>`;
-    msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;
+    if(res.status!=='done'){msg.textContent=`⚠ Scan abhi bhi chal raha hai (job ${s.job}) — thodi der baad chhota span try karo.`;return;}
+    renderScan(res,fy,ty,msg);
   }catch(e){msg.textContent='⚠ Scan error: '+e;}
   finally{btn.disabled=false;btn.textContent=ob;}
+}
+// AUTO scan: timing-sawaal par backend khud scan kick karta hai; result aate hi
+// engine-windows render + Gemini se ek follow-up narration.
+async function autoScan(scan){
+  if(window.LASTJOB===scan.job)return;window.LASTJOB=scan.job;
+  const msg=addMsg('ai',`🔮 Engine date-scan chal raha hai — "${scan.domain}" ${scan.from_y}–${scan.to_y} … (result aane par yahin bataunga)`);
+  document.getElementById('chat').scrollTop=1e9;
+  const res=await pollScan(scan.job,msg,`"${scan.domain}" ${scan.from_y}–${scan.to_y}`);
+  if(!res||res.status!=='done'){msg.textContent='⚠ Auto date-scan poora nahi hua'+((res&&res.error)?': '+res.error:' — Scan button se chhota span try karo.');return;}
+  renderScan(res,scan.from_y,scan.to_y,msg);
+  // follow-up narration grounded on the engine windows
+  HIST.push({role:'user',content:`(auto) Engine ka ${scan.domain} salience date-scan poora ho gaya — mere pichhle sawaal ka timing-jawab ab IN ranked windows se do (context me last_salience_scan).`});
+  const ai=addMsg('ai','…');
+  try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({messages:HIST,context:chatCtx(),chart:chartParams(),model:document.getElementById('cmodel').value})});
+    const j=await r.json();
+    if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
+    ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
+    const chat=document.getElementById('chat');chat.scrollTop+=ai.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;
+  }catch(e){ai.textContent='Network error: '+e;HIST.pop();}
 }
 
 // location search → lat/lon/timezone

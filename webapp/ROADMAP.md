@@ -50,11 +50,16 @@ future session continues the same way (read this before changing `webapp/`).
   injected as GROUND TRUTH and the system prompt switches to NARRATOR mode (explain
   the engine's verdict + daśā; don't invent nodes/dates). Non-domain questions
   (e.g. "personality") fall back to plain chart interpretation.
-  - **Why not the full salience timeline:** `render_domain`/`candidate_map` is a
-    weekly sliding scan — ~45 s for 3 yrs, too slow for a synchronous chat turn.
-    The standing-witness + tempo read is ~0.2 s and carries the triangulation
-    *verdict* (blessed/afflicted, fired nodes, tempo); precise date windows stay a
-    separate heavy step (`/api/events`) if ever surfaced behind a spinner.
+  - **Why not the full salience timeline synchronously:** `candidate_map` scans the
+    ephemeris across the span — too slow for a chat turn even after the transit
+    position memo (engine, 2026-07-02) made it ~3.8× faster.
+  - **AUTO salience integration (shipped):** a timing question ("kab hui/hogi…")
+    now auto-kicks the salience scan in the background (`_kick_scan`, with reuse of
+    identical jobs) — past-tense → last 4 yrs, future → next 3 yrs. The chat answers
+    instantly from the fast read; when the scan lands, the frontend renders the
+    ranked windows and asks Gemini for a follow-up narration grounded on them
+    (`last_salience_scan` in context). The manual Scan button stays for custom
+    ranges.
 - Alternative still open: option (b), the engine's own `triangulate()`/
   `event_evidence` pack as a deterministic "Praśna" panel (no LLM at all).
 
