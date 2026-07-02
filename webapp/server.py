@@ -439,12 +439,14 @@ def chat_json(body):
         if mdl in tried:
             continue
         tried.append(mdl)
-        # Big output budget (Devanāgarī is very token-heavy) and, for the 2.5
-        # "thinking" models, disable the thinking budget so it doesn't eat the
-        # output tokens and truncate the visible answer.
-        gen = dict(maxOutputTokens=4096, temperature=0.6)
+        # Thinking tokens count against maxOutputTokens, so give a big total budget
+        # (Devanāgarī is token-heavy too). For the 2.5 "thinking" models keep
+        # thinking ON — it materially improves the triangulation reasoning — but
+        # BOUND it so it can't eat the whole budget and truncate the answer:
+        # 4096 for thinking, leaving ~4096 for the visible reply.
+        gen = dict(maxOutputTokens=8192, temperature=0.6)
         if mdl.startswith("gemini-2.5"):
-            gen["thinkingConfig"] = {"thinkingBudget": 0}
+            gen["thinkingConfig"] = {"thinkingBudget": 4096}
         payload["generationConfig"] = gen
         ok, res = _gemini_post(mdl, payload, key)
         if ok:
