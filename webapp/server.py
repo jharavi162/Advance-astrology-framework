@@ -302,11 +302,12 @@ CHAT_NARRATOR = (
     "with weights, the PROMISE verdict, and the TEMPO (early / late / with-friction). "
     "Treat this as ground truth and build your answer on it: state whether the matter "
     "is promised and blessed or afflicted, WHY (name the fired nodes), and the tempo. "
-    "For 'kab' (timing), reason from the Vimśottari mahādaśā chain in the chart "
-    "together with this tempo, and give an INDICATIVE window — clearly flagged as "
-    "indicative, since the precise date-by-date salience scan is a separate heavy "
-    "step not run here. Do NOT invent nodes, yogas or exact dates beyond what the "
-    "engine read and the daśā give you."
+    "For 'kab' (timing), reason from the engine-exact Vimśottari mahā→antar list "
+    "given below together with this tempo, and give an INDICATIVE window — clearly "
+    "flagged as indicative, since the precise date-by-date salience scan is a "
+    "separate heavy step not run here. Cite daśā/antardaśā ONLY using the exact "
+    "dates in that list — never write a daśā date that isn't in it. Do NOT invent "
+    "nodes, yogas or exact dates beyond what the engine read and the daśā give you."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -320,6 +321,17 @@ def _chart_from(c):
                        for k in ("when", "tz", "lat", "lon", "ayanamsa")})[0]
     except Exception:
         return None
+
+
+def _dasha_tree_text(v):
+    """Full-life Vimśottari mahā→antar with engine-exact dates, compact text."""
+    lines = []
+    for m in v.dasha("vimshottari", levels=2):
+        lines.append(f"{m.lord.value} {m.start.date()}→{m.end.date()}")
+        for a in (m.sub_periods or []):
+            lines.append(f"  {m.lord.value[:2]}-{a.lord.value} "
+                         f"{a.start.date()}→{a.end.date()}")
+    return "\n".join(lines)
 
 
 def _engine_read(v, question):
@@ -424,7 +436,10 @@ def chat_json(body):
             engine_domain = dom
             sys += ("\n\n" + CHAT_NARRATOR
                     + "\n\nENGINE TRIANGULATION (ground truth — narrate, don't "
-                    f"recompute):\n{read}")
+                    f"recompute):\n{read}"
+                    + "\n\nVIMŚOTTARI DAŚĀ (engine-exact mahā→antar — use ONLY "
+                    "these dates for any daśā/antardaśā you cite; never state a "
+                    f"daśā date not in this list):\n{_dasha_tree_text(v)}")
     contents = [dict(role=("user" if m.get("role") == "user" else "model"),
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
