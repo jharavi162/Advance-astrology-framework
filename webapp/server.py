@@ -166,6 +166,10 @@ def _aspects(v):
 # slow for a synchronous request. Client starts a job and polls for the result.
 # --------------------------------------------------------------------------- #
 _SCANS: dict = {}
+# Only ONE scan computes at a time. On a small (free) instance parallel scan
+# threads saturate the CPU and the HTTP server can't even serve the page — the
+# app looks "stuck at loading". Later jobs wait at the gate (status "queued").
+_SCAN_GATE = threading.Lock()
 
 
 def _outcome_reads(v, prof, start, end, step_days):
@@ -187,6 +191,13 @@ def _outcome_reads(v, prof, start, end, step_days):
 
 
 def _scan_worker(job, params, domain, start, end, step_days):
+    _SCANS[job]["status"] = "queued"
+    with _SCAN_GATE:
+        _SCANS[job]["status"] = "running"
+        _run_scan(job, params, domain, start, end, step_days)
+
+
+def _run_scan(job, params, domain, start, end, step_days):
     try:
         from interpreter.event_evidence import candidate_map
         from interpreter.significators import resolve
@@ -260,7 +271,8 @@ def _kick_scan(params, domain, start, end, step_hint=30):
     key = (tuple(params.get(k, "") for k in ("when", "tz", "lat", "lon", "ayanamsa")),
            domain.lower(), start.date().isoformat(), end.date().isoformat())
     old = _SCAN_KEYS.get(key)
-    if old and old in _SCANS and _SCANS[old].get("status") in ("running", "done"):
+    if old and old in _SCANS and _SCANS[old].get("status") in ("queued", "running",
+                                                               "done"):
         return old
     # The scan's cost scales with the span (each node scans the ephemeris across
     # it), so ADAPT the step: sample ~24 points max so the job stays bounded.
