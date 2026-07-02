@@ -451,9 +451,10 @@ CHAT_NARRATOR = (
     "dated window as if it were computed. Instead: (a) name the daśā/antardaśā "
     "periods that are astrologically SUPPORTIVE (using ONLY the exact dates in the "
     "Vimśottari list below — never a date not in it), respecting past-vs-future per "
-    "the TIME CONTEXT, and (b) tell the user that the actual ranked dated windows "
-    "come from the 🔮 Salience scan (and to scan PAST years if the event may already "
-    "have happened). Do NOT invent nodes, yogas or exact dates beyond the engine "
+    "the TIME CONTEXT, and (b) if the engine's date-scan was auto-started for this "
+    "question, close by saying the committed verdict (YES/NO + window) is being "
+    "computed and will follow in a moment. NEVER ask the user to run a scan — it "
+    "runs automatically. Do NOT invent nodes, yogas or exact dates beyond the engine "
     "read and the daśā list. If a Salience-scan result is present in the context, "
     "narrate THOSE ranked windows as the timing answer. Each scan window may carry "
     "the engine's OUTCOME-READ ('outcome': CHANGE/UPGRADE · LOSS/BREAK · "
@@ -682,8 +683,11 @@ def chat_json(body):
             # AUTO salience scan for timing questions: kick (or reuse) the heavy
             # dated-window scan in the background; the frontend polls the job and
             # asks for a follow-up narration once the engine windows land.
-            # Explicit years in the question also count as a timing ask.
+            # Explicit years, past-tense ("ho chuki hai ya nahi?") and future
+            # markers all count as a timing ask — any of them kicks the scan
+            # that produces the committed verdict call.
             if allow_kick and (_TIMING_RE.search(last_user)
+                               or _PAST_RE.search(last_user)
                                or _YEAR_RE.search(last_user)):
                 s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
                 prev = (ctx or {}).get("last_salience_scan") or {}
@@ -693,6 +697,11 @@ def chat_json(body):
                     job = _kick_scan(body.get("chart") or {}, dom, s0, e0)
                     scan_meta = dict(job=job, domain=dom,
                                      from_y=s0.year, to_y=e0.year)
+    if scan_meta:
+        sys += ("\n\nNOTE: the engine's salience date-scan HAS been auto-started "
+                "for this question — the committed verdict (YES/NO + window) will "
+                "follow as a separate message in a minute or two. Say so; do not "
+                "hedge and do not ask the user to run anything.")
     contents = [dict(role=("user" if m.get("role") == "user" else "model"),
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
