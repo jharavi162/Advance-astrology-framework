@@ -319,6 +319,10 @@ class DomainProfile:
     saham: str | None                     # Tājika Saham timing the matter
     reversal_saham: str | None            # Saham timing the matter's reversal
     varga: int                            # divisional chart confirming the TYPE
+    rupture_matter: bool = False          # the matter IS a rupture (divorce/…):
+                                          # time it with the reversal timer
+    base_domain: str | None = None        # the underlying matter whose reversal
+                                          # this rupture is (divorce → marriage)
 
     @classmethod
     def from_dict(cls, name: str, spec: dict) -> "DomainProfile":
@@ -334,6 +338,8 @@ class DomainProfile:
             saham=spec.get("saham"),
             reversal_saham=spec.get("reversal_saham"),
             varga=spec.get("varga", 9),
+            rupture_matter=bool(spec.get("rupture_matter", False)),
+            base_domain=spec.get("base_domain"),
         )
 
 
@@ -1064,12 +1070,18 @@ class Verdict:
     reasons: list
 
 
-def domain_verdict(v, profile, rows, asof) -> Verdict:
+def domain_verdict(v, profile, rows, asof, rrows=None) -> Verdict:
     """Committed retrodiction for "has this matter's event happened in the scanned
     window?" — decides from (1) KP promise-vs-denial, (2) elapsed high-convergence
     windows, (3) convergence count as confidence. Affliction NEVER vetoes
     existence; it only sets the quality (KP: affliction = troubled event, denial =
-    no event)."""
+    no event).
+
+    RUPTURE matters (``profile.rupture_matter``, e.g. divorce): the fulfilment
+    scan times the AXIS (which also spikes for the marriage itself), so elapsed
+    evidence comes from the REVERSAL timer instead — pass its rows as ``rrows``;
+    an elapsed LOSS/BREAK window is the delivered event, its rupture-score the
+    confidence."""
     pt = promise_and_tempo(v, profile)
     sig = set(pt.cusp_signifies)
     denied = ((not pt.promised) and bool(sig & profile.negate_houses))
@@ -1088,6 +1100,21 @@ def domain_verdict(v, profile, rows, asof) -> Verdict:
     if not pt.promised:
         reasons.append("sub-lord signifies neither group decisively")
         return Verdict("UNCERTAIN", "LOW", "", "", 0, quality, reasons)
+    if profile.rupture_matter and rrows is not None:
+        hits = [r for r in rrows if r.start <= asof and r.kind == "LOSS/BREAK"]
+        if hits:
+            best = max(hits, key=lambda r: (r.rupture_score, r.start))
+            conf = ("HIGH" if best.rupture_score >= 4
+                    else "MEDIUM" if best.rupture_score >= 3 else "LOW")
+            reasons.append(f"rupture promised + elapsed LOSS/BREAK window "
+                           f"{best.start:%Y-%m-%d} (rupture-score "
+                           f"{best.rupture_score}/5) → the break stands delivered")
+            return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
+                           ">".join(best.chain), best.rupture_score, quality,
+                           reasons)
+        reasons.append("rupture promised, but no LOSS/BREAK window has elapsed "
+                       "in the scanned span → not yet (or outside this span)")
+        return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons)
     elapsed = [r for r in rows if r.start <= asof and r.systems_firing >= 2]
     if elapsed:
         best = max(elapsed, key=lambda r: r.salience)

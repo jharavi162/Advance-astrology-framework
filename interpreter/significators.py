@@ -138,6 +138,7 @@ THEME_LEXICON: dict[str, dict] = {
     # Upapada doctrine for the break of the UL.)
     "divorce": dict(houses=[7], fulfil_houses=[1, 6, 10], negate_houses=[2, 7, 11],
                     natural_karaka=Planet.SATURN, arudhas=["UL"], varga=9,
+                    rupture_matter=True, base_domain="marriage",
                     synonyms=["talaq", "talak", "separation", "alag hona",
                               "alag hue", "breakup", "break up", "rishta toota",
                               "divorce hua", "judai"]),

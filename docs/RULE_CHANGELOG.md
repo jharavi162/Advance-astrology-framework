@@ -830,3 +830,20 @@ addresses (coverage vs discrimination).
   signifying 1/6/10; 2/7/11 signification denies it (KP Reader VI). UL and its
   sustenance carry the marriage's break in Jaimini (Upapada doctrine).
 - **Tests:** `test_divorce_domain_resolves_with_kp_groups`.
+
+## 2026-07-02 — Rupture-class domains: verdict/scan timed by the reversal timer
+
+- **Change:** `DomainProfile` gains `rupture_matter` + `base_domain`. For a
+  rupture matter (divorce → base marriage) the scan and `domain_verdict` no
+  longer use the axis-fulfilment scan (which spikes for the UNION itself — the
+  wedding lit the same 7th-axis windows) — the break is timed by
+  `reversal_map` of the UNDERLYING matter: elapsed LOSS/BREAK window = delivered
+  break; rupture-score (0–5 independent rupture signatures) = confidence.
+  Using the base profile also avoids a double-inversion (the rupture profile's
+  inverted KP groups flipped reversal_map's pro/anti semantics).
+- **Why (śāstra):** The separation event is classically timed by separative
+  testimony — Śani/nodes running, the 6/8/12-from-the-house activation, dark
+  Lagna, the reversal Saham — not by the matter's fulfilment significators
+  (KP separative doctrine; Jaimini Upapada-break).
+- **Tests:** `test_rupture_matter_verdict_uses_reversal_timer` (rule-consistency
+  on the base-domain reversal rows). Full suite 155 green.

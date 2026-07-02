@@ -446,7 +446,9 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
     html=`<b style="color:var(--acc)">🔮 Macro-scan — kaunse life-areas spike hue (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} life-areas ranked by stand-out spike · CALL = engine ka committed YES/NOT-YET/NO · ~${res.step||30}-day resolution</div>`;
     html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.domain.toUpperCase()}</b>${w.call?` · <b style="color:var(--acc)">${w.call.answer}</b> (${w.call.confidence})${w.call.window?' ~'+w.call.window:''}`:''} · peak <b>${w.date}</b> · ${w.chain}${oc(w.outcome)} · ${w.verdict||''} (${w.standing>=0?'+':''}${w.standing})<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
   }else{
-    html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
+    html=res.rupture
+      ?`<b style="color:var(--acc)">🔮 Rupture-timer windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · rupture-score /5 se ranked (LOSS/BREAK = engine ka committed break-read) · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b>`:''}</div>`
+      :`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
     html+=callLine(res.call);
     html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · KP ${w.kp}${oc(w.outcome)}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
   }

@@ -237,11 +237,53 @@ def _run_scan(job, params, domain, start, end, step_days):
                                step=step_days, ts=time.time())
             return
         prof = resolve(domain)
+        from interpreter.event_evidence import domain_verdict
+        now = datetime.now(timezone.utc)
+        if getattr(prof, "rupture_matter", False):
+            # RUPTURE matter (divorce/…): the fulfilment scan times the AXIS
+            # (which also spikes for the union itself) — time the BREAK with the
+            # reversal timer of the UNDERLYING matter (divorce = the marriage's
+            # reversal; the rupture profile's inverted KP groups would otherwise
+            # double-invert the reversal semantics), ranked by rupture-score.
+            from interpreter.event_evidence import (DOMAIN_PROFILES,
+                                                    reversal_map,
+                                                    standing_balance)
+            base = DOMAIN_PROFILES.get(getattr(prof, "base_domain", None) or "",
+                                       prof)
+            rrows = reversal_map(v, base, start, end, step_days=step_days)
+            bal, _f = standing_balance(v, prof)
+            verdict = ("blessed/PRO" if bal >= 1.0
+                       else "afflicted" if bal < 0 else "mixed")
+            vd = domain_verdict(v, prof, [], now, rrows=rrows)
+            top = sorted(rrows, key=lambda r: (-r.rupture_score, r.start))[:8]
+            def _rnodes(r):
+                out = []
+                if r.kp_rupture >= 2: out.append("KP rupture-houses in daśā")
+                if r.separators_running: out.append("separators running (Śani/nodes)")
+                if r.break_house_dt: out.append("break-house double-transit")
+                if r.reversal_saham_dt: out.append("reversal-Saham double-transit")
+                if r.lagna_dark_with_malefic: out.append("dark Lagna under malefic")
+                return out
+            windows = [dict(date=r.start.strftime("%Y-%m-%d"),
+                            chain=">".join(r.chain),
+                            salience=r.rupture_score, systems=r.rupture_score,
+                            kp=f"{r.kp_rupture}r/{r.kp_fulfil}f",
+                            outcome=r.kind, nodes=_rnodes(r)) for r in top]
+            _SCANS[job] = dict(status="done", domain=prof.name, rupture=True,
+                               windows=windows, scanned=len(rrows),
+                               step=step_days, standing=round(bal, 2),
+                               verdict=verdict,
+                               call=dict(answer=vd.answer,
+                                         confidence=vd.confidence,
+                                         window=vd.best_window, chain=vd.chain,
+                                         systems=vd.systems, quality=vd.quality,
+                                         reasons=vd.reasons),
+                               ts=time.time())
+            return
         rows = candidate_map(v, prof, start, end, step_days=step_days)
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
         bal, verdict, kind_at = _outcome_reads(v, prof, start, end, step_days)
-        from interpreter.event_evidence import domain_verdict
-        vd = domain_verdict(v, prof, rows, datetime.now(timezone.utc))
+        vd = domain_verdict(v, prof, rows, now)
         windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
                         salience=round(r.salience, 3), systems=r.systems_firing,
                         convergence=round(r.convergence, 1),

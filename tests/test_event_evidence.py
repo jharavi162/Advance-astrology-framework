@@ -350,3 +350,31 @@ def test_domain_verdict_not_yet_when_nothing_elapsed():
     vd = domain_verdict(v, prof, rows, datetime(2026, 1, 1, tzinfo=UTC))
     if promise_and_tempo(v, prof).promised:
         assert vd.answer == "NOT-YET"
+
+
+def test_rupture_matter_verdict_uses_reversal_timer():
+    """Divorce-class domains time the BREAK with reversal rows, not the
+    axis-fulfilment scan (which also spikes for the union itself)."""
+    from interpreter.event_evidence import domain_verdict, promise_and_tempo
+    from interpreter.significators import resolve
+    v = _chart()
+    prof = resolve("divorce")
+    assert prof.rupture_matter and prof.base_domain == "marriage"
+    start = datetime(2022, 1, 1, tzinfo=UTC)
+    end = datetime(2026, 7, 1, tzinfo=UTC)
+    # the break is timed by the UNDERLYING matter's reversal (marriage), so the
+    # rupture profile's inverted KP groups can't double-invert the semantics
+    rrows = reversal_map(v, DOMAIN_PROFILES[prof.base_domain], start, end,
+                         step_days=45)
+    vd = domain_verdict(v, prof, [], end, rrows=rrows)
+    pt = promise_and_tempo(v, prof)
+    hits = [r for r in rrows if r.start <= end and r.kind == "LOSS/BREAK"]
+    if pt.promised and hits:
+        assert vd.answer == "YES"
+        best = max(hits, key=lambda r: (r.rupture_score, r.start))
+        assert vd.best_window == f"{best.start:%Y-%m-%d}"
+        assert vd.systems == best.rupture_score
+    if pt.promised and not hits:
+        assert vd.answer == "NOT-YET"
+    # rupture path must never fall through to the fulfilment-elapsed rule
+    assert vd.answer in ("YES", "NOT-YET", "NO (denied)", "UNCERTAIN")
