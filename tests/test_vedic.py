@@ -543,6 +543,16 @@ def test_scan_windows_trivial(vchart):
     assert tr.scan_windows(lambda w: False, start, end, step_days=30) == []
 
 
+def test_transits_instance_is_shared(vchart):
+    # VedicChart.transits() hands back ONE instance, so every consumer (all the
+    # timing nodes of a multi-domain scan) shares the same position memo.
+    tr = vchart.transits()
+    assert vchart.transits() is tr
+    when = datetime(2024, 4, 4, tzinfo=timezone.utc)
+    from advance_astrology.vedic.transits import Transits
+    assert tr.positions(when) == Transits(vchart).positions(when)
+
+
 def test_transit_position_cache_is_exact(vchart):
     # The (when, planet) memo in Transits.positions must be a pure cache:
     # repeated calls and a fresh instance give bit-for-bit identical longitudes.

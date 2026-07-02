@@ -286,9 +286,12 @@ class VedicChart:
         return kakshya_lord(self.longitudes[planet])
 
     def transits(self):
-        """Gochara calculator bound to this natal chart."""
+        """Gochara calculator bound to this natal chart (one shared instance, so
+        every consumer reuses the same memoized transit-position cache)."""
         from .transits import Transits
-        return Transits(self)
+        if not hasattr(self, "_transits"):
+            self._transits = Transits(self)
+        return self._transits
 
     def triangulate(self, start: datetime, end: datetime):
         """Multi-paddhati convergence analysis over a time window.

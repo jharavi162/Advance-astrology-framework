@@ -755,3 +755,14 @@ addresses (coverage vs discrimination).
   only — no calibration, no new node.
 - **Tests:** `test_transit_position_cache_is_exact` (repeat + fresh-instance
   equality); full `tests/test_vedic.py` (81) green.
+
+## 2026-07-02 — VedicChart.transits() returns one shared instance (pure performance)
+
+- **Change:** `VedicChart.transits()` memoizes its `Transits` instance, so every
+  consumer shares one transit-position cache. A 9-domain × 3-yr macro scan drops
+  from ~9× single-domain cost to ~28 s locally (first domain builds the cache,
+  the rest reuse it, ~2 s each). No computation changed — same class, same values
+  (test: shared instance ≡ fresh instance).
+- **Why:** The chat's open "kaun-se bade events hue?" question needs the engine's
+  `scan_domains`-style multi-domain ranking interactively.
+- **Tests:** `test_transits_instance_is_shared`; full vedic suite (82) green.

@@ -438,8 +438,14 @@ async function pollScan(job,msg,label){const chat=document.getElementById('chat'
   return res;}
 function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
   window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
-  let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
-  html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
+  let html;
+  if(res.macro){
+    html=`<b style="color:var(--acc)">🔮 Macro-scan — kaunse life-areas spike hue (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} life-areas ranked by stand-out spike (peak − apna hi average) · ~${res.step||30}-day resolution</div>`;
+    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.domain.toUpperCase()}</b> · peak <b>${w.date}</b> · ${w.chain} · stand-out <b>+${w.standout}</b> · sal ${w.salience} · ${w.systems} sys<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
+  }else{
+    html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
+    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
+  }
   msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}
 // AUTO scan: timing-sawaal par backend khud scan kick karta hai; result aate hi
 // engine-windows render + Gemini se ek follow-up narration.
@@ -451,7 +457,9 @@ async function autoScan(scan){
   if(!res||res.status!=='done'){msg.textContent='⚠ Auto date-scan poora nahi hua'+((res&&res.error)?': '+res.error:' — Scan button se chhota span try karo.');return;}
   renderScan(res,scan.from_y,scan.to_y,msg);
   // follow-up narration grounded on the engine windows
-  HIST.push({role:'user',content:`(auto) Engine ka ${scan.domain} salience date-scan poora ho gaya — mere pichhle sawaal ka timing-jawab ab IN ranked windows se do (context me last_salience_scan).`});
+  HIST.push({role:'user',content:res.macro
+    ?`(auto) Engine ka multi-domain macro-scan poora ho gaya — batao is window me kaun-se life-areas me sabse bade events (kya kya hua) hue honge aur kab, IN ranked areas se (context me last_salience_scan).`
+    :`(auto) Engine ka ${scan.domain} salience date-scan poora ho gaya — mere pichhle sawaal ka timing-jawab ab IN ranked windows se do (context me last_salience_scan).`});
   const ai=addMsg('ai','…');
   try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify({messages:HIST,context:chatCtx(),chart:chartParams(),model:document.getElementById('cmodel').value})});

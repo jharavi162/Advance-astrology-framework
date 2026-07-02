@@ -175,6 +175,30 @@ def _scan_worker(job, params, domain, start, end, step_days):
         v = _chart_from(params)
         if v is None:
             raise ValueError("chart params invalid")
+        if domain == "__macro__":
+            # Open "kya-kya hua?" → rank ALL registered life-areas by stand-out
+            # spike (scan_domains logic, structured). The shared transit-position
+            # cache makes domains after the first ~6× cheaper.
+            from interpreter.event_evidence import DOMAIN_PROFILES
+            ranked = []
+            for name, prof in DOMAIN_PROFILES.items():
+                rows = candidate_map(v, prof, start, end, step_days=step_days)
+                if not rows:
+                    continue
+                scores = [r.salience for r in rows]
+                peak = max(rows, key=lambda x: x.salience)
+                ranked.append(dict(
+                    domain=name,
+                    standout=round(peak.salience - sum(scores) / len(scores), 2),
+                    salience=round(peak.salience, 3),
+                    date=peak.start.strftime("%Y-%m-%d"),
+                    chain=">".join(peak.chain), systems=peak.systems_firing,
+                    nodes=[n for n, _ in peak.firing_nodes()][:5]))
+            ranked.sort(key=lambda r: -r["standout"])
+            _SCANS[job] = dict(status="done", macro=True, domain="macro",
+                               windows=ranked[:8], scanned=len(ranked),
+                               step=step_days, ts=time.time())
+            return
         prof = resolve(domain)
         rows = candidate_map(v, prof, start, end, step_days=step_days)
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
@@ -428,20 +452,37 @@ _TIMING_RE = re.compile(
     r"(kab|when|kis\s+(saal|varsh|year)|timing|window|date|hogi|hoga|hui|hua|"
     r"milegi|milega|banega|banegi)", re.I)
 _PAST_RE = re.compile(
-    r"(hui|hua|ho\s+(gaya|gayi|chuk\w*)|chuki|chuka|\btha\b|\bthi\b|already|"
-    r"when\s+did|happened)", re.I)
+    r"(hui|hua|hue|huye|ho\s+(gaya|gayi|gaye|chuk\w*)|chuki|chuka|chuke|"
+    r"\btha\b|\bthi\b|already|when\s+did|happened)", re.I)
 _YEAR_RE = re.compile(r"\b(19\d{2}|20\d{2})\b")
+_REL_PAST_RE = re.compile(
+    r"(pichh?le|beete|last)\s+(\d{1,2})\s*(saal|varsh|years?|yrs?)", re.I)
+_REL_FUT_RE = re.compile(
+    r"(agle|aane\s*wale|next)\s+(\d{1,2})\s*(saal|varsh|years?|yrs?)", re.I)
+# Open "which life-events happened?" question → multi-domain MACRO scan.
+_MACRO_RE = re.compile(
+    r"(kya\s*kya|hot\s*events?|big\s*events?|bade\s*events?|"
+    r"events?\s*(kya|hue|huye|honge)|kya\s*(hua|hue|huye|hoga|honge)|"
+    r"life\s*events?|what\s*happened|sabse\s*(bada|bade)\s*event)", re.I)
 
 
 def _auto_scan_window(question, today):
-    """(start, end) for the auto scan. Explicit years in the question win
-    ("2015 se 2018", "2024 me…" → that range, span capped at 6 yrs); otherwise
-    tense decides: past-tense → last 4 yrs, else next 3 yrs."""
+    """(start, end) for the auto scan. Priority: explicit years ("2015 se 2018" →
+    that range, span capped at 6 yrs) → relative ranges ("pichle 3 saal" /
+    "agle 2 saal") → tense (past → last 4 yrs, else next 3 yrs)."""
     years = sorted(int(y) for y in _YEAR_RE.findall(question))
     if years:
         y0, y1 = years[0], min(years[-1], years[0] + 6)
         return (datetime(y0, 1, 1, tzinfo=timezone.utc),
                 datetime(y1, 12, 31, tzinfo=timezone.utc))
+    m = _REL_PAST_RE.search(question)
+    if m:
+        n = min(int(m.group(2)), 6)
+        return today - timedelta(days=n * 365), today
+    m = _REL_FUT_RE.search(question)
+    if m:
+        n = min(int(m.group(2)), 6)
+        return today, today + timedelta(days=n * 365)
     if _PAST_RE.search(question):
         return today - timedelta(days=4 * 365), today
     return today, today + timedelta(days=3 * 365)
@@ -553,7 +594,30 @@ def chat_json(body):
                 "weigh past daśā windows up to today and do NOT default to the "
                 "future; a future-tense question looks ahead from today.")
     scan_meta = None
-    if v is not None and last_user:
+    # "(auto)" follow-ups narrate an already-delivered scan — never re-kick one.
+    allow_kick = not last_user.startswith("(auto)")
+    if v is not None and last_user and _MACRO_RE.search(last_user):
+        # Open "kaun-se bade events?" → multi-domain macro scan, not one domain.
+        s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
+        prev = (ctx or {}).get("last_salience_scan") or {}
+        if allow_kick and not (prev.get("domain") == "macro"
+                               and prev.get("range") == f"{s0.year}–{e0.year}"):
+            job = _kick_scan(body.get("chart") or {}, "__macro__", s0, e0)
+            scan_meta = dict(job=job, domain="macro", from_y=s0.year, to_y=e0.year)
+        engine_domain = "macro (sab life-areas)"
+        sys += ("\n\nMACRO MODE: the user asks WHICH life-events stood out in a "
+                "window. The engine is ranking ALL life-areas (marriage, career, "
+                "children, wealth, mother, father, illness, education, relocation) "
+                "by stand-out salience spike in the background. If the context has "
+                "a last_salience_scan with per-domain entries, answer FROM it: name "
+                "the top areas, their peak month and daśā chain — say the AREA and "
+                "WHEN, but never assert a specific outcome (e.g. don't declare "
+                "'divorce happened'); the engine ranks areas, not outcomes. If the "
+                "scan hasn't landed yet, say the multi-domain scan is running and "
+                "give only a brief chart-level overview — do NOT guess events."
+                + "\n\nVIMŚOTTARI DAŚĀ (engine-exact mahā→antar — use ONLY these "
+                f"dates for any daśā you cite):\n{_dasha_tree_text(v)}")
+    elif v is not None and last_user:
         dom, read = _engine_read(v, last_user)
         if read:
             engine_domain = dom
@@ -567,7 +631,8 @@ def chat_json(body):
             # dated-window scan in the background; the frontend polls the job and
             # asks for a follow-up narration once the engine windows land.
             # Explicit years in the question also count as a timing ask.
-            if _TIMING_RE.search(last_user) or _YEAR_RE.search(last_user):
+            if allow_kick and (_TIMING_RE.search(last_user)
+                               or _YEAR_RE.search(last_user)):
                 s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
                 prev = (ctx or {}).get("last_salience_scan") or {}
                 same = (prev.get("domain") == dom
