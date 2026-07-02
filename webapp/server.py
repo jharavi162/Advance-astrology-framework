@@ -429,8 +429,7 @@ def chat_json(body):
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
     payload = dict(system_instruction=dict(parts=[dict(text=sys)]),
-                   contents=contents,
-                   generationConfig=dict(maxOutputTokens=1600, temperature=0.6))
+                   contents=contents)
     # On a 429 (free-tier quota), try the other free models before giving up —
     # different models have separate quotas. Stop on success or a non-429 error.
     note = ""
@@ -440,6 +439,13 @@ def chat_json(body):
         if mdl in tried:
             continue
         tried.append(mdl)
+        # Big output budget (Devanāgarī is very token-heavy) and, for the 2.5
+        # "thinking" models, disable the thinking budget so it doesn't eat the
+        # output tokens and truncate the visible answer.
+        gen = dict(maxOutputTokens=4096, temperature=0.6)
+        if mdl.startswith("gemini-2.5"):
+            gen["thinkingConfig"] = {"thinkingBudget": 0}
+        payload["generationConfig"] = gen
         ok, res = _gemini_post(mdl, payload, key)
         if ok:
             if mdl != model:
@@ -452,10 +458,14 @@ def chat_json(body):
         return dict(error=_explain_gemini_error(code, msg))
     j = res
     try:
-        parts = j["candidates"][0]["content"]["parts"]
+        cand = j["candidates"][0]
+        parts = cand["content"]["parts"]
         text = "".join(p.get("text", "") for p in parts).strip()
     except Exception:
-        text = ""
+        cand, text = {}, ""
+    if cand.get("finishReason") == "MAX_TOKENS":
+        note = (note + " · " if note else "") + \
+            "⚠ jawab lamba tha aur token-limit pe cut gaya — thoda specific poochho."
     if engine_domain:
         tag = f"🧩 engine triangulation use hui — domain: {engine_domain}"
         note = (note + " · " + tag) if note else tag
