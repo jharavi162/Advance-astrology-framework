@@ -437,14 +437,17 @@ async function pollScan(job,msg,label){const chat=document.getElementById('chat'
     msg.textContent=`🔮 Scanning ${label} … ${tries*3}s (engine timeline, ruko)`;chat.scrollTop=chat.scrollHeight;}
   return res;}
 function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
-  window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
+  window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows,
+    ...(res.call?{call:res.call}:{}),...(res.verdict?{standing_verdict:res.verdict,standing:res.standing}:{})};
   let html;
   const oc=k=>!k?'':` · <b style="color:${k==='LOSS/BREAK'?'#ff9bb0':(k==='CHANGE/UPGRADE'?'#7fe0c0':'var(--mut)')}">${k}</b>`;
+  const callLine=c=>!c?'':`<div class="refrow" style="border:1px solid var(--acc);border-radius:8px;padding:7px 9px;margin:4px 0 8px">📌 <b style="color:var(--acc)">CALL: ${c.answer}</b> (${c.confidence})${c.window?` · ~<b>${c.window}</b>${c.chain?' '+c.chain:''}`:''} · quality: ${c.quality}</div>`;
   if(res.macro){
-    html=`<b style="color:var(--acc)">🔮 Macro-scan — kaunse life-areas spike hue (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} life-areas ranked by stand-out spike · outcome-read = engine ka CHANGE/UPGRADE vs LOSS/BREAK vs transition-watch · ~${res.step||30}-day resolution</div>`;
-    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.domain.toUpperCase()}</b> · peak <b>${w.date}</b> · ${w.chain} · stand-out <b>+${w.standout}</b>${oc(w.outcome)} · ${w.verdict||''} (${w.standing>=0?'+':''}${w.standing})<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
+    html=`<b style="color:var(--acc)">🔮 Macro-scan — kaunse life-areas spike hue (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} life-areas ranked by stand-out spike · CALL = engine ka committed YES/NOT-YET/NO · ~${res.step||30}-day resolution</div>`;
+    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.domain.toUpperCase()}</b>${w.call?` · <b style="color:var(--acc)">${w.call.answer}</b> (${w.call.confidence})${w.call.window?' ~'+w.call.window:''}`:''} · peak <b>${w.date}</b> · ${w.chain}${oc(w.outcome)} · ${w.verdict||''} (${w.standing>=0?'+':''}${w.standing})<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
   }else{
     html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
+    html+=callLine(res.call);
     html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · KP ${w.kp}${oc(w.outcome)}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
   }
   msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}

@@ -312,3 +312,41 @@ def test_functional_valence_flows_into_windows():
         assert w.vote(r) == r.func_valence
     # the node groups inside the dasha paddhati (not a fake independent system)
     assert _paddhati(w.name) == "dasha"
+
+
+def test_domain_verdict_follows_the_decision_rule():
+    """The verdict layer is a deterministic function of promise/denial + elapsed
+    convergence windows — verify the RULE, not a hardcoded outcome."""
+    from interpreter.event_evidence import domain_verdict, promise_and_tempo
+    v = _chart()
+    start = datetime(2023, 7, 1, tzinfo=UTC)
+    end = datetime(2026, 7, 1, tzinfo=UTC)
+    asof = end
+    for name in ("marriage", "career"):
+        prof = DOMAIN_PROFILES[name]
+        rows = candidate_map(v, prof, start, end, step_days=45)
+        vd = domain_verdict(v, prof, rows, asof)
+        assert vd.answer in ("YES", "NO (denied)", "NOT-YET", "UNCERTAIN")
+        assert vd.confidence in ("HIGH", "MEDIUM", "LOW")
+        pt = promise_and_tempo(v, prof)
+        elapsed = [r for r in rows if r.start <= asof and r.systems_firing >= 2]
+        if pt.promised and elapsed:
+            assert vd.answer == "YES"
+            assert vd.best_window and vd.systems >= 2
+        if vd.answer == "YES":
+            best = max(elapsed, key=lambda r: r.salience)
+            assert vd.best_window == f"{best.start:%Y-%m-%d}"
+        # quality is stated but never used to flip existence
+        assert "quality" not in vd.answer
+
+
+def test_domain_verdict_not_yet_when_nothing_elapsed():
+    from interpreter.event_evidence import domain_verdict, promise_and_tempo
+    v = _chart()
+    prof = DOMAIN_PROFILES["marriage"]
+    rows = candidate_map(v, prof, datetime(2027, 1, 1, tzinfo=UTC),
+                         datetime(2028, 1, 1, tzinfo=UTC), step_days=45)
+    # asof BEFORE the scanned span: nothing has elapsed
+    vd = domain_verdict(v, prof, rows, datetime(2026, 1, 1, tzinfo=UTC))
+    if promise_and_tempo(v, prof).promised:
+        assert vd.answer == "NOT-YET"

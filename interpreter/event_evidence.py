@@ -1046,6 +1046,67 @@ _PADDHATI_RULES = [
 ]
 
 
+# ---------------------------------------------------------------------------- #
+# VERDICT layer (user-approved 2026-07-02) — the committed yes/no decision rule
+# a KP professional follows, made deterministic. Sources: KP Readers III & VI
+# (promise vs denial by the cusp sub-lord's house-groups; event stands DELIVERED
+# once its significators' daśā has run), BPHS daśā-phala (the daśā delivers what
+# the natal chart promises). No calibration: confidence = convergence count only.
+# ---------------------------------------------------------------------------- #
+@dataclass
+class Verdict:
+    answer: str          # "YES" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
+    confidence: str      # "HIGH" | "MEDIUM" | "LOW"
+    best_window: str     # "YYYY-MM-DD" of the committed window ("" if none)
+    chain: str           # daśā chain at that window
+    systems: int         # independent systems converging there
+    quality: str         # affliction/outcome texture — QUALITY, never existence
+    reasons: list
+
+
+def domain_verdict(v, profile, rows, asof) -> Verdict:
+    """Committed retrodiction for "has this matter's event happened in the scanned
+    window?" — decides from (1) KP promise-vs-denial, (2) elapsed high-convergence
+    windows, (3) convergence count as confidence. Affliction NEVER vetoes
+    existence; it only sets the quality (KP: affliction = troubled event, denial =
+    no event)."""
+    pt = promise_and_tempo(v, profile)
+    sig = set(pt.cusp_signifies)
+    denied = ((not pt.promised) and bool(sig & profile.negate_houses))
+    bal, _ = standing_balance(v, profile)
+    quality = ("blessed/clean" if bal >= 1.0
+               else "afflicted/troubled" if bal < 0 else "mixed")
+    reasons = [f"KP: {primary_label(profile)} sub-lord {pt.cusp_sublord} "
+               f"signifies {sorted(sig)} (fulfil={sorted(profile.fulfil_houses)}, "
+               f"negate={sorted(profile.negate_houses)})",
+               f"standing balance {bal:+.2f} → quality: {quality} "
+               "(quality ≠ existence)"]
+    if denied:
+        conf = "HIGH" if not (sig & profile.fulfil_houses) else "MEDIUM"
+        reasons.append("sub-lord signifies ONLY the negation group → denial")
+        return Verdict("NO (denied)", conf, "", "", 0, quality, reasons)
+    if not pt.promised:
+        reasons.append("sub-lord signifies neither group decisively")
+        return Verdict("UNCERTAIN", "LOW", "", "", 0, quality, reasons)
+    elapsed = [r for r in rows if r.start <= asof and r.systems_firing >= 2]
+    if elapsed:
+        best = max(elapsed, key=lambda r: r.salience)
+        conf = ("HIGH" if best.systems_firing >= 6
+                else "MEDIUM" if best.systems_firing >= 4 else "LOW")
+        reasons.append(f"promise + elapsed convergence window "
+                       f"{best.start:%Y-%m-%d} ({best.systems_firing} systems) "
+                       "→ event stands delivered (KP: significators' daśā has run)")
+        return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
+                       ">".join(best.chain), best.systems_firing, quality, reasons)
+    reasons.append("promised, but no ≥2-system window has elapsed in the scanned "
+                   "span → not yet (or the event lies outside this span)")
+    return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons)
+
+
+def primary_label(profile) -> str:
+    return f"H{profile.houses[0]}-cusp"
+
+
 def _paddhati(name: str) -> str:
     """Map a node name to its independent astrological SYSTEM (for the gate)."""
     for needle, group in _PADDHATI_RULES:

@@ -795,3 +795,25 @@ addresses (coverage vs discrimination).
 - **Tests:** `test_outcome_witnesses_registered_and_bounded`,
   `test_arudha_sustenance_needs_arudhas`, `test_vakri_witness_never_positive`,
   `test_functional_valence_flows_into_windows`; coverage-matrix sync tests green.
+
+## 2026-07-02 — VERDICT layer: committed yes/no retrodiction (user-approved)
+
+- **Change:** `domain_verdict(v, profile, rows, asof)` in `event_evidence.py` —
+  the deterministic decision rule a KP professional follows for "has this
+  matter's event happened?": (1) KP promise-vs-denial by the cusp sub-lord's
+  house-groups (denial = signifies the negation group without the fulfilment
+  group); (2) retrodiction — promise + an ELAPSED ≥2-system convergence window ⇒
+  "YES, around <best elapsed window>"; promise but nothing elapsed ⇒ "NOT-YET";
+  (3) confidence = convergence count only (≥6 HIGH, 4–5 MEDIUM, else LOW — no
+  fitted weights, charter-safe). **Affliction ≠ denial:** the standing balance
+  sets only the QUALITY (blessed/clean · mixed · afflicted/troubled), never
+  existence. Scans surface the call (`call` in /api/scan_status; macro per-area);
+  the chat narrator must LEAD with the committed call and may not hedge it.
+- **Why:** With evidence-only output the AI synthesizer hedged past-tense yes/no
+  questions (reading affliction as "maybe didn't happen"). The decision rule
+  itself is classical and mechanical, so it belongs in CODE.
+- **Sources:** KP Readers III & VI (promise/denial house-groups; an event stands
+  delivered once its significators' daśā has run); BPHS daśā-phala (the daśā
+  delivers what the natal chart promises).
+- **Tests:** `test_domain_verdict_follows_the_decision_rule` (rule-consistency,
+  not hardcoded outcomes), `test_domain_verdict_not_yet_when_nothing_elapsed`.

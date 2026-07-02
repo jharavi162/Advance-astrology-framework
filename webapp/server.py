@@ -197,7 +197,9 @@ def _scan_worker(job, params, domain, start, end, step_days):
             # Open "kya-kya hua?" → rank ALL registered life-areas by stand-out
             # spike (scan_domains logic, structured). The shared transit-position
             # cache makes domains after the first ~6× cheaper.
-            from interpreter.event_evidence import DOMAIN_PROFILES
+            from interpreter.event_evidence import (DOMAIN_PROFILES,
+                                                    domain_verdict)
+            now = datetime.now(timezone.utc)
             ranked = []
             for name, prof in DOMAIN_PROFILES.items():
                 rows = candidate_map(v, prof, start, end, step_days=step_days)
@@ -207,6 +209,7 @@ def _scan_worker(job, params, domain, start, end, step_days):
                 peak = max(rows, key=lambda x: x.salience)
                 bal, verdict, kind_at = _outcome_reads(v, prof, start, end,
                                                        step_days)
+                vd = domain_verdict(v, prof, rows, now)
                 ranked.append(dict(
                     domain=name,
                     standout=round(peak.salience - sum(scores) / len(scores), 2),
@@ -214,6 +217,8 @@ def _scan_worker(job, params, domain, start, end, step_days):
                     date=peak.start.strftime("%Y-%m-%d"),
                     chain=">".join(peak.chain), systems=peak.systems_firing,
                     outcome=kind_at(peak.start), standing=bal, verdict=verdict,
+                    call=dict(answer=vd.answer, confidence=vd.confidence,
+                              window=vd.best_window, quality=vd.quality),
                     nodes=[n for n, _ in peak.firing_nodes()][:5]))
             ranked.sort(key=lambda r: -r["standout"])
             _SCANS[job] = dict(status="done", macro=True, domain="macro",
@@ -224,6 +229,8 @@ def _scan_worker(job, params, domain, start, end, step_days):
         rows = candidate_map(v, prof, start, end, step_days=step_days)
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
         bal, verdict, kind_at = _outcome_reads(v, prof, start, end, step_days)
+        from interpreter.event_evidence import domain_verdict
+        vd = domain_verdict(v, prof, rows, datetime.now(timezone.utc))
         windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
                         salience=round(r.salience, 3), systems=r.systems_firing,
                         convergence=round(r.convergence, 1),
@@ -232,7 +239,12 @@ def _scan_worker(job, params, domain, start, end, step_days):
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
-                           standing=bal, verdict=verdict, ts=time.time())
+                           standing=bal, verdict=verdict,
+                           call=dict(answer=vd.answer, confidence=vd.confidence,
+                                     window=vd.best_window, chain=vd.chain,
+                                     systems=vd.systems, quality=vd.quality,
+                                     reasons=vd.reasons),
+                           ts=time.time())
     except Exception as e:
         _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
                            ts=time.time())
@@ -448,7 +460,13 @@ CHAT_NARRATOR = (
     "transition-watch, plus a domain 'verdict' blessed/afflicted/mixed): state the "
     "outcome TYPE from it — e.g. upgrade-type vs loss/break-type event — but never "
     "assert a concrete real-world outcome (like 'divorce happened') beyond that "
-    "type."
+    "type. If the scan carries a committed 'call' (answer/confidence/window/"
+    "quality), START your reply with that call verbatim-in-spirit — e.g. 'HAAN — "
+    "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. CRITICAL "
+    "KP rule: AFFLICTION ≠ DENIAL. An afflicted/troubled standing describes the "
+    "event's QUALITY (troubled/with-friction), NEVER whether it happened — "
+    "existence comes only from the call's promise/denial + elapsed-window logic. "
+    "Do not hedge a committed call."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -641,9 +659,12 @@ def chat_json(body):
                 "a last_salience_scan with per-domain entries, answer FROM it: name "
                 "the top areas, their peak month, daśā chain AND each area's "
                 "engine outcome-read ('outcome' CHANGE/UPGRADE · LOSS/BREAK · "
-                "transition-watch + 'verdict' blessed/afflicted) — say the AREA, "
-                "WHEN and the outcome TYPE, but never assert a concrete real-world "
-                "outcome (e.g. don't declare 'divorce happened'). If the "
+                "transition-watch + 'verdict' blessed/afflicted) and its committed "
+                "'call' (answer YES/NOT-YET/NO + confidence + window) — lead with "
+                "the calls: which areas the engine says DID see an event (YES), "
+                "when, and of what TYPE/quality. AFFLICTION ≠ DENIAL: afflicted "
+                "means troubled quality, never 'did not happen'. Still never "
+                "assert a concrete real-world outcome (e.g. 'divorce'). If the "
                 "scan hasn't landed yet, say the multi-domain scan is running and "
                 "give only a brief chart-level overview — do NOT guess events."
                 + "\n\nVIMŚOTTARI DAŚĀ (engine-exact mahā→antar — use ONLY these "
