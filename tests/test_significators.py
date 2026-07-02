@@ -35,6 +35,19 @@ def test_every_lexicon_theme_is_resolvable_and_complete():
         assert 1 <= prof.varga <= 60
 
 
+def test_divorce_domain_resolves_with_kp_groups():
+    # Divorce fulfils on the marriage-negation group and is denied by the
+    # marriage-sustenance group (KP), with Saturn as the separative karaka.
+    for q in ("divorce", "talaq", "divorce hua ya nahi", "rishta toota kya"):
+        prof = resolve(q)
+        assert prof.name == "divorce", q
+    prof = resolve("divorce")
+    assert set(prof.fulfil_houses) == {1, 6, 10}
+    assert set(prof.negate_houses) == {2, 7, 11}
+    assert prof.natural_karaka == Planet.SATURN
+    assert "UL" in prof.arudhas and prof.varga == 9
+
+
 def test_freeform_question_matches_words_not_substrings():
     # A full-sentence question resolves on word boundaries: "career" must NOT be
     # mis-mapped to vehicle via the substring "car", and the right domain wins.

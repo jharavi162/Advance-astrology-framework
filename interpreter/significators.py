@@ -130,6 +130,17 @@ THEME_LEXICON: dict[str, dict] = {
     "surgery": dict(houses=[6, 8], fulfil_houses=[6, 8, 12], negate_houses=[1, 5, 11],
                     natural_karaka=Planet.MARS, arudhas=["A6"], varga=30,
                     synonyms=["operation", "accident", "injury", "wound", "chot"]),
+    # Divorce/separation — textbook KP: judged from the 7th cusp, but the
+    # FULFILMENT group is the marriage-NEGATION group (1/6/10: self-assertion,
+    # separation/litigation, 12th-from-11th) and the marriage-sustenance group
+    # (2/7/11) DENIES it. Saturn = the separative kāraka; UL axis carries the
+    # marriage's sustenance; D9 the marriage varga. (KP Readers VI; Jaimini
+    # Upapada doctrine for the break of the UL.)
+    "divorce": dict(houses=[7], fulfil_houses=[1, 6, 10], negate_houses=[2, 7, 11],
+                    natural_karaka=Planet.SATURN, arudhas=["UL"], varga=9,
+                    synonyms=["talaq", "talak", "separation", "alag hona",
+                              "alag hue", "breakup", "break up", "rishta toota",
+                              "divorce hua", "judai"]),
 }
 
 

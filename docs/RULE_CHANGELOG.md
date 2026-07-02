@@ -817,3 +817,16 @@ addresses (coverage vs discrimination).
   delivers what the natal chart promises).
 - **Tests:** `test_domain_verdict_follows_the_decision_rule` (rule-consistency,
   not hardcoded outcomes), `test_domain_verdict_not_yet_when_nothing_elapsed`.
+
+## 2026-07-02 — DATA: divorce/separation domain (autonomous domain-add)
+
+- **Change:** `THEME_LEXICON["divorce"]` — houses=[7] (judged from the marriage
+  cusp) with the KP inversion: FULFIL = the marriage-negation group {1,6,10},
+  NEGATE = the marriage-sustenance group {2,7,11}; kāraka Saturn (separative);
+  arudha UL; varga D9. Synonyms: talaq/talak, separation, breakup, rishta toota,
+  alag hona, judai. "Divorce hua ya nahi?" previously resolved to NO domain at
+  all (no narrator, no scan, no verdict).
+- **Why (śāstra):** Textbook KP — divorce is read from the 7th cusp sub-lord
+  signifying 1/6/10; 2/7/11 signification denies it (KP Reader VI). UL and its
+  sustenance carry the marriage's break in Jaimini (Upapada doctrine).
+- **Tests:** `test_divorce_domain_resolves_with_kp_groups`.
