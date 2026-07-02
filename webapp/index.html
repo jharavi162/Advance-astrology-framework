@@ -419,7 +419,9 @@ async function sendChat(){const ctx=chatCtx();
     const j=await r.json();
     const chat=document.getElementById('chat');
     const toTop=()=>{chat.scrollTop+=ai.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;};
-    if(j.error){ai.textContent='⚠ '+j.error;toTop();HIST.pop();return;}
+    if(j.error){ai.textContent='⚠ '+j.error;toTop();HIST.pop();
+      if(j.scan)autoScan(j.scan,false);  // engine ka scan+CALL Gemini ke bina bhi dikhta hai
+      return;}
     ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
     if(j.note){const n=document.createElement('div');n.className='srcs';n.textContent=j.note;ai.appendChild(n);}
     toTop();  // bring the start of the new answer to the top so it reads from the beginning
@@ -455,13 +457,14 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
   msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}
 // AUTO scan: timing-sawaal par backend khud scan kick karta hai; result aate hi
 // engine-windows render + Gemini se ek follow-up narration.
-async function autoScan(scan){
+async function autoScan(scan,narrate=true){
   if(window.LASTJOB===scan.job)return;window.LASTJOB=scan.job;
   const msg=addMsg('ai',`🔮 Engine date-scan chal raha hai — "${scan.domain}" ${scan.from_y}–${scan.to_y} … (result aane par yahin bataunga)`);
   document.getElementById('chat').scrollTop=1e9;
   const res=await pollScan(scan.job,msg,`"${scan.domain}" ${scan.from_y}–${scan.to_y}`);
-  if(!res||res.status!=='done'){msg.textContent='⚠ Auto date-scan poora nahi hua'+((res&&res.error)?': '+res.error:' — Scan button se chhota span try karo.');return;}
+  if(!res||res.status!=='done'){msg.textContent='⚠ Auto date-scan poora nahi hua'+((res&&res.error)?': '+res.error:' — thodi der baad phir poochho.');return;}
   renderScan(res,scan.from_y,scan.to_y,msg);
+  if(!narrate)return;  // LLM quota over tha — engine windows+CALL kaafi hain
   // follow-up narration grounded on the engine windows
   HIST.push({role:'user',content:res.macro
     ?`(auto) Engine ka multi-domain macro-scan poora ho gaya — batao is window me kaun-se life-areas me sabse bade events (kya kya hua) hue honge aur kab, IN ranked areas se (context me last_salience_scan).`

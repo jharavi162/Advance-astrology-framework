@@ -789,7 +789,10 @@ def chat_json(body):
             break  # non-quota error (e.g. bad key) — other models won't help
     if not ok:
         code, msg = res
-        return dict(error=_explain_gemini_error(code, msg))
+        # Even when the LLM is out of quota, the ENGINE's scan was already
+        # kicked — hand its job back so the frontend can still show the
+        # deterministic windows + committed CALL (no Gemini needed for those).
+        return dict(error=_explain_gemini_error(code, msg), scan=scan_meta)
     j = res
     try:
         cand = j["candidates"][0]
