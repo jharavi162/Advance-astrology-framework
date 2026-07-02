@@ -56,6 +56,11 @@ class Transits:
         self.natal_moon_sign = chart.signs[Planet.MOON]
         self.asc_sign = chart.ascendant_sign
         self._sav = sarvashtakavarga(chart.signs, self.asc_sign)
+        # Memoized sidereal longitudes keyed by (when, planet). Timing scans
+        # (double-transit / Kakṣyā / BNN / the candidate ledger) ask for the SAME
+        # instants repeatedly across nodes; the ephemeris call dominates their
+        # runtime, and the cached value is exactly what would be recomputed.
+        self._pos_cache: dict = {}
 
     # ------------------------------------------------------------------ #
     def positions(self, when: datetime,
@@ -64,12 +69,14 @@ class Transits:
         if when.tzinfo is None:
             when = when.replace(tzinfo=timezone.utc)
         planets = planets or DEFAULT_PLANETS
-        t = self._eph.time(when)
-        ayan = compute_ayanamsa(self._eph.julian_day(t), self._ayanamsa_name)
-        return {
-            p: norm360(self._eph.position(p, t).longitude - ayan)
-            for p in planets
-        }
+        missing = [p for p in planets if (when, p) not in self._pos_cache]
+        if missing:
+            t = self._eph.time(when)
+            ayan = compute_ayanamsa(self._eph.julian_day(t), self._ayanamsa_name)
+            for p in missing:
+                self._pos_cache[(when, p)] = norm360(
+                    self._eph.position(p, t).longitude - ayan)
+        return {p: self._pos_cache[(when, p)] for p in planets}
 
     def transit_sign(self, when: datetime, planet: Planet) -> int:
         return to_zodiac(self.positions(when, [planet])[planet]).sign_index

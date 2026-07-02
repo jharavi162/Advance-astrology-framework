@@ -740,3 +740,18 @@ addresses (coverage vs discrimination).
   logic, not a triangulation rule — no node added.
 - **Tests:** `test_freeform_question_matches_words_not_substrings`
   (career→career, shaadi→marriage, property→property).
+
+## 2026-07-02 — Transits: (when, planet) position memo (pure performance)
+
+- **Change:** `Transits.positions()` memoizes sidereal longitudes per
+  `(when, planet)` for the lifetime of the `Transits` instance. Timing scans
+  (double-transit, Kakṣyā, BNN, the candidate ledger's per-window nodes) request
+  the SAME instants repeatedly across nodes; profiling showed ~94% of
+  `candidate_map`'s runtime was duplicate ephemeris calls. 2-yr salience scan:
+  34.2s → 9.0s (3.8×). No rule/weight/threshold changed — the cache returns
+  exactly the value that would be recomputed (bit-for-bit).
+- **Why:** The webapp's salience date-scan was timing out on modest hardware;
+  this makes the deterministic timing engine usable interactively. Performance
+  only — no calibration, no new node.
+- **Tests:** `test_transit_position_cache_is_exact` (repeat + fresh-instance
+  equality); full `tests/test_vedic.py` (81) green.

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -541,6 +541,18 @@ def test_scan_windows_trivial(vchart):
     assert len(always) == 1
     assert always[0].start == start and always[0].end == end
     assert tr.scan_windows(lambda w: False, start, end, step_days=30) == []
+
+
+def test_transit_position_cache_is_exact(vchart):
+    # The (when, planet) memo in Transits.positions must be a pure cache:
+    # repeated calls and a fresh instance give bit-for-bit identical longitudes.
+    tr_a, tr_b = vchart.transits(), vchart.transits()
+    for days in range(0, 400, 61):
+        when = datetime(2022, 3, 1, tzinfo=timezone.utc) + timedelta(days=days)
+        first = tr_a.positions(when)
+        again = tr_a.positions(when)          # served from the cache
+        fresh = tr_b.positions(when)          # computed by a separate instance
+        assert first == again == fresh
 
 
 def test_house_windows_well_formed(vchart):
