@@ -183,7 +183,7 @@ def _scan_worker(job, params, domain, start, end, step_days):
                         kp=f"{r.kp_fulfil}/{r.kp_negate}",
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
-                           scanned=len(rows), ts=time.time())
+                           scanned=len(rows), step=step_days, ts=time.time())
     except Exception as e:
         _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
                            ts=time.time())
@@ -199,7 +199,13 @@ def scan_start(q):
         end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
     except Exception:
         return dict(error="start/end (YYYY-MM-DD) required")
-    step = max(15, min(60, int(q.get("step", ["30"])[0] or "30")))
+    # The scan's cost ≈ number of distinct pratyantar-daśā periods sampled, and
+    # each is skyfield-heavy. On a slow (free) instance a fine step over a multi-year
+    # span never finishes. So ADAPT the step to the span: sample ~24 points max,
+    # which bounds the work (coarser dates, but the scan actually completes).
+    span_days = max(1, (end - start).days)
+    step = max(int(q.get("step", ["30"])[0] or "30"), span_days // 24)
+    step = max(15, min(120, step))
     params = {k: q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa")}
     job = uuid.uuid4().hex[:12]
     _SCANS[job] = dict(status="running", ts=time.time())

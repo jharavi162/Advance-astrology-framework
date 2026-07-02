@@ -285,7 +285,7 @@ function finishLoad(j){renderDetails(j);document.getElementById('out').style.dis
   if(!document.getElementById('tdate').value)document.getElementById('tdate').value=new Date().toISOString().slice(0,10);
   const y=new Date().getFullYear();
   if(!document.getElementById('scanFrom').value)document.getElementById('scanFrom').value=y;
-  if(!document.getElementById('scanTo').value)document.getElementById('scanTo').value=y+5;
+  if(!document.getElementById('scanTo').value)document.getElementById('scanTo').value=y+2;
   showTransit();}
 
 function renderDetails(j){
@@ -443,9 +443,9 @@ async function runScan(){
     || [...HIST].reverse().find(m=>m.role==='user')?.content || 'marriage');
   const fy=+document.getElementById('scanFrom').value, ty=+document.getElementById('scanTo').value;
   if(!fy||!ty||ty<fy){alert('Sahi from–to year daalo.');return;}
-  if(ty-fy>6){alert('Zyada se zyada 6 saal ka span (scan slow hai).');return;}
+  if(ty-fy>3){alert('Span chhota rakho (max 4 saal) — scan ki cost span ke saath badhti hai; bade range ke liye 2-3 chhote scans karo.');return;}
   const btn=document.getElementById('scanBtn');btn.disabled=true;const ob=btn.textContent;btn.textContent='Scanning…';
-  const msg=addMsg('ai',`🔮 Salience scan: "${domain}" ${fy}–${ty} … (engine timeline, ~1–2 min, ruko)`);
+  const msg=addMsg('ai',`🔮 Salience scan: "${domain}" ${fy}–${ty} … (engine timeline; free instance pe ~2–4 min lag sakta hai, ruko)`);
   const chat=document.getElementById('chat');chat.scrollTop=chat.scrollHeight;
   const P=chartParams();const qs=new URLSearchParams({...P,domain,start:fy+'-01-01',end:ty+'-12-31',step:'30'});
   try{
@@ -459,7 +459,7 @@ async function runScan(){
     if(!res||res.status==='error'){msg.textContent='⚠ Scan error: '+((res&&res.error)||'unknown');return;}
     if(res.status!=='done'){msg.textContent=`⚠ Scan abhi bhi chal raha hai (job ${job}) — thodi der baad chhota span try karo.`;return;}
     window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows};
-    let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows scanned · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
+    let html=`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution · salience = info-weighted votes gated on ≥2 systems agreeing</div>`;
     html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · conv ${w.convergence} · KP ${w.kp}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
     html+=`<div class="srcs">🧩 engine salience scan · niche chat me "in windows ko samjhao" poochho — Gemini inhi ko narrate karega.</div>`;
     msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;
