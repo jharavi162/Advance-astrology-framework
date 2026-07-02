@@ -510,7 +510,8 @@ def _dasha_tree_text(v):
 # ask WHEN, and does its tense point at the past (event may already have happened)?
 _TIMING_RE = re.compile(
     r"(kab|when|kis\s+(saal|varsh|year)|timing|window|date|hogi|hoga|hui|hua|"
-    r"milegi|milega|banega|banegi)", re.I)
+    r"milegi|milega|banega|banegi|payega|payegi|rahega|rahegi|hone\s*wala|"
+    r"hone\s*wali|kitne\s+(din|mahine|saal))", re.I)
 _PAST_RE = re.compile(
     r"(hui|hua|hue|huye|ho\s+(gaya|gayi|gaye|chuk\w*)|chuki|chuka|chuke|"
     r"\btha\b|\bthi\b|already|when\s+did|happened)", re.I)
