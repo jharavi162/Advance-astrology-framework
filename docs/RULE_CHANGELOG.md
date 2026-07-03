@@ -877,3 +877,21 @@ addresses (coverage vs discrimination).
   retrodiction/maturity is decision-procedure, not a new astrological rule.
 - **Tests:** decision-rule test extended (contested ⇔ negation ≥ fulfilment on
   the delivered window), `test_verdict_boundary_and_next_window`; suite 156.
+
+## 2026-07-03 — Verdict grades: FULL vs PARTIAL promise (KP primary-house doctrine)
+
+- **Change (user-approved):** replaces "YES (contested)". The promise is graded:
+  **FULL** when the cusp sub-lord signifies the matter's OWN house (e.g. 7 for
+  marriage) → an elapsed window is a DELIVERED event ("YES"; window-negation is
+  reported as friction, never as non-occurrence). **PARTIAL** when only
+  secondary fulfil-houses are signified (e.g. 2/11 without 7) → an elapsed
+  window commits "ATTEMPTED (incomplete)": rishta/baat/attempt-level event ran,
+  completion not certified — with the WHY named mechanically (`_blockers`:
+  blocking houses the sub-lord feeds with their bhāva meanings, the strongest
+  negative natal witnesses, the window's negation count).
+- **Why (śāstra):** KP primary-house doctrine — signification of the matter's
+  own cusp is what certifies the matter itself; secondary houses alone move the
+  axis (alliances/talks) without the contract. Two live blind cases surfaced the
+  need; the rule is stated from doctrine, not fitted (no thresholds tuned).
+- **Tests:** decision-rule test asserts YES ⇔ primary-house signified (else
+  ATTEMPTED) on live-computed inputs; suite 156 green.

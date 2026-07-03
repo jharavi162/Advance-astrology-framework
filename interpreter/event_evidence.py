@@ -1061,7 +1061,7 @@ _PADDHATI_RULES = [
 # ---------------------------------------------------------------------------- #
 @dataclass
 class Verdict:
-    answer: str          # "YES" | "YES (contested)" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
+    answer: str          # "YES" | "ATTEMPTED (incomplete)" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
     confidence: str      # "HIGH" | "MEDIUM" | "LOW"
     best_window: str     # "YYYY-MM-DD" of the committed window ("" if none)
     chain: str           # daśā chain at that window
@@ -1090,11 +1090,13 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
     before ``asof`` — otherwise a forward scan's very first row (which starts AT
     the scan boundary, i.e. today) masquerades as delivered evidence.
 
-    CONTESTED completion (KP simultaneous signification): when the delivered
-    window's KP negation ≥ its fulfilment, the sub-lords fed BOTH groups at once
-    — the classical "fixed-then-obstructed" pattern. The verdict then commits
-    "YES (contested)": the event-AXIS ran (talks/attempt/ceremony), but the
-    engine cannot certify clean completion vs an obstructed attempt."""
+    PROMISE GRADE (KP primary-house doctrine): the promise is FULL only when the
+    matter's OWN house is among the cusp sub-lord's significations — then an
+    elapsed window is a DELIVERED event ("YES", friction noted separately).
+    Secondary fulfil-houses alone (e.g. 2/11 without 7 for marriage) are a
+    PARTIAL promise: the axis runs (talks/rishta/attempt-level event) but the
+    union/contract itself is not certified — "ATTEMPTED (incomplete)", with the
+    blocking factors named mechanically."""
     pt = promise_and_tempo(v, profile)
     sig = set(pt.cusp_signifies)
     denied = ((not pt.promised) and bool(sig & profile.negate_houses))
@@ -1144,29 +1146,67 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
         best = max(elapsed, key=lambda r: r.salience)
         conf = ("HIGH" if best.systems_firing >= 6
                 else "MEDIUM" if best.systems_firing >= 4 else "LOW")
-        if best.kp_negate >= best.kp_fulfil:
-            # KP simultaneous signification: the delivered window fed the
-            # negation group at least as strongly as the fulfilment group —
-            # the axis ran, but completion stands CONTESTED (attempt/talks
-            # obstructed, or completed-with-friction). No clean YES.
+        # KP promise GRADE (primary-house doctrine): the promise is FULL only
+        # when the matter's OWN house is among the sub-lord's significations;
+        # secondary fulfil-houses alone (e.g. 2/11 without 7 for marriage) give
+        # a PARTIAL promise — the axis runs (talks/rishta/attempt) but the
+        # union/contract itself is not certified.
+        primary = profile.houses[0]
+        full_promise = primary in sig
+        if full_promise:
             reasons.append(
-                f"elapsed window {best.start:%Y-%m-%d} ran the event-axis "
-                f"({best.systems_firing} systems) but KP negation "
-                f"{best.kp_negate} ≥ fulfilment {best.kp_fulfil} → completion "
-                "contested: obstructed attempt OR completed-with-friction")
-            return Verdict("YES (contested)", conf, f"{best.start:%Y-%m-%d}",
+                f"FULL promise (sub-lord signifies the matter's own house "
+                f"H{primary}) + elapsed window {best.start:%Y-%m-%d} "
+                f"({best.systems_firing} systems) → event stands DELIVERED")
+            if best.kp_negate >= best.kp_fulfil:
+                reasons.append(
+                    f"window KP negation {best.kp_negate} ≥ fulfilment "
+                    f"{best.kp_fulfil} → the event came WITH friction/"
+                    "obstacles (completion unaffected — primary-house promise)")
+            return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
                            ">".join(best.chain), best.systems_firing, quality,
                            reasons, nw, nc)
-        reasons.append(f"promise + elapsed convergence window "
-                       f"{best.start:%Y-%m-%d} ({best.systems_firing} systems, "
-                       f"KP {best.kp_fulfil}>{best.kp_negate}) "
-                       "→ event stands delivered (KP: significators' daśā has run)")
-        return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
-                       ">".join(best.chain), best.systems_firing, quality,
-                       reasons, nw, nc)
+        blockers = _blockers(v, profile, sig, best)
+        reasons.append(
+            f"PARTIAL promise (sub-lord signifies {sorted(sig)} — the matter's "
+            f"own house H{primary} is ABSENT) + elapsed window "
+            f"{best.start:%Y-%m-%d} → the AXIS ran (talks/rishta/attempt-level "
+            "event) but completion is NOT certified")
+        reasons += blockers
+        return Verdict("ATTEMPTED (incomplete)", conf,
+                       f"{best.start:%Y-%m-%d}", ">".join(best.chain),
+                       best.systems_firing, quality, reasons, nw, nc)
     reasons.append("promised, but no ≥2-system window has elapsed in the scanned "
                    "span → not yet (or the event lies outside this span)")
     return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons, nw, nc)
+
+
+_BHAVA_MEANING = {1: "self/own stand", 2: "family & finances",
+                  3: "own effort/communication", 4: "home/domestic front",
+                  5: "romance/children", 6: "dispute/obstacle/debt",
+                  7: "the union itself", 8: "joint finances/sudden blocks",
+                  9: "elders/tradition", 10: "status/career",
+                  11: "gains/expectations", 12: "loss/distance/expense"}
+
+
+def _blockers(v, profile, sig, best) -> list:
+    """Name WHY an attempted matter stalled — mechanically: the negation houses
+    the sub-lord feeds (with their classical meanings), the strongest negative
+    natal witnesses, and the window's own negation count."""
+    out = []
+    neg = sorted(sig & profile.negate_houses)
+    if neg:
+        out.append("blocking significations: " + ", ".join(
+            f"H{h} ({_BHAVA_MEANING.get(h, '')})" for h in neg))
+    _, fired = standing_balance(v, profile)
+    worst = sorted([f for f in fired if f[1] < 0], key=lambda x: x[1])[:3]
+    if worst:
+        out.append("natal blockers: " + "; ".join(
+            f"{n} ({c:+.2f})" for n, c in worst))
+    if best.kp_negate:
+        out.append(f"window carried {best.kp_negate} negation-signification(s) "
+                   f"vs {best.kp_fulfil} fulfilment")
+    return out
 
 
 def primary_label(profile) -> str:
