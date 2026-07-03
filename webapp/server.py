@@ -187,7 +187,7 @@ def _outcome_reads(v, prof, start, end, step_days):
             return None
         row = min(rrows, key=lambda r: abs((r.start - when).days))
         return row.kind
-    return round(bal, 2), verdict, kind_at
+    return round(bal, 2), verdict, kind_at, rrows
 
 
 def _scan_worker(job, params, domain, start, end, step_days):
@@ -218,9 +218,9 @@ def _run_scan(job, params, domain, start, end, step_days):
                     continue
                 scores = [r.salience for r in rows]
                 peak = max(rows, key=lambda x: x.salience)
-                bal, verdict, kind_at = _outcome_reads(v, prof, start, end,
-                                                       step_days)
-                vd = domain_verdict(v, prof, rows, now)
+                bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end,
+                                                           step_days)
+                vd = domain_verdict(v, prof, rows, now, rrows=rr)
                 ranked.append(dict(
                     domain=name,
                     standout=round(peak.salience - sum(scores) / len(scores), 2),
@@ -285,8 +285,8 @@ def _run_scan(job, params, domain, start, end, step_days):
             return
         rows = candidate_map(v, prof, start, end, step_days=step_days)
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
-        bal, verdict, kind_at = _outcome_reads(v, prof, start, end, step_days)
-        vd = domain_verdict(v, prof, rows, now)
+        bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end, step_days)
+        vd = domain_verdict(v, prof, rows, now, rrows=rr)
         windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
                         salience=round(r.salience, 3), systems=r.systems_firing,
                         convergence=round(r.convergence, 1),
@@ -300,7 +300,7 @@ def _run_scan(job, params, domain, start, end, step_days):
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
                                      next=vd.next_window, next_chain=vd.next_chain,
-                                     reasons=vd.reasons),
+                                     arc=vd.arc, reasons=vd.reasons),
                            ts=time.time())
     except Exception as e:
         _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
@@ -522,11 +522,16 @@ CHAT_NARRATOR = (
     "type. If the scan carries a committed 'call' (answer/confidence/window/"
     "quality), START your reply with that call verbatim-in-spirit — e.g. 'HAAN — "
     "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. "
-    "'ATTEMPTED (incomplete)' means the axis ran (rishta/baat/engagement-level "
-    "event in that window) but the matter's own house was not signified — say "
+    "'ATTEMPTED (incomplete)' means the completion PANEL voted negative — say "
     "SPECIFICALLY: 'baat/rishta bana hoga par poora nahi hua', and quote the "
-    "engine's named blockers (blocking houses + natal blockers) as the WHY. If "
-    "the user's own account confirms what happened, adopt it and reason forward. If "
+    "engine's named blockers (blocking houses + natal blockers) as the WHY. "
+    "'CONTESTED' means the panel split — present both readings and adopt the "
+    "user's own account if given. If the call carries an 'arc', narrate it "
+    "CHRONOLOGICALLY: pehle attempts/bani-ke-toote, phir the event window, phir "
+    "post-event rupture (friction/break AFTERWARDS) — never describe the arc's "
+    "affliction as the event-moment's texture; 'afflicted' quality is the "
+    "matter's ARC (break-PRONE), and a break is certified only by rupture "
+    "windows. If "
     "the call carries a 'next' window, state it as the engine's committed "
     "UPCOMING window. CRITICAL KP rule: AFFLICTION ≠ DENIAL. An afflicted/"
     "troubled standing describes the event's QUALITY (troubled/with-friction), "

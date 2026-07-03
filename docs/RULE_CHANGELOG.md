@@ -895,3 +895,26 @@ addresses (coverage vs discrimination).
   need; the rule is stated from doctrine, not fitted (no thresholds tuned).
 - **Tests:** decision-rule test asserts YES ⇔ primary-house signified (else
   ATTEMPTED) on live-computed inputs; suite 156 green.
+
+## 2026-07-03 — Completion CONVERGENCE PANEL + arc-sequencing (replaces single-rule grade)
+
+- **Change (user-approved):** the completion grade is no longer decided by the
+  KP primary-house rule alone (that violated the charter's "never one rule as
+  sole judge" — caught by the user). `_completion_panel` votes ±1 per system:
+  KP primary-house signified (KP Readers), Arudha-axis lit in the window (the
+  Arudha IS the matter's public manifestation — Jaimini), varga deposition
+  (Phaladeepika), Saham fruition double-transit (Tājika), window KP net, and
+  the 2nd-from-Arudha sustenance sign. Majority: net ≥ +2 → YES (delivered);
+  net ≤ −1 → ATTEMPTED (incomplete, blockers named); else CONTESTED.
+- **Arc-sequencing:** the verdict now carries a chronological `arc` — pre-event
+  attempt windows, pre-event LOSS/BREAKs (bana-ke-toota), the event window,
+  post-event ruptures — and the narrator must present it in order. SEMANTICS
+  CLARIFIED: "afflicted" quality is the matter's ARC (troubled, break-PRONE),
+  never the event-moment's texture; a break is certified only by rupture
+  windows.
+- **Why:** a live blind case (completed marriage, smooth event, trouble later,
+  multiple earlier broken talks) showed the single-rule grade and the
+  friction-at-event phrasing both mis-described reality that the engine's own
+  computed windows already contained in sequence.
+- **Tests:** decision-rule test recomputes the panel live and asserts the grade
+  ⇔ panel majority; arc must contain the event entry. Suite 156 green.

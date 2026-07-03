@@ -326,20 +326,23 @@ def test_domain_verdict_follows_the_decision_rule():
         prof = DOMAIN_PROFILES[name]
         rows = candidate_map(v, prof, start, end, step_days=45)
         vd = domain_verdict(v, prof, rows, asof)
-        assert vd.answer in ("YES", "ATTEMPTED (incomplete)", "NO (denied)",
-                             "NOT-YET", "UNCERTAIN")
+        assert vd.answer in ("YES", "ATTEMPTED (incomplete)", "CONTESTED",
+                             "NO (denied)", "NOT-YET", "UNCERTAIN")
         assert vd.confidence in ("HIGH", "MEDIUM", "LOW")
         pt = promise_and_tempo(v, prof)
         elapsed = [r for r in rows
                    if (asof - r.start).days >= 30 and r.systems_firing >= 2]
         if pt.promised and elapsed:
-            # FULL promise (primary house signified) -> delivered YES;
-            # PARTIAL promise -> axis ran but completion not certified.
-            full = prof.houses[0] in set(pt.cusp_signifies)
-            assert vd.answer == ("YES" if full else "ATTEMPTED (incomplete)")
-            assert vd.best_window and vd.systems >= 2
+            # completion grade = PANEL majority, never one rule alone
+            from interpreter.event_evidence import _completion_panel
             best = max(elapsed, key=lambda r: r.salience)
+            net = sum(_completion_panel(v, prof, set(pt.cusp_signifies),
+                                        pt, best).values())
+            expected = ("YES" if net >= 2 else
+                        "ATTEMPTED (incomplete)" if net <= -1 else "CONTESTED")
+            assert vd.answer == expected
             assert vd.best_window == f"{best.start:%Y-%m-%d}"
+            assert vd.arc and any("EVENT window" in a for a in vd.arc)
         # quality is stated but never used to flip existence
         assert "quality" not in vd.answer
 

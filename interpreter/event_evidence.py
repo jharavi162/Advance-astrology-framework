@@ -1070,6 +1070,7 @@ class Verdict:
     reasons: list
     next_window: str = ""    # strongest UPCOMING window after asof ("" if none)
     next_chain: str = ""
+    arc: list = field(default_factory=list)   # chronological story around the event
 
 
 def domain_verdict(v, profile, rows, asof, rrows=None,
@@ -1146,39 +1147,89 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
         best = max(elapsed, key=lambda r: r.salience)
         conf = ("HIGH" if best.systems_firing >= 6
                 else "MEDIUM" if best.systems_firing >= 4 else "LOW")
-        # KP promise GRADE (primary-house doctrine): the promise is FULL only
-        # when the matter's OWN house is among the sub-lord's significations;
-        # secondary fulfil-houses alone (e.g. 2/11 without 7 for marriage) give
-        # a PARTIAL promise — the axis runs (talks/rishta/attempt) but the
-        # union/contract itself is not certified.
-        primary = profile.houses[0]
-        full_promise = primary in sig
-        if full_promise:
+        # COMPLETION CONVERGENCE PANEL — no single rule (not even KP primary-
+        # house) decides the grade alone; the systems VOTE. Clear positive
+        # majority → COMPLETED; clear negative → ATTEMPTED; else CONTESTED.
+        votes = _completion_panel(v, profile, sig, pt, best)
+        net = sum(votes.values())
+        vote_line = ", ".join(f"{k}:{'+' if x > 0 else ''}{x}"
+                              for k, x in votes.items())
+        arc = _arc(rows, rrows, best)
+        reasons.append(f"completion panel [{vote_line}] → net {net:+d}")
+        if net >= 2:
             reasons.append(
-                f"FULL promise (sub-lord signifies the matter's own house "
-                f"H{primary}) + elapsed window {best.start:%Y-%m-%d} "
-                f"({best.systems_firing} systems) → event stands DELIVERED")
-            if best.kp_negate >= best.kp_fulfil:
-                reasons.append(
-                    f"window KP negation {best.kp_negate} ≥ fulfilment "
-                    f"{best.kp_fulfil} → the event came WITH friction/"
-                    "obstacles (completion unaffected — primary-house promise)")
+                f"panel majority + elapsed window {best.start:%Y-%m-%d} "
+                f"({best.systems_firing} systems) → event stands DELIVERED; "
+                "afflicted standing (if any) is the matter's ARC — the trouble "
+                "comes in the life of the matter, not necessarily at the event")
             return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
                            ">".join(best.chain), best.systems_firing, quality,
-                           reasons, nw, nc)
-        blockers = _blockers(v, profile, sig, best)
-        reasons.append(
-            f"PARTIAL promise (sub-lord signifies {sorted(sig)} — the matter's "
-            f"own house H{primary} is ABSENT) + elapsed window "
-            f"{best.start:%Y-%m-%d} → the AXIS ran (talks/rishta/attempt-level "
-            "event) but completion is NOT certified")
-        reasons += blockers
-        return Verdict("ATTEMPTED (incomplete)", conf,
-                       f"{best.start:%Y-%m-%d}", ">".join(best.chain),
-                       best.systems_firing, quality, reasons, nw, nc)
+                           reasons, nw, nc, arc)
+        if net <= -1:
+            reasons.append(
+                f"panel majority NEGATIVE + elapsed window "
+                f"{best.start:%Y-%m-%d} → the AXIS ran (talks/rishta/attempt-"
+                "level event) but completion is NOT certified")
+            reasons += _blockers(v, profile, sig, best)
+            return Verdict("ATTEMPTED (incomplete)", conf,
+                           f"{best.start:%Y-%m-%d}", ">".join(best.chain),
+                           best.systems_firing, quality, reasons, nw, nc, arc)
+        reasons.append("panel split — completed vs attempted CONTESTED; use the "
+                       "user's own account of the past if given")
+        return Verdict("CONTESTED", conf, f"{best.start:%Y-%m-%d}",
+                       ">".join(best.chain), best.systems_firing, quality,
+                       reasons, nw, nc, arc)
     reasons.append("promised, but no ≥2-system window has elapsed in the scanned "
                    "span → not yet (or the event lies outside this span)")
     return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons, nw, nc)
+
+
+def _completion_panel(v, profile, sig, pt, best) -> dict:
+    """COMPLETION CONVERGENCE PANEL — no single rule decides the grade; each
+    system votes ±1 (0 = silent) on whether the delivered window was a COMPLETED
+    matter vs an attempt. Sources per vote in RULE_CHANGELOG (2026-07-03)."""
+    votes = {}
+    primary = profile.houses[0]
+    votes["KP primary-house signified"] = 1 if primary in sig else -1
+    if best.kp_fulfil != best.kp_negate:
+        votes["window KP net (fulfil vs negate)"] = (
+            1 if best.kp_fulfil > best.kp_negate else -1)
+    if getattr(best, "arudha_axis", False):
+        votes["Arudha-axis lit (public manifestation)"] = 1
+    if profile.saham and getattr(best, "saham_double_transit", False):
+        votes["Saham fruition (double-transit)"] = 1
+    vo = [b for b in pt.varga_ok.values() if b is not None]
+    if vo:
+        votes["varga deposition (domain varga)"] = (
+            1 if 2 * sum(vo) >= len(vo) else -1)
+    sus = _w_arudha_sustenance(v, profile)
+    if sus:
+        votes["2nd-from-Arudha sustenance"] = 1 if sus > 0 else -1
+    return votes
+
+
+def _arc(rows, rrows, best) -> list:
+    """Chronological ARC around the delivered window: earlier attempt-windows,
+    pre-event LOSS/BREAKs (bani-ke-tooti), the event, post-event ruptures
+    (friction/break comes LATER — arc quality, not event-moment texture)."""
+    ev = []
+    pre_att = [r for r in rows
+               if r.start < best.start and r.systems_firing >= 2]
+    pre_br = [x for x in (rrows or [])
+              if x.start < best.start and x.kind == "LOSS/BREAK"]
+    post_br = [x for x in (rrows or [])
+               if x.start > best.start and x.kind == "LOSS/BREAK"]
+    if pre_att:
+        ev.append(f"pre-event attempts ({len(pre_att)} windows): "
+                  + ", ".join(f"{r.start:%Y-%m}" for r in pre_att[:4]))
+    if pre_br:
+        ev.append("pre-event LOSS/BREAK (bana-ke-toota): "
+                  + ", ".join(f"{x.start:%Y-%m}" for x in pre_br[:3]))
+    ev.append(f"EVENT window: {best.start:%Y-%m-%d}")
+    if post_br:
+        ev.append("post-event rupture (friction/break AFTERWARDS): "
+                  + ", ".join(f"{x.start:%Y-%m}" for x in post_br[:3]))
+    return ev
 
 
 _BHAVA_MEANING = {1: "self/own stand", 2: "family & finances",
