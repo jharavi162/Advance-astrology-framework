@@ -1061,16 +1061,19 @@ _PADDHATI_RULES = [
 # ---------------------------------------------------------------------------- #
 @dataclass
 class Verdict:
-    answer: str          # "YES" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
+    answer: str          # "YES" | "YES (contested)" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
     confidence: str      # "HIGH" | "MEDIUM" | "LOW"
     best_window: str     # "YYYY-MM-DD" of the committed window ("" if none)
     chain: str           # daśā chain at that window
     systems: int         # independent systems converging there
     quality: str         # affliction/outcome texture — QUALITY, never existence
     reasons: list
+    next_window: str = ""    # strongest UPCOMING window after asof ("" if none)
+    next_chain: str = ""
 
 
-def domain_verdict(v, profile, rows, asof, rrows=None) -> Verdict:
+def domain_verdict(v, profile, rows, asof, rrows=None,
+                   min_elapsed_days=30) -> Verdict:
     """Committed retrodiction for "has this matter's event happened in the scanned
     window?" — decides from (1) KP promise-vs-denial, (2) elapsed high-convergence
     windows, (3) convergence count as confidence. Affliction NEVER vetoes
@@ -1081,7 +1084,17 @@ def domain_verdict(v, profile, rows, asof, rrows=None) -> Verdict:
     scan times the AXIS (which also spikes for the marriage itself), so elapsed
     evidence comes from the REVERSAL timer instead — pass its rows as ``rrows``;
     an elapsed LOSS/BREAK window is the delivered event, its rupture-score the
-    confidence."""
+    confidence.
+
+    A window only counts as ELAPSED once it has matured ``min_elapsed_days``
+    before ``asof`` — otherwise a forward scan's very first row (which starts AT
+    the scan boundary, i.e. today) masquerades as delivered evidence.
+
+    CONTESTED completion (KP simultaneous signification): when the delivered
+    window's KP negation ≥ its fulfilment, the sub-lords fed BOTH groups at once
+    — the classical "fixed-then-obstructed" pattern. The verdict then commits
+    "YES (contested)": the event-AXIS ran (talks/attempt/ceremony), but the
+    engine cannot certify clean completion vs an obstructed attempt."""
     pt = promise_and_tempo(v, profile)
     sig = set(pt.cusp_signifies)
     denied = ((not pt.promised) and bool(sig & profile.negate_houses))
@@ -1093,15 +1106,26 @@ def domain_verdict(v, profile, rows, asof, rrows=None) -> Verdict:
                f"negate={sorted(profile.negate_houses)})",
                f"standing balance {bal:+.2f} → quality: {quality} "
                "(quality ≠ existence)"]
+
+    def _matured(r):
+        return (asof - r.start).days >= min_elapsed_days
+
+    # strongest UPCOMING window (committed "agla window" for the narration)
+    upcoming = [r for r in rows if r.start > asof]
+    nxt = max(upcoming, key=lambda r: r.salience) if upcoming else None
+    nw = f"{nxt.start:%Y-%m-%d}" if nxt else ""
+    nc = ">".join(nxt.chain) if nxt else ""
+
     if denied:
         conf = "HIGH" if not (sig & profile.fulfil_houses) else "MEDIUM"
         reasons.append("sub-lord signifies ONLY the negation group → denial")
-        return Verdict("NO (denied)", conf, "", "", 0, quality, reasons)
+        return Verdict("NO (denied)", conf, "", "", 0, quality, reasons, nw, nc)
     if not pt.promised:
         reasons.append("sub-lord signifies neither group decisively")
-        return Verdict("UNCERTAIN", "LOW", "", "", 0, quality, reasons)
+        return Verdict("UNCERTAIN", "LOW", "", "", 0, quality, reasons, nw, nc)
     if profile.rupture_matter and rrows is not None:
-        hits = [r for r in rrows if r.start <= asof and r.kind == "LOSS/BREAK"]
+        hits = [r for r in rrows
+                if r.kind == "LOSS/BREAK" and _matured(r)]
         if hits:
             best = max(hits, key=lambda r: (r.rupture_score, r.start))
             conf = ("HIGH" if best.rupture_score >= 4
@@ -1111,23 +1135,38 @@ def domain_verdict(v, profile, rows, asof, rrows=None) -> Verdict:
                            f"{best.rupture_score}/5) → the break stands delivered")
             return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
                            ">".join(best.chain), best.rupture_score, quality,
-                           reasons)
+                           reasons, nw, nc)
         reasons.append("rupture promised, but no LOSS/BREAK window has elapsed "
                        "in the scanned span → not yet (or outside this span)")
-        return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons)
-    elapsed = [r for r in rows if r.start <= asof and r.systems_firing >= 2]
+        return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons, nw, nc)
+    elapsed = [r for r in rows if _matured(r) and r.systems_firing >= 2]
     if elapsed:
         best = max(elapsed, key=lambda r: r.salience)
         conf = ("HIGH" if best.systems_firing >= 6
                 else "MEDIUM" if best.systems_firing >= 4 else "LOW")
+        if best.kp_negate >= best.kp_fulfil:
+            # KP simultaneous signification: the delivered window fed the
+            # negation group at least as strongly as the fulfilment group —
+            # the axis ran, but completion stands CONTESTED (attempt/talks
+            # obstructed, or completed-with-friction). No clean YES.
+            reasons.append(
+                f"elapsed window {best.start:%Y-%m-%d} ran the event-axis "
+                f"({best.systems_firing} systems) but KP negation "
+                f"{best.kp_negate} ≥ fulfilment {best.kp_fulfil} → completion "
+                "contested: obstructed attempt OR completed-with-friction")
+            return Verdict("YES (contested)", conf, f"{best.start:%Y-%m-%d}",
+                           ">".join(best.chain), best.systems_firing, quality,
+                           reasons, nw, nc)
         reasons.append(f"promise + elapsed convergence window "
-                       f"{best.start:%Y-%m-%d} ({best.systems_firing} systems) "
+                       f"{best.start:%Y-%m-%d} ({best.systems_firing} systems, "
+                       f"KP {best.kp_fulfil}>{best.kp_negate}) "
                        "→ event stands delivered (KP: significators' daśā has run)")
         return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
-                       ">".join(best.chain), best.systems_firing, quality, reasons)
+                       ">".join(best.chain), best.systems_firing, quality,
+                       reasons, nw, nc)
     reasons.append("promised, but no ≥2-system window has elapsed in the scanned "
                    "span → not yet (or the event lies outside this span)")
-    return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons)
+    return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons, nw, nc)
 
 
 def primary_label(profile) -> str:

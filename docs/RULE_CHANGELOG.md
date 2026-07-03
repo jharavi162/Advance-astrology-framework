@@ -847,3 +847,33 @@ addresses (coverage vs discrimination).
   (KP separative doctrine; Jaimini Upapada-break).
 - **Tests:** `test_rupture_matter_verdict_uses_reversal_timer` (rule-consistency
   on the base-domain reversal rows). Full suite 155 green.
+
+## 2026-07-03 — Verdict: contested-completion, boundary maturity, next-window; STORY-mode scan
+
+- **Change (user-approved):**
+  1. **YES (contested)** — when the delivered window's KP negation ≥ its
+     fulfilment, the sub-lords fed BOTH groups at once (classical KP simultaneous
+     signification): the event-AXIS ran, but the engine no longer certifies clean
+     completion — it commits "YES (contested): obstructed attempt OR
+     completed-with-friction". The boundary (≥) is the natural KP one; no fitted
+     threshold (a live blind case exposed a false-positive where marriage-talks
+     windows read as a delivered marriage).
+  2. **Elapsed maturity** — a window counts as delivered evidence only once it
+     started ≥30 days before *asof*, so a forward scan's first row (starting AT
+     the scan boundary, i.e. today) can no longer masquerade as "delivered
+     today". Applied to the rupture path too.
+  3. **next_window** — every verdict also commits the strongest UPCOMING window
+     after *asof* (chain included) so "aage kab" is engine-committed, not
+     narrated.
+  4. **STORY-mode window** (webapp) — a question carrying BOTH a past narrative
+     and a future ask ("…tal gayi… aage kab hogi?") scans one span from 2 yrs
+     back through 3 yrs ahead, so the verdict reads the delivered/contested past
+     AND the committed next window together.
+- **Narrator:** contested calls explain both readings and adopt the user's own
+  account of the past; questions the engine cannot decide mechanically (same
+  person vs new, third parties without their chart) must be answered as
+  "(interpretive — engine-committed nahi)".
+- **Sources:** KP simultaneous-signification doctrine (KP Readers III/VI);
+  retrodiction/maturity is decision-procedure, not a new astrological rule.
+- **Tests:** decision-rule test extended (contested ⇔ negation ≥ fulfilment on
+  the delivered window), `test_verdict_boundary_and_next_window`; suite 156.

@@ -1,6 +1,6 @@
 """Regression tests for the domain-general event-evidence builder."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart
@@ -326,16 +326,20 @@ def test_domain_verdict_follows_the_decision_rule():
         prof = DOMAIN_PROFILES[name]
         rows = candidate_map(v, prof, start, end, step_days=45)
         vd = domain_verdict(v, prof, rows, asof)
-        assert vd.answer in ("YES", "NO (denied)", "NOT-YET", "UNCERTAIN")
+        assert vd.answer in ("YES", "YES (contested)", "NO (denied)",
+                             "NOT-YET", "UNCERTAIN")
         assert vd.confidence in ("HIGH", "MEDIUM", "LOW")
         pt = promise_and_tempo(v, prof)
-        elapsed = [r for r in rows if r.start <= asof and r.systems_firing >= 2]
+        elapsed = [r for r in rows
+                   if (asof - r.start).days >= 30 and r.systems_firing >= 2]
         if pt.promised and elapsed:
-            assert vd.answer == "YES"
+            assert vd.answer.startswith("YES")   # clean YES or YES (contested)
             assert vd.best_window and vd.systems >= 2
-        if vd.answer == "YES":
+        if vd.answer.startswith("YES"):
             best = max(elapsed, key=lambda r: r.salience)
             assert vd.best_window == f"{best.start:%Y-%m-%d}"
+            # contested exactly when the delivered window's negation >= fulfilment
+            assert (vd.answer == "YES (contested)") == (best.kp_negate >= best.kp_fulfil)
         # quality is stated but never used to flip existence
         assert "quality" not in vd.answer
 
@@ -368,7 +372,8 @@ def test_rupture_matter_verdict_uses_reversal_timer():
                          step_days=45)
     vd = domain_verdict(v, prof, [], end, rrows=rrows)
     pt = promise_and_tempo(v, prof)
-    hits = [r for r in rrows if r.start <= end and r.kind == "LOSS/BREAK"]
+    hits = [r for r in rrows
+            if (end - r.start).days >= 30 and r.kind == "LOSS/BREAK"]
     if pt.promised and hits:
         assert vd.answer == "YES"
         best = max(hits, key=lambda r: (r.rupture_score, r.start))
@@ -378,3 +383,22 @@ def test_rupture_matter_verdict_uses_reversal_timer():
         assert vd.answer == "NOT-YET"
     # rupture path must never fall through to the fulfilment-elapsed rule
     assert vd.answer in ("YES", "NOT-YET", "NO (denied)", "UNCERTAIN")
+
+
+def test_verdict_boundary_and_next_window():
+    """A forward scan's boundary row (starting AT asof) must not count as
+    delivered evidence; the strongest window after asof is committed as
+    next_window."""
+    from interpreter.event_evidence import domain_verdict, promise_and_tempo
+    v = _chart()
+    prof = DOMAIN_PROFILES["marriage"]
+    asof = datetime(2027, 1, 1, tzinfo=UTC)
+    rows = candidate_map(v, prof, asof, asof + timedelta(days=3 * 365),
+                         step_days=45)
+    vd = domain_verdict(v, prof, rows, asof)
+    if promise_and_tempo(v, prof).promised:
+        assert vd.answer == "NOT-YET"      # nothing matured before asof
+    upcoming = [r for r in rows if r.start > asof]
+    if upcoming:
+        nxt = max(upcoming, key=lambda r: r.salience)
+        assert vd.next_window == f"{nxt.start:%Y-%m-%d}"

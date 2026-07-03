@@ -229,7 +229,8 @@ def _run_scan(job, params, domain, start, end, step_days):
                     chain=">".join(peak.chain), systems=peak.systems_firing,
                     outcome=kind_at(peak.start), standing=bal, verdict=verdict,
                     call=dict(answer=vd.answer, confidence=vd.confidence,
-                              window=vd.best_window, quality=vd.quality),
+                              window=vd.best_window, quality=vd.quality,
+                              next=vd.next_window, next_chain=vd.next_chain),
                     nodes=[n for n, _ in peak.firing_nodes()][:5]))
             ranked.sort(key=lambda r: -r["standout"])
             _SCANS[job] = dict(status="done", macro=True, domain="macro",
@@ -277,6 +278,8 @@ def _run_scan(job, params, domain, start, end, step_days):
                                          confidence=vd.confidence,
                                          window=vd.best_window, chain=vd.chain,
                                          systems=vd.systems, quality=vd.quality,
+                                         next=vd.next_window,
+                                         next_chain=vd.next_chain,
                                          reasons=vd.reasons),
                                ts=time.time())
             return
@@ -296,6 +299,7 @@ def _run_scan(job, params, domain, start, end, step_days):
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
+                                     next=vd.next_window, next_chain=vd.next_chain,
                                      reasons=vd.reasons),
                            ts=time.time())
     except Exception as e:
@@ -517,11 +521,20 @@ CHAT_NARRATOR = (
     "assert a concrete real-world outcome (like 'divorce happened') beyond that "
     "type. If the scan carries a committed 'call' (answer/confidence/window/"
     "quality), START your reply with that call verbatim-in-spirit — e.g. 'HAAN — "
-    "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. CRITICAL "
-    "KP rule: AFFLICTION ≠ DENIAL. An afflicted/troubled standing describes the "
-    "event's QUALITY (troubled/with-friction), NEVER whether it happened — "
-    "existence comes only from the call's promise/denial + elapsed-window logic. "
-    "Do not hedge a committed call."
+    "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. 'YES "
+    "(contested)' means the event-AXIS ran in that window but KP negation was "
+    "simultaneously lit: explain BOTH readings (attempt/talks that got obstructed "
+    "OR completed-with-friction) and, if the user's own account says which one "
+    "happened, adopt their account for the past and reason forward from it. If "
+    "the call carries a 'next' window, state it as the engine's committed "
+    "UPCOMING window. CRITICAL KP rule: AFFLICTION ≠ DENIAL. An afflicted/"
+    "troubled standing describes the event's QUALITY (troubled/with-friction), "
+    "NEVER whether it happened — existence comes only from the call's promise/"
+    "denial + elapsed-window logic. Do not hedge a committed call. HONESTY RULE: "
+    "questions the engine cannot decide mechanically — SAME person vs a NEW "
+    "person, kaun/kis se, anything about a third party without their chart — "
+    "answer briefly and label that part '(interpretive — engine-committed "
+    "nahi)'; never present it as an engine verdict."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -562,6 +575,9 @@ _REL_PAST_RE = re.compile(
     r"(pichh?le|beete|last)\s+(\d{1,2})\s*(saal|varsh|years?|yrs?)", re.I)
 _REL_FUT_RE = re.compile(
     r"(agle|aane\s*wale|next)\s+(\d{1,2})\s*(saal|varsh|years?|yrs?)", re.I)
+_FUT_RE = re.compile(
+    r"(hogi|hoga|milegi|milega|banega|banegi|payega|payegi|rahega|rahegi|"
+    r"aayega|aayegi|hone\s*wal[ai]|\bwill\b|\bfuture\b|aage)", re.I)
 # Open "which life-events happened?" question → multi-domain MACRO scan.
 _MACRO_RE = re.compile(
     r"(kya\s*kya|hot\s*events?|big\s*events?|bade\s*events?|"
@@ -571,13 +587,18 @@ _MACRO_RE = re.compile(
 
 def _auto_scan_window(question, today):
     """(start, end) for the auto scan. Priority: explicit years ("2015 se 2018" →
-    that range, span capped at 6 yrs) → relative ranges ("pichle 3 saal" /
+    that range, span capped at 6 yrs) → STORY-mode (past narrative + future ask →
+    last 2 yrs THROUGH next 3 yrs, one span) → relative ranges ("pichle 3 saal" /
     "agle 2 saal") → tense (past → last 4 yrs, else next 3 yrs)."""
     years = sorted(int(y) for y in _YEAR_RE.findall(question))
     if years:
         y0, y1 = years[0], min(years[-1], years[0] + 6)
         return (datetime(y0, 1, 1, tzinfo=timezone.utc),
                 datetime(y1, 12, 31, tzinfo=timezone.utc))
+    if _PAST_RE.search(question) and _FUT_RE.search(question):
+        # "…hua tha / tal gayi … ab aage kab hogi?" → one span covering both,
+        # so the verdict reads the delivered/contested past AND the next window.
+        return today - timedelta(days=2 * 365), today + timedelta(days=3 * 365)
     m = _REL_PAST_RE.search(question)
     if m:
         n = min(int(m.group(2)), 6)
