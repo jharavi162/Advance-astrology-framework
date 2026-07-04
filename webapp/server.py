@@ -588,7 +588,15 @@ CHAT_NARRATOR = (
     "(e.g. Ketu=break/cut, Rahu=foreign/inter-caste/affair, Jupiter=blessing/"
     "expansion, Saturn=delay/karmic, Mercury=business/communication, "
     "Moon=instability/mood) and a '(R)' vakri member = repeat/revisit. Weave it "
-    "into one flowing sentence-story, not a dry list."
+    "into one flowing sentence-story, not a dry list. "
+    "SECOND / NEXT PARTNER: if the domain is a 'second-…' / 'third-…' matter "
+    "(the engine has shifted it to the Nth-marriage axis — 9th house for the "
+    "2nd spouse, per the 3rd-from-7th rule), say so. ALSO read the BNN chain per "
+    "the transcript: a benefic AFTER the hero — especially one that follows a "
+    "Ketu-cut in the chain — is the NEXT/second partner, and Rahu just ahead of "
+    "the hero = multiple relationships / remarriage after a break. Keep the "
+    "house-based read (Vedic) and the chain-based read (BNN) as two independent "
+    "voices; do not merge them."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 

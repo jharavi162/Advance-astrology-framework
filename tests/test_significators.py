@@ -67,3 +67,34 @@ def test_unmappable_word_raises():
     import pytest
     with pytest.raises(ValueError):
         resolve("qwertyzxcv")
+
+
+def test_ordinal_meta_rule_shifts_by_third_from_previous():
+    # 2nd spouse = 9th (7 + 2), 3rd = 11th; generic serial rule: 2nd child = 7th.
+    m2 = resolve("second marriage")
+    assert m2.houses == (9,) and m2.base_domain == "marriage"
+    assert m2.natural_karaka == Planet.VENUS and m2.varga == 9
+    assert resolve("dusri shaadi").houses == (9,)
+    assert resolve("teesri shaadi").houses == (11,)          # 7 + 4
+    assert resolve("doosra bachcha").houses == (7,)          # children 5 + 2
+    # a bare 'doosri partner' still lands on the marriage axis (not a stray house)
+    dp = resolve("doosri partner life me kya aa chuki h")
+    assert dp.houses == (9,) and dp.natural_karaka == Planet.VENUS
+    # a plain (1st) matter is NOT shifted
+    assert resolve("meri shaadi kab hui").houses == (7,)
+    assert resolve("career kaisa rahega").houses == (10,)
+
+
+def test_second_marriage_nadi_karaka_is_gender_aware():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from advance_astrology import VedicChart
+    from interpreter.event_evidence import nadi_karaka
+    v = VedicChart.create(
+        when=datetime(1991, 4, 4, 6, 23, tzinfo=ZoneInfo("Asia/Kolkata")),
+        latitude=23.63, longitude=85.52, ayanamsa="lahiri")
+    prof = resolve("second marriage")
+    v.gender = "male"
+    assert nadi_karaka(v, prof) == Planet.VENUS
+    v.gender = "female"
+    assert nadi_karaka(v, prof) == Planet.MARS

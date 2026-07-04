@@ -1152,3 +1152,29 @@ transcript. Three changes to reach professional standard:
   conjunction + 1/5/9 trine, degree-sequence = event-sequence, retrograde-back
   rule; user approval 2026-07-04. Kāraka stays domain-driven — no native
   hard-coding. Suite 166 green.
+
+## 2026-07-04 — Ordinal / Nth-instance meta-rule + second-marriage domain (user-approved)
+
+Bug: "doosri partner / second marriage / dusri shaadi" silently dropped the
+ordinal and resolved to plain "marriage" (7th) — the engine scanned the FIRST
+marriage and reported its date as the second partner (the "2022/2024" mis-read).
+
+- **Generic ordinal meta-rule** (`interpreter/significators.py`): a query's
+  ordinal ("doosra/second/2nd/teesra/third/agla/next…") is parsed, the base
+  matter resolved, and its primary house shifted by 2·(N−1) — the classical
+  successive-significator (3rd-from-previous) rule. So 2nd marriage → 9th, 3rd →
+  11th; 2nd child → 7th; etc. — ONE mechanism, no per-question hand-coding.
+  Convention (user-approved, web-researched): 2nd spouse = **9th house**
+  (3rd-from-7th school), kāraka Venus/Mars, D9. `base_domain` is set so the Nāḍī
+  kāraka stays gender-aware; `nadi_karaka` now follows `base_domain` for derived
+  domains. Added 'partner/life partner/jeevansathi' → marriage synonyms.
+- **BNN side stays chain-based** (no house): the narrator reads a benefic AFTER
+  the hero (esp. after a Ketu-cut) as the next/second partner, and Rahu-ahead as
+  multiple/remarriage — per BNN_METHODS.md §7. Vedic (house) and BNN (chain)
+  kept as independent voices.
+- **Sources:** 2nd-marriage house — KP/Parashari (9th = 3rd-from-7th; Kalidasa's
+  2nd-house alternate noted); BNN second-partner — the class transcript (chain
+  sequence). Serial rule — classical "3rd-from-previous" for co-borns/spouses/
+  children.
+- **Tests:** `test_ordinal_meta_rule_shifts_by_third_from_previous`,
+  `test_second_marriage_nadi_karaka_is_gender_aware`. Suite 168 green.

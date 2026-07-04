@@ -785,6 +785,8 @@ def nadi_karaka(v, profile) -> Planet:
     """The matter's Nāḍī kāraka. Gender-aware for kalatra matters; unknown
     domains fall back to the profile's natural kāraka (data-driven)."""
     spec = NADI_KARAKAS.get(profile.name)
+    if spec is None:      # derived (e.g. 'second-marriage') → follow base matter
+        spec = NADI_KARAKAS.get(getattr(profile, "base_domain", None) or "")
     if spec == "kalatra":
         g = (getattr(v, "gender", "") or "").lower()
         return Planet.MARS if g.startswith("f") else Planet.VENUS
