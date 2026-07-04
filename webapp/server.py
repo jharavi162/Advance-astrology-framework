@@ -242,12 +242,14 @@ def _run_scan(job, params, domain, start, end, step_days):
             return
         prof = resolve(domain)
         from interpreter.event_evidence import (domain_verdict, nadi_karaka,
-                                                 nadi_nature)
+                                                 nadi_nature, nadi_chain)
         now = datetime.now(timezone.utc)
-        # NĀḌĪ (BNN) nature verdict — kāraka-centric, domain-general; the DATE (if
-        # a timing question) comes from the day-level pinpoint below.
+        # NĀḌĪ (BNN) nature verdict + degree-ordered CHAIN — kāraka-centric,
+        # domain-general; the DATE (if a timing question) comes from the day-
+        # level pinpoint below.
         nadi = dict(karaka=nadi_karaka(v, prof).value,
-                    nature=nadi_nature(v, prof) or "clean (smooth/straightforward)")
+                    nature=nadi_nature(v, prof) or "clean (smooth/straightforward)",
+                    chain=nadi_chain(v, prof))
         if getattr(prof, "rupture_matter", False):
             # RUPTURE matter (divorce/…): the fulfilment scan times the AXIS
             # (which also spikes for the union itself) — time the BREAK with the
@@ -577,7 +579,16 @@ CHAT_NARRATOR = (
     "unconventional, Ketu-saṅga = delay/break-prone, vakri = repeat-pattern, or "
     "clean = smooth); for a 'kab/when' question give the day-level 'pinpoint' "
     "date(s) if the scan carries them. This Nāḍī voice is independent of KP/"
-    "Jaimini — present it as its own line, not merged into them."
+    "Jaimini — present it as its own line, not merged into them. "
+    "NĀḌĪ CHAIN: the read also carries a 'NĀḌĪ CHAIN' — the hero (kāraka) and the "
+    "planets conjunct/trine (1/5/9) it, in DEGREE ORDER. Narrate this as the "
+    "Bhrigu-Nandi STORY, left→right: a member tagged [pre] (lower degree than the "
+    "hero) already acted BEFORE the event / was pre-existing; [post] (higher "
+    "degree) unfolds AFTER it. Apply each planet's significations from the chain "
+    "(e.g. Ketu=break/cut, Rahu=foreign/inter-caste/affair, Jupiter=blessing/"
+    "expansion, Saturn=delay/karmic, Mercury=business/communication, "
+    "Moon=instability/mood) and a '(R)' vakri member = repeat/revisit. Weave it "
+    "into one flowing sentence-story, not a dry list."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -686,13 +697,26 @@ def _engine_read(v, question):
     # available (nature is a natal read; the DATE, if a timing question, comes
     # from the salience scan's day-level 'pinpoint'). Domain-general.
     try:
-        from interpreter.event_evidence import nadi_karaka, nadi_nature
+        from interpreter.event_evidence import (nadi_karaka, nadi_nature,
+                                                 nadi_chain)
         nkp = nadi_karaka(v, prof)
         nn = nadi_nature(v, prof)
         lines.append(
-            f"NĀḌĪ (BNN, trine method): kāraka={nkp.value}; nature = "
+            f"NĀḌĪ (BNN, 1/5/9 trine method): kāraka={nkp.value}; nature = "
             + (nn or "clean — no Rahu/Ketu-saṅga or vakri on the kāraka "
                "(smooth/straightforward rang)"))
+        chain = nadi_chain(v, prof)
+        if chain:
+            def _c(r):
+                tag = ("HERO" if "HERO" in r["when"]
+                       else "pre" if "before" in r["when"] else "post")
+                return (f"{r['planet']} {r['degree']}° {r['relation']}"
+                        f"[{tag}]{'(R)' if r['retrograde'] else ''} — "
+                        f"{r['signifies']}")
+            lines.append(
+                "NĀḌĪ CHAIN (BNN degree-order = chronology; pre = already/before "
+                "the event, post = after it — read the story left→right): "
+                + "  →  ".join(_c(r) for r in chain))
     except Exception:
         pass
     # A tier-3 derived domain is named after the raw query — show a tidy label.

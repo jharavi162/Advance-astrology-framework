@@ -447,7 +447,8 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
     ...(res.nadi?{nadi:res.nadi}:{}),
     ...(res.verdict?{standing_verdict:res.verdict,standing:res.standing}:{})};
   let html;
-  const nadiLine=n=>!n?'':`<div class="refrow" style="margin:0 0 8px">🌿 <b style="color:var(--acc)">Nāḍī</b> (BNN, trine method) · kāraka <b>${n.karaka}</b> · nature: ${n.nature}</div>`;
+  const cw=w=>/HERO/.test(w)?'HERO':/before/.test(w)?'pre':'post';
+  const nadiLine=n=>!n?'':`<div class="refrow" style="margin:0 0 8px">🌿 <b style="color:var(--acc)">Nāḍī</b> (BNN, 1/5/9 trine method) · kāraka <b>${n.karaka}</b> · nature: ${n.nature}${(n.chain&&n.chain.length)?`<div class="sub" style="margin-top:3px">🔗 chain (degree-order = story): ${n.chain.map(c=>`<b>${c.planet}</b> ${c.degree}° ${c.relation}${c.retrograde?' [R]':''} <i>[${cw(c.when)}]</i>`).join(' → ')}</div>`:''}</div>`;
   const oc=k=>!k?'':` · <b style="color:${k==='LOSS/BREAK'?'#ff9bb0':(k==='CHANGE/UPGRADE'?'#7fe0c0':'var(--mut)')}">${k}</b>`;
   const callLine=c=>!c?'':`<div class="refrow" style="border:1px solid var(--acc);border-radius:8px;padding:7px 9px;margin:4px 0 8px">📌 <b style="color:var(--acc)">CALL: ${c.answer}</b> (${c.confidence})${c.window?` · ~<b>${c.window}</b>${c.chain?' '+c.chain:''}`:''} · quality: ${c.quality}${c.next?`<div class="sub" style="margin-top:3px">⏭ agla strong window: <b>${c.next}</b>${c.next_chain?' '+c.next_chain:''}</div>`:''}</div>`;
   if(res.macro){

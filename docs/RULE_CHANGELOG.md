@@ -1125,3 +1125,30 @@ addresses (coverage vs discrimination).
   that a Mars-alone rule produced.
 - **Tests:** `test_nadi_rupture_pinpoint_is_separator_driven` (separator-only
   scoring, Maṅgal-never-alone, no union hit, bounds, gaps, determinism).
+
+## 2026-07-04 — BNN natal CHAIN + retrograde shift-back + drop the 7th (video-audited, user-approved)
+
+Audited the engine's Nāḍī method against a full BNN marriage crash-course
+transcript. Three changes to reach professional standard:
+
+- **Golden relations = 1/5/9 only.** `_NADI_REL` {0,4,6,8} → {0,4,8}; removed the
+  180° (7th) leg from `_trine_windows`. The 7th (opposition) is NOT a BNN golden
+  relation in standard practice. Verified: the kāraka's own chart validation
+  (wedding pinpoint 2024-01-29, rupture Aug–Sept 2025) is unchanged — every lock
+  there was a conjunction or a 5/9 trine, never the 7th. New test
+  `test_nadi_golden_relations_are_1_5_9_only`.
+- **Retrograde shift-back** (`_nadi_sign`): a vakri planet is reckoned ONE sign
+  back for the conjunction/trine test (its degree number kept); nodes stay at
+  their actual sign. Test `test_nadi_sign_shifts_retrograde_one_back`.
+- **`nadi_chain(v, profile)`** — the heart of a BNN read, previously MISSING: the
+  hero (kāraka) plus every planet conjunct/trine (1/5/9) it, ordered by DEGREE.
+  The degree order IS the chronology — a member below the hero's degree acted
+  'before/already', above it 'after' (post-event). Carries each planet's generic
+  significations (reference DATA; the AI narrates the story — charter division).
+  Surfaced in the chat engine-read, the scan `nadi` block, and the UI (🔗 chain
+  line); the narrator is told to narrate it as the left→right BNN story. Test
+  `test_nadi_chain_is_degree_ordered_and_golden_to_hero`.
+- **Sources:** BNN marriage class transcript (R.G. Rao lineage) — hero planet,
+  conjunction + 1/5/9 trine, degree-sequence = event-sequence, retrograde-back
+  rule; user approval 2026-07-04. Kāraka stays domain-driven — no native
+  hard-coding. Suite 166 green.

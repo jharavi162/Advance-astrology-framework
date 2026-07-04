@@ -563,3 +563,56 @@ def test_nadi_rupture_pinpoint_is_separator_driven():
     for a, b in zip(dates, dates[1:]):
         assert (b - a).days >= 7
     assert pins == nadi_rupture_pinpoint(v, prof, s, e)
+
+
+def test_nadi_golden_relations_are_1_5_9_only():
+    """Professional BNN standard: the golden relations are conjunction + the
+    1/5/9 trine ONLY — the 7th (opposition, offset 6) is NOT one."""
+    from interpreter.event_evidence import _NADI_REL, _nrel
+    assert _NADI_REL == {0, 4, 8}
+    assert not _nrel(0, 6)          # 7th is not golden
+    assert _nrel(0, 0) and _nrel(0, 4) and _nrel(0, 8)
+
+
+def test_nadi_sign_shifts_retrograde_one_back():
+    from interpreter.event_evidence import _nadi_sign
+    # 45° = 15° Taurus (sign 1); direct → sign 1, retrograde → one back (Aries 0)
+    assert _nadi_sign(45.0, retrograde=False) == 1
+    assert _nadi_sign(45.0, retrograde=True) == 0
+    assert _nadi_sign(5.0, retrograde=True) == 11   # wraps Aries → Pisces
+
+
+def test_nadi_chain_is_degree_ordered_and_golden_to_hero():
+    """The chain holds the hero + only planets in a 1/5/9 golden relation to the
+    hero's BNN sign, ordered by degree; the hero is marked; before/after tags
+    follow the degree vs the hero; deterministic. Retrograde members reckon one
+    sign back."""
+    from interpreter.event_evidence import (nadi_chain, nadi_karaka, _nadi_sign,
+                                            _NADI_REL)
+    from advance_astrology import Planet
+    v = _chart()
+    v.gender = "male"
+    prof = DOMAIN_PROFILES["marriage"]
+    chain = nadi_chain(v, prof)
+    assert chain, "hero is always at least its own chain member"
+    # degree-ordered
+    degs = [r["degree"] for r in chain]
+    assert degs == sorted(degs)
+    # exactly one HERO, and it is the kāraka
+    heroes = [r for r in chain if "HERO" in r["when"]]
+    assert len(heroes) == 1 and heroes[0]["planet"] == nadi_karaka(v, prof).value
+    hero_deg = heroes[0]["degree"]
+    hero = nadi_karaka(v, prof)
+    hero_sign = _nadi_sign(float(v.longitudes[hero]),
+                           bool(v.natal.placements[hero].retrograde)
+                           and hero not in (Planet.RAHU, Planet.KETU))
+    for r in chain:
+        # each member is golden to the hero's sign
+        p = next(pl for pl in Planet if pl.value == r["planet"])
+        retro = r["retrograde"]
+        assert ((_nadi_sign(float(v.longitudes[p]), retro) - hero_sign) % 12
+                in _NADI_REL)
+        # before/after tag consistent with degree vs hero (hero excepted)
+        if "HERO" not in r["when"]:
+            assert ("before" in r["when"]) == (r["degree"] < hero_deg)
+    assert chain == nadi_chain(v, prof)

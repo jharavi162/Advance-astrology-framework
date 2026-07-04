@@ -811,7 +811,11 @@ def nadi_nature(v, profile) -> str:
     return "; ".join(notes)
 
 
-_NADI_REL = {0, 4, 6, 8}                     # 1 / 5 / 7 / 9 — golden relations
+_NADI_REL = {0, 4, 8}     # 1 / 5 / 9 (conjunction + trine) — golden relations.
+# Professional BNN standard (R.G. Rao class + user 2026-07-04): the "with /
+# holding-hands" relation is conjunction + the 1/5/9 trine ONLY — the 7th
+# (opposition) is NOT a Nāḍī golden relation. (The kāraka's own chart validation
+# never relied on the 7th — every lock there was a conjunction or 5/9 trine.)
 
 
 def _nrel(s_from, s_to) -> bool:
@@ -821,6 +825,75 @@ def _nrel(s_from, s_to) -> bool:
 def _deg_close(l1, l2, orb=3.0) -> bool:
     """Nāḍī degree-to-degree: same degree-number in the respective signs."""
     return abs((l1 % 30.0) - (l2 % 30.0)) <= orb
+
+
+def _nadi_sign(lon, retrograde=False) -> int:
+    """BNN reckoning sign of a longitude — a RETROGRADE (vakri) planet is taken
+    ONE sign BACK (it walks backwards), then its conjunction/trine is judged from
+    there. Nodes are excluded by the caller (treated at their actual sign)."""
+    s = int(lon // 30)
+    return (s - 1) % 12 if retrograde else s
+
+
+# Generic planetary significations (relationship/marriage flavour, per the BNN
+# class) — reference DATA the chain carries so the read is legible; the AI still
+# does the interpretation (charter). Not native-specific.
+_NADI_SIGNIF = {
+    Planet.SUN: "authority/govt/father; influential, ego-driven spouse",
+    Planet.MOON: "emotions/instability; caring but changeable, mood-swings",
+    Planet.MARS: "husband(♀)/passion/drive; the cutter & executor",
+    Planet.MERCURY: "communication/business; witty, playful, younger-seeming",
+    Planet.JUPITER: "jeeva/blessing/expansion; mature, fortunate, abundant",
+    Planet.VENUS: "spouse(♂)/love/quality-of-marriage; comfort, romance",
+    Planet.SATURN: "delay/karma/cold; older/serious spouse, karmic bond",
+    Planet.RAHU: "foreign/inter-caste/unconventional; sharp, affair-prone",
+    Planet.KETU: "cut/break/detachment; separation, disinterest",
+}
+_CHAIN_BODIES = (Planet.SUN, Planet.MOON, Planet.MARS, Planet.MERCURY,
+                 Planet.JUPITER, Planet.VENUS, Planet.SATURN,
+                 Planet.RAHU, Planet.KETU)
+
+
+def nadi_chain(v, profile) -> list:
+    """The BNN natal CHAIN — the heart of a Bhrigu-Nandi reading. Take the hero
+    (`nadi_karaka`), collect every planet in a golden relation (conjunction or
+    1/5/9 trine) to the hero's BNN sign, and order them by DEGREE. The degree
+    order IS the chronology: a member with a LOWER degree than the hero acted
+    'before / already' (pre-existing); a HIGHER degree comes 'after' (post-
+    event). A retrograde member is reckoned one sign back (`_nadi_sign`) before
+    the relation is tested — its degree number is kept; the nodes are always
+    taken at their actual sign. The ENGINE returns the deterministic ordered
+    chain; the AI narrates the significations/story (charter division)."""
+    hero = nadi_karaka(v, profile)
+
+    def _retro(p):
+        try:
+            return (bool(v.natal.placements[p].retrograde)
+                    and p not in (Planet.RAHU, Planet.KETU))
+        except Exception:
+            return False
+
+    hero_lon = float(v.longitudes[hero])
+    hero_sign = _nadi_sign(hero_lon, _retro(hero))
+    hero_deg = hero_lon % 30.0
+    rows = []
+    for p in _CHAIN_BODIES:
+        lon = float(v.longitudes[p])
+        retro = _retro(p)
+        off = (_nadi_sign(lon, retro) - hero_sign) % 12
+        if off not in _NADI_REL:
+            continue
+        deg = lon % 30.0
+        rel = ("conjunction" if off == 0
+               else "trine-5th" if off == 4 else "trine-9th")
+        when = ("HERO (kāraka — the pivot)" if p == hero
+                else "before / already (pre-existing)" if deg < hero_deg
+                else "after (post-event / follows)")
+        rows.append(dict(planet=p.value, degree=round(deg, 1), relation=rel,
+                         retrograde=retro, when=when,
+                         signifies=_NADI_SIGNIF.get(p, "")))
+    rows.sort(key=lambda r: r["degree"])
+    return rows
 
 
 def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
@@ -1021,11 +1094,11 @@ register_witness("nadi: Ketu-saṅga on kāraka (delay/break-prone)", "standing"
 
 
 def _trine_windows(tr, transit, natal_lon, start, end, orb=9.0):
-    """Windows where a transit holds a Nāḍī golden relation (1/5/9 trine, 7th
-    opposition, or conjunction) to a natal point — Nāḍī reads these as 'with'.
-    Slow movers only (Jupiter/Saturn)."""
+    """Windows where a transit holds a Nāḍī golden relation (conjunction or the
+    1/5/9 trine — NOT the 7th; professional BNN standard) to a natal point —
+    Nāḍī reads these as 'with'. Slow movers only (Jupiter/Saturn)."""
     out = []
-    for ang in (0.0, 120.0, 240.0, 180.0):
+    for ang in (0.0, 120.0, 240.0):
         out += [(w.start, w.end) for w in
                 tr.conjunction_windows(transit, (natal_lon + ang) % 360.0,
                                        start, end, orb=orb, step_days=10.0)]
