@@ -532,3 +532,34 @@ def test_nadi_pinpoint_multi_covers_all_anchor_windows():
     assert all(p["date"] in union for p in pins)
     # deterministic
     assert pins == nadi_pinpoint_multi(v, prof, anchors, s, e, top=5)
+
+
+def test_nadi_rupture_pinpoint_is_separator_driven():
+    """The rupture funnel scores ONLY on separators (Śani/Rāhu/Ketu) degree-
+    locked on the break-axis; Maṅgal is a trigger that never scores alone, and
+    no benefic union-hit (Śukra/Guru) ever appears. Bounded, deterministic,
+    gap-separated."""
+    from interpreter.event_evidence import nadi_rupture_pinpoint
+    from interpreter.significators import resolve
+    v = _chart()
+    v.gender = "male"
+    prof = resolve("divorce")
+    s = datetime(2024, 1, 1, tzinfo=UTC)
+    e = datetime(2027, 1, 1, tzinfo=UTC)
+    pins = nadi_rupture_pinpoint(v, prof, s, e)
+    assert pins, "no rupture-pinpoint days in a three-year span"
+    dates = [datetime.strptime(p["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+             for p in pins]
+    assert all(s <= d <= e for d in dates)
+    for p in pins:
+        # max = Śani 2 + node 2 + Maṅgal 1 + Śani-return 1
+        assert 1 <= p["score"] <= 6 and p["hits"]
+        sep = any(("karma-cut" in h or "severance" in h) for h in p["hits"])
+        mars = any("Maṅgal severer" in h for h in p["hits"])
+        # Maṅgal never fires without a separator locked the same day
+        assert (not mars) or sep
+        # never a union-funnel hit
+        assert not any(("Śukra" in h or "Guru" in h) for h in p["hits"])
+    for a, b in zip(dates, dates[1:]):
+        assert (b - a).days >= 7
+    assert pins == nadi_rupture_pinpoint(v, prof, s, e)

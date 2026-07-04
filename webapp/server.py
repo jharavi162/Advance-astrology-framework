@@ -278,10 +278,20 @@ def _run_scan(job, params, domain, start, end, step_days):
                             salience=r.rupture_score, systems=r.rupture_score,
                             kp=f"{r.kp_rupture}r/{r.kp_fulfil}f",
                             outcome=r.kind, nodes=_rnodes(r)) for r in top]
+            # RUPTURE-mode Nāḍī day-pinpoint (Śani/Rāhu-Ketu/Maṅgal separators
+            # degree-locked on the break-axis) around the top LOSS/BREAK windows.
+            from interpreter.event_evidence import (nadi_pinpoint_multi,
+                                                    nadi_rupture_pinpoint)
+            r_anchors = [r.start for r in top
+                         if r.kind == "LOSS/BREAK" and r.start <= now][:6] \
+                or [r.start for r in top[:4]]
+            rpins = nadi_pinpoint_multi(v, prof, r_anchors, start, end, top=5,
+                                        min_gap_days=21,
+                                        funnel=nadi_rupture_pinpoint)
             _SCANS[job] = dict(status="done", domain=prof.name, rupture=True,
                                windows=windows, scanned=len(rrows),
                                step=step_days, standing=round(bal, 2),
-                               verdict=verdict, nadi=nadi,
+                               verdict=verdict, nadi=nadi, pinpoint=rpins,
                                call=dict(answer=vd.answer,
                                          confidence=vd.confidence,
                                          window=vd.best_window, chain=vd.chain,

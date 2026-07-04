@@ -459,7 +459,7 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
       :`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
     html+=callLine(res.call);
     html+=nadiLine(res.nadi);
-    if(res.pinpoint&&res.pinpoint.length)html+=`<div class="refrow" style="margin:0 0 8px">📍 <b style="color:var(--acc)">Nāḍī pinpoint</b> (din-level): ${res.pinpoint.map(p=>`<b>${p.date}</b> (${p.score})`).join(' · ')}<div class="sub">${res.pinpoint[0].hits.join(', ')}</div></div>`;
+    if(res.pinpoint&&res.pinpoint.length)html+=`<div class="refrow" style="margin:0 0 8px">${res.rupture?'💔':'📍'} <b style="color:var(--acc)">Nāḍī ${res.rupture?'rupture-pinpoint':'pinpoint'}</b> (din-level): ${res.pinpoint.map(p=>`<b>${p.date}</b> (${p.score})`).join(' · ')}<div class="sub">${res.pinpoint[0].hits.join(', ')}</div></div>`;
     html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · KP ${w.kp}${oc(w.outcome)}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
   }
   msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}

@@ -897,7 +897,7 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
 
 
 def nadi_pinpoint_multi(v, profile, anchors, start, end, radius_days=45,
-                        top=5, min_gap_days=7) -> list:
+                        top=5, min_gap_days=7, funnel=None) -> list:
     """Run the day-funnel around SEVERAL candidate-window anchor dates and merge
     into one ranked list. The salience engine's #1 window is not always the
     matter's only real window (e.g. a wedding ceremony vs its legal date can be
@@ -905,14 +905,17 @@ def nadi_pinpoint_multi(v, profile, anchors, start, end, radius_days=45,
     would then miss the other. So we funnel around each of the top elapsed
     windows (±radius_days), merge, and rank tightest-lock-first — the strongest,
     most-exact day surfaces regardless of which anchor window it fell in.
-    Deterministic; gap-separated across the merged set."""
+    Deterministic; gap-separated across the merged set. ``funnel`` selects the
+    per-day scorer: `nadi_pinpoint` (auspicious union) by default, or
+    `nadi_rupture_pinpoint` for break-class matters."""
+    funnel = funnel or nadi_pinpoint
     seen, merged = set(), []
     for a in anchors:
         s0 = max(a - timedelta(days=radius_days), start)
         e0 = min(a + timedelta(days=radius_days), end)
         if e0 <= s0:
             continue
-        for p in nadi_pinpoint(v, profile, s0, e0, min_gap_days=min_gap_days):
+        for p in funnel(v, profile, s0, e0, min_gap_days=min_gap_days):
             if p["date"] not in seen:
                 seen.add(p["date"]); merged.append(p)
     merged.sort(key=lambda p: (-p["score"], p["orb"], p["date"]))
@@ -925,6 +928,85 @@ def nadi_pinpoint_multi(v, profile, anchors, start, end, radius_days=45,
         if len(out) >= top:
             break
     return out
+
+
+def nadi_rupture_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
+    """RUPTURE-mode Nāḍī day-funnel — the MIRROR of `nadi_pinpoint`. Where the
+    union funnel times an auspicious event via the benefics (Guru-jeeva + Śukra)
+    degree-locked onto the kāraka, this times a BREAK (divorce-class) via the
+    SEPARATORS degree-locked in a golden relation (1/5/7/9) onto the matter's
+    kāraka / natal Śani. All layers are VOTES; the tightest combined degree-lock
+    orb wins an equal-score plateau (Nāḍī exactness = strength).
+      • Śani karma-cut (+2): transit Saturn — the viyoga/karma-kāraka — golden-
+        relation + degree-lock (±3°) onto the natal kāraka;
+      • Rāhu/Ketu severance (+2): a transit node golden-relation + degree-lock
+        onto the natal kāraka (sudden/karmic cut);
+      • Maṅgal severer (+1): transit Mars — the universal cheda/executor —
+        golden-relation + degree-lock onto the natal kāraka OR natal Śani, but
+        ONLY when a separator is already locked that day. Mars alone contacting
+        the kāraka also recurs at a MARRIAGE, so on its own it is not a break
+        signal — it merely SHARPENS a separator-driven cut;
+      • Śani≈natal-Śani karma-return (+1): transit Saturn golden-relation to
+        natal Saturn (the karma axis itself lit).
+    Sources: BPHS māraka/separation doctrine (Śani as viyoga-kāraka); Jaimini/KP
+    separative significators (Śani/Rāhu/Ketu); Maṅgal the universal executor
+    (user doctrine 2026-07-04). The kāraka stays domain-driven (`nadi_karaka`),
+    so this never hard-codes a native. Slow separators give the SEASON, fast
+    Maṅgal the sharper day inside it."""
+    tr = v.transits()
+    nk = nadi_karaka(v, profile)
+    nk_lon = float(v.longitudes[nk])
+    nk_sign = int(nk_lon // 30)
+    sat_lon = float(v.longitudes[Planet.SATURN])
+    sat_sign = int(sat_lon // 30)
+    movers = [Planet.SATURN, Planet.RAHU, Planet.KETU, Planet.MARS]
+    days = []
+    d = datetime(start.year, start.month, start.day, tzinfo=start.tzinfo)
+    while d <= end:
+        pos = tr.positions(d, movers)
+        sat, rah, ket, mar = (float(pos[p]) for p in movers)
+        ss, rs, ks, ms = (int(sat // 30), int(rah // 30),
+                          int(ket // 30), int(mar // 30))
+        score, hits, orb = 0, [], 0.0
+
+        def _dd(l1, l2):
+            return abs((l1 % 30.0) - (l2 % 30.0))
+        separator = False
+        if _nrel(nk_sign, ss) and _deg_close(sat, nk_lon):
+            score += 2; separator = True
+            hits.append("Śani karma-cut degree-lock")
+            orb += _dd(sat, nk_lon)
+        node_orbs = [_dd(nl, nk_lon) for nl, nsg in ((rah, rs), (ket, ks))
+                     if _nrel(nk_sign, nsg) and _deg_close(nl, nk_lon)]
+        if node_orbs:
+            score += 2; separator = True
+            hits.append("Rāhu/Ketu severance degree-lock")
+            orb += min(node_orbs)
+        # Maṅgal is a TRIGGER, not a standalone break signal — count it only in a
+        # separator-active context (Mars∼kāraka alone also fires at a marriage).
+        if separator:
+            m_orbs = [_dd(mar, a) for a, s_ok in
+                      ((nk_lon, _nrel(nk_sign, ms)), (sat_lon, _nrel(sat_sign, ms)))
+                      if s_ok and _deg_close(mar, a)]
+            if m_orbs:
+                score += 1; hits.append("Maṅgal severer degree-lock")
+                orb += min(m_orbs)
+        if _nrel(sat_sign, ss) and _deg_close(sat, sat_lon):
+            score += 1; hits.append("Śani≈natal-Śani karma-return")
+        if score > 0:
+            locked = any("degree-lock" in h for h in hits)
+            days.append((d, score, hits, orb if locked else 99.0))
+        d += timedelta(days=1)
+    days.sort(key=lambda x: (-x[1], x[3], x[0]))
+    picked = []
+    for d, sc, h, ob in days:
+        if all(abs((d - p[0]).days) >= min_gap_days for p in picked):
+            picked.append((d, sc, h, ob))
+        if len(picked) >= top:
+            break
+    picked.sort(key=lambda x: x[0])
+    return [dict(date=f"{x[0]:%Y-%m-%d}", score=x[1], hits=x[2],
+                 orb=round(x[3], 2)) for x in picked]
 
 
 def _w_nadi_ketu_sanga(v, p):

@@ -1101,3 +1101,27 @@ addresses (coverage vs discrimination).
   a NEW mechanical node — proposed for approval, not yet built.
 - **Tests:** engine unchanged this turn (server/prompt/UI + `_engine_read` only);
   suite 162 green.
+
+## 2026-07-04 — RUPTURE-mode Nāḍī pinpoint (break-class dates) — user-approved
+
+- **Change:** `nadi_rupture_pinpoint(v, profile, start, end)` — the mirror of the
+  union funnel — times a BREAK via the SEPARATORS degree-locked in a golden
+  relation (1/5/7/9) onto the matter's kāraka / natal Śani:
+    • Śani karma-cut (+2): transit Saturn golden-rel + degree-lock (±3°) → kāraka;
+    • Rāhu/Ketu severance (+2): a transit node golden-rel + degree-lock → kāraka;
+    • Maṅgal severer (+1): transit Mars golden-rel + degree-lock → kāraka/natal
+      Śani, counted ONLY when a separator is already locked that day (Mars∼kāraka
+      alone also recurs at a marriage, so it is a trigger, never a break signal);
+    • Śani≈natal-Śani karma-return (+1).
+  Tightest combined degree-lock orb wins an equal-score plateau; day-granular.
+  `nadi_pinpoint_multi` gained a `funnel=` arg; the webapp rupture branch anchors
+  it on the top elapsed LOSS/BREAK windows (min_gap 21d, slow separators) and
+  reports `pinpoint`; the UI shows a "💔 Nāḍī rupture-pinpoint" line.
+- **Sources:** BPHS māraka/separation doctrine (Śani = viyoga-kāraka); Jaimini/KP
+  separative significators (Śani/Rāhu/Ketu); Maṅgal the universal cheda/executor
+  (user doctrine). Kāraka stays domain-driven (`nadi_karaka`) — no native
+  hard-coding. Validated blind: the funnel centres on the Ketu-on-kāraka
+  severance lock (a separation season), free of the wedding-adjacent Mars noise
+  that a Mars-alone rule produced.
+- **Tests:** `test_nadi_rupture_pinpoint_is_separator_driven` (separator-only
+  scoring, Maṅgal-never-alone, no union hit, bounds, gaps, determinism).
