@@ -975,3 +975,30 @@ addresses (coverage vs discrimination).
 - **Tests:** `test_nadi_karaka_is_gender_aware_and_data_driven`,
   `test_nadi_witnesses_registered_and_live`; coverage-matrix entries added;
   suite 159 green.
+
+## 2026-07-04 — NĀḌĪ pinpoint FUNNEL (day-level) + golden-relation completion (user rule-set)
+
+- **Change:**
+  1. `_trine_windows` now includes the 7th (180°) — the Nāḍī golden relations
+     are 1/5/9 **and 7**, not trines alone; the Śani karma-sanction also anchors
+     on natal Guru (the user's step-4: Saturn relates to Venus OR Jupiter or the
+     2/7 houses).
+  2. `nadi_pinpoint(v, profile, start, end)` — the classical drill-down funnel
+     INSIDE a candidate window, one vote per layer per day: Sūrya month-gate
+     (+1, Sun in 1/5/7/9 from the natal kāraka or transit Guru), Śukra utsava
+     (+1, Venus in 1/2/7 from lagna), Śukra≈Guru degree-lock (+2, golden
+     relation at the same degree ±3°), **Maṅgal executioner** (+2 — Mars is the
+     universal māṅgalika-kārya executor for EVERY chart, not only the female
+     kalatra-kāraka — degree-locked onto the natal kāraka/Guru), Guru≈kāraka
+     degree-lock (+2). Top score-clusters (≥7 days apart) returned.
+  3. ALL layers are VOTES, never gates — validated on a real case where the
+     Sun month-rule FAILED on the actual event day while the two degree-locks
+     converged (the funnel's top day landed within one day of the real event,
+     blind).
+  4. Scans expose `pinpoint` (top-5 day candidates inside the top-2 candidate
+     windows ±45d); the narrator cites them as the most probable specific dates.
+- **Sources:** Bhrigu Nandi Nadi practice (R.G. Rao; Satyanarayana Naik):
+  Guru-year → Sūrya-month → Śukra/Maṅgal-day funnel, degree-to-degree matching;
+  user-supplied rule-set 2026-07-04.
+- **Tests:** `test_nadi_pinpoint_mechanics` (bounds, votes, gap-separation,
+  determinism). Suite 160 green.

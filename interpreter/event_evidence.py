@@ -811,6 +811,74 @@ def nadi_nature(v, profile) -> str:
     return "; ".join(notes)
 
 
+_NADI_REL = {0, 4, 6, 8}                     # 1 / 5 / 7 / 9 — golden relations
+
+
+def _nrel(s_from, s_to) -> bool:
+    return (s_to - s_from) % 12 in _NADI_REL
+
+
+def _deg_close(l1, l2, orb=3.0) -> bool:
+    """Nāḍī degree-to-degree: same degree-number in the respective signs."""
+    return abs((l1 % 30.0) - (l2 % 30.0)) <= orb
+
+
+def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
+    """Nāḍī drill-down FUNNEL inside a candidate window (user rule-set,
+    2026-07-04): Guru fixes the YEAR; the fast movers then vote per day —
+      • Sūrya month-gate (+1): transit Sun in 1/5/7/9 from the natal kāraka OR
+        from transit Guru;
+      • Śukra utsava (+1): transit Venus in the 1st/2nd/7th (from lagna);
+      • Śukra≈Guru degree-lock (+2): transit Venus in a golden relation to
+        transit Guru at the SAME degree (±3°);
+      • Maṅgal executioner (+2): transit Mars — the universal māṅgalika-kārya
+        executor, NOT only the female kalatra-kāraka — degree-locked (±3°) in a
+        golden relation onto the natal kāraka or natal Guru;
+      • Guru≈kāraka degree-lock (+2): transit Guru at the natal kāraka's degree.
+    ALL layers are VOTES, never gates — verified on a real case where the
+    Sun-rule failed on the actual event day while the degree-locks converged.
+    Returns the top score-clusters (≥ min_gap_days apart)."""
+    tr = v.transits()
+    nk = nadi_karaka(v, profile)
+    nk_lon = float(v.longitudes[nk])
+    nk_sign = int(nk_lon // 30)
+    nj_lon = float(v.longitudes[Planet.JUPITER])
+    nj_sign = int(nj_lon // 30)
+    asc = v.ascendant_sign
+    utsava_signs = {asc, (asc + 1) % 12, (asc + 6) % 12}
+    fast = [Planet.SUN, Planet.VENUS, Planet.MARS, Planet.JUPITER]
+    days = []
+    d = start
+    while d <= end:
+        pos = tr.positions(d, fast)
+        sun, ven, mar, jup = (float(pos[p]) for p in fast)
+        js, vs, ms, ss = int(jup // 30), int(ven // 30), int(mar // 30), int(sun // 30)
+        score, hits = 0, []
+        if _nrel(nk_sign, ss) or _nrel(js, ss):
+            score += 1; hits.append("Sūrya month-gate")
+        if vs in utsava_signs:
+            score += 1; hits.append("Śukra utsava (1/2/7)")
+        if _nrel(js, vs) and _deg_close(ven, jup):
+            score += 2; hits.append("Śukra≈Guru degree-lock")
+        if ((_nrel(nk_sign, ms) and _deg_close(mar, nk_lon))
+                or (_nrel(nj_sign, ms) and _deg_close(mar, nj_lon))):
+            score += 2; hits.append("Maṅgal executioner degree-lock")
+        if _nrel(nk_sign, js) and _deg_close(jup, nk_lon):
+            score += 2; hits.append("Guru≈kāraka degree-lock")
+        if score > 0:
+            days.append((d, score, hits))
+        d += timedelta(days=1)
+    days.sort(key=lambda x: (-x[1], x[0]))
+    picked = []
+    for d, sc, h in days:
+        if all(abs((d - p[0]).days) >= min_gap_days for p in picked):
+            picked.append((d, sc, h))
+        if len(picked) >= top:
+            break
+    picked.sort(key=lambda x: x[0])
+    return [dict(date=f"{x[0]:%Y-%m-%d}", score=x[1], hits=x[2]) for x in picked]
+
+
 def _w_nadi_ketu_sanga(v, p):
     """Standing: Ketu with/trine the Nāḍī kāraka = classical delay/break-prone."""
     nk = nadi_karaka(v, p)
@@ -823,10 +891,11 @@ register_witness("nadi: Ketu-saṅga on kāraka (delay/break-prone)", "standing"
 
 
 def _trine_windows(tr, transit, natal_lon, start, end, orb=9.0):
-    """Windows where a transit is conjunct OR trine (1-5-9) a natal point —
-    Nāḍī reads trine as 'with'. Slow movers only (Jupiter/Saturn)."""
+    """Windows where a transit holds a Nāḍī golden relation (1/5/9 trine, 7th
+    opposition, or conjunction) to a natal point — Nāḍī reads these as 'with'.
+    Slow movers only (Jupiter/Saturn)."""
     out = []
-    for ang in (0.0, 120.0, 240.0):
+    for ang in (0.0, 120.0, 240.0, 180.0):
         out += [(w.start, w.end) for w in
                 tr.conjunction_windows(transit, (natal_lon + ang) % 360.0,
                                        start, end, orb=orb, step_days=10.0)]
@@ -1043,7 +1112,10 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
     nk = nadi_karaka(v, profile)
     nk_lon = float(v.longitudes[nk])
     nadi_jeeva_w = _trine_windows(tr, Planet.JUPITER, nk_lon, start, end)
-    nadi_sat_w = _trine_windows(tr, Planet.SATURN, nk_lon, start, end)
+    nadi_sat_w = (_trine_windows(tr, Planet.SATURN, nk_lon, start, end)
+                  + _trine_windows(tr, Planet.SATURN,
+                                   float(v.longitudes[Planet.JUPITER]),
+                                   start, end))
     fulfil_signs = {(lagna_sign + h - 1) % 12 for h in profile.fulfil_houses}
 
     def _nadi_sanction(when) -> bool:

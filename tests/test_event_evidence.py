@@ -459,3 +459,25 @@ def test_nadi_witnesses_registered_and_live():
                for r in rows)
     assert any(r.nadi_jeeva for r in rows)   # Guru-jeeva fires somewhere
     assert any(r.nadi_karma for r in rows)   # Śani sanction fires somewhere
+
+
+def test_nadi_pinpoint_mechanics():
+    """Funnel returns sorted, in-range, gap-separated day-candidates with named
+    hits; deterministic; all layers are votes (score bounded 1..8)."""
+    from interpreter.event_evidence import nadi_pinpoint
+    v = _chart()
+    v.gender = "male"
+    prof = DOMAIN_PROFILES["marriage"]
+    s = datetime(2024, 1, 1, tzinfo=UTC)
+    e = datetime(2024, 4, 30, tzinfo=UTC)
+    pins = nadi_pinpoint(v, prof, s, e)
+    assert pins, "no pinpoint days in an active window"
+    dates = [datetime.strptime(p["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+             for p in pins]
+    assert all(s <= d <= e for d in dates)
+    assert all(1 <= p["score"] <= 8 and p["hits"] for p in pins)
+    # min-gap separation
+    for a, b in zip(dates, dates[1:]):
+        assert (b - a).days >= 7
+    # deterministic
+    assert pins == nadi_pinpoint(v, prof, s, e)

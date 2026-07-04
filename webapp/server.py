@@ -298,9 +298,23 @@ def _run_scan(job, params, domain, start, end, step_days):
                         outcome=kind_at(r.start),
                         broke_after=broke_after(r, rr),
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
+        # NĀḌĪ day-level pinpoint inside the top candidate windows (±45d)
+        from interpreter.event_evidence import nadi_pinpoint
+        pins, seen = [], set()
+        for c in (vd.candidates or [])[:2]:
+            cd = datetime.strptime(c["date"], "%Y-%m-%d").replace(
+                tzinfo=timezone.utc)
+            s0 = max(cd - timedelta(days=45), start)
+            e0 = min(cd + timedelta(days=45), end)
+            for p in nadi_pinpoint(v, prof, s0, e0):
+                if p["date"] not in seen:
+                    seen.add(p["date"])
+                    pins.append(p)
+        pins.sort(key=lambda p: (-p["score"], p["date"]))
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
+                           pinpoint=pins[:5],
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
@@ -534,7 +548,10 @@ CHAT_NARRATOR = (
     "SPECIFICALLY: 'baat/rishta bana hoga par poora nahi hua', and quote the "
     "engine's named blockers (blocking houses + natal blockers) as the WHY. "
     "'CONTESTED' means the panel split — present both readings and adopt the "
-    "user's own account if given. If the call carries an 'arc', narrate it "
+    "user's own account if given. If the scan carries 'pinpoint' days, they are "
+    "the engine's Nāḍī day-level funnel (Sun month-gate, Venus utsava, "
+    "Śukra≈Guru and Maṅgal degree-locks) inside the top windows — cite them as "
+    "the most probable SPECIFIC dates, highest score first. If the call carries an 'arc', narrate it "
     "CHRONOLOGICALLY: pehle attempts/bani-ke-toote, phir the event window, phir "
     "post-event rupture (friction/break AFTERWARDS) — never describe the arc's "
     "affliction as the event-moment's texture; 'afflicted' quality is the "
