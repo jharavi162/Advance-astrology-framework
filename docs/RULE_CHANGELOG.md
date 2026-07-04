@@ -1002,3 +1002,36 @@ addresses (coverage vs discrimination).
   user-supplied rule-set 2026-07-04.
 - **Tests:** `test_nadi_pinpoint_mechanics` (bounds, votes, gap-separation,
   determinism). Suite 160 green.
+
+## 2026-07-04 — Nāḍī pinpoint TIE-BREAK: exactness of the degree-lock (user-approved)
+
+- **Change:** within an equal-score plateau (several consecutive days carrying
+  the same funnel votes) `nadi_pinpoint` now returns the day with the
+  **tightest combined degree-lock orb** instead of the plateau's first calendar
+  day. Days without any degree-lock rank after locked days at the same score.
+  Each pinpoint carries its `orb` so the narrator can state lock-tightness.
+- **Why (śāstra, not calibration):** Nāḍī degree-to-degree doctrine reads
+  EXACTNESS as strength — the nearer the lock, the surer the trigger (R.G. Rao,
+  Bhrigu Nandi Nadi practice). "First day of the plateau" was an arbitrary
+  artifact of the sort already outlawed by pratyantar-midpoint sampling. The
+  rule is date-agnostic and applies to every chart.
+- **Tests:** `test_nadi_pinpoint_tiebreak_prefers_tightest_lock` (rule verified
+  against the full per-day list, no event dates).
+
+## 2026-07-04 — ROLLBACK: completion-grade machinery removed (user-directed)
+
+- **Change:** the verdict layer is SIMPLE again — `domain_verdict` commits only
+  YES / NO (denied) / NOT-YET / UNCERTAIN (+ confidence, window, next-window,
+  quality). Removed: the Completion Convergence Panel, the
+  "ATTEMPTED (incomplete)" and "CONTESTED" grades, mechanical blockers,
+  attempt-arcs (`_arc`), candidate clusters and the `broke_after`
+  (bana-ke-toota) tag — from the engine, the scan payload, the narrator prompt
+  and the app UI. The boundary-maturity guard (`min_elapsed_days`) and the
+  committed next-window stay (independent fixes, no attempts-language).
+- **Why:** user rollback 2026-07-04 — "salience engine simple hona chahiye;
+  itne attempts hue, convert nahi hue — ye sab salience me nahi aana chahiye."
+  Whether an elapsed axis-window was the completed matter vs an attempt is left
+  to the user's own account + the AI's multivalent reading
+  (docs/AI_TRIANGULATION_PROMPT.md), not a mechanical grade.
+- **Tests:** `test_domain_verdict_follows_the_decision_rule` now asserts the
+  SIMPLE vocabulary (attempted/contested must never reappear).

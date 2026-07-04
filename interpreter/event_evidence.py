@@ -837,6 +837,11 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
       • Guru≈kāraka degree-lock (+2): transit Guru at the natal kāraka's degree.
     ALL layers are VOTES, never gates — verified on a real case where the
     Sun-rule failed on the actual event day while the degree-locks converged.
+    TIE-BREAK (approved 2026-07-04): within an equal-score plateau the day with
+    the TIGHTEST combined degree-lock orb wins — Nāḍī degree-to-degree doctrine
+    reads exactness as strength (the nearer the lock, the surer the trigger), so
+    "first calendar day of the plateau" would be an arbitrary artifact (same
+    class as the grid-landing lottery fixed by pratyantar-midpoint sampling).
     Returns the top score-clusters (≥ min_gap_days apart)."""
     tr = v.transits()
     nk = nadi_karaka(v, profile)
@@ -853,30 +858,41 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
         pos = tr.positions(d, fast)
         sun, ven, mar, jup = (float(pos[p]) for p in fast)
         js, vs, ms, ss = int(jup // 30), int(ven // 30), int(mar // 30), int(sun // 30)
-        score, hits = 0, []
+        score, hits, orb = 0, [], 0.0
+
+        def _dd(l1, l2):
+            return abs((l1 % 30.0) - (l2 % 30.0))
         if _nrel(nk_sign, ss) or _nrel(js, ss):
             score += 1; hits.append("Sūrya month-gate")
         if vs in utsava_signs:
             score += 1; hits.append("Śukra utsava (1/2/7)")
         if _nrel(js, vs) and _deg_close(ven, jup):
             score += 2; hits.append("Śukra≈Guru degree-lock")
-        if ((_nrel(nk_sign, ms) and _deg_close(mar, nk_lon))
-                or (_nrel(nj_sign, ms) and _deg_close(mar, nj_lon))):
+            orb += _dd(ven, jup)
+        m_orbs = [_dd(mar, a) for a, s_ok in
+                  ((nk_lon, _nrel(nk_sign, ms)), (nj_lon, _nrel(nj_sign, ms)))
+                  if s_ok and _deg_close(mar, a)]
+        if m_orbs:
             score += 2; hits.append("Maṅgal executioner degree-lock")
+            orb += min(m_orbs)
         if _nrel(nk_sign, js) and _deg_close(jup, nk_lon):
             score += 2; hits.append("Guru≈kāraka degree-lock")
+            orb += _dd(jup, nk_lon)
         if score > 0:
-            days.append((d, score, hits))
+            # no degree-lock → no exactness to compare; rank after locked days
+            locked = any("degree-lock" in h for h in hits)
+            days.append((d, score, hits, orb if locked else 99.0))
         d += timedelta(days=1)
-    days.sort(key=lambda x: (-x[1], x[0]))
+    days.sort(key=lambda x: (-x[1], x[3], x[0]))
     picked = []
-    for d, sc, h in days:
+    for d, sc, h, ob in days:
         if all(abs((d - p[0]).days) >= min_gap_days for p in picked):
-            picked.append((d, sc, h))
+            picked.append((d, sc, h, ob))
         if len(picked) >= top:
             break
     picked.sort(key=lambda x: x[0])
-    return [dict(date=f"{x[0]:%Y-%m-%d}", score=x[1], hits=x[2]) for x in picked]
+    return [dict(date=f"{x[0]:%Y-%m-%d}", score=x[1], hits=x[2],
+                 orb=round(x[3], 2)) for x in picked]
 
 
 def _w_nadi_ketu_sanga(v, p):
@@ -1246,7 +1262,7 @@ _PADDHATI_RULES = [
 # ---------------------------------------------------------------------------- #
 @dataclass
 class Verdict:
-    answer: str          # "YES" | "ATTEMPTED (incomplete)" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
+    answer: str          # "YES" | "NO (denied)" | "NOT-YET" | "UNCERTAIN"
     confidence: str      # "HIGH" | "MEDIUM" | "LOW"
     best_window: str     # "YYYY-MM-DD" of the committed window ("" if none)
     chain: str           # daśā chain at that window
@@ -1255,9 +1271,6 @@ class Verdict:
     reasons: list
     next_window: str = ""    # strongest UPCOMING window after asof ("" if none)
     next_chain: str = ""
-    arc: list = field(default_factory=list)   # chronological story around the event
-    candidates: list = field(default_factory=list)  # top elapsed windows — the CALL
-                                                    # never fakes single-date certainty
 
 
 def domain_verdict(v, profile, rows, asof, rrows=None,
@@ -1278,13 +1291,11 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
     before ``asof`` — otherwise a forward scan's very first row (which starts AT
     the scan boundary, i.e. today) masquerades as delivered evidence.
 
-    PROMISE GRADE (KP primary-house doctrine): the promise is FULL only when the
-    matter's OWN house is among the cusp sub-lord's significations — then an
-    elapsed window is a DELIVERED event ("YES", friction noted separately).
-    Secondary fulfil-houses alone (e.g. 2/11 without 7 for marriage) are a
-    PARTIAL promise: the axis runs (talks/rishta/attempt-level event) but the
-    union/contract itself is not certified — "ATTEMPTED (incomplete)", with the
-    blocking factors named mechanically."""
+    Kept SIMPLE by design (user rollback, 2026-07-04): the completion-grade
+    machinery (panel votes, ATTEMPTED/CONTESTED, attempt-arcs, candidate
+    clusters) was removed — the verdict commits YES / NO / NOT-YET / UNCERTAIN
+    only; whether an elapsed axis-window was the completed matter vs an attempt
+    is left to the user's own account and the AI's multivalent reading."""
     pt = promise_and_tempo(v, profile)
     sig = set(pt.cusp_signifies)
     denied = ((not pt.promised) and bool(sig & profile.negate_houses))
@@ -1337,134 +1348,16 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
         best = max(elapsed, key=lambda r: r.salience)
         conf = ("HIGH" if best.systems_firing >= 6
                 else "MEDIUM" if best.systems_firing >= 4 else "LOW")
-        # COMPLETION CONVERGENCE PANEL — no single rule (not even KP primary-
-        # house) decides the grade alone; the systems VOTE. Clear positive
-        # majority → COMPLETED; clear negative → ATTEMPTED; else CONTESTED.
-        votes = _completion_panel(v, profile, sig, pt, best)
-        net = sum(votes.values())
-        vote_line = ", ".join(f"{k}:{'+' if x > 0 else ''}{x}"
-                              for k, x in votes.items())
-        arc = _arc(rows, rrows, best)
-        # Top elapsed CANDIDATES — several real axis-events can sit close in
-        # rank; the call reports the cluster instead of faking one certain date.
-        cands = [dict(date=f"{r.start:%Y-%m-%d}", chain=">".join(r.chain),
-                      salience=round(r.salience, 2),
-                      broke_after=broke_after(r, rrows))
-                 for r in sorted(elapsed, key=lambda r: -r.salience)[:3]]
-        reasons.append(f"completion panel [{vote_line}] → net {net:+d}")
-        if net >= 2:
-            reasons.append(
-                f"panel majority + elapsed window {best.start:%Y-%m-%d} "
-                f"({best.systems_firing} systems) → event stands DELIVERED; "
-                "afflicted standing (if any) is the matter's ARC — the trouble "
-                "comes in the life of the matter, not necessarily at the event")
-            return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
-                           ">".join(best.chain), best.systems_firing, quality,
-                           reasons, nw, nc, arc, cands)
-        if net <= -1:
-            reasons.append(
-                f"panel majority NEGATIVE + elapsed window "
-                f"{best.start:%Y-%m-%d} → the AXIS ran (talks/rishta/attempt-"
-                "level event) but completion is NOT certified")
-            reasons += _blockers(v, profile, sig, best)
-            return Verdict("ATTEMPTED (incomplete)", conf,
-                           f"{best.start:%Y-%m-%d}", ">".join(best.chain),
-                           best.systems_firing, quality, reasons, nw, nc, arc,
-                           cands)
-        reasons.append("panel split — completed vs attempted CONTESTED; use the "
-                       "user's own account of the past if given")
-        return Verdict("CONTESTED", conf, f"{best.start:%Y-%m-%d}",
+        reasons.append(
+            f"promised + elapsed window {best.start:%Y-%m-%d} "
+            f"({best.systems_firing} systems) → the event stands delivered; "
+            "afflicted standing (if any) is the matter's QUALITY, not denial")
+        return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
                        ">".join(best.chain), best.systems_firing, quality,
-                       reasons, nw, nc, arc, cands)
+                       reasons, nw, nc)
     reasons.append("promised, but no ≥2-system window has elapsed in the scanned "
                    "span → not yet (or the event lies outside this span)")
     return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons, nw, nc)
-
-
-def broke_after(window, rrows) -> bool:
-    """'Bana-ke-toota' tag: a LOSS/BREAK from the rupture timer in the SAME
-    antardaśā on/after the window — a period-structural bound (no tuned day
-    threshold). Attempts that broke carry it; a completed matter does not."""
-    return any(x.kind == "LOSS/BREAK"
-               and list(x.chain[:2]) == list(window.chain[:2])
-               and x.start >= window.start
-               for x in (rrows or []))
-
-
-def _completion_panel(v, profile, sig, pt, best) -> dict:
-    """COMPLETION CONVERGENCE PANEL — no single rule decides the grade; each
-    system votes ±1 (0 = silent) on whether the delivered window was a COMPLETED
-    matter vs an attempt. Sources per vote in RULE_CHANGELOG (2026-07-03)."""
-    votes = {}
-    primary = profile.houses[0]
-    votes["KP primary-house signified"] = 1 if primary in sig else -1
-    if best.kp_fulfil != best.kp_negate:
-        votes["window KP net (fulfil vs negate)"] = (
-            1 if best.kp_fulfil > best.kp_negate else -1)
-    if getattr(best, "arudha_axis", False):
-        votes["Arudha-axis lit (public manifestation)"] = 1
-    if profile.saham and getattr(best, "saham_double_transit", False):
-        votes["Saham fruition (double-transit)"] = 1
-    vo = [b for b in pt.varga_ok.values() if b is not None]
-    if vo:
-        votes["varga deposition (domain varga)"] = (
-            1 if 2 * sum(vo) >= len(vo) else -1)
-    sus = _w_arudha_sustenance(v, profile)
-    if sus:
-        votes["2nd-from-Arudha sustenance"] = 1 if sus > 0 else -1
-    return votes
-
-
-def _arc(rows, rrows, best) -> list:
-    """Chronological ARC around the delivered window: earlier attempt-windows,
-    pre-event LOSS/BREAKs (bani-ke-tooti), the event, post-event ruptures
-    (friction/break comes LATER — arc quality, not event-moment texture)."""
-    ev = []
-    pre_att = [r for r in rows
-               if r.start < best.start and r.systems_firing >= 2]
-    pre_br = [x for x in (rrows or [])
-              if x.start < best.start and x.kind == "LOSS/BREAK"]
-    post_br = [x for x in (rrows or [])
-               if x.start > best.start and x.kind == "LOSS/BREAK"]
-    if pre_att:
-        ev.append(f"pre-event attempts ({len(pre_att)} windows): "
-                  + ", ".join(f"{r.start:%Y-%m}" for r in pre_att[:4]))
-    if pre_br:
-        ev.append("pre-event LOSS/BREAK (bana-ke-toota): "
-                  + ", ".join(f"{x.start:%Y-%m}" for x in pre_br[:3]))
-    ev.append(f"EVENT window: {best.start:%Y-%m-%d}")
-    if post_br:
-        ev.append("post-event rupture (friction/break AFTERWARDS): "
-                  + ", ".join(f"{x.start:%Y-%m}" for x in post_br[:3]))
-    return ev
-
-
-_BHAVA_MEANING = {1: "self/own stand", 2: "family & finances",
-                  3: "own effort/communication", 4: "home/domestic front",
-                  5: "romance/children", 6: "dispute/obstacle/debt",
-                  7: "the union itself", 8: "joint finances/sudden blocks",
-                  9: "elders/tradition", 10: "status/career",
-                  11: "gains/expectations", 12: "loss/distance/expense"}
-
-
-def _blockers(v, profile, sig, best) -> list:
-    """Name WHY an attempted matter stalled — mechanically: the negation houses
-    the sub-lord feeds (with their classical meanings), the strongest negative
-    natal witnesses, and the window's own negation count."""
-    out = []
-    neg = sorted(sig & profile.negate_houses)
-    if neg:
-        out.append("blocking significations: " + ", ".join(
-            f"H{h} ({_BHAVA_MEANING.get(h, '')})" for h in neg))
-    _, fired = standing_balance(v, profile)
-    worst = sorted([f for f in fired if f[1] < 0], key=lambda x: x[1])[:3]
-    if worst:
-        out.append("natal blockers: " + "; ".join(
-            f"{n} ({c:+.2f})" for n, c in worst))
-    if best.kp_negate:
-        out.append(f"window carried {best.kp_negate} negation-signification(s) "
-                   f"vs {best.kp_fulfil} fulfilment")
-    return out
 
 
 def primary_label(profile) -> str:

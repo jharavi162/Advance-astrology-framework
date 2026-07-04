@@ -330,23 +330,17 @@ def test_domain_verdict_follows_the_decision_rule():
         prof = DOMAIN_PROFILES[name]
         rows = candidate_map(v, prof, start, end, step_days=45)
         vd = domain_verdict(v, prof, rows, asof)
-        assert vd.answer in ("YES", "ATTEMPTED (incomplete)", "CONTESTED",
-                             "NO (denied)", "NOT-YET", "UNCERTAIN")
+        # SIMPLE verdict vocabulary (user rollback 2026-07-04): no completion
+        # grades — attempted/contested language must never come back.
+        assert vd.answer in ("YES", "NO (denied)", "NOT-YET", "UNCERTAIN")
         assert vd.confidence in ("HIGH", "MEDIUM", "LOW")
         pt = promise_and_tempo(v, prof)
         elapsed = [r for r in rows
                    if (asof - r.start).days >= 30 and r.systems_firing >= 2]
         if pt.promised and elapsed:
-            # completion grade = PANEL majority, never one rule alone
-            from interpreter.event_evidence import _completion_panel
             best = max(elapsed, key=lambda r: r.salience)
-            net = sum(_completion_panel(v, prof, set(pt.cusp_signifies),
-                                        pt, best).values())
-            expected = ("YES" if net >= 2 else
-                        "ATTEMPTED (incomplete)" if net <= -1 else "CONTESTED")
-            assert vd.answer == expected
+            assert vd.answer == "YES"
             assert vd.best_window == f"{best.start:%Y-%m-%d}"
-            assert vd.arc and any("EVENT window" in a for a in vd.arc)
         # quality is stated but never used to flip existence
         assert "quality" not in vd.answer
 
@@ -481,3 +475,26 @@ def test_nadi_pinpoint_mechanics():
         assert (b - a).days >= 7
     # deterministic
     assert pins == nadi_pinpoint(v, prof, s, e)
+
+
+def test_nadi_pinpoint_tiebreak_prefers_tightest_lock():
+    """Within an equal-score plateau the returned day must be the one with the
+    TIGHTEST combined degree-lock orb (Nāḍī exactness = strength), never just
+    the plateau's first calendar day. Verified as a RULE: the funnel's overall
+    #1 must equal the best day of the full per-day list under the same key."""
+    from interpreter.event_evidence import nadi_pinpoint
+    v = _chart()
+    v.gender = "male"
+    prof = DOMAIN_PROFILES["marriage"]
+    s = datetime(2024, 1, 1, tzinfo=UTC)
+    e = datetime(2024, 4, 30, tzinfo=UTC)
+    allday = nadi_pinpoint(v, prof, s, e, top=10 ** 6, min_gap_days=1)
+    assert allday and all("orb" in p for p in allday)
+    key = lambda p: (-p["score"], p["orb"], p["date"])
+    best = min(allday, key=key)
+    pins = nadi_pinpoint(v, prof, s, e)
+    assert min(pins, key=key) == best
+    # locked days carry a real orb (≤ 2 locks × 3° each); unlocked rank last
+    for p in allday:
+        locked = any("degree-lock" in h for h in p["hits"])
+        assert (p["orb"] <= 9.0) if locked else (p["orb"] == 99.0)
