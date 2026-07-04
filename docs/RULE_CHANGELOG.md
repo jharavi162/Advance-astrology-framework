@@ -1052,3 +1052,26 @@ addresses (coverage vs discrimination).
   Marriage Through Nadi"; user direction 2026-07-04.)
 - **Tests:** `test_nadi_pinpoint_mechanics` now asserts score ≤ 7 and that no
   pin ever carries a Sun/Sūrya hit.
+
+## 2026-07-04 — Nāḍī pinpoint: golden-relation Śukra + multi-window anchoring (user-approved)
+
+- **Change 1 — Śukra vote is golden-relation now:** the +1 Venus vote fires when
+  transit Venus holds a golden relation (1/5/7/9) to the natal **kāraka**,
+  replacing the earlier lagna-based 1/2/7 "utsava" (the 2nd is not a golden
+  relation). BNN is kāraka-centric, so the funnel is now 100% golden-relation +
+  degree-lock — no lagna houses, no Sun.
+- **Change 2 — anchor on the top elapsed windows, not just #1:**
+  `nadi_pinpoint_multi(v, profile, anchors, ...)` runs the day-funnel around each
+  of the top-6 elapsed salience windows (±45d), merges, and ranks
+  tightest-lock-first. The salience #1 window is not always the matter's only
+  real window (a wedding ceremony and its legal date can be two different high
+  windows); anchoring only on #1 previously hid the day-pin of every other
+  window. The webapp scan now uses this and reports the merged top-5 pins.
+- **Why:** user direction 2026-07-04 ("jo bhi suggest kar rahe ho sab kar do")
+  after diagnosing that the ceremony-day pin was missing purely because the
+  funnel was anchored on the higher-salience legal-date window. No calibration —
+  the funnel and its inputs are unchanged; it simply now covers all the strong
+  windows a real matter can occupy.
+- **Tests:** `test_nadi_pinpoint_multi_covers_all_anchor_windows` (merge order,
+  gap-separation, membership, determinism); pinpoint-mechanics score cap 7 and
+  no-Sun assertions retained.

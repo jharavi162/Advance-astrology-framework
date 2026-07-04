@@ -501,3 +501,34 @@ def test_nadi_pinpoint_tiebreak_prefers_tightest_lock():
     for p in allday:
         locked = any("degree-lock" in h for h in p["hits"])
         assert (p["orb"] <= 9.0) if locked else (p["orb"] == 99.0)
+
+
+def test_nadi_pinpoint_multi_covers_all_anchor_windows():
+    """The multi-window funnel anchors on SEVERAL windows (not just #1) so a
+    strong day in any of them surfaces; ranked tightest-lock-first, gap-
+    separated across the merged set, capped and deterministic."""
+    from interpreter.event_evidence import nadi_pinpoint, nadi_pinpoint_multi
+    v = _chart()
+    v.gender = "male"
+    prof = DOMAIN_PROFILES["marriage"]
+    s = datetime(2023, 1, 1, tzinfo=UTC)
+    e = datetime(2025, 1, 1, tzinfo=UTC)
+    anchors = [datetime(2024, 2, 14, tzinfo=UTC), datetime(2024, 4, 15, tzinfo=UTC)]
+    pins = nadi_pinpoint_multi(v, prof, anchors, s, e, top=5)
+    assert pins and len(pins) <= 5
+    # ranked by (-score, orb) — no lower/looser pin ahead of a higher/tighter one
+    keys = [(-p["score"], p["orb"]) for p in pins]
+    assert keys == sorted(keys)
+    # gap separation ACROSS the merged windows
+    ds = sorted(datetime.strptime(p["date"], "%Y-%m-%d") for p in pins)
+    for a, b in zip(ds, ds[1:]):
+        assert (b - a).days >= 7
+    # every returned pin is a real funnel day from SOME anchor window
+    union = set()
+    for a in anchors:
+        for p in nadi_pinpoint(v, prof, a - timedelta(days=45),
+                               a + timedelta(days=45)):
+            union.add(p["date"])
+    assert all(p["date"] in union for p in pins)
+    # deterministic
+    assert pins == nadi_pinpoint_multi(v, prof, anchors, s, e, top=5)

@@ -296,22 +296,18 @@ def _run_scan(job, params, domain, start, end, step_days):
                         kp=f"{r.kp_fulfil}/{r.kp_negate}",
                         outcome=kind_at(r.start),
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
-        # NĀḌĪ day-level pinpoint inside the top-salience windows (±45d)
-        from interpreter.event_evidence import nadi_pinpoint
-        pins, seen = [], set()
-        for r in top[:2]:
-            cd = r.start
-            s0 = max(cd - timedelta(days=45), start)
-            e0 = min(cd + timedelta(days=45), end)
-            for p in nadi_pinpoint(v, prof, s0, e0):
-                if p["date"] not in seen:
-                    seen.add(p["date"])
-                    pins.append(p)
-        pins.sort(key=lambda p: (-p["score"], p["date"]))
+        # NĀḌĪ day-level pinpoint around the TOP-6 elapsed windows (±45d) — not
+        # just #1, so the ceremony AND the legal window both get day-pins.
+        from interpreter.event_evidence import nadi_pinpoint_multi
+        anchors = [r.start for r in
+                   sorted((r for r in top if r.start <= now),
+                          key=lambda x: (-x.salience, x.start))[:6]] or \
+                  [r.start for r in top[:2]]
+        pins = nadi_pinpoint_multi(v, prof, anchors, start, end, top=5)
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
-                           pinpoint=pins[:5],
+                           pinpoint=pins,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
@@ -541,9 +537,9 @@ CHAT_NARRATOR = (
     "quality), START your reply with that call verbatim-in-spirit — e.g. 'HAAN — "
     "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. "
     "If the scan carries 'pinpoint' days, they are "
-    "the engine's Nāḍī day-level funnel (Venus utsava, "
+    "the engine's Nāḍī day-level funnel (Śukra golden-relation to kāraka, "
     "Śukra≈Guru and Maṅgal degree-locks — all BNN golden-relation, NO Sun) "
-    "inside the top windows — cite them as "
+    "around the top elapsed windows — cite them as "
     "the most probable SPECIFIC dates, highest score first (a smaller 'orb' = "
     "a tighter degree-lock = stronger). If "
     "the call carries a 'next' window, state it as the engine's committed "

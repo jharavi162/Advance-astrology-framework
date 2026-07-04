@@ -830,7 +830,9 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     Sun plays NO part (updated 2026-07-04 per user + BNN research: BNN times with
     Jupiter/Saturn/Rāhu/Ketu and the 7th-lord/Mars/Venus/Moon in golden relation,
     never a Sūrya month-gate):
-      • Śukra utsava (+1): transit Venus in the 1st/2nd/7th (from lagna);
+      • Śukra golden-relation (+1): transit Venus in a golden relation (1/5/7/9)
+        to the natal kāraka — BNN is kāraka-centric, so this replaces the earlier
+        lagna-based 1/2/7 "utsava" (the 2nd house is not a golden relation);
       • Śukra≈Guru degree-lock (+2): transit Venus in a golden relation to
         transit Guru at the SAME degree (±3°);
       • Maṅgal executioner (+2): transit Mars — the universal māṅgalika-kārya
@@ -850,11 +852,11 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     nk_sign = int(nk_lon // 30)
     nj_lon = float(v.longitudes[Planet.JUPITER])
     nj_sign = int(nj_lon // 30)
-    asc = v.ascendant_sign
-    utsava_signs = {asc, (asc + 1) % 12, (asc + 6) % 12}
     fast = [Planet.VENUS, Planet.MARS, Planet.JUPITER]
     days = []
-    d = start
+    # sample at day granularity (00:00) so the labelled day and its orb do not
+    # depend on the anchor window's intraday timestamp — the pin is a DATE.
+    d = datetime(start.year, start.month, start.day, tzinfo=start.tzinfo)
     while d <= end:
         pos = tr.positions(d, fast)
         ven, mar, jup = (float(pos[p]) for p in fast)
@@ -863,8 +865,8 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
 
         def _dd(l1, l2):
             return abs((l1 % 30.0) - (l2 % 30.0))
-        if vs in utsava_signs:
-            score += 1; hits.append("Śukra utsava (1/2/7)")
+        if _nrel(nk_sign, vs):
+            score += 1; hits.append("Śukra golden-relation to kāraka")
         if _nrel(js, vs) and _deg_close(ven, jup):
             score += 2; hits.append("Śukra≈Guru degree-lock")
             orb += _dd(ven, jup)
@@ -892,6 +894,37 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     picked.sort(key=lambda x: x[0])
     return [dict(date=f"{x[0]:%Y-%m-%d}", score=x[1], hits=x[2],
                  orb=round(x[3], 2)) for x in picked]
+
+
+def nadi_pinpoint_multi(v, profile, anchors, start, end, radius_days=45,
+                        top=5, min_gap_days=7) -> list:
+    """Run the day-funnel around SEVERAL candidate-window anchor dates and merge
+    into one ranked list. The salience engine's #1 window is not always the
+    matter's only real window (e.g. a wedding ceremony vs its legal date can be
+    two different high windows); anchoring the pinpoint on just the top window
+    would then miss the other. So we funnel around each of the top elapsed
+    windows (±radius_days), merge, and rank tightest-lock-first — the strongest,
+    most-exact day surfaces regardless of which anchor window it fell in.
+    Deterministic; gap-separated across the merged set."""
+    seen, merged = set(), []
+    for a in anchors:
+        s0 = max(a - timedelta(days=radius_days), start)
+        e0 = min(a + timedelta(days=radius_days), end)
+        if e0 <= s0:
+            continue
+        for p in nadi_pinpoint(v, profile, s0, e0, min_gap_days=min_gap_days):
+            if p["date"] not in seen:
+                seen.add(p["date"]); merged.append(p)
+    merged.sort(key=lambda p: (-p["score"], p["orb"], p["date"]))
+    out = []
+    for p in merged:
+        pd = datetime.strptime(p["date"], "%Y-%m-%d")
+        if all(abs((pd - datetime.strptime(q["date"], "%Y-%m-%d")).days)
+               >= min_gap_days for q in out):
+            out.append(p)
+        if len(out) >= top:
+            break
+    return out
 
 
 def _w_nadi_ketu_sanga(v, p):
