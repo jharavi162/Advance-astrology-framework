@@ -918,3 +918,28 @@ addresses (coverage vs discrimination).
   computed windows already contained in sequence.
 - **Tests:** decision-rule test recomputes the panel live and asserts the grade
   ⇔ panel majority; arc must contain the event entry. Suite 156 green.
+
+## 2026-07-03 — Deterministic pratyantar-midpoint sampling + candidate cluster + bana-ke-toota tag
+
+- **Change (user-approved):**
+  1. `candidate_map` and `reversal_map` no longer walk a start+k·step grid — each
+     Vimśottari pratyantar intersecting the span is evaluated at its (clipped)
+     MIDPOINT. The old grid's landing spot inside a pratyantar was an accident of
+     scan start/step: the same chart ranked a different #1 window at step 45 vs
+     60. Rankings are now parameter-independent (regression test); `step_days`
+     is retained in the signatures for API compatibility but no longer affects
+     sampling.
+  2. The verdict carries `candidates` — the top-3 elapsed windows — and the CALL
+     presents the CLUSTER instead of faking single-date certainty (several real
+     axis-events can sit within ranking noise of each other).
+  3. `broke_after(window, rrows)` — the "bana-ke-toota" tag: a LOSS/BREAK from
+     the rupture timer in the SAME antardaśā on/after a fulfilment window
+     (period-structural bound, no tuned day threshold). Shown per window and per
+     candidate.
+- **Why:** a live case showed two runs of the same chart committing different
+  top windows purely from sampling luck; the ground truth also showed several
+  top-ranked windows were all REAL axis-events (an alliance fixed-then-broken,
+  meeting the spouse, the wedding) — so the honest output is a deterministic
+  ranked cluster with rupture-pairing, not one fabricated-certain date.
+- **Tests:** `test_candidate_map_is_step_deterministic`; liveness test band
+  widened for midpoint sampling. Suite 156 green.

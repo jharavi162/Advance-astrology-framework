@@ -774,6 +774,26 @@ def _domain_signs(v, profile):
     return {(v.ascendant_sign + h - 1) % 12 for h in profile.houses}
 
 
+def _pratyantar_midpoints(v, start, end) -> list:
+    """Deterministic evaluation dates: the MIDPOINT of every Vimśottari
+    pratyantar intersecting [start, end] (clipped). Replaces the old start+k·step
+    grid, whose landing spot inside each pratyantar was an accident of the scan
+    parameters — the same chart could rank windows differently at step 45 vs 60."""
+    out = []
+    for m in v.dasha("vimshottari", levels=3):
+        if m.end <= start or m.start >= end:
+            continue
+        for a in (m.sub_periods or []):
+            if a.end <= start or a.start >= end:
+                continue
+            for p in (a.sub_periods or []):
+                if p.end <= start or p.start >= end:
+                    continue
+                s2, e2 = max(p.start, start), min(p.end, end)
+                out.append(s2 + (e2 - s2) / 2)
+    return sorted(out)
+
+
 @dataclass
 class ReversalRow:
     start: datetime
@@ -833,25 +853,22 @@ def reversal_map(v, profile, start, end, step_days=7) -> list[ReversalRow]:
         if sah:
             saham_dt = _dt_windows(tr, (sah.sign_index - lagna) % 12 + 1, start, end)
     standing, _ = standing_balance(v, profile)   # natal multi-nodal pattern (once)
-    rows, d, last = [], start, None
-    while d < end:
+    rows = []
+    for d in _pratyantar_midpoints(v, start, end):   # deterministic (no grid jitter)
         chain = _chain_lords(v, d, levels=3)
-        if tuple(chain) != last:
-            last = tuple(chain)
-            kp = sum(len(set(kps.planet_signifies(l)) & rupture_houses) for l in chain)
-            # judge fulfilment co-occurrence from the TIMING lords (AD+PD), not the
-            # mahādaśā — else a domain-lord MD (e.g. the 7th-lord running for 20y)
-            # permanently inflates fulfilment and masks a real loss.
-            fulfil = sum(len(set(kps.planet_signifies(l)) & profile.fulfil_houses)
-                         for l in chain[1:])
-            dark = not _slow_on_sign(tr, lagna, d)
-            rows.append(ReversalRow(
-                start=d, chain=[c.value[:2] for c in chain], kp_rupture=kp,
-                separators_running=any(l in separators for l in chain),
-                break_house_dt=_in(d, bh_dt), reversal_saham_dt=_in(d, saham_dt),
-                lagna_dark_with_malefic=dark and any(l in nodes_sat for l in chain),
-                kp_fulfil=fulfil, standing=standing))
-        d += timedelta(days=step_days)
+        kp = sum(len(set(kps.planet_signifies(l)) & rupture_houses) for l in chain)
+        # judge fulfilment co-occurrence from the TIMING lords (AD+PD), not the
+        # mahādaśā — else a domain-lord MD (e.g. the 7th-lord running for 20y)
+        # permanently inflates fulfilment and masks a real loss.
+        fulfil = sum(len(set(kps.planet_signifies(l)) & profile.fulfil_houses)
+                     for l in chain[1:])
+        dark = not _slow_on_sign(tr, lagna, d)
+        rows.append(ReversalRow(
+            start=d, chain=[c.value[:2] for c in chain], kp_rupture=kp,
+            separators_running=any(l in separators for l in chain),
+            break_house_dt=_in(d, bh_dt), reversal_saham_dt=_in(d, saham_dt),
+            lagna_dark_with_malefic=dark and any(l in nodes_sat for l in chain),
+            kp_fulfil=fulfil, standing=standing))
     return rows
 
 
@@ -973,51 +990,48 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 sc -= 0.5
         return max(-1.0, min(1.0, sc / max(1, len(lords))))
 
-    rows, d, last = [], start, None
-    while d < end:
+    rows = []
+    for d in _pratyantar_midpoints(v, start, end):   # deterministic (no grid jitter)
         chain = _chain_lords(v, d, levels=3)
-        if tuple(chain) != last:
-            last = tuple(chain)
-            f = n = 0
-            for lord in chain:
-                a, b = _kp_score(kps, lord, profile)
-                f += a
-                n += b
-            deep = v.current_dasha("vimshottari", d, levels=5)
-            su = v.sudarshana(d)
-            chara = v.current_chara_dasha(d, levels=2)
-            sig = {f"dasha::{name}":
-                   (1.0 if any(_signifies_matter(p) for p in look(d)) else 0.0)
-                   for name, look in dasha_lookups.items()}
-            we = WindowEvidence(
-                start=d, chain=[c.value[:2] for c in chain],
-                kp_fulfil=f, kp_negate=n,
-                karaka_in_chain=any(l in karakas for l in chain),
-                karaka_sukshma=any(c.lord in karakas for c in deep[3:]),
-                lagnesh_in_chain=lagnesh in chain,
-                lagna_activators=_slow_on_sign(tr, lagna_sign, d),
-                house_double_transit=_in(d, house_dt),
-                lord_double_transit=_in(d, lord_dt),
-                saham_double_transit=_in(d, saham_dt),
-                bnn=_in(d, bnn_w),
-                kakshya=_in(d, kak_w),
-                varshaphal_muntha=muntha.get(d.year) in profile.houses,
-                chara_ad=" > ".join(c.note for c in chara),
-                sudarshana_hit=any(s in dom_signs for s in
-                                   (su.lagna_month_sign, su.moon_month_sign,
-                                    su.lagna_year_sign, su.moon_year_sign)),
-                gochara_from_moon=_in(d, moon_dt),
-                fulfil_house_dt=_in(d, fulfil_dt),
-                kp_star_transit=_kp_star_hit(d),
-                tajika_sig=tajika.get(d.year, False),
-                arudha_axis=_arudha_axis_hit(d),
-                bb_active=_bb_hit(d),
-                func_valence=_chain_valence(chain),
-                signals=sig,
-            )
-            we.panel = panel
-            rows.append(we)
-        d += timedelta(days=step_days)
+        f = n = 0
+        for lord in chain:
+            a, b = _kp_score(kps, lord, profile)
+            f += a
+            n += b
+        deep = v.current_dasha("vimshottari", d, levels=5)
+        su = v.sudarshana(d)
+        chara = v.current_chara_dasha(d, levels=2)
+        sig = {f"dasha::{name}":
+               (1.0 if any(_signifies_matter(p) for p in look(d)) else 0.0)
+               for name, look in dasha_lookups.items()}
+        we = WindowEvidence(
+            start=d, chain=[c.value[:2] for c in chain],
+            kp_fulfil=f, kp_negate=n,
+            karaka_in_chain=any(l in karakas for l in chain),
+            karaka_sukshma=any(c.lord in karakas for c in deep[3:]),
+            lagnesh_in_chain=lagnesh in chain,
+            lagna_activators=_slow_on_sign(tr, lagna_sign, d),
+            house_double_transit=_in(d, house_dt),
+            lord_double_transit=_in(d, lord_dt),
+            saham_double_transit=_in(d, saham_dt),
+            bnn=_in(d, bnn_w),
+            kakshya=_in(d, kak_w),
+            varshaphal_muntha=muntha.get(d.year) in profile.houses,
+            chara_ad=" > ".join(c.note for c in chara),
+            sudarshana_hit=any(s in dom_signs for s in
+                               (su.lagna_month_sign, su.moon_month_sign,
+                                su.lagna_year_sign, su.moon_year_sign)),
+            gochara_from_moon=_in(d, moon_dt),
+            fulfil_house_dt=_in(d, fulfil_dt),
+            kp_star_transit=_kp_star_hit(d),
+            tajika_sig=tajika.get(d.year, False),
+            arudha_axis=_arudha_axis_hit(d),
+            bb_active=_bb_hit(d),
+            func_valence=_chain_valence(chain),
+            signals=sig,
+        )
+        we.panel = panel
+        rows.append(we)
     _score_rows(rows)
     return rows
 
@@ -1071,6 +1085,8 @@ class Verdict:
     next_window: str = ""    # strongest UPCOMING window after asof ("" if none)
     next_chain: str = ""
     arc: list = field(default_factory=list)   # chronological story around the event
+    candidates: list = field(default_factory=list)  # top elapsed windows — the CALL
+                                                    # never fakes single-date certainty
 
 
 def domain_verdict(v, profile, rows, asof, rrows=None,
@@ -1155,6 +1171,12 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
         vote_line = ", ".join(f"{k}:{'+' if x > 0 else ''}{x}"
                               for k, x in votes.items())
         arc = _arc(rows, rrows, best)
+        # Top elapsed CANDIDATES — several real axis-events can sit close in
+        # rank; the call reports the cluster instead of faking one certain date.
+        cands = [dict(date=f"{r.start:%Y-%m-%d}", chain=">".join(r.chain),
+                      salience=round(r.salience, 2),
+                      broke_after=broke_after(r, rrows))
+                 for r in sorted(elapsed, key=lambda r: -r.salience)[:3]]
         reasons.append(f"completion panel [{vote_line}] → net {net:+d}")
         if net >= 2:
             reasons.append(
@@ -1164,7 +1186,7 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
                 "comes in the life of the matter, not necessarily at the event")
             return Verdict("YES", conf, f"{best.start:%Y-%m-%d}",
                            ">".join(best.chain), best.systems_firing, quality,
-                           reasons, nw, nc, arc)
+                           reasons, nw, nc, arc, cands)
         if net <= -1:
             reasons.append(
                 f"panel majority NEGATIVE + elapsed window "
@@ -1173,15 +1195,26 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
             reasons += _blockers(v, profile, sig, best)
             return Verdict("ATTEMPTED (incomplete)", conf,
                            f"{best.start:%Y-%m-%d}", ">".join(best.chain),
-                           best.systems_firing, quality, reasons, nw, nc, arc)
+                           best.systems_firing, quality, reasons, nw, nc, arc,
+                           cands)
         reasons.append("panel split — completed vs attempted CONTESTED; use the "
                        "user's own account of the past if given")
         return Verdict("CONTESTED", conf, f"{best.start:%Y-%m-%d}",
                        ">".join(best.chain), best.systems_firing, quality,
-                       reasons, nw, nc, arc)
+                       reasons, nw, nc, arc, cands)
     reasons.append("promised, but no ≥2-system window has elapsed in the scanned "
                    "span → not yet (or the event lies outside this span)")
     return Verdict("NOT-YET", "MEDIUM", "", "", 0, quality, reasons, nw, nc)
+
+
+def broke_after(window, rrows) -> bool:
+    """'Bana-ke-toota' tag: a LOSS/BREAK from the rupture timer in the SAME
+    antardaśā on/after the window — a period-structural bound (no tuned day
+    threshold). Attempts that broke carry it; a completed matter does not."""
+    return any(x.kind == "LOSS/BREAK"
+               and list(x.chain[:2]) == list(window.chain[:2])
+               and x.start >= window.start
+               for x in (rrows or []))
 
 
 def _completion_panel(v, profile, sig, pt, best) -> dict:

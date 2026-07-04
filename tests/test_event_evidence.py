@@ -108,9 +108,11 @@ def test_new_timing_nodes_registered_and_computed():
                    "KP transit:", "Tājika Varṣeśa/Muntha"):
         assert any(needle in n for n in names), f"missing node: {needle}"
     v = _chart()
+    # liveness needs a band wide enough that the deterministic pratyantar
+    # midpoints intersect the nodes' activation windows
     rows = candidate_map(v, DOMAIN_PROFILES["relocation"],
-                         datetime(2024, 5, 1, tzinfo=UTC),
-                         datetime(2025, 2, 1, tzinfo=UTC))
+                         datetime(2023, 1, 1, tzinfo=UTC),
+                         datetime(2025, 6, 1, tzinfo=UTC))
     assert rows
     for r in rows:  # every new field is a real bool, computed (not left None)
         assert isinstance(r.gochara_from_moon, bool)
@@ -155,9 +157,11 @@ def test_window_scores_use_the_full_panel_including_families():
     """The per-window scoring must iterate the domain's full panel (families
     included), and the catalogue signals must be computed on each window."""
     v = _chart()
+    # liveness needs a band wide enough that the deterministic pratyantar
+    # midpoints intersect the nodes' activation windows
     rows = candidate_map(v, DOMAIN_PROFILES["relocation"],
-                         datetime(2024, 5, 1, tzinfo=UTC),
-                         datetime(2025, 2, 1, tzinfo=UTC))
+                         datetime(2023, 1, 1, tzinfo=UTC),
+                         datetime(2025, 6, 1, tzinfo=UTC))
     assert rows
     for r in rows:
         assert r.panel is not None and len(r.panel) == len(WITNESSES) + len(DASHA_SYSTEMS)
@@ -405,3 +409,18 @@ def test_verdict_boundary_and_next_window():
     if upcoming:
         nxt = max(upcoming, key=lambda r: r.salience)
         assert vd.next_window == f"{nxt.start:%Y-%m-%d}"
+
+
+def test_candidate_map_is_step_deterministic():
+    """Rankings must NOT depend on scan parameters: the same span at different
+    step_days gives identical rows (pratyantar-midpoint sampling)."""
+    v = _chart()
+    prof = DOMAIN_PROFILES["marriage"]
+    s, e = datetime(2023, 1, 1, tzinfo=UTC), datetime(2025, 1, 1, tzinfo=UTC)
+    a = candidate_map(v, prof, s, e, step_days=45)
+    b = candidate_map(v, prof, s, e, step_days=60)
+    assert [(r.start, r.salience) for r in a] == [(r.start, r.salience) for r in b]
+    ra = reversal_map(v, prof, s, e, step_days=45)
+    rb = reversal_map(v, prof, s, e, step_days=60)
+    assert [(r.start, r.rupture_score) for r in ra] == \
+           [(r.start, r.rupture_score) for r in rb]

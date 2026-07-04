@@ -287,11 +287,13 @@ def _run_scan(job, params, domain, start, end, step_days):
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
         bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end, step_days)
         vd = domain_verdict(v, prof, rows, now, rrows=rr)
+        from interpreter.event_evidence import broke_after
         windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
                         salience=round(r.salience, 3), systems=r.systems_firing,
                         convergence=round(r.convergence, 1),
                         kp=f"{r.kp_fulfil}/{r.kp_negate}",
                         outcome=kind_at(r.start),
+                        broke_after=broke_after(r, rr),
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
@@ -300,7 +302,8 @@ def _run_scan(job, params, domain, start, end, step_days):
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
                                      next=vd.next_window, next_chain=vd.next_chain,
-                                     arc=vd.arc, reasons=vd.reasons),
+                                     arc=vd.arc, candidates=vd.candidates,
+                                     reasons=vd.reasons),
                            ts=time.time())
     except Exception as e:
         _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
