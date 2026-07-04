@@ -82,6 +82,7 @@
       <label>Latitude<input name="lat" value="28.61" size="7"></label>
       <label>Longitude<input name="lon" value="77.20" size="7"></label>
       <label>Timezone<input name="tz" value="Asia/Kolkata" size="13"></label>
+      <label>Gender<select id="gender"><option value="">—</option><option value="male">Male</option><option value="female">Female</option></select></label>
       <label>System<select id="ay"><option value="lahiri">Lahiri</option><option value="kp">KP</option><option value="raman">Raman</option><option value="multi">Multi (all 3)</option></select></label>
       <button type="submit">Cast chart</button>
     </form>
@@ -255,6 +256,7 @@ function params(extra){
   const when=`${d} ${String(hh).padStart(2,'0')}:${String(+document.getElementById('mm').value).padStart(2,'0')}`;
   return new URLSearchParams({when,tz:document.querySelector('[name=tz]').value,
     lat:document.querySelector('[name=lat]').value,lon:document.querySelector('[name=lon]').value,
+    gender:document.getElementById('gender').value,
     ayanamsa:extra||document.getElementById('ay').value});
 }
 const natal=ay=>fetch('/api/natal?'+params(ay)).then(r=>r.json());
@@ -408,7 +410,8 @@ function chatCtx(){const j=window.NATAL;if(!j)return null;
     sarvashtakavarga:j.sarva,panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10'],
     ...(window.LASTSCAN?{last_salience_scan:window.LASTSCAN}:{})};}
 function chartParams(){const P=params();let ay=P.get('ayanamsa');if(ay==='multi')ay='lahiri';
-  return {when:P.get('when'),tz:P.get('tz'),lat:P.get('lat'),lon:P.get('lon'),ayanamsa:ay};}
+  return {when:P.get('when'),tz:P.get('tz'),lat:P.get('lat'),lon:P.get('lon'),ayanamsa:ay,
+    gender:P.get('gender')||''};}
 async function sendChat(){const ctx=chatCtx();
   if(!ctx){alert('Pehle Cast chart karo.');return;}
   const inp=document.getElementById('cin'),txt=inp.value.trim();if(!txt)return;

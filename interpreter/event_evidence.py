@@ -533,6 +533,8 @@ class WindowEvidence:
     arudha_axis: bool = False              # slow benefic/kāraka activating the Arudha axis (UL/2nd-from-UL …)
     bb_active: bool = False                # Bhṛgu Bindu activated by a slow mover (Nāḍī timing)
     func_valence: float = 0.0              # signed: chain lords functional benefic(+) vs malefic/māraka(−)
+    nadi_jeeva: bool = False               # transit Jupiter conj/trine the Nāḍī kāraka (BNN year-marker)
+    nadi_karma: bool = False               # transit Saturn sanction (conj/trine kāraka OR in fulfil-houses)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
     systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
@@ -611,6 +613,14 @@ register_witness("Tājika Varṣeśa/Muntha signifies the matter", "timing", 0.6
 # inflate rank, and the "daśā" name keeps it inside the dasha paddhati group.
 register_witness("daśā-lord functional valence (Laghu Pārāśarī)", "timing", 0.8,
                  lambda w: w.func_valence)
+# NĀḌĪ timing pair (user-approved 2026-07-04; sources at the NĀḌĪ family block):
+# Guru-jeeva marks the YEAR (slow), Śani sanctions the karma — both firing is
+# the classical Nāḍī fructification signature. Grouped under the independent
+# "nadi" paddhati for the convergence gate.
+register_witness("nadi: Guru-jeeva activates kāraka (BNN)", "timing", 1.0,
+                 lambda w: 1.0 if w.nadi_jeeva else 0.0)
+register_witness("nadi: Śani karma-sanction (BNN)", "timing", 0.7,
+                 lambda w: 1.0 if w.nadi_karma else 0.0)
 # Jaimini Arudha-axis gochara (user-approved 2026-06-23). Domain-general: the
 # matter's Arudha (for marriage UL) and the 2nd-from-it (sustenance) lit by a slow
 # benefic (Jupiter/Saturn occupation OR dṛṣṭi) or the domain kāraka (conjunction).
@@ -746,6 +756,81 @@ def _dt_windows(tr, house, start, end):
 def _conj_windows(tr, transit, natal_lon, start, end):
     return [(w.start, w.end) for w in
             tr.conjunction_windows(transit, natal_lon, start, end, orb=4.0)]
+
+
+# ---------------------------------------------------------------------------- #
+# NĀḌĪ (Bhrigu-Nandi) family — planets AS kārakas, houses secondary.
+# Sources: R.G. Rao (Bhrigu Nandi Nadi); Satyanarayana Naik (Revelation from
+# Naadi Jyotisha). Doctrine wired here (user-provided rule-set, 2026-07-04):
+#   • gender-aware kalatra kāraka — male: Venus, female: Mars;
+#   • Jeeva = Jupiter: the event fructifies when TRANSIT Jupiter conjuncts or
+#     trines (1-5-9) the matter's natal kāraka — the Nāḍī year-marker;
+#   • Śani's sanction: karma begins only when transit Saturn also touches the
+#     kāraka (conj/trine) or the matter's fulfilment houses;
+#   • kāraka-saṅga colours the NATURE: Rahu = sudden/unconventional,
+#     Ketu = delay / talks-break / vairāgya (trine counts as "with" in Nāḍī).
+# ---------------------------------------------------------------------------- #
+NADI_KARAKAS = {
+    "marriage": "kalatra",          # gender-aware: Venus (male) / Mars (female)
+    "divorce": "kalatra",
+    "career": Planet.SATURN, "children": Planet.JUPITER,
+    "education": Planet.MERCURY, "wealth": Planet.VENUS,
+    "mother": Planet.MOON, "father": Planet.SUN,
+    "illness": Planet.SATURN, "relocation": Planet.RAHU,
+    "foreign": Planet.RAHU, "property": Planet.MARS,
+}
+
+
+def nadi_karaka(v, profile) -> Planet:
+    """The matter's Nāḍī kāraka. Gender-aware for kalatra matters; unknown
+    domains fall back to the profile's natural kāraka (data-driven)."""
+    spec = NADI_KARAKAS.get(profile.name)
+    if spec == "kalatra":
+        g = (getattr(v, "gender", "") or "").lower()
+        return Planet.MARS if g.startswith("f") else Planet.VENUS
+    if spec is None:
+        return profile.natural_karaka or Planet.JUPITER
+    return spec
+
+
+def nadi_nature(v, profile) -> str:
+    """Kāraka-saṅga (same sign or trine = 'with' in Nāḍī): the EVENT's flavour."""
+    nk = nadi_karaka(v, profile)
+    s = v.signs[nk]
+    trines = {s, (s + 4) % 12, (s + 8) % 12}
+    notes = []
+    if v.signs[Planet.RAHU] in trines:
+        notes.append("Rahu-saṅga → sudden/unconventional (love/inter-community rang)")
+    if v.signs[Planet.KETU] in trines:
+        notes.append("Ketu-saṅga → delay / baat-toot-na / vairāgya rang")
+    try:
+        if v.natal.placements[nk].retrograde:
+            notes.append("vakri kāraka → repeat/revisit pattern")
+    except Exception:
+        pass
+    return "; ".join(notes)
+
+
+def _w_nadi_ketu_sanga(v, p):
+    """Standing: Ketu with/trine the Nāḍī kāraka = classical delay/break-prone."""
+    nk = nadi_karaka(v, p)
+    s = v.signs[nk]
+    return -0.5 if v.signs[Planet.KETU] in {s, (s + 4) % 12, (s + 8) % 12} else 0.0
+
+
+register_witness("nadi: Ketu-saṅga on kāraka (delay/break-prone)", "standing",
+                 0.6, _w_nadi_ketu_sanga)
+
+
+def _trine_windows(tr, transit, natal_lon, start, end, orb=9.0):
+    """Windows where a transit is conjunct OR trine (1-5-9) a natal point —
+    Nāḍī reads trine as 'with'. Slow movers only (Jupiter/Saturn)."""
+    out = []
+    for ang in (0.0, 120.0, 240.0):
+        out += [(w.start, w.end) for w in
+                tr.conjunction_windows(transit, (natal_lon + ang) % 360.0,
+                                       start, end, orb=orb, step_days=10.0)]
+    return out
 
 
 def _kakshya_windows(tr, start, end):
@@ -954,6 +1039,17 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
                 return True
         return False
 
+    # --- NĀḌĪ: Guru-jeeva × kāraka + Śani karma-sanction ----------------------
+    nk = nadi_karaka(v, profile)
+    nk_lon = float(v.longitudes[nk])
+    nadi_jeeva_w = _trine_windows(tr, Planet.JUPITER, nk_lon, start, end)
+    nadi_sat_w = _trine_windows(tr, Planet.SATURN, nk_lon, start, end)
+    fulfil_signs = {(lagna_sign + h - 1) % 12 for h in profile.fulfil_houses}
+
+    def _nadi_sanction(when) -> bool:
+        return (_in(when, nadi_sat_w)
+                or tr.transit_sign(when, Planet.SATURN) in fulfil_signs)
+
     # --- node: Bhṛgu Bindu (Moon–Rāhu midpoint) activated by a slow mover -----
     bb_sign = int(v.bhrigu_bindu() // 30)
 
@@ -1028,6 +1124,8 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             arudha_axis=_arudha_axis_hit(d),
             bb_active=_bb_hit(d),
             func_valence=_chain_valence(chain),
+            nadi_jeeva=_in(d, nadi_jeeva_w),
+            nadi_karma=_nadi_sanction(d),
             signals=sig,
         )
         we.panel = panel
@@ -1053,6 +1151,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
 # the raw transparent sums.
 # ---------------------------------------------------------------------------- #
 _PADDHATI_RULES = [
+    ("nadi:", "nadi"),
     ("daśā", "dasha"), ("Lagneśa", "dasha"),
     ("Arudha", "jaimini"), ("Upapada", "jaimini"),
     ("Bhṛgu Bindu", "nadi"),
@@ -1125,6 +1224,9 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
                f"negate={sorted(profile.negate_houses)})",
                f"standing balance {bal:+.2f} → quality: {quality} "
                "(quality ≠ existence)"]
+    nn = nadi_nature(v, profile)
+    if nn:
+        reasons.append(f"nāḍī kāraka-saṅga ({nadi_karaka(v, profile).value}): {nn}")
 
     def _matured(r):
         return (asof - r.start).days >= min_elapsed_days

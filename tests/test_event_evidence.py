@@ -424,3 +424,38 @@ def test_candidate_map_is_step_deterministic():
     rb = reversal_map(v, prof, s, e, step_days=60)
     assert [(r.start, r.rupture_score) for r in ra] == \
            [(r.start, r.rupture_score) for r in rb]
+
+
+# --- NĀḌĪ (BNN) family (user-approved 2026-07-04) ---------------------------- #
+def test_nadi_karaka_is_gender_aware_and_data_driven():
+    from interpreter.event_evidence import nadi_karaka
+    from advance_astrology import Planet
+    v = _chart()
+    prof = DOMAIN_PROFILES["marriage"]
+    v.gender = "male"
+    assert nadi_karaka(v, prof) == Planet.VENUS
+    v.gender = "female"
+    assert nadi_karaka(v, prof) == Planet.MARS
+    v.gender = ""
+    assert nadi_karaka(v, prof) == Planet.VENUS      # default
+    assert nadi_karaka(v, DOMAIN_PROFILES["career"]) == Planet.SATURN
+    assert nadi_karaka(v, DOMAIN_PROFILES["children"]) == Planet.JUPITER
+
+
+def test_nadi_witnesses_registered_and_live():
+    names = [w.name for w in WITNESSES]
+    assert any("nadi: Guru-jeeva" in n for n in names)
+    assert any("nadi: Śani karma-sanction" in n for n in names)
+    assert any("nadi: Ketu-saṅga" in n for n in names)
+    # independent paddhati for the convergence gate (not lumped into gochara)
+    assert _paddhati("nadi: Guru-jeeva activates kāraka (BNN)") == "nadi"
+    assert _paddhati("nadi: Śani karma-sanction (BNN)") == "nadi"
+    v = _chart()
+    v.gender = "male"
+    rows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                         datetime(2022, 1, 1, tzinfo=UTC),
+                         datetime(2025, 1, 1, tzinfo=UTC), step_days=45)
+    assert all(isinstance(r.nadi_jeeva, bool) and isinstance(r.nadi_karma, bool)
+               for r in rows)
+    assert any(r.nadi_jeeva for r in rows)   # Guru-jeeva fires somewhere
+    assert any(r.nadi_karma for r in rows)   # Śani sanction fires somewhere

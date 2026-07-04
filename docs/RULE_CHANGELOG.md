@@ -943,3 +943,35 @@ addresses (coverage vs discrimination).
   ranked cluster with rupture-pairing, not one fabricated-certain date.
 - **Tests:** `test_candidate_map_is_step_deterministic`; liveness test band
   widened for midpoint sampling. Suite 156 green.
+
+## 2026-07-04 — NĀḌĪ (Bhrigu-Nandi) family: independent convergence voice (user-approved)
+
+- **Change:** Nāḍī doctrine wired as its own witness family + independent
+  "nadi" paddhati in the convergence gate:
+  1. `nadi_karaka()` — planets-as-kārakas, GENDER-aware for kalatra matters
+     (male → Venus, female → Mars; webapp gained a Gender field threaded through
+     chart params and scan keys); other domains data-mapped (career → Śani
+     [karma], children → Guru, education → Budha, wealth → Śukra, father → Sūrya,
+     mother → Chandra, foreign/relocation → Rāhu, property → Maṅgal), unknown
+     domains fall back to the profile's natural kāraka.
+  2. `nadi: Guru-jeeva activates kāraka (BNN)` — TIMING (weight 1.0): transit
+     Jupiter conjunct OR trine (1-5-9; Nāḍī reads trine as "with") the natal
+     Nāḍī kāraka, orb 9° — the Nāḍī year-marker. Prototyped blind on the fixture
+     first: the naive whole-sign version lit half the calendar (rejected); the
+     tight conj/trine version isolated the correct ~1-year span.
+  3. `nadi: Śani karma-sanction (BNN)` — TIMING (0.7): transit Saturn conj/trine
+     the kāraka OR transiting a fulfilment-house sign — karma's approval.
+  4. `nadi: Ketu-saṅga on kāraka` — STANDING (0.6, ≤0): Ketu with/trine the
+     kāraka = classical delay/talks-break texture; `nadi_nature()` also surfaces
+     Rahu-saṅga (sudden/unconventional) and vakri-kāraka (repeat) as TYPE notes
+     in the verdict reasons.
+  - `_PADDHATI_RULES` maps the "nadi:" prefix to the independent "nadi" system
+    (placed first so the "BNN" needle can't misfile it under gochara).
+- **Why (śāstra):** R.G. Rao (Bhrigu Nandi Nadi); Satyanarayana Naik (Revelation
+  from Naadi Jyotisha): planets-as-kārakas primacy, jeeva-Jupiter transits as
+  the timing clock, Śani's karmic sanction, kāraka-saṅga colouring. Previously
+  Nāḍī had no independent convergence voice (only the BNN degree-trigger filed
+  under gochara and the Bhṛgu-Bindu point).
+- **Tests:** `test_nadi_karaka_is_gender_aware_and_data_driven`,
+  `test_nadi_witnesses_registered_and_live`; coverage-matrix entries added;
+  suite 159 green.

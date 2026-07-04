@@ -38,9 +38,12 @@ ABBR = {Planet.SUN: "Su", Planet.MOON: "Mo", Planet.MARS: "Ma", Planet.MERCURY: 
 def _chart(q):
     when = datetime.strptime(q["when"][0], "%Y-%m-%d %H:%M").replace(
         tzinfo=ZoneInfo(q.get("tz", ["Asia/Kolkata"])[0]))
-    return VedicChart.create(when=when, latitude=float(q["lat"][0]),
-                             longitude=float(q["lon"][0]),
-                             ayanamsa=q.get("ayanamsa", ["lahiri"])[0]), when
+    v = VedicChart.create(when=when, latitude=float(q["lat"][0]),
+                          longitude=float(q["lon"][0]),
+                          ayanamsa=q.get("ayanamsa", ["lahiri"])[0])
+    # Nāḍī kalatra-kāraka is gender-aware (Venus male / Mars female)
+    v.gender = q.get("gender", [""])[0]
+    return v, when
 
 
 def _dig(v, p):
@@ -317,7 +320,8 @@ def _kick_scan(params, domain, start, end, step_hint=30):
     """Start (or REUSE) a salience scan; returns the job id. Identical requests
     within ~15 min share one job, so repeated chat questions don't pile up
     duplicate CPU-heavy scans."""
-    key = (tuple(params.get(k, "") for k in ("when", "tz", "lat", "lon", "ayanamsa")),
+    key = (tuple(params.get(k, "") for k in
+                 ("when", "tz", "lat", "lon", "ayanamsa", "gender")),
            domain.lower(), start.date().isoformat(), end.date().isoformat())
     old = _SCAN_KEYS.get(key)
     if old and old in _SCANS and _SCANS[old].get("status") in ("queued", "running",
@@ -351,7 +355,8 @@ def scan_start(q):
         end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
     except Exception:
         return dict(error="start/end (YYYY-MM-DD) required")
-    params = {k: q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa")}
+    params = {k: q.get(k, [""])[0]
+              for k in ("when", "tz", "lat", "lon", "ayanamsa", "gender")}
     step_hint = int(q.get("step", ["30"])[0] or "30")
     return dict(job=_kick_scan(params, domain, start, end, step_hint))
 
@@ -554,7 +559,8 @@ def _chart_from(c):
         return None
     try:
         return _chart({k: [str(c.get(k, ""))]
-                       for k in ("when", "tz", "lat", "lon", "ayanamsa")})[0]
+                       for k in ("when", "tz", "lat", "lon", "ayanamsa",
+                                 "gender")})[0]
     except Exception:
         return None
 
