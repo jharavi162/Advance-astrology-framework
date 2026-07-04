@@ -824,10 +824,12 @@ def _deg_close(l1, l2, orb=3.0) -> bool:
 
 
 def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
-    """Nāḍī drill-down FUNNEL inside a candidate window (user rule-set,
-    2026-07-04): Guru fixes the YEAR; the fast movers then vote per day —
-      • Sūrya month-gate (+1): transit Sun in 1/5/7/9 from the natal kāraka OR
-        from transit Guru;
+    """Nāḍī (BNN) drill-down FUNNEL inside a candidate window: Guru (jeeva) fixes
+    the YEAR; the fast movers then vote per day, PURELY on BNN golden relations
+    (1/5/9 trine, 7th opposition, conjunction) matched degree-to-degree — the
+    Sun plays NO part (updated 2026-07-04 per user + BNN research: BNN times with
+    Jupiter/Saturn/Rāhu/Ketu and the 7th-lord/Mars/Venus/Moon in golden relation,
+    never a Sūrya month-gate):
       • Śukra utsava (+1): transit Venus in the 1st/2nd/7th (from lagna);
       • Śukra≈Guru degree-lock (+2): transit Venus in a golden relation to
         transit Guru at the SAME degree (±3°);
@@ -835,8 +837,7 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
         executor, NOT only the female kalatra-kāraka — degree-locked (±3°) in a
         golden relation onto the natal kāraka or natal Guru;
       • Guru≈kāraka degree-lock (+2): transit Guru at the natal kāraka's degree.
-    ALL layers are VOTES, never gates — verified on a real case where the
-    Sun-rule failed on the actual event day while the degree-locks converged.
+    ALL layers are VOTES, never gates.
     TIE-BREAK (approved 2026-07-04): within an equal-score plateau the day with
     the TIGHTEST combined degree-lock orb wins — Nāḍī degree-to-degree doctrine
     reads exactness as strength (the nearer the lock, the surer the trigger), so
@@ -851,19 +852,17 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     nj_sign = int(nj_lon // 30)
     asc = v.ascendant_sign
     utsava_signs = {asc, (asc + 1) % 12, (asc + 6) % 12}
-    fast = [Planet.SUN, Planet.VENUS, Planet.MARS, Planet.JUPITER]
+    fast = [Planet.VENUS, Planet.MARS, Planet.JUPITER]
     days = []
     d = start
     while d <= end:
         pos = tr.positions(d, fast)
-        sun, ven, mar, jup = (float(pos[p]) for p in fast)
-        js, vs, ms, ss = int(jup // 30), int(ven // 30), int(mar // 30), int(sun // 30)
+        ven, mar, jup = (float(pos[p]) for p in fast)
+        js, vs, ms = int(jup // 30), int(ven // 30), int(mar // 30)
         score, hits, orb = 0, [], 0.0
 
         def _dd(l1, l2):
             return abs((l1 % 30.0) - (l2 % 30.0))
-        if _nrel(nk_sign, ss) or _nrel(js, ss):
-            score += 1; hits.append("Sūrya month-gate")
         if vs in utsava_signs:
             score += 1; hits.append("Śukra utsava (1/2/7)")
         if _nrel(js, vs) and _deg_close(ven, jup):

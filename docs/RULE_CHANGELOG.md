@@ -1035,3 +1035,20 @@ addresses (coverage vs discrimination).
   (docs/AI_TRIANGULATION_PROMPT.md), not a mechanical grade.
 - **Tests:** `test_domain_verdict_follows_the_decision_rule` now asserts the
   SIMPLE vocabulary (attempted/contested must never reappear).
+
+## 2026-07-04 — Nāḍī pinpoint: DROP the Sūrya month-gate (BNN research + user)
+
+- **Change:** removed the Sun "month-gate" vote from `nadi_pinpoint`. The funnel
+  now scores PURELY on BNN golden relations (1/5/9 trine, 7th, conjunction)
+  matched degree-to-degree: Śukra utsava (+1), Śukra≈Guru degree-lock (+2),
+  Maṅgal executioner degree-lock (+2), Guru≈kāraka degree-lock (+2). Max 7.
+- **Why (research, not calibration):** Bhrigu Nandi Nadi times events with the
+  major/relevant transiting bodies — Jupiter (jeeva → year), Saturn (karma
+  sanction), Rāhu/Ketu, and for the month/date the 7th-lord, Mars, Venus and
+  Moon — via golden relations verified by degree; the **Sun is not a BNN timing
+  planet**. The month falls out of the slow→fast degree progression of
+  Jupiter/Venus/Mars themselves, so a separate Sun gate has no śāstric basis.
+  (R.G. Rao, *Bhrigu Nandi Nadi*; Saptarishis Astrology, "Finding Date of
+  Marriage Through Nadi"; user direction 2026-07-04.)
+- **Tests:** `test_nadi_pinpoint_mechanics` now asserts score ≤ 7 and that no
+  pin ever carries a Sun/Sūrya hit.

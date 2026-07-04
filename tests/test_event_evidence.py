@@ -457,7 +457,7 @@ def test_nadi_witnesses_registered_and_live():
 
 def test_nadi_pinpoint_mechanics():
     """Funnel returns sorted, in-range, gap-separated day-candidates with named
-    hits; deterministic; all layers are votes (score bounded 1..8)."""
+    hits; deterministic; all layers are votes (score bounded 1..7, no Sun)."""
     from interpreter.event_evidence import nadi_pinpoint
     v = _chart()
     v.gender = "male"
@@ -469,7 +469,10 @@ def test_nadi_pinpoint_mechanics():
     dates = [datetime.strptime(p["date"], "%Y-%m-%d").replace(tzinfo=UTC)
              for p in pins]
     assert all(s <= d <= e for d in dates)
-    assert all(1 <= p["score"] <= 8 and p["hits"] for p in pins)
+    assert all(1 <= p["score"] <= 7 and p["hits"] for p in pins)
+    # the Sun plays no part in BNN timing — never a hit
+    assert all(not any("Sūrya" in h or "Sun" in h for h in p["hits"])
+               for p in pins)
     # min-gap separation
     for a, b in zip(dates, dates[1:]):
         assert (b - a).days >= 7
