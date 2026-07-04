@@ -1075,3 +1075,29 @@ addresses (coverage vs discrimination).
 - **Tests:** `test_nadi_pinpoint_multi_covers_all_anchor_windows` (merge order,
   gap-separation, membership, determinism); pinpoint-mechanics score cap 7 and
   no-Sun assertions retained.
+
+## 2026-07-04 — Universal Nāḍī verdict on every question + plain-language summary
+
+- **Change 1 — Nāḍī verdict for ANY domain, any tense:** the fast engine read
+  (`_engine_read`) now always appends a `NĀḌī (BNN, trine method)` line with the
+  matter's kāraka and its nature, so every chat answer carries a Nāḍī voice —
+  the nature ("kaisa": Rahu-saṅga=sudden, Ketu-saṅga=delay/break-prone,
+  vakri=repeat, clean=smooth) always, and the day-level DATE ("kab") from the
+  scan's `pinpoint` when it is a timing question. The pinpoint funnel was already
+  kāraka-centric (`nadi_karaka`), so it is domain-general as-is — verified across
+  career/children/wealth/education/father. Scans now also carry a `nadi`
+  {kāraka, nature} block (both the normal and the rupture branch) and the UI
+  shows a "🌿 Nāḍī" line; the narrator is instructed to present Nāḍī as its own
+  independent voice, not merged into KP/Jaimini.
+- **Change 2 — plain-language summary:** every chat reply now ends with a
+  '📝 सरल सारांश' section — 2–4 simple lines a non-astrologer understands.
+  (`CHAT_SYSTEM` instruction.)
+- **Why:** user direction 2026-07-04 — a Nāḍī date/nature verdict for any random
+  question via the trine (golden-relation) method, plus a common-language summary
+  at the bottom of each answer.
+- **Note / still open:** the day-level pinpoint is a marriage-/positive-event
+  (Guru+Śukra+Maṅgal golden-relation) funnel; a RUPTURE-mode pinpoint (Śani /
+  Rāhu-Ketu / Maṅgal degree-locks on the break-axis) for divorce-class dates is
+  a NEW mechanical node — proposed for approval, not yet built.
+- **Tests:** engine unchanged this turn (server/prompt/UI + `_engine_read` only);
+  suite 162 green.

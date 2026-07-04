@@ -241,8 +241,13 @@ def _run_scan(job, params, domain, start, end, step_days):
                                step=step_days, ts=time.time())
             return
         prof = resolve(domain)
-        from interpreter.event_evidence import domain_verdict
+        from interpreter.event_evidence import (domain_verdict, nadi_karaka,
+                                                 nadi_nature)
         now = datetime.now(timezone.utc)
+        # NĀḌĪ (BNN) nature verdict — kāraka-centric, domain-general; the DATE (if
+        # a timing question) comes from the day-level pinpoint below.
+        nadi = dict(karaka=nadi_karaka(v, prof).value,
+                    nature=nadi_nature(v, prof) or "clean (smooth/straightforward)")
         if getattr(prof, "rupture_matter", False):
             # RUPTURE matter (divorce/…): the fulfilment scan times the AXIS
             # (which also spikes for the union itself) — time the BREAK with the
@@ -276,7 +281,7 @@ def _run_scan(job, params, domain, start, end, step_days):
             _SCANS[job] = dict(status="done", domain=prof.name, rupture=True,
                                windows=windows, scanned=len(rrows),
                                step=step_days, standing=round(bal, 2),
-                               verdict=verdict,
+                               verdict=verdict, nadi=nadi,
                                call=dict(answer=vd.answer,
                                          confidence=vd.confidence,
                                          window=vd.best_window, chain=vd.chain,
@@ -307,7 +312,7 @@ def _run_scan(job, params, domain, start, end, step_days):
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
-                           pinpoint=pins,
+                           pinpoint=pins, nadi=nadi,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
@@ -509,7 +514,11 @@ CHAT_SYSTEM = (
     "relevant Sahams. Draw on your own classical knowledge (BPHS, Phaladeepika, "
     "Saravali, Jaimini Sūtras, KP, etc.) to interpret — but if the chart JSON "
     "doesn't contain something, say so rather than guessing. "
-    "Answer in the user's language (Hinglish is fine)."
+    "Answer in the user's language (Hinglish is fine). "
+    "ALWAYS end EVERY reply with a final section headed '📝 सरल सारांश' — 2 to 4 "
+    "short lines in very simple Hinglish/Hindi that a non-astrologer easily "
+    "understands: seedhe-seedhe kya answer hai (haan/nahi, kab, kaisa rahega), "
+    "bina jyotish jargon ke. Yeh section hamesha sabse aakhir me ho."
 )
 CHAT_NARRATOR = (
     "ENGINE TRIANGULATION MODE: for this question the engine has ALREADY resolved "
@@ -550,7 +559,15 @@ CHAT_NARRATOR = (
     "questions the engine cannot decide mechanically — SAME person vs a NEW "
     "person, kaun/kis se, anything about a third party without their chart — "
     "answer briefly and label that part '(interpretive — engine-committed "
-    "nahi)'; never present it as an engine verdict."
+    "nahi)'; never present it as an engine verdict. "
+    "NĀḌĪ VERDICT (give it for EVERY question, any domain, trine/golden-relation "
+    "method): the engine read carries a 'NĀḌĪ (BNN...)' line with the matter's "
+    "kāraka and its nature. ALWAYS include a short 'Nāḍī:' verdict — for a "
+    "'kaisa/nature' question state that nature line (Rahu-saṅga = sudden/"
+    "unconventional, Ketu-saṅga = delay/break-prone, vakri = repeat-pattern, or "
+    "clean = smooth); for a 'kab/when' question give the day-level 'pinpoint' "
+    "date(s) if the scan carries them. This Nāḍī voice is independent of KP/"
+    "Jaimini — present it as its own line, not merged into them."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -655,6 +672,19 @@ def _engine_read(v, question):
     for nm, c in sorted(fired, key=lambda x: -abs(x[1])):
         lines.append(f"  {'+' if c > 0 else '-'} {nm}: {c:+.2f}")
     lines += _fmt_tempo(pt)
+    # NĀḌĪ (BNN) verdict — kāraka-centric, trine/golden-relation method — always
+    # available (nature is a natal read; the DATE, if a timing question, comes
+    # from the salience scan's day-level 'pinpoint'). Domain-general.
+    try:
+        from interpreter.event_evidence import nadi_karaka, nadi_nature
+        nkp = nadi_karaka(v, prof)
+        nn = nadi_nature(v, prof)
+        lines.append(
+            f"NĀḌĪ (BNN, trine method): kāraka={nkp.value}; nature = "
+            + (nn or "clean — no Rahu/Ketu-saṅga or vakri on the kāraka "
+               "(smooth/straightforward rang)"))
+    except Exception:
+        pass
     # A tier-3 derived domain is named after the raw query — show a tidy label.
     label = prof.name if len(prof.name) <= 20 else "house " + "/".join(
         str(h) for h in prof.houses)
