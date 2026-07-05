@@ -1178,3 +1178,28 @@ marriage and reported its date as the second partner (the "2022/2024" mis-read).
   children.
 - **Tests:** `test_ordinal_meta_rule_shifts_by_third_from_previous`,
   `test_second_marriage_nadi_karaka_is_gender_aware`. Suite 168 green.
+
+## 2026-07-05 — Two-layer convergence (5 independent schools) — Task 3
+
+- **Layer-2 gate (part 1):** `_school()` collapses every witness to one of the 5
+  genuinely-independent schools (Parāśari / Jaimini / KP / Tājika / Nāḍī).
+  Sudarśana, Aṣṭakavarga, Vimśottari, gochara are Parāśari SUB-TOOLS, not schools,
+  so they no longer count as independent convergence — this removes the
+  false-confidence inflation (a window lit by dasha+gochara+Sudarśana is ONE
+  school, not three). `_score_rows` gates on ≥2 schools; `systems_firing` = school
+  count (max 5); `domain_verdict` confidence rescaled (HIGH ≥4, MEDIUM 3, LOW ≤2).
+  salience total unchanged — only windows that "converged" purely within Parāśari
+  are correctly demoted.
+- **Layer-1 breakdown (part 2):** `school_report(v, profile, rows)` — per school,
+  the window IT independently points to (info-weighted peak) or 'abstains' when it
+  never fires. Surfaced in the scan (`schools`), the UI ("⚖ Schools" line) and the
+  narrator, which is told to read the AGREEMENT (more schools clustering = surer)
+  and state divergence honestly rather than forcing a date; a thin/abstaining
+  school is never a 'no'. Existence stays with `domain_verdict`; this makes a
+  wrong school VISIBLE instead of blended away.
+- **Verified:** classical taxonomy (Sudarśana/Aṣṭakavarga = Parāśari sub-tools;
+  Tājika/Jaimini/KP/Nāḍī independent). Sample female chart now shows the schools
+  genuinely diverge (Parāśari→2024, KP→2010, Nāḍī→2019) — transparency the blended
+  score hid. Suite 170 green.
+- **Tests:** `test_school_collapses_parashari_subtools_to_one`,
+  `test_school_report_layer1_breakdown`.

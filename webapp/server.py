@@ -321,10 +321,13 @@ def _run_scan(job, params, domain, start, end, step_days):
                           key=lambda x: (-x.salience, x.start))[:6]] or \
                   [r.start for r in top[:2]]
         pins = nadi_pinpoint_multi(v, prof, anchors, start, end, top=5)
+        # LAYER-1 per-school timing breakdown (two-layer convergence view)
+        from interpreter.event_evidence import school_report
+        schools = school_report(v, prof, rows)
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
-                           pinpoint=pins, nadi=nadi,
+                           pinpoint=pins, nadi=nadi, schools=schools,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
@@ -563,7 +566,14 @@ CHAT_NARRATOR = (
     "karma-approval (Jupiter+Saturn together = the double-approval = strongest); "
     "Śukra/Maṅgal degree-locks only REFINE the exact day. Cite them as "
     "the most probable SPECIFIC dates, highest score first (a smaller 'orb' = "
-    "a tighter degree-lock = stronger). If "
+    "a tighter degree-lock = stronger). "
+    "TWO-LAYER CONVERGENCE: if the scan carries 'schools', that is the Layer-1 "
+    "per-school breakdown — each of the 5 INDEPENDENT schools (Parāśari, Jaimini, "
+    "KP, Tājika, Nāḍī) with the window IT independently points to, or 'abstain' "
+    "when it casts no vote. Present it as such and read the AGREEMENT: the more "
+    "independent schools that cluster on the same window, the surer the call "
+    "(that is the real confidence); where they diverge, say so honestly rather "
+    "than forcing one date. Do not treat a thin/abstaining school as a 'no'. If "
     "the call carries a 'next' window, state it as the engine's committed "
     "UPCOMING window. CRITICAL KP rule: AFFLICTION ≠ DENIAL. An afflicted/"
     "troubled standing describes the event's QUALITY (troubled/with-friction), "

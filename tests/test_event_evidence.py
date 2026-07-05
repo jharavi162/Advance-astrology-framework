@@ -645,3 +645,20 @@ def test_school_collapses_parashari_subtools_to_one():
     names = ["daśā: kāraka in MD>AD>PD", "double-transit (house/lord)",
              "Sudarśana wheel"]
     assert len({_school(n) for n in names}) == 1
+
+
+def test_school_report_layer1_breakdown():
+    """Layer-1: each of the 5 schools gets its own best window or abstains;
+    deterministic; a firing school carries a window, an abstaining one does not."""
+    from interpreter.event_evidence import school_report, _SCHOOLS
+    v = _chart(); v.gender = "female"
+    prof = DOMAIN_PROFILES["marriage"]
+    rows = candidate_map(v, prof, datetime(2012, 1, 1, tzinfo=UTC),
+                         datetime(2020, 1, 1, tzinfo=UTC), step_days=45)
+    rep = school_report(v, prof, rows)
+    assert [r["school"] for r in rep] == list(_SCHOOLS)   # all 5, in order
+    for r in rep:
+        assert (r["window"] != "") == r["fires"]          # fires ⇔ has a window
+        assert r["strength"] >= 0.0
+    assert any(r["fires"] for r in rep)                   # something fires
+    assert rep == school_report(v, prof, rows)            # deterministic

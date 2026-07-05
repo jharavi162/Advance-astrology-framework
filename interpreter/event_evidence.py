@@ -1642,6 +1642,41 @@ def _score_rows(rows: list) -> None:
         r.salience = round(sum(groups.values()) * gate, 3)
 
 
+def school_report(v, profile, rows) -> list:
+    """LAYER-1 per-school timing breakdown (the two-layer view). For each of the 5
+    independent schools, find WHERE it independently points — the window carrying
+    the most of that school's info-weighted vote — or mark it 'abstains' when the
+    school never fires (thin/absent coverage, so it casts no vote rather than a
+    false one). Layer-2 convergence is then simply how many schools cluster on the
+    committed window (systems_firing). Existence stays with domain_verdict; this
+    surfaces agreement/disagreement so a wrong school is visible, not blended
+    away."""
+    if not rows:
+        return []
+    total = len(rows)
+    fire: dict = {}
+    for r in rows:
+        for n, _ in r.firing_nodes():
+            fire[n] = fire.get(n, 0) + 1
+    out = []
+    for sch in _SCHOOLS:
+        best, best_str = None, 0.0
+        for r in rows:
+            s = sum(abs(c) * (1.0 - fire[n] / total)
+                    for n, c in r.firing_nodes() if _school(n) == sch)
+            if s > best_str:
+                best_str, best = s, r
+        if best is None:
+            out.append(dict(school=sch, fires=False, window="",
+                            chain="", strength=0.0))
+        else:
+            out.append(dict(school=sch, fires=True,
+                            window=f"{best.start:%Y-%m-%d}",
+                            chain=">".join(best.chain),
+                            strength=round(best_str, 2)))
+    return out
+
+
 # ---------------------------------------------------------------------------- #
 # Rendering
 # ---------------------------------------------------------------------------- #
