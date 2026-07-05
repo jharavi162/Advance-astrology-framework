@@ -557,13 +557,16 @@ def test_nadi_rupture_pinpoint_is_separator_driven():
              for p in pins]
     assert all(s <= d <= e for d in dates)
     for p in pins:
-        # max = Śani 2 + node 2 + Maṅgal 1 + Śani-return 1
-        assert 1 <= p["score"] <= 6 and p["hits"]
-        sep = any(("karma-cut" in h or "severance" in h) for h in p["hits"])
-        mars = any("Maṅgal severer" in h for h in p["hits"])
-        # Maṅgal never fires without a separator locked the same day
+        # canonical mirror: Śani primary +3/+1, node +2, Maṅgal refine +1
+        assert 1 <= p["score"] <= 7 and p["hits"]
+        sep = any(("Śani (karma) contacts" in h or "severance" in h)
+                  for h in p["hits"])
+        # every pin carries a separator PRIMARY approval (Śani or node)
+        assert sep
+        mars = any("Maṅgal" in h for h in p["hits"])
+        # Maṅgal never fires without a separator approval the same day
         assert (not mars) or sep
-        # never a union-funnel hit
+        # never a union-funnel hit (benefic Śukra/Guru)
         assert not any(("Śukra" in h or "Guru" in h) for h in p["hits"])
     for a, b in zip(dates, dates[1:]):
         assert (b - a).days >= 7
