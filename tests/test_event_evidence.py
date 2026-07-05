@@ -624,3 +624,24 @@ def test_nadi_chain_is_degree_ordered_and_golden_to_hero():
         if "HERO" not in r["when"]:
             assert ("before" in r["when"]) == (r["degree"] < hero_deg)
     assert chain == nadi_chain(v, prof)
+
+
+def test_school_collapses_parashari_subtools_to_one():
+    """Convergence must count the 5 INDEPENDENT schools, not fine sub-techniques.
+    Vimśottari, gochara, Sudarśana, Aṣṭakavarga all collapse into Parāśari — a
+    window lit only by them is ONE school, not three (no false convergence)."""
+    from interpreter.event_evidence import _school
+    assert _school("daśā: kāraka in MD>AD>PD") == "parashari"
+    assert _school("double-transit (house/lord)") == "parashari"
+    assert _school("Sudarśana wheel") == "parashari"
+    assert _school("Kakṣyā window") == "parashari"
+    assert _school("KP fulfilment ≥ negation") == "kp"
+    assert _school("Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)") == "jaimini"
+    assert _school("daśā[nārāyaṇa]: significator running") == "jaimini"
+    assert _school("domain Saham double-transit") == "tajika"
+    assert _school("Varṣaphal Muntha") == "tajika"
+    assert _school("nadi: Guru-jeeva activates kāraka (BNN)") == "nadi"
+    # three Parāśari sub-tools in one window => ONE independent school
+    names = ["daśā: kāraka in MD>AD>PD", "double-transit (house/lord)",
+             "Sudarśana wheel"]
+    assert len({_school(n) for n in names}) == 1

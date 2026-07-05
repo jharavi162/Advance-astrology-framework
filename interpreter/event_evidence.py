@@ -1561,8 +1561,9 @@ def domain_verdict(v, profile, rows, asof, rrows=None,
     elapsed = [r for r in rows if _matured(r) and r.systems_firing >= 2]
     if elapsed:
         best = max(elapsed, key=lambda r: r.salience)
-        conf = ("HIGH" if best.systems_firing >= 6
-                else "MEDIUM" if best.systems_firing >= 4 else "LOW")
+        # confidence = # of INDEPENDENT schools converging (max 5)
+        conf = ("HIGH" if best.systems_firing >= 4
+                else "MEDIUM" if best.systems_firing == 3 else "LOW")
         reasons.append(
             f"promised + elapsed window {best.start:%Y-%m-%d} "
             f"({best.systems_firing} systems) → the event stands delivered; "
@@ -1580,16 +1581,48 @@ def primary_label(profile) -> str:
 
 
 def _paddhati(name: str) -> str:
-    """Map a node name to its independent astrological SYSTEM (for the gate)."""
+    """Map a node name to its fine-grained technique group (kept for the ledger
+    and tests). The convergence GATE uses `_school` (the independent parent), not
+    this — see `_school`."""
     for needle, group in _PADDHATI_RULES:
         if needle in name:
             return group
     return "misc"
 
 
+# The FIVE genuinely-independent schools. Sudarśana, Aṣṭakavarga, Vimśottari and
+# gochara are SUB-TOOLS of Parāśari (BPHS) — NOT independent schools — so they
+# collapse into "parashari"; counting them as separate convergence inflated
+# confidence (a window lit by dasha+gochara+Sudarśana is ONE school agreeing with
+# itself, not three). Verified against the classical taxonomy (2026-07-05).
+_SCHOOLS = ("parashari", "jaimini", "kp", "tajika", "nadi")
+_SCHOOL_RULES = [
+    ("nadi:", "nadi"), ("BNN", "nadi"), ("Bhṛgu Bindu", "nadi"),
+    ("KP", "kp"),
+    ("Arudha", "jaimini"), ("Upapada", "jaimini"), ("argala", "jaimini"),
+    ("daśā[chara]", "jaimini"), ("daśā[nārāyaṇa]", "jaimini"),
+    ("daśā[sudasā]", "jaimini"),
+    ("Muntha", "tajika"), ("Varṣeśa", "tajika"), ("Tājika", "tajika"),
+    ("Saham", "tajika"),
+    # everything else = Parāśari corpus (Vimśottari, gochara, yogas, Ṣaḍbala,
+    # Aṣṭakavarga, Sudarśana, Lagna materialization, māraka, avasthā …)
+]
+
+
+def _school(name: str) -> str:
+    """Collapse a witness to its INDEPENDENT parent school (one of `_SCHOOLS`).
+    Parāśari is the default corpus."""
+    for needle, sch in _SCHOOL_RULES:
+        if needle in name:
+            return sch
+    return "parashari"
+
+
 def _score_rows(rows: list) -> None:
     """Set `salience` and `systems_firing` on each row: info-weighted votes,
-    grouped by independent paddhati, gated on ≥2 systems converging."""
+    grouped by INDEPENDENT SCHOOL (not fine sub-technique), gated on ≥2 schools
+    converging. `systems_firing` is therefore the count of independent schools
+    (max 5) lighting the window — the true convergence signal."""
     if not rows:
         return
     total = len(rows)
@@ -1601,10 +1634,10 @@ def _score_rows(rows: list) -> None:
         groups: dict = {}
         for n, c in r.firing_nodes():
             info = 1.0 - fire[n] / total            # specificity (rare ⇒ ~1)
-            grp = _paddhati(n)
+            grp = _school(n)                         # independent-school gate
             groups[grp] = groups.get(grp, 0.0) + abs(c) * info
         n_systems = len(groups)
-        gate = 1.0 if n_systems >= 2 else 0.4       # convergence requirement
+        gate = 1.0 if n_systems >= 2 else 0.4       # ≥2 INDEPENDENT schools
         r.systems_firing = n_systems
         r.salience = round(sum(groups.values()) * gate, 3)
 
