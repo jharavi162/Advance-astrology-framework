@@ -626,6 +626,7 @@ class WindowEvidence:
     func_valence: float = 0.0              # signed: chain lords functional benefic(+) vs malefic/māraka(−)
     nadi_jeeva: bool = False               # transit Jupiter conj/trine the Nāḍī kāraka (BNN year-marker)
     nadi_karma: bool = False               # transit Saturn sanction (conj/trine kāraka OR in fulfil-houses)
+    sade_sati: bool = False                # transit Saturn in 12/1/2 from natal Moon (Sade-Sati/Kaṇṭaka)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
     systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
@@ -682,6 +683,8 @@ register_witness("Varṣaphal Muntha", "timing", 1.0,
                  lambda w: 1.0 if w.varshaphal_muntha else 0.0)
 register_witness("Sudarśana wheel", "timing", 1.0,
                  lambda w: 1.0 if w.sudarshana_hit else 0.0)
+register_witness("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)", "timing", 0.5,
+                 lambda w: 1.0 if w.sade_sati else 0.0)
 register_witness("Lagna materialization", "timing", 1.0,
                  lambda w: 1.0 if w.lagna_activators else 0.0, shared=True)
 
@@ -1520,6 +1523,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             func_valence=_chain_valence(chain),
             nadi_jeeva=_in(d, nadi_jeeva_w),
             nadi_karma=_nadi_sanction(d),
+            sade_sati=tr.sade_sati(d).get("active", False),
             signals=sig,
         )
         we.panel = panel

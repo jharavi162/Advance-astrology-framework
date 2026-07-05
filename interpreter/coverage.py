@@ -81,9 +81,9 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Sudasā (Śrī) daśā", "sudasa_dasha", "daśā[sudasā]", "wired"),
     CoverageItem("Bhāva-Chalit result-house shift", "bhava_chalit", "Bhāva-Chalit result-shift", "wired"),
     CoverageItem("Indu Lagna / special lagnas", "special_lagnas/indu_lagna", "Indu Lagna", "wired"),
-    # ---- RED — engine computes it, NO witness reads it yet ----------------- #
-    CoverageItem("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)", "transits.sade_sati", "", "red"),
+    CoverageItem("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)", "transits.sade_sati", "Sade-Sati", "wired"),
     CoverageItem("Functional benefic/malefic weighting", "functional_nature", "daśā-lord functional valence", "wired"),
+    # ---- RED — engine computes it, NO witness reads it yet ----------------- #
     CoverageItem("Full yoga-engine mapping (beyond rāja-yoga)", "yogas", "", "red"),
     CoverageItem("Bhinnāṣṭakavarga of house/lord", "bhinnashtakavarga", "", "red"),
     CoverageItem("Kala-vela upagrahas (Dhūma/Vyatīpāta…)", "calculated_upagrahas", "", "red"),

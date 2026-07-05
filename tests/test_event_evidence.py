@@ -702,3 +702,16 @@ def test_coverage_matrix_in_sync_after_task4():
     a = audit()
     assert a["claims_without_witness"] == [], a["claims_without_witness"]
     assert a["witnesses_not_in_matrix"] == [], a["witnesses_not_in_matrix"]
+
+
+def test_sade_sati_timing_node_wired():
+    """Sade-Sati (Saturn 12/1/2 from natal Moon) is wired as a Parāśari-gochara
+    timing node; computed per window as a bool."""
+    from interpreter.event_evidence import WITNESSES, _school
+    assert any("Sade-Sati" in w.name for w in WITNESSES)
+    assert _school("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)") == "parashari"
+    v = _chart()
+    rows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                         datetime(2018, 1, 1, tzinfo=UTC),
+                         datetime(2022, 1, 1, tzinfo=UTC), step_days=45)
+    assert rows and all(isinstance(r.sade_sati, bool) for r in rows)

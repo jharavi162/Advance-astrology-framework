@@ -1220,3 +1220,13 @@ native hard-coding):
 Coverage matrix: Bhāva-Chalit, Indu Lagna, Karakāṃśa moved RED→wired; Kuja dosha
 and husband-kāraka added as new wired rows; sync-tests green. Suite green.
 Sade-Sati (timing node) follows in batch B.
+
+## 2026-07-05 — Task 4 (batch B): Sade-Sati timing node wired
+
+`sade_sati` field on WindowEvidence, computed per window (transit Saturn in
+12/1/2 from the natal Moon via transits.sade_sati) and read by a Parāśari-gochara
+timing witness "Sade-Sati / Kaṇṭaka" (weight 0.5). Being a ~7.5-yr marker, the
+info-weighting naturally down-weights it in long scans — it simply stops being a
+silent RED gap and contributes as a karmic-transition co-factor. Coverage matrix:
+Sade-Sati RED→wired; coverage-summary test updated (Bhinnāṣṭakavarga/yoga-engine
+remain the named RED gaps). Task 4 complete. Suite 173 green.
