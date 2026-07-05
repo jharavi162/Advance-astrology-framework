@@ -795,6 +795,21 @@ def nadi_karaka(v, profile) -> Planet:
     return spec
 
 
+def nadi_timing_karaka(v, profile) -> Planet:
+    """The kāraka that TIMES the event (distinct from the spouse-descriptor kāraka).
+    For marriage-class matters it is ALWAYS **Venus** — R.G. Rao's universal
+    "Venus for marriages" event-kāraka — regardless of gender. The gender kāraka
+    (Mars for a female) describes the SPOUSE/husband and is used by nadi_chain /
+    nadi_nature, NOT the marriage date. (Source: docs/knowledge/bnn/, book — a
+    female's marriage & marital-happiness are read from Venus; Mars only reads the
+    husband.) All other domains time on their own kāraka."""
+    spec = (NADI_KARAKAS.get(profile.name)
+            or NADI_KARAKAS.get(getattr(profile, "base_domain", None) or ""))
+    if spec == "kalatra":
+        return Planet.VENUS
+    return nadi_karaka(v, profile)
+
+
 def nadi_nature(v, profile) -> str:
     """Kāraka-saṅga (same sign or trine = 'with' in Nāḍī): the EVENT's flavour."""
     nk = nadi_karaka(v, profile)
@@ -922,7 +937,7 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     TIE-BREAK: within an equal score, the TIGHTEST combined degree-lock orb wins
     (Nāḍī exactness = strength). Returns top clusters (≥ min_gap_days apart)."""
     tr = v.transits()
-    nk = nadi_karaka(v, profile)
+    nk = nadi_timing_karaka(v, profile)     # marriage → Venus (event-kāraka)
     nk_lon = float(v.longitudes[nk])
     nk_sign = int(nk_lon // 30)
     sev_lon = (nk_lon + 180.0) % 360.0          # 7th-from-kāraka (partner seat)
@@ -1042,7 +1057,7 @@ def nadi_rupture_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list
     so this never hard-codes a native. Slow separators give the SEASON, fast
     Maṅgal the sharper day inside it."""
     tr = v.transits()
-    nk = nadi_karaka(v, profile)
+    nk = nadi_timing_karaka(v, profile)     # marriage-class → Venus (event-kāraka)
     nk_lon = float(v.longitudes[nk])
     nk_sign = int(nk_lon // 30)
     sat_lon = float(v.longitudes[Planet.SATURN])
@@ -1327,7 +1342,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
         return False
 
     # --- NĀḌĪ: Guru-jeeva × kāraka + Śani karma-sanction ----------------------
-    nk = nadi_karaka(v, profile)
+    nk = nadi_timing_karaka(v, profile)     # marriage-class → Venus (event-kāraka)
     nk_lon = float(v.longitudes[nk])
     nadi_jeeva_w = _trine_windows(tr, Planet.JUPITER, nk_lon, start, end)
     nadi_sat_w = (_trine_windows(tr, Planet.SATURN, nk_lon, start, end)
