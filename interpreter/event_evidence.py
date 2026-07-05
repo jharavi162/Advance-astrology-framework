@@ -899,65 +899,78 @@ def nadi_chain(v, profile) -> list:
 
 
 def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
-    """Nāḍī (BNN) drill-down FUNNEL inside a candidate window: Guru (jeeva) fixes
-    the YEAR; the fast movers then vote per day, PURELY on BNN golden relations
-    (1/5/9 trine, 7th opposition, conjunction) matched degree-to-degree — the
-    Sun plays NO part (updated 2026-07-04 per user + BNN research: BNN times with
-    Jupiter/Saturn/Rāhu/Ketu and the 7th-lord/Mars/Venus/Moon in golden relation,
-    never a Sūrya month-gate):
-      • Śukra golden-relation (+1): transit Venus in a golden relation (1/5/7/9)
-        to the natal kāraka — BNN is kāraka-centric, so this replaces the earlier
-        lagna-based 1/2/7 "utsava" (the 2nd house is not a golden relation);
-      • Śukra≈Guru degree-lock (+2): transit Venus in a golden relation to
-        transit Guru at the SAME degree (±3°);
-      • Maṅgal executioner (+2): transit Mars — the universal māṅgalika-kārya
-        executor, NOT only the female kalatra-kāraka — degree-locked (±3°) in a
-        golden relation onto the natal kāraka or natal Guru;
-      • Guru≈kāraka degree-lock (+2): transit Guru at the natal kāraka's degree.
-    ALL layers are VOTES, never gates.
-    TIE-BREAK (approved 2026-07-04): within an equal-score plateau the day with
-    the TIGHTEST combined degree-lock orb wins — Nāḍī degree-to-degree doctrine
-    reads exactness as strength (the nearer the lock, the surer the trigger), so
-    "first calendar day of the plateau" would be an arbitrary artifact (same
-    class as the grid-landing lottery fixed by pratyantar-midpoint sampling).
-    Returns the top score-clusters (≥ min_gap_days apart)."""
+    """Nāḍī (BNN) event-timing FUNNEL — CANONICAL per R.G. Rao (see
+    docs/knowledge/bnn/01_timing_method.md). Two tiers per day:
+
+    PRIMARY APPROVAL (the slow gate — decides the PERIOD):
+      • Guru (jeeva) contacts the kāraka or the 7th-from-kāraka (+3): transit
+        Jupiter in a golden relation (1/5/9 or conjunction) to the natal kāraka
+        OR to the 7th-from-kāraka (the partner seat) — Rao: "Jupiter gives the
+        results of the sign he transits"; marriage = Jupiter contacts Venus.
+        A tight degree-lock adds +1.
+      • Śani karma-approval (+2): transit Saturn in a golden relation to the
+        kāraka/7th — Saturn is the karma planet; timely marriage runs on Jupiter
+        activation, LATE marriage on Saturn. Jupiter + Saturn together = the
+        classical DOUBLE-APPROVAL (strongest).
+    A day with NEITHER slow-planet approval is not an event-time (skipped).
+
+    FAST REFINEMENT (picks the exact DAY inside an approved period, +1 each):
+      • Śukra≈Guru degree-lock, Śukra→kāraka golden relation, Maṅgal degree-lock
+        onto the kāraka/natal-Jupiter (the universal executor). These no longer
+        drive the call — they only sharpen the day (demoted from the earlier
+        over-weighting).
+    TIE-BREAK: within an equal score, the TIGHTEST combined degree-lock orb wins
+    (Nāḍī exactness = strength). Returns top clusters (≥ min_gap_days apart)."""
     tr = v.transits()
     nk = nadi_karaka(v, profile)
     nk_lon = float(v.longitudes[nk])
     nk_sign = int(nk_lon // 30)
+    sev_lon = (nk_lon + 180.0) % 360.0          # 7th-from-kāraka (partner seat)
+    sev_sign = int(sev_lon // 30)
     nj_lon = float(v.longitudes[Planet.JUPITER])
     nj_sign = int(nj_lon // 30)
-    fast = [Planet.VENUS, Planet.MARS, Planet.JUPITER]
+    movers = [Planet.VENUS, Planet.MARS, Planet.JUPITER, Planet.SATURN]
     days = []
-    # sample at day granularity (00:00) so the labelled day and its orb do not
-    # depend on the anchor window's intraday timestamp — the pin is a DATE.
+
+    def _dd(l1, l2):
+        return abs((l1 % 30.0) - (l2 % 30.0))
+    # sample at day granularity (00:00) so the labelled day/orb is independent of
+    # the anchor window's intraday timestamp — the pin is a DATE.
     d = datetime(start.year, start.month, start.day, tzinfo=start.tzinfo)
     while d <= end:
-        pos = tr.positions(d, fast)
-        ven, mar, jup = (float(pos[p]) for p in fast)
-        js, vs, ms = int(jup // 30), int(ven // 30), int(mar // 30)
-        score, hits, orb = 0, [], 0.0
-
-        def _dd(l1, l2):
-            return abs((l1 % 30.0) - (l2 % 30.0))
-        if _nrel(nk_sign, vs):
-            score += 1; hits.append("Śukra golden-relation to kāraka")
+        pos = tr.positions(d, movers)
+        ven, mar, jup, sat = (float(pos[p]) for p in movers)
+        js, vs, ms, ss = (int(jup // 30), int(ven // 30),
+                          int(mar // 30), int(sat // 30))
+        jup_k, jup_7 = _nrel(nk_sign, js), _nrel(sev_sign, js)
+        sat_k, sat_7 = _nrel(nk_sign, ss), _nrel(sev_sign, ss)
+        jup_gate, sat_gate = (jup_k or jup_7), (sat_k or sat_7)
+        if not (jup_gate or sat_gate):          # no slow-planet approval → skip
+            d += timedelta(days=1); continue
+        score, hits, orb, locked = 0, [], 0.0, False
+        if jup_gate:
+            score += 3; hits.append("Guru(jeeva) contacts kāraka/7th [primary]")
+            dl = [_dd(jup, t) for t, ok in ((nk_lon, jup_k), (sev_lon, jup_7))
+                  if ok and _deg_close(jup, t)]
+            if dl:
+                score += 1; orb += min(dl); locked = True
+                hits.append("Guru≈kāraka degree-lock")
+        if sat_gate:
+            score += 2
+            hits.append("Śani karma-approval (double-approval)" if jup_gate
+                        else "Śani karma-approval (late)")
         if _nrel(js, vs) and _deg_close(ven, jup):
-            score += 2; hits.append("Śukra≈Guru degree-lock")
-            orb += _dd(ven, jup)
-        m_orbs = [_dd(mar, a) for a, s_ok in
+            score += 1; orb += _dd(ven, jup); locked = True
+            hits.append("Śukra≈Guru degree-lock (refine)")
+        if _nrel(nk_sign, vs):
+            score += 1; hits.append("Śukra→kāraka golden (refine)")
+        m_orbs = [_dd(mar, a) for a, ok in
                   ((nk_lon, _nrel(nk_sign, ms)), (nj_lon, _nrel(nj_sign, ms)))
-                  if s_ok and _deg_close(mar, a)]
+                  if ok and _deg_close(mar, a)]
         if m_orbs:
-            score += 2; hits.append("Maṅgal executioner degree-lock")
-            orb += min(m_orbs)
-        if _nrel(nk_sign, js) and _deg_close(jup, nk_lon):
-            score += 2; hits.append("Guru≈kāraka degree-lock")
-            orb += _dd(jup, nk_lon)
-        if score > 0:
-            # no degree-lock → no exactness to compare; rank after locked days
-            locked = any("degree-lock" in h for h in hits)
-            days.append((d, score, hits, orb if locked else 99.0))
+            score += 1; orb += min(m_orbs); locked = True
+            hits.append("Maṅgal degree-lock (refine)")
+        days.append((d, score, hits, orb if locked else 99.0))
         d += timedelta(days=1)
     days.sort(key=lambda x: (-x[1], x[3], x[0]))
     picked = []

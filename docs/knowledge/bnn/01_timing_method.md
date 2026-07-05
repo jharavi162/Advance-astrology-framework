@@ -70,16 +70,16 @@ gate.
 
 ---
 
-## Engine implications (Task 2 — make Nāḍī timing canonical)
-1. **Primary gate = Jupiter transit contacting the kāraka** (Venus for marriage;
-   Saturn for profession; Jupiter for children; Mercury for education). Currently
-   the day-pinpoint over-weights fast Venus–Mars degree-locks → demote those to a
-   **refinement**, promote Jupiter-contact-kāraka to primary.
-2. **Add Saturn contact + double-approval:** Jupiter-connect → timely; Saturn-connect
-   → late; both → strongest. (We already have Guru-jeeva and Śani-sanction witnesses
-   at the window layer — elevate to a joint double-approval signal.)
-3. **Add the 7th-from-kāraka target** (partner seat) — transits to it also time the
-   event. (Currently only natal-kāraka and natal-Jupiter are targeted.)
-4. Keep degree-lock as the **tie-break/refinement**, not the trigger.
-5. Also-read factors for interpretation (AI): sign-lord, co-tenants, 12th-from-kāraka,
-   sign-exchange (parivartana).
+## Engine implications (Task 2 — make Nāḍī timing canonical) — DONE 2026-07-05
+`nadi_pinpoint` rewritten to the canonical two-tier scoring:
+1. ✅ **Primary gate = Guru(jeeva) contacts kāraka OR 7th-from-kāraka** (+3; a tight
+   degree-lock +1). A day with no slow-planet approval is skipped.
+2. ✅ **Śani karma-approval** (+2) — Jupiter + Saturn together = double-approval.
+3. ✅ **7th-from-kāraka** target added (partner seat).
+4. ✅ Fast **Śukra/Maṅgal** degree-locks demoted to **refinement** (+1 each, only
+   sharpen the day inside an approved period).
+   Re-verified blind: user chart wedding **2024-01-29 = score 8** (top); sample
+   female chart concentrates on **~Feb-2021**.
+5. TODO (interpretation, AI): sign-lord, co-tenants, 12th-from-kāraka, sign-exchange
+   (parivartana). Also TODO: mirror the 7th-from-kāraka + double-approval logic into
+   `nadi_rupture_pinpoint`.
