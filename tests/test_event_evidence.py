@@ -662,3 +662,43 @@ def test_school_report_layer1_breakdown():
         assert r["strength"] >= 0.0
     assert any(r["fires"] for r in rep)                   # something fires
     assert rep == school_report(v, prof, rows)            # deterministic
+
+
+def test_task4_standing_nodes_bounded_and_domain_gated():
+    """The 5 approved Parāśari/Jaimini nodes: bounded votes, correctly gated to
+    their matter (Manglik/Karakāṃśa/husband-kāraka → marriage only; Indu → wealth
+    only; female-husband-kāraka only for a ♀ chart)."""
+    from interpreter.event_evidence import (WITNESSES, _w_manglik,
+        _w_female_husband_karaka, _w_karakamsha_spouse, _w_indu_lagna,
+        _w_bhava_chalit_shift)
+    from advance_astrology import Planet
+    v = _chart()
+    names = [w.name for w in WITNESSES]
+    for sub in ("Kuja dosha", "husband kāraka", "Karakāṃśa 7th-spouse",
+                "Indu Lagna", "Bhāva-Chalit result-shift"):
+        assert any(sub in n for n in names), sub
+    mar, wealth, career = (DOMAIN_PROFILES["marriage"], DOMAIN_PROFILES["wealth"],
+                           DOMAIN_PROFILES["career"])
+    # Manglik: marriage-gated, non-positive, zero for career
+    assert -1.0 <= _w_manglik(v, mar) <= 0.0
+    assert _w_manglik(v, career) == 0.0
+    # Karakāṃśa spouse: marriage-gated, bounded
+    assert -0.5 <= _w_karakamsha_spouse(v, mar) <= 0.5
+    assert _w_karakamsha_spouse(v, career) == 0.0
+    # Indu Lagna: wealth-gated
+    assert _w_indu_lagna(v, mar) == 0.0
+    assert -0.4 <= _w_indu_lagna(v, wealth) <= 0.4
+    # Bhāva-Chalit: bounded caution
+    assert -0.6 <= _w_bhava_chalit_shift(v, mar) <= 0.0
+    # female husband-kāraka: zero unless ♀
+    v.gender = "male"
+    assert _w_female_husband_karaka(v, mar) == 0.0
+    v.gender = "female"
+    assert -0.4 <= _w_female_husband_karaka(v, mar) <= 0.4
+
+
+def test_coverage_matrix_in_sync_after_task4():
+    from interpreter.coverage import audit
+    a = audit()
+    assert a["claims_without_witness"] == [], a["claims_without_witness"]
+    assert a["witnesses_not_in_matrix"] == [], a["witnesses_not_in_matrix"]

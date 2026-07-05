@@ -49,6 +49,9 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Maraka affliction", "marakas", "maraka", "wired"),
     CoverageItem("2nd-from-Arudha sustenance (Jaimini)", "arudhas+graha_aspects", "2nd-from-Arudha sustenance", "wired"),
     CoverageItem("Vakri (retrograde) significator", "placements.retrograde", "vakri (retrograde)", "wired"),
+    CoverageItem("Kuja/Maṅgala dosha (marriage friction)", "signs vs lagna/Moon/Venus", "Kuja dosha", "wired"),
+    CoverageItem("Strī-jātaka husband kāraka (Jupiter, ♀)", "gender + Jupiter company", "husband kāraka", "wired"),
+    CoverageItem("Karakāṃśa 7th-from (AK in D9, spouse)", "karakamsha + navamsha", "Karakāṃśa 7th-spouse", "wired"),
     # ---- TIMING ----------------------------------------------------------- #
     CoverageItem("Vimśottari daśā (kāraka in chain)", "current_dasha", "kāraka in MD", "wired"),
     CoverageItem("Vimśottari sūkṣma drill", "current_dasha levels=5", "kāraka at sūkṣma", "wired"),
@@ -76,14 +79,13 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Chara (Jaimini rāśi) daśā", "current_chara_dasha", "daśā[chara]", "wired"),
     CoverageItem("Nārāyaṇa daśā", "narayana_dasha", "daśā[nārāyaṇa]", "wired"),
     CoverageItem("Sudasā (Śrī) daśā", "sudasa_dasha", "daśā[sudasā]", "wired"),
+    CoverageItem("Bhāva-Chalit result-house shift", "bhava_chalit", "Bhāva-Chalit result-shift", "wired"),
+    CoverageItem("Indu Lagna / special lagnas", "special_lagnas/indu_lagna", "Indu Lagna", "wired"),
     # ---- RED — engine computes it, NO witness reads it yet ----------------- #
-    CoverageItem("Bhāva-Chalit result-house shift", "bhava_chalit", "", "red"),
     CoverageItem("Sade-Sati / Kaṇṭaka (Saturn-from-Moon)", "transits.sade_sati", "", "red"),
     CoverageItem("Functional benefic/malefic weighting", "functional_nature", "daśā-lord functional valence", "wired"),
     CoverageItem("Full yoga-engine mapping (beyond rāja-yoga)", "yogas", "", "red"),
     CoverageItem("Bhinnāṣṭakavarga of house/lord", "bhinnashtakavarga", "", "red"),
-    CoverageItem("Indu Lagna / special lagnas", "special_lagnas/indu_lagna", "", "red"),
-    CoverageItem("Karakāṃśa (AK in D9)", "karakamsha", "", "red"),
     CoverageItem("Kala-vela upagrahas (Dhūma/Vyatīpāta…)", "calculated_upagrahas", "", "red"),
     # ---- INTERPRETIVE — not a mechanical vote (AI judgment) --------------- #
     CoverageItem("Pañcāṅga subtleties", "panchanga", "", "interpretive"),

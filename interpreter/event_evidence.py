@@ -288,6 +288,97 @@ register_witness("vakri (retrograde) significator", "standing", 0.6,
                  _w_retro_significator)
 
 
+# --- Task-4 standing nodes (user-approved 2026-07-05, with classical sources) - #
+def _house_from(sign, asc):
+    return (sign - asc) % 12 + 1
+
+
+_MANGLIK_HOUSES = {1, 2, 4, 7, 8, 12}
+
+
+def _w_manglik(v, p):
+    """Kuja / Maṅgala dosha (BPHS; Saravali): Mars in 1/2/4/7/8/12 reckoned from
+    the lagna, the Moon AND Venus → friction/delay in marriage. Marriage-class
+    matters only (does not touch career, wealth, …)."""
+    if 7 not in p.houses and (getattr(p, "base_domain", None) or "") != "marriage":
+        return 0.0
+    mars = v.signs[Planet.MARS]
+    hits = sum(1 for ref in (v.ascendant_sign, v.signs[Planet.MOON],
+                             v.signs[Planet.VENUS])
+               if _house_from(mars, ref) in _MANGLIK_HOUSES)
+    return -1.0 if hits >= 2 else (-0.5 if hits == 1 else 0.0)
+
+
+def _w_female_husband_karaka(v, p):
+    """Strī-jātaka (BPHS): in a woman's chart the husband is read from JUPITER
+    (besides the 7th lord). Reads Jupiter's benefic/malefic company for a
+    marriage-class female chart — the marriage EVENT still times on Venus/7th."""
+    if (getattr(v, "gender", "") or "").lower()[:1] != "f":
+        return 0.0
+    if 7 not in p.houses and (getattr(p, "base_domain", None) or "") != "marriage":
+        return 0.0
+    co = set(v.planets_in_house(_house_from(v.signs[Planet.JUPITER],
+                                            v.ascendant_sign))) - {Planet.JUPITER}
+    b, m = len(co & _NAT_BENEFIC), len(co & _NAT_MALEFIC)
+    return 0.4 * (1 if b > m else -1 if m > b else 0)
+
+
+def _w_karakamsha_spouse(v, p):
+    """Jaimini Karakāṃśa: the 7th-from-Karakāṃśa (the Ātmakāraka's D9 sign) shows
+    the spouse — benefics occupying it = good, malefics = troubled. Marriage-class
+    matters only."""
+    if 7 not in p.houses and (getattr(p, "base_domain", None) or "") != "marriage":
+        return 0.0
+    try:
+        seventh = (v.karakamsha() + 6) % 12
+        d9 = v.navamsha.signs
+    except Exception:
+        return 0.0
+    occ = [pl for pl, s in d9.items()
+           if s == seventh and pl in (_NAT_BENEFIC | _NAT_MALEFIC)]
+    b = sum(1 for pl in occ if pl in _NAT_BENEFIC)
+    m = sum(1 for pl in occ if pl in _NAT_MALEFIC)
+    return 0.5 * (1 if b > m else -1 if m > b else 0)
+
+
+def _w_indu_lagna(v, p):
+    """Indu Lagna (BPHS special lagna) — the wealth ascendant. Benefic company
+    strengthens dhana. Wealth-class matters (2nd/11th houses) only."""
+    if not ({2, 11} & set(p.houses)):
+        return 0.0
+    try:
+        co = set(v.planets_in_house(_house_from(v.indu_lagna(), v.ascendant_sign)))
+    except Exception:
+        return 0.0
+    b, m = len(co & _NAT_BENEFIC), len(co & _NAT_MALEFIC)
+    return 0.4 * (1 if b > m else -1 if m > b else 0)
+
+
+def _w_bhava_chalit_shift(v, p):
+    """Bhāva-Chalit (KP/BPHS): when the matter's house-lord's physical (Placidus
+    Chalit) house differs from its rāśi house, its rāśi-based result is weakened /
+    shifted — a small caution on the promise."""
+    try:
+        chalit = v.bhava_chalit()
+    except Exception:
+        return 0.0
+    shifted = sum(1 for h in p.houses
+                  if getattr(chalit.get(v.house_lord(h)), "shifted", False))
+    return -min(0.6, 0.3 * shifted)
+
+
+register_witness("Maṅgala/Kuja dosha (Mars 1/2/4/7/8/12)", "standing", 0.8,
+                 _w_manglik)
+register_witness("Strī-jātaka husband kāraka (Jupiter, ♀ chart)", "standing",
+                 0.8, _w_female_husband_karaka)
+register_witness("Karakāṃśa 7th-spouse (Jaimini D9)", "standing", 0.8,
+                 _w_karakamsha_spouse)
+register_witness("Indu Lagna wealth-ascendant (special lagna)", "standing", 0.6,
+                 _w_indu_lagna)
+register_witness("Bhāva-Chalit result-shift of house-lord", "standing", 0.6,
+                 _w_bhava_chalit_shift)
+
+
 def standing_balance(v, profile):
     """Net natal pro/anti pattern on the matter + the list of firing nodes."""
     total = 0.0

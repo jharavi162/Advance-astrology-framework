@@ -1203,3 +1203,20 @@ marriage and reported its date as the second partner (the "2022/2024" mis-read).
   score hid. Suite 170 green.
 - **Tests:** `test_school_collapses_parashari_subtools_to_one`,
   `test_school_report_layer1_breakdown`.
+
+## 2026-07-05 — Task 4 (batch A): Parāśari/Jaimini standing nodes wired (user-approved)
+
+Five approved standing nodes added (each classically sourced, domain-gated, no
+native hard-coding):
+- **Kuja/Maṅgala dosha** (BPHS/Saravali): Mars in 1/2/4/7/8/12 from lagna/Moon/
+  Venus → marriage friction (marriage-class only).
+- **Strī-jātaka husband-kāraka** (BPHS): a ♀ chart reads the husband from Jupiter's
+  company (marriage EVENT still Venus/7th-timed).
+- **Karakāṃśa 7th-spouse** (Jaimini): benefics/malefics in the 7th-from-Karakāṃśa
+  (AK's D9 sign) — spouse quality (marriage-class).
+- **Indu Lagna** (BPHS special lagna): wealth-ascendant company (wealth-class 2/11).
+- **Bhāva-Chalit result-shift** (KP/BPHS): house-lord's Chalit house ≠ rāśi house →
+  a caution on the promise.
+Coverage matrix: Bhāva-Chalit, Indu Lagna, Karakāṃśa moved RED→wired; Kuja dosha
+and husband-kāraka added as new wired rows; sync-tests green. Suite green.
+Sade-Sati (timing node) follows in batch B.
