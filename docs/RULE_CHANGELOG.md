@@ -1274,3 +1274,21 @@ separation-era window (backed by the rupture-timer), the fulfil windows read
 broke, with no date-fitting. Wired windows/rwindows into the scan call; UI adds a
 'troubled' colour. Suite 175 green. Test:
 `test_day_convergence_direction_defers_to_window_signals`.
+
+## 2026-07-05 — KP primary-timing discriminator: daśā-lords must signify the matter
+
+Research (KP Readers; jagannathhora/astrosage KP-timing) confirmed the #1 event-
+timing rule: the running daśā-BHUKTI-ANTARA lords must SIGNIFY the matter's
+fulfil-houses, else the period cannot deliver (transit convergence alone can't
+make an event happen). The engine already computed this (`kp_fulfil`/`kp_negate`
+= the MD>AD>PD chain lords' KP significations) but only as ONE diluted vote among
+~20 nodes — so a window whose daśā-lords don't signify the matter could still top
+the ranking on transit pile-up. Fixed in `_score_rows`: the signification acts as
+a graded DISCRIMINATOR (×1.0 if fulfil ≥ negate, ×0.6 if any fulfil, ×0.3 if
+none) — never a hard 0 (so it discriminates without being sole judge). General,
+KP-sourced, NOT date-fit.
+
+Honest note: on charts with a genuinely BROAD eligible period (e.g. a long Venus
+MD where many windows are KP-3/3), this correctly does NOT collapse to a single
+date — the honest output stays a shortlist + direction; a single date needs the
+finest hand (Moon/muhurta), inherently uncertain. Suite 175 green.

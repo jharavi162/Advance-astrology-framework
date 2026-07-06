@@ -1886,8 +1886,18 @@ def _score_rows(rows: list) -> None:
             groups[grp] = groups.get(grp, 0.0) + abs(c) * info
         n_systems = len(groups)
         gate = 1.0 if n_systems >= 2 else 0.4       # ≥2 INDEPENDENT schools
+        # KP PRIMARY TIMING RULE (KP Readers; the #1 discriminator): the running
+        # daśā-chain (MD>AD>PD) lords must SIGNIFY the matter's fulfil-houses for
+        # the period to deliver — otherwise transit convergence alone cannot make
+        # an event happen. `kp_fulfil`/`kp_negate` already hold the chain-lords'
+        # fulfil/negate significations; here they act as a graded DISCRIMINATOR
+        # (not a diluted single vote): a window whose daśā-lords do not signify
+        # the matter is strongly damped, however many transits pile on. Graded
+        # (never a hard 0) so it discriminates without being sole judge.
+        kf, kn = getattr(r, "kp_fulfil", 0), getattr(r, "kp_negate", 0)
+        sig = (1.0 if kf >= max(1, kn) else 0.6 if kf >= 1 else 0.3)
         r.systems_firing = n_systems
-        r.salience = round(sum(groups.values()) * gate, 3)
+        r.salience = round(sum(groups.values()) * gate * sig, 3)
 
 
 def school_report(v, profile, rows) -> list:
