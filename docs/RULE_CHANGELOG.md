@@ -11,6 +11,37 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — INTERPRETATION method: theme-first sub-period + read KP-negation through the theme (4C-bis)
+
+- **Change:** PROMPT-LAYER ONLY (no engine/app/UI change). Added §4C-bis to
+  `docs/AI_TRIANGULATION_PROMPT.md` + COMMON-MISS #10, and mirrored the essence
+  into the webapp narrator instruction (`CHAT_NARRATOR`). The interpretive
+  sequence: (1) read the matter's KARMIC THEME first (lasting vs separative/
+  break-prone) from the STANDING chart; (2) find the significator daśā-window
+  (kāraka / 7th-lord MD-AD); (3) let the theme pick the sub-period — a break-prone
+  matter fires under a SEPARATIVE sub-lord (node/Saturn), a lasting one under a
+  BENEFIC sub-lord; (4) BNN degree-locks the day inside it; (5) KP verifies but is
+  read THROUGH the theme — a negation-lean (6/8/12 lit) on a kāraka-lit, BNN-locked
+  day is the CONFIRMING signature of a troubled union, NOT a denial.
+- **Why:** The pure KP-fulfilment ranking buries the true date whenever the event
+  is karmically troubled (it fires in a separative sub-period where KP naturally
+  shows negation houses). Reading the negation-lean as the theme's signature —
+  not a veto — is the correction. This is INTERPRETATION judgment, so per CLAUDE.md
+  it belongs in the PROMPT, never hard-coded in the engine.
+- **Source / basis:** BPHS kalatra-kāraka (Venus) + daśā-of-significators timing;
+  KP significator doctrine; classical separative-node/Saturn = break karma;
+  R.G. Rao BNN degree-lock for the day. Stated GENERALLY (no hard-coded planet
+  sequence, no native, no date).
+- **Validation (NOT calibration):** the engine's own Vimśottari independently
+  places two real, break-followed marriages in a Venus-MD → Mars-AD → separative
+  (Rāhu) PD window, and BNN independently degree-locks the day there; the method
+  was written in general form and merely *validated* against — not fitted to —
+  those outcomes. The doc explicitly forbids deriving the theme from a known date.
+- **Failure-mode addressed:** DISCRIMINATION of the correct date for
+  karmically-troubled events (interpretation, not a mechanical vote).
+
+---
+
 ## 2026-07-06 — Wire 3 BNN marriage-QUALITY standing nodes (user-approved)
 
 - **Change:** Added three domain-general **standing** witnesses (they shade the

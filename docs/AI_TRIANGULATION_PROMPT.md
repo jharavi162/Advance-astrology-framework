@@ -380,10 +380,62 @@ witness-registry computes this standing balance for you; add a node as one
 > on its own significators, and report them separately rather than fusing two
 > distinct moments into a single claim.
 
+### 4C-bis. Let the matter's KARMIC THEME choose the sub-period — and read the negation-signature THROUGH the theme
+This is the interpretive sequence that ties the six confirmations together, and
+it is the correction to the commonest pinpoint miss: **scoring a window purely on
+KP-fulfilment and discarding the one where the negation houses are lit — even
+when that is exactly where the event occurred.** Follow it in order:
+
+1. **Read the matter's theme FIRST (from the STANDING testimony, before timing).**
+   Establish not just *whether* the matter is promised but *what kind* of instance
+   the chart carries — for a union: is it **lasting/blessed** (benefics on the 7th
+   and the Upapada, dignified kāraka, no separative grip) or **separative /
+   karmically-troubled / break-prone** (separative nodes or Saturn gripping the 7th
+   & UL, an afflicted kāraka, a dusthāna Arudha)? Name the theme explicitly; it
+   governs everything below.
+
+2. **Find the significator daśā-window** — the MD/AD in which the matter's own
+   significators run (the kāraka — e.g. Venus for marriage/kalatra — and/or the
+   7th-lord). This is the *frame* inside which the event must fall.
+
+3. **Let the theme choose the SUB-PERIOD (pratyantara/sūkṣma) that carries it.**
+   The event does **not** wait for the "nicest" sub-lord — it arrives in the
+   sub-period whose lord's **nature matches the matter's karma**. A lasting,
+   blessed union tends to fire under a **benefic** sub-lord (Jupiter/Venus); a
+   **separative / divorce-prone** union fires under a **separative** sub-lord (a
+   node — Rāhu/Ketu — or Saturn), because that sub-lord *is* the karmic agent of
+   the very separation the chart promised. So when the theme is break-prone, look
+   to the separative sub-period WITHIN the significator window for the event; the
+   adjacent benefic sub-period is where the same event would have fallen had the
+   union been karmically clean.
+
+4. **BNN degree-locks the exact day** inside that chosen sub-period (the transit
+   kāraka on its own natal degree / golden 1-5-9 relation — §4C-3). This is the
+   pinpoint; trust the degree-lock even when step 5 looks "weak."
+
+5. **KP verifies — but read it THROUGH the theme, never as a raw gate.** When the
+   fulfilment kāraka (Venus / the 7th) is signified AND BNN has locked the day, a
+   **negation-lean in KP is not a denial — it is the SIGNATURE of the matter's
+   theme.** A divorce-bound marriage will, on its own wedding day, show the
+   separative houses (6/8/12) lit through the running node/Saturn significators;
+   that lit-negation describes *how the union is karmically built* (it will
+   strain / break later), it does **not** mean "no marriage." Only when the
+   fulfilment kāraka is itself absent *and* the negation houses dominate *and* the
+   standing promise is dark do you read a true non-event. **Do not let a low
+   fulfilment-count or a negation-lean down-rank or veto a window whose kāraka
+   fires, whose theme it matches, and which BNN has degree-locked.**
+
+The output of 4C-bis is a single most-probable day (or tight cluster) plus a
+one-line reason of the form: *theme → significator window → theme-matched
+sub-period → BNN-locked day → KP read as \<fulfils / confirms-the-troubled-theme\>.*
+
 ### 4D. Convergence, Ranking & Falsification
 Count how many independent systems converged per theme; **rank**; the call is the
 top-ranked theme. Actively seek contradicting signatures; if strong methods
 disagree, lower confidence or rule out. "One factor points here" is never enough.
+**But** (per 4C-bis) a KP negation-lean that merely *mirrors an already-declared
+break-prone theme* is a CONFIRMING witness, not a contradicting one — do not let
+it lower confidence in a kāraka-lit, BNN-locked, theme-matched window.
 
 ---
 
@@ -496,6 +548,19 @@ Theme can be right while the *date* is wrong. The recurring causes:
    the full remaining span — will miss the actual trigger. Re-scan the lord's
    sign to the very end of the span, and count Saturn's 3rd/10th and Jupiter's
    5th/9th glances, not occupation or the 7th aspect alone.
+10. **Discarding the window whose negation houses are lit — when that IS the
+    event.** For a matter the chart marks as **karmically troubled / break-prone**
+    (a divorce-bound marriage, a job taken only to be lost), the event fires under
+    a **separative** sub-lord (a node or Saturn), so on the event day KP will show
+    the *negation* houses (6/8/12) lit. Scoring windows purely by KP-fulfilment
+    then buries the real date under "cleaner" windows where nothing happened. The
+    fix is 4C-bis: read the **theme first**, let it pick the separative sub-period,
+    take the **BNN degree-lock** as the day, and read the KP negation-lean as the
+    *confirming signature of the troubled theme* — not as a denial. The fulfilment
+    kāraka being present (Venus/7th signified) + a BNN lock is enough for the event
+    to have occurred; the lit negation only tells you it was built to strain or
+    break. (Never invert this into calibration: derive the theme from the standing
+    chart alone, never from a known outcome date.)
 
 ## FORBIDDEN BEHAVIOURS
 - Answering after only natal + Vimśottari (the cardinal mistake).
