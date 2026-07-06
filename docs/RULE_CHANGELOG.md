@@ -11,6 +11,38 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — BNN pinpoint anchors the SPOUSE/gender kāraka (Mars ♀); fuller significator identification
+
+- **Change:**
+  1. **ENGINE** (`nadi_pinpoint`): the day-funnel now anchors BOTH the event-kāraka
+     (Venus) AND the **spouse/gender kāraka** (`nadi_karaka` — Mars for a female
+     husband, Venus for a male). The slow-gate (Guru/Śani golden) accepts a
+     contact to the spouse-kāraka or its 7th, and a new refinement fires when the
+     **spouse-kāraka returns to its own natal degree** (BNN "own degree = give much
+     importance"). Backward-compatible: for a male the spouse-kāraka == the
+     event-kāraka (both Venus), so nothing changes.
+  2. **INTERPRETATION** (AI_TRIANGULATION_PROMPT §4C-bis step 2/4 + CHAT_NARRATOR):
+     significator identification now spans ALL layers — 7th lord, 7th CUSP
+     SUB-LORD, kalatra-kāraka Venus, spouse/gender kāraka, Darakaraka, 7th
+     occupants/aspectors, 2nd/11th lords, Lagna lord, nakṣatra-lords — a planet
+     counts even when its house-significations omit the 7th (e.g. Venus as
+     DK/cusp-sublord). BNN step confirms on the SAME set, including the
+     spouse-kāraka's degree-return.
+- **Why:** Anchoring the BNN funnel only on Venus missed the husband-kāraka Mars
+  stamp on female charts (Mars returning to its natal degree). R.G. Rao reads the
+  **husband from Mars for a female** — so the husband-kāraka's activation must be
+  in the funnel. User-requested ("BNN trines as per the book").
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (Mars = husband for a female; a planet
+  on its own natal degree = "give much importance"); Jaimini Darakaraka; KP 7th
+  cusp sub-lord.
+- **Validation (NOT calibration):** male chart's top pinpoint is unchanged
+  (backward-compatible); on a female chart the husband-kāraka degree-return now
+  surfaces the marriage window that Venus-only anchoring had missed. General for
+  all charts; no native date hard-coded. Regression test
+  `test_nadi_pinpoint_anchors_the_spouse_karaka_for_female`.
+- **Failure-mode:** COVERAGE + DISCRIMINATION — a whole class (female marriage)
+  whose true stamp is on the husband-kāraka was unreachable before.
+
 ## 2026-07-06 — Fix interpretation: significator-daśā + BNN-lock OUTRANK the salience call
 
 - **Change:** PROMPT-LAYER ONLY (AI_TRIANGULATION_PROMPT §4C-bis + webapp

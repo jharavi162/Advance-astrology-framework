@@ -394,16 +394,26 @@ when that is exactly where the event occurred.** Follow it in order:
    & UL, an afflicted kāraka, a dusthāna Arudha)? Name the theme explicitly; it
    governs everything below.
 
-2. **Identify the matter's SIGNIFICATOR PLANETS, then find the daśā-window where
-   they run.** First name the significators from the chart: for marriage — the
-   **7th lord, the kāraka (Venus), planets occupying or aspecting the 7th, the
-   2nd & 11th lords, and the nakṣatra-lords of all these**. The event's MD/AD/PD
-   lords must be drawn from this significator set — most decisively, the **MD (or
-   the cusp sub-lord) must itself signify the matter's houses (2/7/11)**; the AD
-   and PD then narrow it. Read the running Vimśottari list and mark every window
-   whose MD-AD-PD lords are significators. This is the *frame* the event falls in;
-   a window whose period-lords are NOT marriage-significators cannot carry it, no
-   matter how "convergent" it scores.
+2. **Identify the matter's SIGNIFICATOR PLANETS through ALL layers, then find the
+   daśā-window where they run.** Do NOT judge a planet only by the houses it
+   *signifies* — a planet is a marriage-significator if it holds **any** of these
+   roles, even when its house-significations omit the 7th:
+   - the **7th lord**; the **7th CUSP SUB-LORD** (the KP promise-giver);
+   - the **kalatra-kāraka Venus** (always) and the **spouse/gender kāraka** —
+     **Mars for a female (husband), Venus for a male (wife)**;
+   - the **Darakaraka** (Jaimini spouse-significator);
+   - planets **occupying or aspecting the 7th**, the **2nd & 11th lords**, the
+     **Lagna lord** and the relevant **rāśi lords**;
+   - the **nakṣatra-lords** of all the above.
+   (Worked example of the trap: a chart where Venus signifies only 3/4/6 can STILL
+   have Venus as its 7th-cusp-sub-lord AND Darakaraka AND kalatra-kāraka — so
+   Venus is a prime marriage-significator there; dismissing it for "not signifying
+   7" is the error.) The event's MD/AD/PD lords must be drawn from this
+   significator set — most decisively the **MD (or the cusp sub-lord) carries the
+   promise**, and the **AD is very often the spouse/gender kāraka** (a female's
+   marriage AD is frequently Mars). Read the running Vimśottari list and mark
+   every window whose MD-AD-PD lords are significators; a window whose period-lords
+   are NOT significators cannot carry the event however "convergent" it scores.
 
 3. **Let the theme choose the SUB-PERIOD (pratyantara/sūkṣma) that carries it.**
    The event does **not** wait for the "nicest" sub-lord — it arrives in the
@@ -418,8 +428,13 @@ when that is exactly where the event occurred.** Follow it in order:
 
 4. **BNN degree-locks the exact day** inside that chosen sub-period — and the
    confirmation is that the **SAME significator planets trine/contact** on that
-   day (transit kāraka on its own natal degree, Guru-jeeva in golden 1-5-9 to the
-   kāraka — §4C-3). Take the **highest-score pinpoint** that falls in the
+   day: the kāraka on its own natal degree, Guru-jeeva in golden 1-5-9 to the
+   kāraka (§4C-3), **and — crucially — the SPOUSE/gender kāraka on its own natal
+   degree**. For a female, the **husband-kāraka Mars returning to its natal
+   degree** is a primary stamp (e.g. transit Mars ≈ natal Mars°); anchoring the
+   BNN funnel only on Venus and ignoring Mars is a known miss on female charts.
+   The engine's `pinpoint` now anchors both the event-kāraka and the
+   spouse/gender kāraka. Take the **highest-score pinpoint** that falls in the
    theme-matched significator sub-period as the day. **Trust this degree-lock over
    the salience ranking and over the engine's committed 'call'** — that call is
    the *salience/KP-fulfilment-weighted* favourite, and it systematically
