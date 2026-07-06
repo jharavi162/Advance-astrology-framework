@@ -634,7 +634,33 @@ CHAT_NARRATOR = (
     "strained) — use them to CONFIRM which theme-matched sub-period in step 3 "
     "carries the event, not as a rival day-list. NEVER claim a single day is THE "
     "event unless the user confirmed it — the engine reports where the positioning "
-    "is strongest, it does not assume the date. If "
+    "is strongest, it does not assume the date. "
+    "CANONICAL MARRIAGE-TIMING STEP-ORDER (validated across charts — follow it "
+    "exactly for a marriage 'kab' question): "
+    "STEP 0 (promise, KP): 7th-cusp sub-lord signifies 2/7/11 → marriage happens; "
+    "1/6/10/12 → denied/delayed. "
+    "STEP 1 (MD, by AGE): among the mahādaśās running in the ADULT/marriageable "
+    "band (use the native's age — NOT just the last few years), take the MD whose "
+    "lord carries a 7th-ROLE: PLACED in the 7th, OR the 7th-lord, OR the 7th-cusp "
+    "sub-lord. (A graha in the 7th is as strong a timer as the 7th-lord.) "
+    "STEP 2 (AD): candidates in priority — 7th-occupants → 7th-lord → 7th-cusp "
+    "sub-lord → Lagna-lord → Rāśi (Moon-sign) lord → Venus (kalatra-kāraka); take "
+    "the one whose AD falls in the age-appropriate band. Use KP NEGATION only as a "
+    "DISAMBIGUATOR for an INDIRECT/weak contender (a planet with no 7th-role, e.g. "
+    "a general kāraka sitting in a dusthāna 6/8/12) — there, if it signifies no "
+    "2/7/11 and sits in a dusthāna, it brings talk/proposals but WEAK conversion, "
+    "so deprioritise it. Do NOT use negation to eliminate a STRONG Parashari role "
+    "(7th-occupant / 7th-lord / cusp-sub-lord): those deliver even if they signify "
+    "negation, because the MD carries the promise. "
+    "STEP 3 (PD): priority again by 7th-role; but a SEPARATIVE-node pratyantara "
+    "(Rāhu/Ketu) very often TRIGGERS the actual event (seen repeatedly) — do not "
+    "dismiss it. Pick the PD by BNN (highest degree-lock). The Jupiter+Saturn "
+    "DOUBLE-TRANSIT on the 7th house/lord is a CONFIRMING bonus, NOT a required "
+    "gate — marriages fire without it; never push the date later just to catch a "
+    "double-transit. "
+    "STEP 4 (Sūkṣma): the BNN degree-lock (Jupiter-jeeva + the spouse/gender "
+    "kāraka's own-degree return) fixes the exact day inside the chosen PD. "
+    "If "
     "the call carries a 'next' window, state it as the engine's committed "
     "UPCOMING window. CRITICAL KP rule: AFFLICTION ≠ DENIAL. An afflicted/"
     "troubled standing describes the event's QUALITY (troubled/with-friction), "
@@ -720,11 +746,18 @@ _MACRO_RE = re.compile(
     r"life\s*events?|what\s*happened|sabse\s*(bada|bade)\s*event)", re.I)
 
 
-def _auto_scan_window(question, today):
+def _auto_scan_window(question, today, born=None):
     """(start, end) for the auto scan. Priority: explicit years ("2015 se 2018" →
     that range, span capped at 6 yrs) → STORY-mode (past narrative + future ask →
     last 2 yrs THROUGH next 3 yrs, one span) → relative ranges ("pichle 3 saal" /
-    "agle 2 saal") → tense (past → last 4 yrs, else next 3 yrs)."""
+    "agle 2 saal") → tense.
+
+    For a PAST-tense question with the birth date known, scan the ADULT band BY
+    AGE (from age 18 to today) rather than a flat last-4-years — a life event
+    like marriage can have happened long ago, and capping at 4 yrs silently
+    misses it (e.g. a wedding 10 yrs back). `_kick_scan` adapts the step to keep
+    even a wide span bounded, so the AI can then place the exact daśā (MD by age
+    → AD → PD → BNN) inside the correct band."""
     years = sorted(int(y) for y in _YEAR_RE.findall(question))
     if years:
         y0, y1 = years[0], min(years[-1], years[0] + 6)
@@ -743,6 +776,14 @@ def _auto_scan_window(question, today):
         n = min(int(m.group(2)), 6)
         return today, today + timedelta(days=n * 365)
     if _PAST_RE.search(question):
+        # AGE-appropriate band: from adulthood (age 18) to today, so an event
+        # years ago is inside the scan. Cap the span at 24 yrs to stay bounded.
+        if born is not None:
+            adult = datetime(born.year + 18, born.month, min(born.day, 28),
+                             tzinfo=timezone.utc)
+            start = max(adult, today - timedelta(days=24 * 365))
+            if start <= today - timedelta(days=365):
+                return start, today
         return today - timedelta(days=4 * 365), today
     return today, today + timedelta(days=3 * 365)
 
@@ -883,7 +924,7 @@ def chat_json(body):
     allow_kick = not last_user.startswith("(auto)")
     if v is not None and last_user and _MACRO_RE.search(last_user):
         # Open "kaun-se bade events?" → multi-domain macro scan, not one domain.
-        s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
+        s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc), born=born)
         prev = (ctx or {}).get("last_salience_scan") or {}
         if allow_kick and not (prev.get("domain") == "macro"
                                and prev.get("range") == f"{s0.year}–{e0.year}"):
@@ -926,7 +967,7 @@ def chat_json(body):
             if allow_kick and (_TIMING_RE.search(last_user)
                                or _PAST_RE.search(last_user)
                                or _YEAR_RE.search(last_user)):
-                s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
+                s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc), born=born)
                 prev = (ctx or {}).get("last_salience_scan") or {}
                 same = (prev.get("domain") == dom
                         and prev.get("range") == f"{s0.year}–{e0.year}")
