@@ -61,6 +61,8 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Domain Saham double-transit", "sahams", "domain Saham", "wired"),
     CoverageItem("BNN degree conjunction", "transits.conjunction_windows", "BNN", "wired"),
     CoverageItem("Kakṣyā narrowing", "transits.kakshya_windows", "Kakṣyā", "wired"),
+    CoverageItem("Bhinnāṣṭakavarga of house/lord (transiting kāraka's own BAV)",
+                 "transits.kakshya_windows(kāraka)", "Bhinnāṣṭakavarga delivery", "wired"),
     CoverageItem("Varṣaphal Muntha", "varshaphal", "Varṣaphal Muntha", "wired"),
     CoverageItem("Sudarśana Chakra", "sudarshana", "Sudarśana", "wired"),
     CoverageItem("Lagna materialization", "transits.transit_sign", "Lagna materialization", "wired"),
@@ -85,7 +87,6 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Functional benefic/malefic weighting", "functional_nature", "daśā-lord functional valence", "wired"),
     # ---- RED — engine computes it, NO witness reads it yet ----------------- #
     CoverageItem("Full yoga-engine mapping (beyond rāja-yoga)", "yogas", "", "red"),
-    CoverageItem("Bhinnāṣṭakavarga of house/lord", "bhinnashtakavarga", "", "red"),
     CoverageItem("Kala-vela upagrahas (Dhūma/Vyatīpāta…)", "calculated_upagrahas", "", "red"),
     # ---- INTERPRETIVE — not a mechanical vote (AI judgment) --------------- #
     CoverageItem("Pañcāṅga subtleties", "panchanga", "", "interpretive"),

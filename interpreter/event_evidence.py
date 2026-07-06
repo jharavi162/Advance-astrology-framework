@@ -44,6 +44,9 @@ from zoneinfo import ZoneInfo
 
 from advance_astrology import VedicChart, Planet
 from advance_astrology.constants import SIGNS
+from advance_astrology.vedic.ashtakavarga import (
+    ASHTAKAVARGA_PLANETS as _ASHTAKAVARGA_PLANETS,
+)
 
 UTC = timezone.utc
 
@@ -627,6 +630,7 @@ class WindowEvidence:
     nadi_jeeva: bool = False               # transit Jupiter conj/trine the Nāḍī kāraka (BNN year-marker)
     nadi_karma: bool = False               # transit Saturn sanction (conj/trine kāraka OR in fulfil-houses)
     sade_sati: bool = False                # transit Saturn in 12/1/2 from natal Moon (Sade-Sati/Kaṇṭaka)
+    karaka_kakshya: float = 0.0            # fraction of the matter's OWN significators (kārakas + slow timers) in a bindu-bearing kakṣyā of their Bhinnāṣṭakavarga (BPHS Aṣṭakavarga delivery)
     signals: dict = field(default_factory=dict)   # generic bag for FAMILY-generated nodes
     panel: object = None                          # the domain's full witness panel (families incl.)
     systems_firing: int = 0                       # # of INDEPENDENT paddhatis firing (set by _score_rows)
@@ -679,6 +683,14 @@ register_witness("BNN degree-trigger", "timing", 1.0,
                  lambda w: 1.0 if w.bnn else 0.0)
 register_witness("Kakṣyā window", "timing", 1.0,
                  lambda w: 1.0 if w.kakshya else 0.0)
+# Bhinnāṣṭakavarga DELIVERY — a transit fructifies in proportion to the bindus
+# the TRANSITING SIGNIFICATOR holds (BPHS Aṣṭakavarga gochara; K.N. Rao,
+# transits-with-Ashtakavarga). Distinct from the generic Jupiter/Saturn Kakṣyā
+# window above: this reads the MATTER'S OWN kārakas' own BAV, so it is
+# domain-scoped. Soft (0.6), graded, purely additive — it up-weights a window
+# whose delivering planets sit in fruitful kakṣyās; it can never veto one.
+register_witness("Bhinnāṣṭakavarga delivery (kāraka in bindu-bearing Kakṣyā)",
+                 "timing", 0.6, lambda w: w.karaka_kakshya)
 register_witness("Varṣaphal Muntha", "timing", 1.0,
                  lambda w: 1.0 if w.varshaphal_muntha else 0.0)
 register_witness("Sudarśana wheel", "timing", 1.0,
@@ -1528,6 +1540,22 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             saham_dt = _dt_windows(tr, (sah.sign_index - lagna_sign) % 12 + 1,
                                    start, end)
     kak_w = _kakshya_windows(tr, start, end)
+    # --- node: Bhinnāṣṭakavarga DELIVERY — the matter's OWN significators (its
+    # kārakas + the slow universal timers) deliver a transit only in proportion
+    # to the bindus they hold in their own BAV (BPHS Aṣṭakavarga gochara). Graded
+    # fraction, domain-general (reads the profile's kārakas, never a native). ----
+    # Ashtakavarga is defined only for the seven grahas Sun..Saturn — nodes
+    # (Rāhu/Ketu) have no BAV, so a nodal kāraka simply doesn't contribute here.
+    bav_planets = [p for p in dict.fromkeys([Planet.JUPITER, Planet.SATURN, *karakas])
+                   if p in _ASHTAKAVARGA_PLANETS]
+    bav_windows = {p: [(w.start, w.end) for w in tr.kakshya_windows(p, start, end)]
+                   for p in bav_planets}
+
+    def _bav_delivery(when) -> float:
+        if not bav_planets:
+            return 0.0
+        return sum(1 for p in bav_planets if _in(when, bav_windows[p])) / len(bav_planets)
+
     muntha = {y: v.varshaphal(y).muntha_house for y in range(start.year, end.year + 1)}
 
     # --- node: gochara reckoned FROM THE MOON (classical Janma-rāśi gochara) ---
@@ -1662,6 +1690,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             saham_double_transit=_in(d, saham_dt),
             bnn=_in(d, bnn_w),
             kakshya=_in(d, kak_w),
+            karaka_kakshya=_bav_delivery(d),
             varshaphal_muntha=muntha.get(d.year) in profile.houses,
             chara_ad=" > ".join(c.note for c in chara),
             sudarshana_hit=any(s in dom_signs for s in

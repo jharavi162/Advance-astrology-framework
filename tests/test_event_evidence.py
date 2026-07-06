@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 from advance_astrology import VedicChart
 from interpreter.event_evidence import (
     DASHA_SYSTEMS, DOMAIN_PROFILES, FAMILIES, WITNESSES, Witness, WindowEvidence,
-    _paddhati, _score_rows, build_panel, candidate_map, register_witness,
+    _paddhati, _school, _score_rows, build_panel, candidate_map, register_witness,
     render_domain, reversal_map, scan_domains, standing_balance,
 )
 
@@ -765,3 +765,45 @@ def test_day_convergence_direction_defers_to_window_signals():
     if brk:
         lbl, _sc = _window_direction(brk[0].start, rows, rr)
         assert lbl in ("break", "troubled", "union")
+
+
+def test_bhinnashtakavarga_delivery_node_registered_and_domain_scoped():
+    """The Bhinnāṣṭakavarga DELIVERY node (previously computed-but-UNWIRED — the
+    red 'Bhinnāṣṭakavarga of house/lord' coverage item) is now a registered,
+    domain-general timing witness: a transit fructifies in proportion to the
+    bindus the TRANSITING SIGNIFICATOR holds in its own BAV (BPHS Aṣṭakavarga
+    gochara). MECHANICAL only — asserts it exists, computes a bounded graded
+    value on every window, is a SOFT additive weight (never negative → never a
+    veto), and belongs to the Parāśari corpus (not a phantom independent school).
+    No date is asserted (that would be calibration)."""
+    names = [w.name for w in WITNESSES if w.layer == "timing"]
+    assert any("Bhinnāṣṭakavarga delivery" in n for n in names), \
+        "Bhinnāṣṭakavarga delivery node not registered"
+    node = next(w for w in WITNESSES
+                if w.layer == "timing" and "Bhinnāṣṭakavarga delivery" in w.name)
+    # it is a SOFT weight (< the hard 1.0 timekeepers) and reads a graded fraction,
+    # so it can only UP-WEIGHT a window — it can never suppress an otherwise-strong
+    # one (respects "never a veto").
+    assert 0 < node.weight < 1.0
+    # Aṣṭakavarga is the Parāśari corpus (SAME school as the generic Kakṣyā node),
+    # so wiring it does NOT invent a new independent school / false convergence.
+    assert _school(node.name) == "parashari"
+    assert _paddhati(node.name) == "ashtakavarga"
+
+    v = _chart()
+    rows = candidate_map(v, DOMAIN_PROFILES["marriage"],
+                         datetime(2023, 1, 1, tzinfo=UTC),
+                         datetime(2025, 6, 1, tzinfo=UTC))
+    assert rows
+    for r in rows:                       # computed on every window, bounded [0,1]
+        assert isinstance(r.karaka_kakshya, float)
+        assert 0.0 <= r.karaka_kakshya <= 1.0
+        assert node.vote(r) >= 0.0       # graded, never negative → never a veto
+    # fires (graded > 0) somewhere in a multi-year band — not dead code
+    assert any(r.karaka_kakshya > 0.0 for r in rows)
+    # domain-general: the kāraka set differs by domain, so the delivery node must
+    # also compute for a non-marriage matter without error
+    crows = candidate_map(v, DOMAIN_PROFILES["career"],
+                          datetime(2023, 1, 1, tzinfo=UTC),
+                          datetime(2025, 6, 1, tzinfo=UTC))
+    assert crows and all(0.0 <= r.karaka_kakshya <= 1.0 for r in crows)

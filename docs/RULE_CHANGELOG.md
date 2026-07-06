@@ -11,6 +11,37 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Wire Bhinnāṣṭakavarga DELIVERY (computed-but-unwired → wired)
+
+- **Change:** Added a domain-general timing node
+  `"Bhinnāṣṭakavarga delivery (kāraka in bindu-bearing Kakṣyā)"` (soft weight
+  0.6, graded fraction). It reads how many of the **matter's own significators**
+  (its kārakas + the slow universal timers Jupiter/Saturn) are transiting a
+  **bindu-bearing kakṣyā of their own Bhinnāṣṭakavarga** at each candidate date,
+  via the already-present `transits.kakshya_windows(planet)`. `WindowEvidence`
+  gains a `karaka_kakshya: float` field, populated per window in `candidate_map`.
+- **Why (śāstra):** A transit fructifies **in proportion to the bindus the
+  transiting planet holds** in the sign it occupies; a zero/low-bindu kakṣyā
+  transit tends not to deliver even when dṛṣṭi/daśā look ripe. This is the
+  classical "why did the promised transit not deliver?" discriminator. The engine
+  already used SAV-of-house (natal strength) and a *generic* Jupiter/Saturn kakṣyā
+  window, but **never checked the matter's OWN kāraka's BAV** — so the
+  domain-relevant delivering planet's kakṣyā strength was unread.
+- **Source:** BPHS *Aṣṭakavarga* (gochara-through-Ashtakavarga); K.N. Rao,
+  *Ups & Downs Through Ashtakavarga* (transit graded by bindus / kakṣyā).
+- **Failure-mode addressed:** COVERAGE — closes the RED coverage item
+  "Bhinnāṣṭakavarga of house/lord" (computed-but-unwired). It is Parāśari-corpus
+  (same school as the generic Kakṣyā node), so it adds **no** new independent
+  school / false convergence. Soft & graded (never negative) → it can only
+  up-weight a window whose delivering planets sit in fruitful kakṣyās; it can
+  never veto an otherwise-strong window. **No calibration** — added because the
+  śāstra's delivery-doctrine needs the significator's own BAV read, independent of
+  any native's date. Regression test:
+  `test_bhinnashtakavarga_delivery_node_registered_and_domain_scoped`; coverage
+  matrix row moved RED→wired; `test_coverage.py` summary assertion updated.
+
+---
+
 ## 2026-06-23 — Blind-test integrity: scrub native OUTCOME dates from the repo
 
 - **Change:** Removed the native's known event-dates (a first-marriage, a
