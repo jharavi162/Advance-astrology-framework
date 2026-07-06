@@ -402,8 +402,10 @@ when that is exactly where the event occurred.** Follow it in order:
    - the **kalatra-kāraka Venus** (always) and the **spouse/gender kāraka** —
      **Mars for a female (husband), Venus for a male (wife)**;
    - the **Darakaraka** (Jaimini spouse-significator);
-   - planets **occupying or aspecting the 7th**, the **2nd & 11th lords**, the
-     **Lagna lord** and the relevant **rāśi lords**;
+   - planets **occupying** the 7th (a graha PLACED in the matter's house is a
+     **top-tier timer, equal to the house-lord** — BPHS: it gives that house's
+     results in its daśā) or **aspecting** it, the **2nd & 11th lords**, the
+     **Lagna lord** and the relevant **rāśi (Moon-sign) lords**;
    - the **nakṣatra-lords** of all the above.
    (Worked example of the trap: a chart where Venus signifies only 3/4/6 can STILL
    have Venus as its 7th-cusp-sub-lord AND Darakaraka AND kalatra-kāraka — so
