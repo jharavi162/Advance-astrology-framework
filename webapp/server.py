@@ -321,9 +321,7 @@ def _run_scan(job, params, domain, start, end, step_days):
                           key=lambda x: (-x.salience, x.start))[:6]] or \
                   [r.start for r in top[:2]]
         pins = nadi_pinpoint_multi(v, prof, anchors, start, end, top=5)
-        # LAYER-1 per-school timing breakdown (two-layer convergence view)
-        from interpreter.event_evidence import school_report, day_convergence
-        schools = school_report(v, prof, rows)
+        from interpreter.event_evidence import day_convergence
         # MULTI-METHOD DAY convergence (pure detectors + direction), bounded to
         # ±45d around the top elapsed windows so it stays fast.
         conv, cseen = [], set()
@@ -341,7 +339,7 @@ def _run_scan(job, params, domain, start, end, step_days):
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
-                           pinpoint=pins, nadi=nadi, schools=schools,
+                           pinpoint=pins, nadi=nadi,
                            convergence=conv,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
@@ -582,13 +580,17 @@ CHAT_NARRATOR = (
     "Śukra/Maṅgal degree-locks only REFINE the exact day. Cite them as "
     "the most probable SPECIFIC dates, highest score first (a smaller 'orb' = "
     "a tighter degree-lock = stronger). "
-    "TWO-LAYER CONVERGENCE: if the scan carries 'schools', that is the Layer-1 "
-    "per-school breakdown — each of the 5 INDEPENDENT schools (Parāśari, Jaimini, "
-    "KP, Tājika, Nāḍī) with the window IT independently points to, or 'abstain' "
-    "when it casts no vote. Present it as such and read the AGREEMENT: the more "
-    "independent schools that cluster on the same window, the surer the call "
-    "(that is the real confidence); where they diverge, say so honestly rather "
-    "than forcing one date. Do not treat a thin/abstaining school as a 'no'. "
+    "TRIANGULATION — HOW TO ANSWER 'when': do NOT recite each system's separate "
+    "date as if they were competing verdicts. Instead READ THE THEME FIRST (from "
+    "the standing verdict + Nāḍī nature: what KIND of event/marriage this is), "
+    "then TRIANGULATE — take the salience-ranked windows (each already gated on "
+    "≥2 independent systems AGREEING; 'systems' count = the convergence strength) "
+    "together with the KP fulfilment on that window and the Nāḍī/BNN reading, and "
+    "name the ONE window (or tight cluster) where the most evidence CONVERGES as "
+    "the most probable time — with an honest confidence. The individual systems "
+    "are SUPPORT for that converged call, not five rival answers. Where the "
+    "evidence genuinely splits into two clusters, give the primary + secondary "
+    "rather than a false single date. "
     "MULTI-METHOD CONVERGENCE: if the scan carries 'convergence', those are the "
     "days where the most independent PURE methods (BNN golden, degree-return, "
     "Parāśari drishti, Moon-hand, kāraka-return) light up together, each with a "

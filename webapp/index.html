@@ -444,11 +444,10 @@ async function pollScan(job,msg,label){const chat=document.getElementById('chat'
 function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
   window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows,
     ...(res.call?{call:res.call}:{}),...(res.pinpoint?{pinpoint:res.pinpoint}:{}),
-    ...(res.nadi?{nadi:res.nadi}:{}),...(res.schools?{schools:res.schools}:{}),
+    ...(res.nadi?{nadi:res.nadi}:{}),
     ...(res.convergence?{convergence:res.convergence}:{}),
     ...(res.verdict?{standing_verdict:res.verdict,standing:res.standing}:{})};
   let html;
-  const schoolLine=sc=>!(sc&&sc.length)?'':`<div class="refrow" style="margin:0 0 8px">⚖ <b style="color:var(--acc)">Schools</b> (independent → converge): ${sc.map(s=>s.fires?`<b>${({parashari:'Parāśari',jaimini:'Jaimini',kp:'KP',tajika:'Tājika',nadi:'Nāḍī'})[s.school]||s.school}</b> ~${s.window}`:`${({parashari:'Parāśari',jaimini:'Jaimini',kp:'KP',tajika:'Tājika',nadi:'Nāḍī'})[s.school]||s.school}: <i>abstain</i>`).join(' · ')}</div>`;
   const cw=w=>/HERO/.test(w)?'HERO':/before/.test(w)?'pre':'post';
   const nadiLine=n=>!n?'':`<div class="refrow" style="margin:0 0 8px">🌿 <b style="color:var(--acc)">Nāḍī</b> (BNN, 1/5/9 trine method) · kāraka <b>${n.karaka}</b> · nature: ${n.nature}${(n.chain&&n.chain.length)?`<div class="sub" style="margin-top:3px">🔗 chain (degree-order = story): ${n.chain.map(c=>`<b>${c.planet}</b> ${c.degree}° ${c.relation}${c.retrograde?' [R]':''} <i>[${cw(c.when)}]</i>`).join(' → ')}</div>`:''}</div>`;
   const oc=k=>!k?'':` · <b style="color:${k==='LOSS/BREAK'?'#ff9bb0':(k==='CHANGE/UPGRADE'?'#7fe0c0':'var(--mut)')}">${k}</b>`;
@@ -461,7 +460,6 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
       ?`<b style="color:var(--acc)">🔮 Rupture-timer windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · rupture-score /5 se ranked (LOSS/BREAK = engine ka committed break-read) · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b>`:''}</div>`
       :`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
     html+=callLine(res.call);
-    html+=schoolLine(res.schools);
     if(res.convergence&&res.convergence.length){const dc=d=>({union:'#7fe0c0',break:'#ff9bb0',troubled:'#e0c060',mixed:'var(--mut)'})[d]||'var(--mut)';
       html+=`<div class="refrow" style="margin:0 0 8px">🧭 <b style="color:var(--acc)">Multi-method convergence</b> (energised days): ${res.convergence.map(c=>`<b>${c.date}</b> ${c.methods}/5 <span style="color:${dc(c.direction)}">[${c.direction}]</span>`).join(' · ')}<div class="sub">${res.convergence[0].active.join(', ')}</div></div>`;}
     html+=nadiLine(res.nadi);
