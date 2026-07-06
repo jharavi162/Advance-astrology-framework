@@ -11,6 +11,104 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Wire 3 BNN marriage-QUALITY standing nodes (user-approved)
+
+- **Change:** Added three domain-general **standing** witnesses (they shade the
+  matter's NATURE via `standing_balance`, never time it; soft, quality-only —
+  return ≤ 0, so they can never veto a window):
+  - `_w_jiva_12th_from_karaka` (−0.6): natal Jupiter in the 12th sign FROM the
+    domain kāraka ⇒ the jīva (enjoyer of results) is in the loss-house from the
+    matter → diminished enjoyment. Dormant when the kāraka is Jupiter.
+  - `_w_karaka_12th_from_descriptor` (−0.5): the Nāḍī event-kāraka in the 12th
+    FROM the matter's descriptor graha ⇒ delay. Dormant when the two coincide.
+  - `_w_karaka_conjunct_separator` (−0.6): the event-kāraka in a separator
+    (Rāhu/Ketu) node's sign-company ⇒ afflicted union.
+- **Why (śāstra):** BNN reads a matter from its kāraka's house-position and
+  company. Jupiter 12th-to-Venus = unhappy marriage; Venus 12th-to-Mars =
+  delayed marriage; Venus + Rāhu/Ketu = estrangement/progeny-trouble. Encoded in
+  the **domain-general** form (Jupiter-vs-kāraka; event-kāraka-vs-descriptor;
+  kāraka-vs-node), reading `profile.natural_karaka` / the Nāḍī kārakas — never a
+  native.
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao — L757 (Jupiter 12th-to-Venus),
+  L4292 (Venus 12th-to-Mars), L1372 / L322 (Venus + node). Distilled in
+  `docs/knowledge/bnn/02_marriage.md`.
+- **Failure-mode addressed:** DISCRIMINATION of outcome NATURE (quality), not
+  timing. No calibration — added because the śāstra reads these, independent of
+  any date. Regression test
+  `test_bnn_quality_standing_witnesses_registered_and_fire`; 3 coverage-matrix
+  rows added (wired); full suite 177 passed. Merged to `main`.
+
+---
+
+## 2026-07-06 — BNN knowledge base, pass 3: marriage (`02_marriage.md`)
+
+- **Change:** Distilled the marriage chapter — timing (Jupiter × Venus contacts,
+  age by Jupiter's rounds, Saturn sanction), quality (Jupiter-12th-from-Venus =
+  unhappy; Venus-12th-from-Mars = delay; Venus+separator = afflicted union),
+  multiple marriages / widowhood, and partner description. **Docs-only.**
+- **Why:** Reference for the narrator; the timing rules were verified already
+  wired (nadi_jeeva/nadi_karma, ♀ husband-kāraka, ordinal 2nd-spouse, rupture).
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (per-chart usages; L-refs in the doc).
+- **Candidate nodes (PROPOSED, not added — approval-gated per CLAUDE.md):** three
+  domain-general marriage-QUALITY standing witnesses — jīva-12th-from-kāraka
+  (BNN L757), kāraka-12th-from-descriptor delay (L4292), kāraka-conjunct-separator
+  affliction (L1372/L322). Listed at the end of `02_marriage.md`; each would ship
+  with a test + coverage row + main-merge if approved. No calibration.
+- **Failure-mode addressed:** knowledge-base coverage (not a prediction rule).
+
+---
+
+## 2026-07-06 — BNN knowledge base, pass 2: significations (`00_significations.md`)
+
+- **Change:** Distilled the kārakatwa dictionary from the source book into
+  `docs/knowledge/bnn/00_significations.md` — each graha's BNN significations,
+  the book's own reading procedure (kāraka → adjacent houses → 7th-from), and
+  secondary rāśi-flavour notes. **Docs-only; no engine/rule change.**
+- **Why:** The *calculable* half (planet→matter kāraka) was already encoded as
+  each domain's `natural_karaka` (THEME_LEXICON / DOMAIN_PROFILES) and verified
+  consistent with BNN in this pass; the *interpretive* half (what each kāraka
+  MEANS, how BNN reads it) now lives as narrator reference so a reading can be
+  explained without re-reading the 327-page PDF.
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (Preface reading-instruction;
+  explicit "Jīva Kāraka Jupiter / Kāma-kāraka Saturn" labels; the per-chart
+  significator usages throughout).
+- **Failure-mode addressed:** none mechanical — this is coverage of the
+  *knowledge base*, not a prediction rule. No calibration. No new node proposed
+  (significations are data/judgment, not a new timing check).
+
+---
+
+## 2026-07-06 — Wire Bhinnāṣṭakavarga DELIVERY (computed-but-unwired → wired)
+
+- **Change:** Added a domain-general timing node
+  `"Bhinnāṣṭakavarga delivery (kāraka in bindu-bearing Kakṣyā)"` (soft weight
+  0.6, graded fraction). It reads how many of the **matter's own significators**
+  (its kārakas + the slow universal timers Jupiter/Saturn) are transiting a
+  **bindu-bearing kakṣyā of their own Bhinnāṣṭakavarga** at each candidate date,
+  via the already-present `transits.kakshya_windows(planet)`. `WindowEvidence`
+  gains a `karaka_kakshya: float` field, populated per window in `candidate_map`.
+- **Why (śāstra):** A transit fructifies **in proportion to the bindus the
+  transiting planet holds** in the sign it occupies; a zero/low-bindu kakṣyā
+  transit tends not to deliver even when dṛṣṭi/daśā look ripe. This is the
+  classical "why did the promised transit not deliver?" discriminator. The engine
+  already used SAV-of-house (natal strength) and a *generic* Jupiter/Saturn kakṣyā
+  window, but **never checked the matter's OWN kāraka's BAV** — so the
+  domain-relevant delivering planet's kakṣyā strength was unread.
+- **Source:** BPHS *Aṣṭakavarga* (gochara-through-Ashtakavarga); K.N. Rao,
+  *Ups & Downs Through Ashtakavarga* (transit graded by bindus / kakṣyā).
+- **Failure-mode addressed:** COVERAGE — closes the RED coverage item
+  "Bhinnāṣṭakavarga of house/lord" (computed-but-unwired). It is Parāśari-corpus
+  (same school as the generic Kakṣyā node), so it adds **no** new independent
+  school / false convergence. Soft & graded (never negative) → it can only
+  up-weight a window whose delivering planets sit in fruitful kakṣyās; it can
+  never veto an otherwise-strong window. **No calibration** — added because the
+  śāstra's delivery-doctrine needs the significator's own BAV read, independent of
+  any native's date. Regression test:
+  `test_bhinnashtakavarga_delivery_node_registered_and_domain_scoped`; coverage
+  matrix row moved RED→wired; `test_coverage.py` summary assertion updated.
+
+---
+
 ## 2026-06-23 — Blind-test integrity: scrub native OUTCOME dates from the repo
 
 - **Change:** Removed the native's known event-dates (a first-marriage, a
@@ -817,3 +915,478 @@ addresses (coverage vs discrimination).
   delivers what the natal chart promises).
 - **Tests:** `test_domain_verdict_follows_the_decision_rule` (rule-consistency,
   not hardcoded outcomes), `test_domain_verdict_not_yet_when_nothing_elapsed`.
+
+## 2026-07-02 — DATA: divorce/separation domain (autonomous domain-add)
+
+- **Change:** `THEME_LEXICON["divorce"]` — houses=[7] (judged from the marriage
+  cusp) with the KP inversion: FULFIL = the marriage-negation group {1,6,10},
+  NEGATE = the marriage-sustenance group {2,7,11}; kāraka Saturn (separative);
+  arudha UL; varga D9. Synonyms: talaq/talak, separation, breakup, rishta toota,
+  alag hona, judai. "Divorce hua ya nahi?" previously resolved to NO domain at
+  all (no narrator, no scan, no verdict).
+- **Why (śāstra):** Textbook KP — divorce is read from the 7th cusp sub-lord
+  signifying 1/6/10; 2/7/11 signification denies it (KP Reader VI). UL and its
+  sustenance carry the marriage's break in Jaimini (Upapada doctrine).
+- **Tests:** `test_divorce_domain_resolves_with_kp_groups`.
+
+## 2026-07-02 — Rupture-class domains: verdict/scan timed by the reversal timer
+
+- **Change:** `DomainProfile` gains `rupture_matter` + `base_domain`. For a
+  rupture matter (divorce → base marriage) the scan and `domain_verdict` no
+  longer use the axis-fulfilment scan (which spikes for the UNION itself — the
+  wedding lit the same 7th-axis windows) — the break is timed by
+  `reversal_map` of the UNDERLYING matter: elapsed LOSS/BREAK window = delivered
+  break; rupture-score (0–5 independent rupture signatures) = confidence.
+  Using the base profile also avoids a double-inversion (the rupture profile's
+  inverted KP groups flipped reversal_map's pro/anti semantics).
+- **Why (śāstra):** The separation event is classically timed by separative
+  testimony — Śani/nodes running, the 6/8/12-from-the-house activation, dark
+  Lagna, the reversal Saham — not by the matter's fulfilment significators
+  (KP separative doctrine; Jaimini Upapada-break).
+- **Tests:** `test_rupture_matter_verdict_uses_reversal_timer` (rule-consistency
+  on the base-domain reversal rows). Full suite 155 green.
+
+## 2026-07-03 — Verdict: contested-completion, boundary maturity, next-window; STORY-mode scan
+
+- **Change (user-approved):**
+  1. **YES (contested)** — when the delivered window's KP negation ≥ its
+     fulfilment, the sub-lords fed BOTH groups at once (classical KP simultaneous
+     signification): the event-AXIS ran, but the engine no longer certifies clean
+     completion — it commits "YES (contested): obstructed attempt OR
+     completed-with-friction". The boundary (≥) is the natural KP one; no fitted
+     threshold (a live blind case exposed a false-positive where marriage-talks
+     windows read as a delivered marriage).
+  2. **Elapsed maturity** — a window counts as delivered evidence only once it
+     started ≥30 days before *asof*, so a forward scan's first row (starting AT
+     the scan boundary, i.e. today) can no longer masquerade as "delivered
+     today". Applied to the rupture path too.
+  3. **next_window** — every verdict also commits the strongest UPCOMING window
+     after *asof* (chain included) so "aage kab" is engine-committed, not
+     narrated.
+  4. **STORY-mode window** (webapp) — a question carrying BOTH a past narrative
+     and a future ask ("…tal gayi… aage kab hogi?") scans one span from 2 yrs
+     back through 3 yrs ahead, so the verdict reads the delivered/contested past
+     AND the committed next window together.
+- **Narrator:** contested calls explain both readings and adopt the user's own
+  account of the past; questions the engine cannot decide mechanically (same
+  person vs new, third parties without their chart) must be answered as
+  "(interpretive — engine-committed nahi)".
+- **Sources:** KP simultaneous-signification doctrine (KP Readers III/VI);
+  retrodiction/maturity is decision-procedure, not a new astrological rule.
+- **Tests:** decision-rule test extended (contested ⇔ negation ≥ fulfilment on
+  the delivered window), `test_verdict_boundary_and_next_window`; suite 156.
+
+## 2026-07-03 — Verdict grades: FULL vs PARTIAL promise (KP primary-house doctrine)
+
+- **Change (user-approved):** replaces "YES (contested)". The promise is graded:
+  **FULL** when the cusp sub-lord signifies the matter's OWN house (e.g. 7 for
+  marriage) → an elapsed window is a DELIVERED event ("YES"; window-negation is
+  reported as friction, never as non-occurrence). **PARTIAL** when only
+  secondary fulfil-houses are signified (e.g. 2/11 without 7) → an elapsed
+  window commits "ATTEMPTED (incomplete)": rishta/baat/attempt-level event ran,
+  completion not certified — with the WHY named mechanically (`_blockers`:
+  blocking houses the sub-lord feeds with their bhāva meanings, the strongest
+  negative natal witnesses, the window's negation count).
+- **Why (śāstra):** KP primary-house doctrine — signification of the matter's
+  own cusp is what certifies the matter itself; secondary houses alone move the
+  axis (alliances/talks) without the contract. Two live blind cases surfaced the
+  need; the rule is stated from doctrine, not fitted (no thresholds tuned).
+- **Tests:** decision-rule test asserts YES ⇔ primary-house signified (else
+  ATTEMPTED) on live-computed inputs; suite 156 green.
+
+## 2026-07-03 — Completion CONVERGENCE PANEL + arc-sequencing (replaces single-rule grade)
+
+- **Change (user-approved):** the completion grade is no longer decided by the
+  KP primary-house rule alone (that violated the charter's "never one rule as
+  sole judge" — caught by the user). `_completion_panel` votes ±1 per system:
+  KP primary-house signified (KP Readers), Arudha-axis lit in the window (the
+  Arudha IS the matter's public manifestation — Jaimini), varga deposition
+  (Phaladeepika), Saham fruition double-transit (Tājika), window KP net, and
+  the 2nd-from-Arudha sustenance sign. Majority: net ≥ +2 → YES (delivered);
+  net ≤ −1 → ATTEMPTED (incomplete, blockers named); else CONTESTED.
+- **Arc-sequencing:** the verdict now carries a chronological `arc` — pre-event
+  attempt windows, pre-event LOSS/BREAKs (bana-ke-toota), the event window,
+  post-event ruptures — and the narrator must present it in order. SEMANTICS
+  CLARIFIED: "afflicted" quality is the matter's ARC (troubled, break-PRONE),
+  never the event-moment's texture; a break is certified only by rupture
+  windows.
+- **Why:** a live blind case (completed marriage, smooth event, trouble later,
+  multiple earlier broken talks) showed the single-rule grade and the
+  friction-at-event phrasing both mis-described reality that the engine's own
+  computed windows already contained in sequence.
+- **Tests:** decision-rule test recomputes the panel live and asserts the grade
+  ⇔ panel majority; arc must contain the event entry. Suite 156 green.
+
+## 2026-07-03 — Deterministic pratyantar-midpoint sampling + candidate cluster + bana-ke-toota tag
+
+- **Change (user-approved):**
+  1. `candidate_map` and `reversal_map` no longer walk a start+k·step grid — each
+     Vimśottari pratyantar intersecting the span is evaluated at its (clipped)
+     MIDPOINT. The old grid's landing spot inside a pratyantar was an accident of
+     scan start/step: the same chart ranked a different #1 window at step 45 vs
+     60. Rankings are now parameter-independent (regression test); `step_days`
+     is retained in the signatures for API compatibility but no longer affects
+     sampling.
+  2. The verdict carries `candidates` — the top-3 elapsed windows — and the CALL
+     presents the CLUSTER instead of faking single-date certainty (several real
+     axis-events can sit within ranking noise of each other).
+  3. `broke_after(window, rrows)` — the "bana-ke-toota" tag: a LOSS/BREAK from
+     the rupture timer in the SAME antardaśā on/after a fulfilment window
+     (period-structural bound, no tuned day threshold). Shown per window and per
+     candidate.
+- **Why:** a live case showed two runs of the same chart committing different
+  top windows purely from sampling luck; the ground truth also showed several
+  top-ranked windows were all REAL axis-events (an alliance fixed-then-broken,
+  meeting the spouse, the wedding) — so the honest output is a deterministic
+  ranked cluster with rupture-pairing, not one fabricated-certain date.
+- **Tests:** `test_candidate_map_is_step_deterministic`; liveness test band
+  widened for midpoint sampling. Suite 156 green.
+
+## 2026-07-04 — NĀḌĪ (Bhrigu-Nandi) family: independent convergence voice (user-approved)
+
+- **Change:** Nāḍī doctrine wired as its own witness family + independent
+  "nadi" paddhati in the convergence gate:
+  1. `nadi_karaka()` — planets-as-kārakas, GENDER-aware for kalatra matters
+     (male → Venus, female → Mars; webapp gained a Gender field threaded through
+     chart params and scan keys); other domains data-mapped (career → Śani
+     [karma], children → Guru, education → Budha, wealth → Śukra, father → Sūrya,
+     mother → Chandra, foreign/relocation → Rāhu, property → Maṅgal), unknown
+     domains fall back to the profile's natural kāraka.
+  2. `nadi: Guru-jeeva activates kāraka (BNN)` — TIMING (weight 1.0): transit
+     Jupiter conjunct OR trine (1-5-9; Nāḍī reads trine as "with") the natal
+     Nāḍī kāraka, orb 9° — the Nāḍī year-marker. Prototyped blind on the fixture
+     first: the naive whole-sign version lit half the calendar (rejected); the
+     tight conj/trine version isolated the correct ~1-year span.
+  3. `nadi: Śani karma-sanction (BNN)` — TIMING (0.7): transit Saturn conj/trine
+     the kāraka OR transiting a fulfilment-house sign — karma's approval.
+  4. `nadi: Ketu-saṅga on kāraka` — STANDING (0.6, ≤0): Ketu with/trine the
+     kāraka = classical delay/talks-break texture; `nadi_nature()` also surfaces
+     Rahu-saṅga (sudden/unconventional) and vakri-kāraka (repeat) as TYPE notes
+     in the verdict reasons.
+  - `_PADDHATI_RULES` maps the "nadi:" prefix to the independent "nadi" system
+    (placed first so the "BNN" needle can't misfile it under gochara).
+- **Why (śāstra):** R.G. Rao (Bhrigu Nandi Nadi); Satyanarayana Naik (Revelation
+  from Naadi Jyotisha): planets-as-kārakas primacy, jeeva-Jupiter transits as
+  the timing clock, Śani's karmic sanction, kāraka-saṅga colouring. Previously
+  Nāḍī had no independent convergence voice (only the BNN degree-trigger filed
+  under gochara and the Bhṛgu-Bindu point).
+- **Tests:** `test_nadi_karaka_is_gender_aware_and_data_driven`,
+  `test_nadi_witnesses_registered_and_live`; coverage-matrix entries added;
+  suite 159 green.
+
+## 2026-07-04 — NĀḌĪ pinpoint FUNNEL (day-level) + golden-relation completion (user rule-set)
+
+- **Change:**
+  1. `_trine_windows` now includes the 7th (180°) — the Nāḍī golden relations
+     are 1/5/9 **and 7**, not trines alone; the Śani karma-sanction also anchors
+     on natal Guru (the user's step-4: Saturn relates to Venus OR Jupiter or the
+     2/7 houses).
+  2. `nadi_pinpoint(v, profile, start, end)` — the classical drill-down funnel
+     INSIDE a candidate window, one vote per layer per day: Sūrya month-gate
+     (+1, Sun in 1/5/7/9 from the natal kāraka or transit Guru), Śukra utsava
+     (+1, Venus in 1/2/7 from lagna), Śukra≈Guru degree-lock (+2, golden
+     relation at the same degree ±3°), **Maṅgal executioner** (+2 — Mars is the
+     universal māṅgalika-kārya executor for EVERY chart, not only the female
+     kalatra-kāraka — degree-locked onto the natal kāraka/Guru), Guru≈kāraka
+     degree-lock (+2). Top score-clusters (≥7 days apart) returned.
+  3. ALL layers are VOTES, never gates — validated on a real case where the
+     Sun month-rule FAILED on the actual event day while the two degree-locks
+     converged (the funnel's top day landed within one day of the real event,
+     blind).
+  4. Scans expose `pinpoint` (top-5 day candidates inside the top-2 candidate
+     windows ±45d); the narrator cites them as the most probable specific dates.
+- **Sources:** Bhrigu Nandi Nadi practice (R.G. Rao; Satyanarayana Naik):
+  Guru-year → Sūrya-month → Śukra/Maṅgal-day funnel, degree-to-degree matching;
+  user-supplied rule-set 2026-07-04.
+- **Tests:** `test_nadi_pinpoint_mechanics` (bounds, votes, gap-separation,
+  determinism). Suite 160 green.
+
+## 2026-07-04 — Nāḍī pinpoint TIE-BREAK: exactness of the degree-lock (user-approved)
+
+- **Change:** within an equal-score plateau (several consecutive days carrying
+  the same funnel votes) `nadi_pinpoint` now returns the day with the
+  **tightest combined degree-lock orb** instead of the plateau's first calendar
+  day. Days without any degree-lock rank after locked days at the same score.
+  Each pinpoint carries its `orb` so the narrator can state lock-tightness.
+- **Why (śāstra, not calibration):** Nāḍī degree-to-degree doctrine reads
+  EXACTNESS as strength — the nearer the lock, the surer the trigger (R.G. Rao,
+  Bhrigu Nandi Nadi practice). "First day of the plateau" was an arbitrary
+  artifact of the sort already outlawed by pratyantar-midpoint sampling. The
+  rule is date-agnostic and applies to every chart.
+- **Tests:** `test_nadi_pinpoint_tiebreak_prefers_tightest_lock` (rule verified
+  against the full per-day list, no event dates).
+
+## 2026-07-04 — ROLLBACK: completion-grade machinery removed (user-directed)
+
+- **Change:** the verdict layer is SIMPLE again — `domain_verdict` commits only
+  YES / NO (denied) / NOT-YET / UNCERTAIN (+ confidence, window, next-window,
+  quality). Removed: the Completion Convergence Panel, the
+  "ATTEMPTED (incomplete)" and "CONTESTED" grades, mechanical blockers,
+  attempt-arcs (`_arc`), candidate clusters and the `broke_after`
+  (bana-ke-toota) tag — from the engine, the scan payload, the narrator prompt
+  and the app UI. The boundary-maturity guard (`min_elapsed_days`) and the
+  committed next-window stay (independent fixes, no attempts-language).
+- **Why:** user rollback 2026-07-04 — "salience engine simple hona chahiye;
+  itne attempts hue, convert nahi hue — ye sab salience me nahi aana chahiye."
+  Whether an elapsed axis-window was the completed matter vs an attempt is left
+  to the user's own account + the AI's multivalent reading
+  (docs/AI_TRIANGULATION_PROMPT.md), not a mechanical grade.
+- **Tests:** `test_domain_verdict_follows_the_decision_rule` now asserts the
+  SIMPLE vocabulary (attempted/contested must never reappear).
+
+## 2026-07-04 — Nāḍī pinpoint: DROP the Sūrya month-gate (BNN research + user)
+
+- **Change:** removed the Sun "month-gate" vote from `nadi_pinpoint`. The funnel
+  now scores PURELY on BNN golden relations (1/5/9 trine, 7th, conjunction)
+  matched degree-to-degree: Śukra utsava (+1), Śukra≈Guru degree-lock (+2),
+  Maṅgal executioner degree-lock (+2), Guru≈kāraka degree-lock (+2). Max 7.
+- **Why (research, not calibration):** Bhrigu Nandi Nadi times events with the
+  major/relevant transiting bodies — Jupiter (jeeva → year), Saturn (karma
+  sanction), Rāhu/Ketu, and for the month/date the 7th-lord, Mars, Venus and
+  Moon — via golden relations verified by degree; the **Sun is not a BNN timing
+  planet**. The month falls out of the slow→fast degree progression of
+  Jupiter/Venus/Mars themselves, so a separate Sun gate has no śāstric basis.
+  (R.G. Rao, *Bhrigu Nandi Nadi*; Saptarishis Astrology, "Finding Date of
+  Marriage Through Nadi"; user direction 2026-07-04.)
+- **Tests:** `test_nadi_pinpoint_mechanics` now asserts score ≤ 7 and that no
+  pin ever carries a Sun/Sūrya hit.
+
+## 2026-07-04 — Nāḍī pinpoint: golden-relation Śukra + multi-window anchoring (user-approved)
+
+- **Change 1 — Śukra vote is golden-relation now:** the +1 Venus vote fires when
+  transit Venus holds a golden relation (1/5/7/9) to the natal **kāraka**,
+  replacing the earlier lagna-based 1/2/7 "utsava" (the 2nd is not a golden
+  relation). BNN is kāraka-centric, so the funnel is now 100% golden-relation +
+  degree-lock — no lagna houses, no Sun.
+- **Change 2 — anchor on the top elapsed windows, not just #1:**
+  `nadi_pinpoint_multi(v, profile, anchors, ...)` runs the day-funnel around each
+  of the top-6 elapsed salience windows (±45d), merges, and ranks
+  tightest-lock-first. The salience #1 window is not always the matter's only
+  real window (a wedding ceremony and its legal date can be two different high
+  windows); anchoring only on #1 previously hid the day-pin of every other
+  window. The webapp scan now uses this and reports the merged top-5 pins.
+- **Why:** user direction 2026-07-04 ("jo bhi suggest kar rahe ho sab kar do")
+  after diagnosing that the ceremony-day pin was missing purely because the
+  funnel was anchored on the higher-salience legal-date window. No calibration —
+  the funnel and its inputs are unchanged; it simply now covers all the strong
+  windows a real matter can occupy.
+- **Tests:** `test_nadi_pinpoint_multi_covers_all_anchor_windows` (merge order,
+  gap-separation, membership, determinism); pinpoint-mechanics score cap 7 and
+  no-Sun assertions retained.
+
+## 2026-07-04 — Universal Nāḍī verdict on every question + plain-language summary
+
+- **Change 1 — Nāḍī verdict for ANY domain, any tense:** the fast engine read
+  (`_engine_read`) now always appends a `NĀḌī (BNN, trine method)` line with the
+  matter's kāraka and its nature, so every chat answer carries a Nāḍī voice —
+  the nature ("kaisa": Rahu-saṅga=sudden, Ketu-saṅga=delay/break-prone,
+  vakri=repeat, clean=smooth) always, and the day-level DATE ("kab") from the
+  scan's `pinpoint` when it is a timing question. The pinpoint funnel was already
+  kāraka-centric (`nadi_karaka`), so it is domain-general as-is — verified across
+  career/children/wealth/education/father. Scans now also carry a `nadi`
+  {kāraka, nature} block (both the normal and the rupture branch) and the UI
+  shows a "🌿 Nāḍī" line; the narrator is instructed to present Nāḍī as its own
+  independent voice, not merged into KP/Jaimini.
+- **Change 2 — plain-language summary:** every chat reply now ends with a
+  '📝 सरल सारांश' section — 2–4 simple lines a non-astrologer understands.
+  (`CHAT_SYSTEM` instruction.)
+- **Why:** user direction 2026-07-04 — a Nāḍī date/nature verdict for any random
+  question via the trine (golden-relation) method, plus a common-language summary
+  at the bottom of each answer.
+- **Note / still open:** the day-level pinpoint is a marriage-/positive-event
+  (Guru+Śukra+Maṅgal golden-relation) funnel; a RUPTURE-mode pinpoint (Śani /
+  Rāhu-Ketu / Maṅgal degree-locks on the break-axis) for divorce-class dates is
+  a NEW mechanical node — proposed for approval, not yet built.
+- **Tests:** engine unchanged this turn (server/prompt/UI + `_engine_read` only);
+  suite 162 green.
+
+## 2026-07-04 — RUPTURE-mode Nāḍī pinpoint (break-class dates) — user-approved
+
+- **Change:** `nadi_rupture_pinpoint(v, profile, start, end)` — the mirror of the
+  union funnel — times a BREAK via the SEPARATORS degree-locked in a golden
+  relation (1/5/7/9) onto the matter's kāraka / natal Śani:
+    • Śani karma-cut (+2): transit Saturn golden-rel + degree-lock (±3°) → kāraka;
+    • Rāhu/Ketu severance (+2): a transit node golden-rel + degree-lock → kāraka;
+    • Maṅgal severer (+1): transit Mars golden-rel + degree-lock → kāraka/natal
+      Śani, counted ONLY when a separator is already locked that day (Mars∼kāraka
+      alone also recurs at a marriage, so it is a trigger, never a break signal);
+    • Śani≈natal-Śani karma-return (+1).
+  Tightest combined degree-lock orb wins an equal-score plateau; day-granular.
+  `nadi_pinpoint_multi` gained a `funnel=` arg; the webapp rupture branch anchors
+  it on the top elapsed LOSS/BREAK windows (min_gap 21d, slow separators) and
+  reports `pinpoint`; the UI shows a "💔 Nāḍī rupture-pinpoint" line.
+- **Sources:** BPHS māraka/separation doctrine (Śani = viyoga-kāraka); Jaimini/KP
+  separative significators (Śani/Rāhu/Ketu); Maṅgal the universal cheda/executor
+  (user doctrine). Kāraka stays domain-driven (`nadi_karaka`) — no native
+  hard-coding. Validated blind: the funnel centres on the Ketu-on-kāraka
+  severance lock (a separation season), free of the wedding-adjacent Mars noise
+  that a Mars-alone rule produced.
+- **Tests:** `test_nadi_rupture_pinpoint_is_separator_driven` (separator-only
+  scoring, Maṅgal-never-alone, no union hit, bounds, gaps, determinism).
+
+## 2026-07-04 — BNN natal CHAIN + retrograde shift-back + drop the 7th (video-audited, user-approved)
+
+Audited the engine's Nāḍī method against a full BNN marriage crash-course
+transcript. Three changes to reach professional standard:
+
+- **Golden relations = 1/5/9 only.** `_NADI_REL` {0,4,6,8} → {0,4,8}; removed the
+  180° (7th) leg from `_trine_windows`. The 7th (opposition) is NOT a BNN golden
+  relation in standard practice. Verified: the kāraka's own chart validation
+  (wedding pinpoint 2024-01-29, rupture Aug–Sept 2025) is unchanged — every lock
+  there was a conjunction or a 5/9 trine, never the 7th. New test
+  `test_nadi_golden_relations_are_1_5_9_only`.
+- **Retrograde shift-back** (`_nadi_sign`): a vakri planet is reckoned ONE sign
+  back for the conjunction/trine test (its degree number kept); nodes stay at
+  their actual sign. Test `test_nadi_sign_shifts_retrograde_one_back`.
+- **`nadi_chain(v, profile)`** — the heart of a BNN read, previously MISSING: the
+  hero (kāraka) plus every planet conjunct/trine (1/5/9) it, ordered by DEGREE.
+  The degree order IS the chronology — a member below the hero's degree acted
+  'before/already', above it 'after' (post-event). Carries each planet's generic
+  significations (reference DATA; the AI narrates the story — charter division).
+  Surfaced in the chat engine-read, the scan `nadi` block, and the UI (🔗 chain
+  line); the narrator is told to narrate it as the left→right BNN story. Test
+  `test_nadi_chain_is_degree_ordered_and_golden_to_hero`.
+- **Sources:** BNN marriage class transcript (R.G. Rao lineage) — hero planet,
+  conjunction + 1/5/9 trine, degree-sequence = event-sequence, retrograde-back
+  rule; user approval 2026-07-04. Kāraka stays domain-driven — no native
+  hard-coding. Suite 166 green.
+
+## 2026-07-04 — Ordinal / Nth-instance meta-rule + second-marriage domain (user-approved)
+
+Bug: "doosri partner / second marriage / dusri shaadi" silently dropped the
+ordinal and resolved to plain "marriage" (7th) — the engine scanned the FIRST
+marriage and reported its date as the second partner (the "2022/2024" mis-read).
+
+- **Generic ordinal meta-rule** (`interpreter/significators.py`): a query's
+  ordinal ("doosra/second/2nd/teesra/third/agla/next…") is parsed, the base
+  matter resolved, and its primary house shifted by 2·(N−1) — the classical
+  successive-significator (3rd-from-previous) rule. So 2nd marriage → 9th, 3rd →
+  11th; 2nd child → 7th; etc. — ONE mechanism, no per-question hand-coding.
+  Convention (user-approved, web-researched): 2nd spouse = **9th house**
+  (3rd-from-7th school), kāraka Venus/Mars, D9. `base_domain` is set so the Nāḍī
+  kāraka stays gender-aware; `nadi_karaka` now follows `base_domain` for derived
+  domains. Added 'partner/life partner/jeevansathi' → marriage synonyms.
+- **BNN side stays chain-based** (no house): the narrator reads a benefic AFTER
+  the hero (esp. after a Ketu-cut) as the next/second partner, and Rahu-ahead as
+  multiple/remarriage — per BNN_METHODS.md §7. Vedic (house) and BNN (chain)
+  kept as independent voices.
+- **Sources:** 2nd-marriage house — KP/Parashari (9th = 3rd-from-7th; Kalidasa's
+  2nd-house alternate noted); BNN second-partner — the class transcript (chain
+  sequence). Serial rule — classical "3rd-from-previous" for co-borns/spouses/
+  children.
+- **Tests:** `test_ordinal_meta_rule_shifts_by_third_from_previous`,
+  `test_second_marriage_nadi_karaka_is_gender_aware`. Suite 168 green.
+
+## 2026-07-05 — Two-layer convergence (5 independent schools) — Task 3
+
+- **Layer-2 gate (part 1):** `_school()` collapses every witness to one of the 5
+  genuinely-independent schools (Parāśari / Jaimini / KP / Tājika / Nāḍī).
+  Sudarśana, Aṣṭakavarga, Vimśottari, gochara are Parāśari SUB-TOOLS, not schools,
+  so they no longer count as independent convergence — this removes the
+  false-confidence inflation (a window lit by dasha+gochara+Sudarśana is ONE
+  school, not three). `_score_rows` gates on ≥2 schools; `systems_firing` = school
+  count (max 5); `domain_verdict` confidence rescaled (HIGH ≥4, MEDIUM 3, LOW ≤2).
+  salience total unchanged — only windows that "converged" purely within Parāśari
+  are correctly demoted.
+- **Layer-1 breakdown (part 2):** `school_report(v, profile, rows)` — per school,
+  the window IT independently points to (info-weighted peak) or 'abstains' when it
+  never fires. Surfaced in the scan (`schools`), the UI ("⚖ Schools" line) and the
+  narrator, which is told to read the AGREEMENT (more schools clustering = surer)
+  and state divergence honestly rather than forcing a date; a thin/abstaining
+  school is never a 'no'. Existence stays with `domain_verdict`; this makes a
+  wrong school VISIBLE instead of blended away.
+- **Verified:** classical taxonomy (Sudarśana/Aṣṭakavarga = Parāśari sub-tools;
+  Tājika/Jaimini/KP/Nāḍī independent). Sample female chart now shows the schools
+  genuinely diverge (Parāśari→2024, KP→2010, Nāḍī→2019) — transparency the blended
+  score hid. Suite 170 green.
+- **Tests:** `test_school_collapses_parashari_subtools_to_one`,
+  `test_school_report_layer1_breakdown`.
+
+## 2026-07-05 — Task 4 (batch A): Parāśari/Jaimini standing nodes wired (user-approved)
+
+Five approved standing nodes added (each classically sourced, domain-gated, no
+native hard-coding):
+- **Kuja/Maṅgala dosha** (BPHS/Saravali): Mars in 1/2/4/7/8/12 from lagna/Moon/
+  Venus → marriage friction (marriage-class only).
+- **Strī-jātaka husband-kāraka** (BPHS): a ♀ chart reads the husband from Jupiter's
+  company (marriage EVENT still Venus/7th-timed).
+- **Karakāṃśa 7th-spouse** (Jaimini): benefics/malefics in the 7th-from-Karakāṃśa
+  (AK's D9 sign) — spouse quality (marriage-class).
+- **Indu Lagna** (BPHS special lagna): wealth-ascendant company (wealth-class 2/11).
+- **Bhāva-Chalit result-shift** (KP/BPHS): house-lord's Chalit house ≠ rāśi house →
+  a caution on the promise.
+Coverage matrix: Bhāva-Chalit, Indu Lagna, Karakāṃśa moved RED→wired; Kuja dosha
+and husband-kāraka added as new wired rows; sync-tests green. Suite green.
+Sade-Sati (timing node) follows in batch B.
+
+## 2026-07-05 — Task 4 (batch B): Sade-Sati timing node wired
+
+`sade_sati` field on WindowEvidence, computed per window (transit Saturn in
+12/1/2 from the natal Moon via transits.sade_sati) and read by a Parāśari-gochara
+timing witness "Sade-Sati / Kaṇṭaka" (weight 0.5). Being a ~7.5-yr marker, the
+info-weighting naturally down-weights it in long scans — it simply stops being a
+silent RED gap and contributes as a karmic-transition co-factor. Coverage matrix:
+Sade-Sati RED→wired; coverage-summary test updated (Bhinnāṣṭakavarga/yoga-engine
+remain the named RED gaps). Task 4 complete. Suite 173 green.
+
+## 2026-07-05 — Multi-method DAY convergence + direction (user-approved; anti-tweak design)
+
+`day_convergence(v, profile, start, end)` — the scalable "wholesome reading":
+a fixed library of PURE, independent day-detectors (BNN-golden, degree-return,
+Parāśari drishti, Moon-hand, gender-kāraka-return), each one classical technique
+kept pure (never cross-contaminated), computed for any chart/domain. A day's
+CONVERGENCE = how many independent methods light it; a separate signed DIRECTION
+pass (benefics vs separators on the kāraka: union/break/mixed) assigns meaning.
+Wired into the scan (bounded to ±45d around the top elapsed windows), the UI
+("🧭 Multi-method convergence" line) and the narrator.
+
+Principle (explicitly reaffirmed with the user): this is NOT date-tuned and never
+will be. Adding coverage = registering ONE more pure detector (serves every
+chart) — never a per-case tweak, never fitting a known date. Ground-truth dates
+are for BLIND VALIDATION only. If a future date doesn't match, we do NOT re-tune;
+we only add a genuinely-missing, TEXT-verified classical method (justified
+independent of the date). The direction layer is an honest v1 (crude for troubled
+charts) — to be refined, never calibrated.
+
+Verified blind on the sample chart: the scan surfaces ~10 energised days across
+2021-24 (incl. 2022-03-16 AND the separation-era 2022-09-05) — showing convergence
+alone shortlists, and direction is what must discriminate. Suite 174 green.
+Tests: `test_day_convergence_multi_method_and_direction`.
+
+## 2026-07-05 — Direction layer refined: window-anchored, 3-label (union/troubled/break)
+
+The day-level benefic-vs-separator heuristic was too coarse (marriage AND
+separation energise the SAME axis). Refined `day_convergence` direction to defer
+FIRST to the engine's canonical, already-tested window signals (`_window_direction`,
+using the candidate rows' KP fulfil/negate + the reversal-timer's rupture-score):
+  • rupture-timer LOSS/BREAK (score ≥3) → **break** (a real separation);
+  • KP fulfil > negate → **union**;
+  • KP negate-lean (no rupture) → **troubled** (afflicted axis, NOT a break —
+    Affliction ≠ Denial);
+  • no covering window → fall back to the day-level lean.
+Also added the fulfil-house (union) vs dusthana-from-house (break) axis to the
+fallback. NOT calibrated: the labels come from tested signals, not any date.
+Blind on the sample chart, the ONLY 'break' flagged across 2021-24 is the
+separation-era window (backed by the rupture-timer), the fulfil windows read
+'union', the rest 'troubled' — consistent with an afflicted marriage that later
+broke, with no date-fitting. Wired windows/rwindows into the scan call; UI adds a
+'troubled' colour. Suite 175 green. Test:
+`test_day_convergence_direction_defers_to_window_signals`.
+
+## 2026-07-05 — KP primary-timing discriminator: daśā-lords must signify the matter
+
+Research (KP Readers; jagannathhora/astrosage KP-timing) confirmed the #1 event-
+timing rule: the running daśā-BHUKTI-ANTARA lords must SIGNIFY the matter's
+fulfil-houses, else the period cannot deliver (transit convergence alone can't
+make an event happen). The engine already computed this (`kp_fulfil`/`kp_negate`
+= the MD>AD>PD chain lords' KP significations) but only as ONE diluted vote among
+~20 nodes — so a window whose daśā-lords don't signify the matter could still top
+the ranking on transit pile-up. Fixed in `_score_rows`: the signification acts as
+a graded DISCRIMINATOR (×1.0 if fulfil ≥ negate, ×0.6 if any fulfil, ×0.3 if
+none) — never a hard 0 (so it discriminates without being sole judge). General,
+KP-sourced, NOT date-fit.
+
+Honest note: on charts with a genuinely BROAD eligible period (e.g. a long Venus
+MD where many windows are KP-3/3), this correctly does NOT collapse to a single
+date — the honest output stays a shortlist + direction; a single date needs the
+finest hand (Moon/muhurta), inherently uncertain. Suite 175 green.
