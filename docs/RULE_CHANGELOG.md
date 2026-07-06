@@ -11,6 +11,34 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Fix interpretation: significator-daśā + BNN-lock OUTRANK the salience call
+
+- **Change:** PROMPT-LAYER ONLY (AI_TRIANGULATION_PROMPT §4C-bis + webapp
+  CHAT_NARRATOR). Two sharpenings, no engine/UI/payload change:
+  1. **Step 2 now IDENTIFIES the significator planets** (7th lord, Venus-kāraka,
+     7th occupants/aspectors, 2nd & 11th lords + their nakṣatra-lords) and marks
+     only the Vimśottari windows whose MD-AD-PD lords are significators (MD/cusp
+     sub-lord must signify 2/7/11). A non-significator window cannot carry the event.
+  2. **Step 4 takes the HIGHEST-score BNN degree-lock** in that significator +
+     theme-matched sub-period, and **TRUSTS it over the salience ranking and the
+     engine's committed 'call'** — the call is only the KP-fulfilment-weighted
+     favourite, which systematically under-ranks the true (negation-lit,
+     separative) window of an afflicted / break-prone marriage. The narrator now
+     opens with the call's YES/NO but RE-DERIVES the date by the method.
+- **Why:** A live read committed the wrong date (a "clean" KP-3/3 window) because
+  the narrator led with the salience call; the true window scored KP 2/5 and was
+  under-ranked. Classical method (KP-Vimśottari significator daśā + BNN kāraka
+  trine/Jupiter progression) times marriage by the significators' periods, not by
+  a fulfilment-count ranking.
+- **Source:** BPHS/KP significator-daśā doctrine; BNN (R.G. Rao) Jupiter-jeeva
+  progression + kāraka trine, "verify timing with daśā"
+  (saptarishisastrology.com; astrosight.ai). Stated generally — no hard-coded
+  planet sequence / native / date.
+- **Validation (NOT calibration):** on the sample chart the method independently
+  ranks the significator + theme-matched sub-period's HIGHEST BNN lock as the day;
+  written in general form and validated against, never fitted to, the outcome.
+- **Failure-mode:** DISCRIMINATION — the salience call over-riding the method.
+
 ## 2026-07-06 — De-spaghetti: collapse the narrator to the SINGLE theme-first timing method
 
 - **Change:** PROMPT-LAYER ONLY (`webapp/server.py` CHAT_NARRATOR). Removed the
