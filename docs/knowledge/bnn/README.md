@@ -14,16 +14,20 @@ Files (added pass by pass):
 - `00_significations.md` — the kārakatwa dictionary (grah kāraka per matter +
   the reading procedure); rāśi notes secondary (BNN is kāraka-first).
 - `01_timing_method.md` — how BNN times events (Jupiter transit, Saturn, karakas).
-- (later) `02_marriage.md`, `03_profession.md`,
+- `02_marriage.md` — marriage timing, quality, multiple/widowhood, partner
+  description; ends with 3 approval-gated candidate quality-nodes.
+- (later) `03_profession.md`,
   `04_children.md`, `05_education.md`, `06_disease_longevity.md`, `07_wealth.md`, …
 
-Status: **timing method (pass 1) + significations (pass 2) distilled.**
-Per-domain chapters pending.
+Status: **timing (1) + significations (2) + marriage (3) distilled.**
+Remaining per-domain chapters pending.
 
 ## TODO (pending — do when asked)
-- Distil the per-domain chapters, in order: `02_marriage.md`,
-  `03_profession.md`, `04_children.md`, `05_education.md`,
-  `06_disease_longevity.md`, `07_wealth.md`. Data/rules → engine (+tests);
-  interpretation → these docs. (Not automatic — runs in a session when asked.)
+- Distil the per-domain chapters, in order: `03_profession.md`,
+  `04_children.md`, `05_education.md`, `06_disease_longevity.md`,
+  `07_wealth.md`. Data/rules → engine (+tests); interpretation → these docs.
+- Decide on the 3 candidate marriage-quality nodes proposed at the end of
+  `02_marriage.md` (jīva-12th-from-kāraka; kāraka-12th-from-descriptor;
+  kāraka-conjunct-separator) — approval-gated, not yet wired.
 - Fine-tune (also deferred): natal-anchor the transit Venus≈Jupiter refine
   (currently chart-independent); validate dates once ground truth is shared.

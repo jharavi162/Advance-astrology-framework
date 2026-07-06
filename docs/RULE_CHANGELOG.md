@@ -11,6 +11,24 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — BNN knowledge base, pass 3: marriage (`02_marriage.md`)
+
+- **Change:** Distilled the marriage chapter — timing (Jupiter × Venus contacts,
+  age by Jupiter's rounds, Saturn sanction), quality (Jupiter-12th-from-Venus =
+  unhappy; Venus-12th-from-Mars = delay; Venus+separator = afflicted union),
+  multiple marriages / widowhood, and partner description. **Docs-only.**
+- **Why:** Reference for the narrator; the timing rules were verified already
+  wired (nadi_jeeva/nadi_karma, ♀ husband-kāraka, ordinal 2nd-spouse, rupture).
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (per-chart usages; L-refs in the doc).
+- **Candidate nodes (PROPOSED, not added — approval-gated per CLAUDE.md):** three
+  domain-general marriage-QUALITY standing witnesses — jīva-12th-from-kāraka
+  (BNN L757), kāraka-12th-from-descriptor delay (L4292), kāraka-conjunct-separator
+  affliction (L1372/L322). Listed at the end of `02_marriage.md`; each would ship
+  with a test + coverage row + main-merge if approved. No calibration.
+- **Failure-mode addressed:** knowledge-base coverage (not a prediction rule).
+
+---
+
 ## 2026-07-06 — BNN knowledge base, pass 2: significations (`00_significations.md`)
 
 - **Change:** Distilled the kārakatwa dictionary from the source book into
