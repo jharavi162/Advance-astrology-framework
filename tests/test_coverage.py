@@ -33,6 +33,7 @@ def test_coverage_summary_names_the_red_gaps():
     s = coverage_summary()
     assert "COVERAGE" in s and "RED" in s
     # a couple of the still-RED gaps must be named so they're visible in every pack
-    # (Bhāva-Chalit, Indu, Karakāṃśa, Sade-Sati were WIRED in Task 4 — no longer RED)
-    assert "Bhinnāṣṭakavarga" in s
-    assert "yoga-engine" in s or "Kala-vela" in s
+    # (Bhāva-Chalit, Indu, Karakāṃśa, Sade-Sati were WIRED in Task 4; Bhinnāṣṭakavarga
+    # was WIRED as a domain-scoped delivery node — no longer RED)
+    assert "yoga-engine" in s
+    assert "Kala-vela" in s or "upagraha" in s
