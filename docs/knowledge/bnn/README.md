@@ -11,15 +11,17 @@ Division of labour (per CLAUDE.md):
 - **Interpretation** (meaning, judgment) → stays here as reference for the AI.
 
 Files (added pass by pass):
+- `00_significations.md` — the kārakatwa dictionary (grah kāraka per matter +
+  the reading procedure); rāśi notes secondary (BNN is kāraka-first).
 - `01_timing_method.md` — how BNN times events (Jupiter transit, Saturn, karakas).
-- (later) `00_significations.md`, `02_marriage.md`, `03_profession.md`,
+- (later) `02_marriage.md`, `03_profession.md`,
   `04_children.md`, `05_education.md`, `06_disease_longevity.md`, `07_wealth.md`, …
 
-Status: **timing method distilled (pass 1).** Rest pending.
+Status: **timing method (pass 1) + significations (pass 2) distilled.**
+Per-domain chapters pending.
 
-## TODO (pending — deferred by user 2026-07-05, do when asked)
-- Distil the REST of the book into this KB, in order: `00_significations.md`
-  (grah/rāśi kāraka for all domains), then per-domain `02_marriage.md`,
+## TODO (pending — do when asked)
+- Distil the per-domain chapters, in order: `02_marriage.md`,
   `03_profession.md`, `04_children.md`, `05_education.md`,
   `06_disease_longevity.md`, `07_wealth.md`. Data/rules → engine (+tests);
   interpretation → these docs. (Not automatic — runs in a session when asked.)

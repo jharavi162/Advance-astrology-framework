@@ -11,6 +11,26 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — BNN knowledge base, pass 2: significations (`00_significations.md`)
+
+- **Change:** Distilled the kārakatwa dictionary from the source book into
+  `docs/knowledge/bnn/00_significations.md` — each graha's BNN significations,
+  the book's own reading procedure (kāraka → adjacent houses → 7th-from), and
+  secondary rāśi-flavour notes. **Docs-only; no engine/rule change.**
+- **Why:** The *calculable* half (planet→matter kāraka) was already encoded as
+  each domain's `natural_karaka` (THEME_LEXICON / DOMAIN_PROFILES) and verified
+  consistent with BNN in this pass; the *interpretive* half (what each kāraka
+  MEANS, how BNN reads it) now lives as narrator reference so a reading can be
+  explained without re-reading the 327-page PDF.
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (Preface reading-instruction;
+  explicit "Jīva Kāraka Jupiter / Kāma-kāraka Saturn" labels; the per-chart
+  significator usages throughout).
+- **Failure-mode addressed:** none mechanical — this is coverage of the
+  *knowledge base*, not a prediction rule. No calibration. No new node proposed
+  (significations are data/judgment, not a new timing check).
+
+---
+
 ## 2026-07-06 — Wire Bhinnāṣṭakavarga DELIVERY (computed-but-unwired → wired)
 
 - **Change:** Added a domain-general timing node
