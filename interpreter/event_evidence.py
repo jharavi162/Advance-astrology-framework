@@ -959,6 +959,86 @@ def nadi_timing_karaka(v, profile) -> Planet:
     return nadi_karaka(v, profile)
 
 
+def role_significators(v, profile) -> list:
+    """Rank the grahas by the DENSITY of the matter's ROLES each one carries — so
+    the timer is found by ROLE, never by a hard-coded planet. The highest-density
+    graha is the matter's principal significator (its MAHĀDAŚĀ frames the event);
+    the spouse/gender kāraka and the Lagna-lord are the usual sub-period
+    ACTIVATORS (antara/pratyantara). Domain-general: every role is read from the
+    profile's houses / kāraka / primary-cusp sub-lord + KP significations +
+    Jaimini Darakaraka + occupancy/aspect — never a native. Returns
+    ``[{planet, score, roles}]``, highest score first.
+
+    Rationale (docs/AI_TRIANGULATION_PROMPT §4C-bis, reverse-engineered from two
+    independent verified charts): both married in the mahādaśā of the graha most
+    loaded with marriage-roles (7th-lord + primary-cusp-sub-lord + kalatra-kāraka
+    + Darakaraka + in/aspecting-7th + 2nd/11th-lord + in-Lagna), which happened to
+    be Venus in both — but the RULE is ROLE-DENSITY, so a chart whose top-role
+    graha is Jupiter/Sun/… times the matter in THAT graha's daśā, not Venus's."""
+    from advance_astrology.vedic.kp import kp_chain
+    _, kps = _kp_view(v)
+    asc = v.ascendant_sign
+    prim = profile.houses[0]                       # the matter's primary house
+    prim_sign = (asc + prim - 1) % 12
+    l1 = v.house_lord(1)
+    sub = kp_chain(kps.cusps[prim]).sub_lord if prim in kps.cusps else None
+    dk = {nm: p for nm, p in v.chara_karakas().items()}.get("Darakaraka")
+    kalatra = nadi_timing_karaka(v, profile)       # matter's event-kāraka (Venus for marriage)
+    spouse = nadi_karaka(v, profile)               # spouse/gender kāraka (Mars ♀)
+    house_lords = {h: v.house_lord(h) for h in profile.houses}
+    fulfil_lords = {v.house_lord(h) for h in profile.fulfil_houses}
+    starlords = {_nakshatra_lord(float(v.longitudes[p]))
+                 for p in {house_lords[prim], kalatra, spouse}}
+
+    def house_of(pl):
+        return (v.signs[pl] - asc) % 12 + 1
+
+    def aspects_prim(pl):
+        return any((prim_sign - v.signs[pl]) % 12 == off
+                   for off in _ASPECT_OFFSETS.get(pl, [6]))
+
+    # role WEIGHTS: the promise-giving roles (owns/is-kāraka-of/sub-lord-of the
+    # matter) outweigh the incidental ones (a stray aspect, sitting in Lagna,
+    # being a star-lord) — otherwise a graha with many soft roles falsely ties the
+    # true significator (magnifying-lens robustness).
+    out = []
+    for p in (_NAT_BENEFIC | _NAT_MALEFIC):        # the nine grahas
+        roles = []                                  # (label, weight)
+        if p == l1:
+            roles.append(("Lagna-lord", 1))
+        for h, lord in house_lords.items():
+            if p == lord:
+                roles.append((f"{h}H-lord" + ("(primary)" if h == prim else ""),
+                              3 if h == prim else 2))
+        if p == sub:
+            roles.append(("primary-cusp-sub-lord", 3))     # KP promise-giver
+        if p == kalatra:
+            roles.append(("event-kāraka", 3))
+        if p == spouse and spouse != kalatra:
+            roles.append(("spouse/gender-kāraka", 2))
+        if dk is not None and p == dk:
+            roles.append(("Darakaraka", 3))
+        if p in fulfil_lords and p not in house_lords.values():
+            roles.append(("fulfil-house-lord", 2))
+        h_ = house_of(p)
+        if h_ in profile.houses:
+            roles.append((f"in-{h_}H(matter)", 2))
+        elif h_ == 1:
+            roles.append(("in-Lagna", 1))
+        if aspects_prim(p):
+            roles.append(("aspects-primary-house", 1))
+        if p in starlords:
+            roles.append(("star-lord-of-core-sig", 1))
+        sig = sorted(set(kps.planet_signifies(p)) & set(profile.fulfil_houses))
+        if sig:
+            roles.append((f"KP-signifies-{sig}", 2 if prim in sig else 1))
+        if roles:
+            out.append(dict(planet=p, score=sum(w for _, w in roles),
+                            roles=[r for r, _ in roles]))
+    out.sort(key=lambda x: (-x["score"], x["planet"].value))
+    return out
+
+
 def nadi_nature(v, profile) -> str:
     """Kāraka-saṅga (same sign or trine = 'with' in Nāḍī): the EVENT's flavour."""
     nk = nadi_karaka(v, profile)

@@ -11,6 +11,38 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Role-DENSITY significator scoring (find the timer by ROLE, not by planet-name)
+
+- **Change:** ENGINE — new `role_significators(v, profile)`: ranks the nine grahas
+  by the WEIGHTED density of the matter's roles each carries — promise-roles
+  (owns the primary house / is its kāraka / primary-cusp-sub-lord / Darakaraka,
+  weight 3) above medium (spouse/gender-kāraka, fulfil-house-lord, in-primary-
+  house, KP-signifies-primary, weight 2) above incidental (Lagna-lord, in-Lagna,
+  aspects-primary, star-lord, weight 1). Domain-general (reads profile houses /
+  kāraka / KP cusp sub-lord / Jaimini DK / occupancy / aspect — never a native).
+  Surfaced in the scan payload as `significators`. INTERPRETATION — §4C-bis step
+  2 + CHAT_NARRATOR now select the timer as the **top role-density graha** (its
+  daśā PERIOD frames the event: MD if running, else its antar/pratyantar within
+  the running MD); the activator sub-period is the spouse/gender-kāraka or the
+  Lagna-lord. Explicitly: **do NOT assume Venus** — use whichever grahas top the
+  ranking.
+- **Why:** Reverse-engineering two verified charts showed both married in the MD
+  of the graha most loaded with marriage-roles (Venus in both) — but that is
+  chart-specific; the general rule is role-density, so a chart whose top-role
+  graha is Jupiter/Sun/etc. times the matter in THAT graha's daśā. Equal-weight
+  counting falsely tied a soft-role graha (Sun: in-Lagna/aspect/star-lord) with
+  the true significator; weighting the promise-roles fixes it (magnifying-lens
+  robustness, per user).
+- **Source:** KP significator + cusp-sub-lord doctrine; Jaimini Darakaraka; BPHS
+  house-lord/kāraka significator theory. General; no native/date/planet hard-coded.
+- **Validation (NOT calibration):** male → Venus [14] dominant; Female A → Jupiter
+  [9] + Venus [8] (its exact wedding chain Ve-MD→Ma→Ju-PD); Female B → Venus [11]
+  dominant (delivers in the Venus-antardaśā within her Saturn MD). Written in
+  general role form; validated against, not fitted to, outcomes. Regression test
+  `test_role_significators_ranks_by_weighted_role_density`.
+- **Failure-mode:** DISCRIMINATION — identifying the correct timer planet by role
+  instead of a hard-coded Venus.
+
 ## 2026-07-06 — BNN pinpoint anchors the SPOUSE/gender kāraka (Mars ♀); fuller significator identification
 
 - **Change:**

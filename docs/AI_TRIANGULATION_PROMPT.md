@@ -408,12 +408,25 @@ when that is exactly where the event occurred.** Follow it in order:
    (Worked example of the trap: a chart where Venus signifies only 3/4/6 can STILL
    have Venus as its 7th-cusp-sub-lord AND Darakaraka AND kalatra-kāraka — so
    Venus is a prime marriage-significator there; dismissing it for "not signifying
-   7" is the error.) The event's MD/AD/PD lords must be drawn from this
-   significator set — most decisively the **MD (or the cusp sub-lord) carries the
-   promise**, and the **AD is very often the spouse/gender kāraka** (a female's
-   marriage AD is frequently Mars). Read the running Vimśottari list and mark
-   every window whose MD-AD-PD lords are significators; a window whose period-lords
-   are NOT significators cannot carry the event however "convergent" it scores.
+   7" is the error.)
+
+   **Find the timer by ROLE-DENSITY, never by a hard-coded planet.** Score each
+   graha by how many of the roles above it carries, weighting the *promise*-roles
+   (owns the house / is its kāraka / cusp-sub-lord / Darakaraka) above the
+   incidental ones (a stray aspect, sitting in Lagna, being a star-lord). The
+   **highest role-density graha is the matter's timer** — in two independently
+   verified charts it was Venus, but *only because Venus topped the role-density
+   there*; a chart whose top-role graha is Jupiter/Sun/… times the matter in THAT
+   graha's daśā. The engine exposes this ranking as `role_significators(v,
+   profile)` (surfaced in the scan as `significators`).
+
+   The timer's **daśā PERIOD frames the event**: its **mahādaśā if that is
+   running, else its antara/pratyantara inside whatever MD runs** (a top
+   significator that is not in its own MD still delivers in its antardaśā within
+   another MD). The **ACTIVATOR** sub-period is usually the **spouse/gender kāraka
+   or the Lagna-lord (self)**. Mark the Vimśottari windows whose MD-AD-PD lords
+   are among the top significators; a window whose period-lords are NOT
+   significators cannot carry the event however "convergent" it scores.
 
 3. **Let the theme choose the SUB-PERIOD (pratyantara/sūkṣma) that carries it.**
    The event does **not** wait for the "nicest" sub-lord — it arrives in the

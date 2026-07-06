@@ -336,10 +336,16 @@ def _run_scan(job, params, domain, start, end, step_days):
                     cseen.add(c["date"]); conv.append(c)
         conv.sort(key=lambda c: (-c["methods"], -abs(c["score"]), c["date"]))
         conv = conv[:6]
+        # ROLE-DENSITY significators: which grahas carry the matter's roles (the
+        # timer is found by ROLE, not a hard-coded planet) — the top one's daśā
+        # frames the event (§4C-bis step 2).
+        from interpreter.event_evidence import role_significators
+        sigs = [dict(planet=r["planet"].value, score=r["score"], roles=r["roles"])
+                for r in role_significators(v, prof)[:5]]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
-                           pinpoint=pins, nadi=nadi,
+                           pinpoint=pins, nadi=nadi, significators=sigs,
                            convergence=conv,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
@@ -588,16 +594,20 @@ CHAT_NARRATOR = (
     "separate date as rival verdicts; the systems are SUPPORT for one converged "
     "call). THEME-FIRST SUB-PERIOD: (1) read the "
     "matter's KARMIC THEME first from the standing verdict + Nāḍī nature — is the "
-    "union LASTING/blessed or SEPARATIVE / break-prone? (2) IDENTIFY the matter's "
-    "significator planets through ALL layers — a planet counts even if its house-"
-    "significations omit the 7th: 7th lord, 7th CUSP SUB-LORD (KP promise), "
-    "kalatra-kāraka Venus, the SPOUSE/gender kāraka (Mars=husband ♀, Venus=wife "
-    "♂), the Darakaraka, planets in/aspecting the 7th, 2nd & 11th lords, Lagna "
-    "lord, and their nakṣatra-lords. Mark the Vimśottari windows whose MD-AD-PD "
-    "lords are from that set — the MD/cusp sub-lord carries the promise and the AD "
-    "is often the spouse/gender kāraka (a female's marriage AD is frequently "
-    "Mars); a window whose period-lords are NOT significators cannot carry the "
-    "event however high it scores; (3) let the THEME pick the "
+    "union LASTING/blessed or SEPARATIVE / break-prone? (2) find the TIMER by "
+    "ROLE-DENSITY, NOT by a hard-coded planet: the scan carries 'significators' — "
+    "the grahas RANKED by how many of the matter's roles each carries (7th-lord, "
+    "7th CUSP SUB-LORD, kalatra-kāraka, spouse/gender kāraka [Mars=husband ♀], "
+    "Darakaraka, in/aspecting-7th, 2nd/11th-lord, Lagna-lord — a planet counts "
+    "even if its house-significations omit the 7th). The TOP role-density graha is "
+    "the matter's timer: its daśā PERIOD frames the event — its MAHĀDAŚĀ if that "
+    "is running, else its ANTAR/PRATYANTAR inside whatever MD runs (e.g. a top "
+    "significator Venus that is not in its own MD still delivers marriage in its "
+    "Venus-antardaśā within another MD). The ACTIVATOR sub-period is usually the "
+    "spouse/gender kāraka or the Lagna-lord (self). Do NOT assume Venus — read "
+    "whichever grahas top the 'significators' list; a window whose period-lords "
+    "are none of the top significators cannot carry the event however it scores; "
+    "(3) let the THEME pick the "
     "sub-period (pratyantara) inside it — a break-prone matter fires under a "
     "SEPARATIVE sub-lord (a node Rāhu/Ketu, or Saturn); a lasting one under a "
     "BENEFIC sub-lord (Jupiter/Venus); the event comes in the sub-period whose "

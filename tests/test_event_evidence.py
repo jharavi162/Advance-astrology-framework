@@ -889,3 +889,31 @@ def test_nadi_pinpoint_anchors_the_spouse_karaka_for_female():
     hits = [h for r in pins for h in r["hits"]]
     assert any("spouse-kāraka degree-return" in h for h in hits), \
         "husband-kāraka (Mars) anchor never fired — spouse-kāraka not wired into the funnel"
+
+
+def test_role_significators_ranks_by_weighted_role_density():
+    """The marriage-timer is found by ROLE-DENSITY, not by a hard-coded planet
+    (docs/AI_TRIANGULATION_PROMPT §4C-bis). MECHANICAL — asserts the scorer is
+    deterministic, weights the promise-giving roles above incidental ones, and
+    that the top-ranked graha holds at least one HEAVY promise-role (owns the
+    house / is its kāraka / cusp-sub-lord / Darakaraka). No native date asserted."""
+    from interpreter.event_evidence import role_significators, DOMAIN_PROFILES
+    v = _chart()
+    v.gender = "male"
+    p = DOMAIN_PROFILES["marriage"]
+    rs = role_significators(v, p)
+    assert rs and rs == role_significators(v, p)          # non-empty + deterministic
+    # sorted descending by weighted score
+    assert all(rs[i]["score"] >= rs[i + 1]["score"] for i in range(len(rs) - 1))
+    HEAVY = ("7H-lord", "primary-cusp-sub-lord", "event-kāraka", "Darakaraka")
+    top = rs[0]
+    assert any(r.startswith(HEAVY) or "(primary)" in r for r in top["roles"]), \
+        "top significator must hold a heavy promise-role, not only soft ones"
+    # weighting really bites: a graha owning the house + being its kāraka must
+    # out-score one that merely aspects it / sits in Lagna (soft roles only)
+    soft = [x for x in rs if not any(r.startswith(HEAVY) or "(primary)" in r
+                                     for r in x["roles"])]
+    if soft:
+        assert top["score"] > soft[0]["score"]
+    # domain-general: runs for a non-marriage matter too
+    assert role_significators(v, DOMAIN_PROFILES["career"])
