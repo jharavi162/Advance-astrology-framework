@@ -1087,12 +1087,21 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     (Nāḍī exactness = strength). Returns top clusters (≥ min_gap_days apart)."""
     tr = v.transits()
     nk = nadi_timing_karaka(v, profile)     # marriage → Venus (event-kāraka)
+    sk = nadi_karaka(v, profile)            # spouse/gender kāraka (Mars ♀ / Venus ♂)
     nk_lon = float(v.longitudes[nk])
     nk_sign = int(nk_lon // 30)
     sev_lon = (nk_lon + 180.0) % 360.0          # 7th-from-kāraka (partner seat)
     sev_sign = int(sev_lon // 30)
     nj_lon = float(v.longitudes[Planet.JUPITER])
     nj_sign = int(nj_lon // 30)
+    # SLOW-GATE anchor set: the event-kāraka + its 7th, PLUS the spouse/gender
+    # kāraka + its 7th when distinct (BNN: for a female the husband is read from
+    # Mars — so the husband-kāraka's activation ALSO opens the marriage period).
+    sk_lon = float(v.longitudes[sk]); sk_sign = int(sk_lon // 30)
+    sk7_lon = (sk_lon + 180.0) % 360.0; sk7_sign = int(sk7_lon // 30)
+    anchors_ks = [(nk_lon, nk_sign), (sev_lon, sev_sign)]
+    if sk != nk:
+        anchors_ks += [(sk_lon, sk_sign), (sk7_lon, sk7_sign)]
     movers = [Planet.VENUS, Planet.MARS, Planet.JUPITER, Planet.SATURN]
     days = []
 
@@ -1106,16 +1115,15 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
         ven, mar, jup, sat = (float(pos[p]) for p in movers)
         js, vs, ms, ss = (int(jup // 30), int(ven // 30),
                           int(mar // 30), int(sat // 30))
-        jup_k, jup_7 = _nrel(nk_sign, js), _nrel(sev_sign, js)
-        sat_k, sat_7 = _nrel(nk_sign, ss), _nrel(sev_sign, ss)
-        jup_gate, sat_gate = (jup_k or jup_7), (sat_k or sat_7)
+        jup_targets = [lon for lon, sg in anchors_ks if _nrel(sg, js)]
+        sat_gate = any(_nrel(sg, ss) for _, sg in anchors_ks)
+        jup_gate = bool(jup_targets)
         if not (jup_gate or sat_gate):          # no slow-planet approval → skip
             d += timedelta(days=1); continue
         score, hits, orb, locked = 0, [], 0.0, False
         if jup_gate:
             score += 3; hits.append("Guru(jeeva) contacts kāraka/7th [primary]")
-            dl = [_dd(jup, t) for t, ok in ((nk_lon, jup_k), (sev_lon, jup_7))
-                  if ok and _deg_close(jup, t)]
+            dl = [_dd(jup, t) for t in jup_targets if _deg_close(jup, t)]
             if dl:
                 score += 1; orb += min(dl); locked = True
                 hits.append("Guru≈kāraka degree-lock")
@@ -1134,6 +1142,12 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
         if m_orbs:
             score += 1; orb += min(m_orbs); locked = True
             hits.append("Maṅgal degree-lock (refine)")
+        # spouse-kāraka DEGREE-RETURN (BNN "own degree" = give much importance):
+        # transit spouse-kāraka back on its natal degree — e.g. ♀ husband-kāraka
+        # Mars returning to its natal degree stamps the day (only when distinct).
+        if sk != nk and _deg_close(float(pos[sk]), sk_lon):
+            score += 1; orb += _dd(float(pos[sk]), sk_lon); locked = True
+            hits.append("spouse-kāraka degree-return (refine)")
         days.append((d, score, hits, orb if locked else 99.0))
         d += timedelta(days=1)
     days.sort(key=lambda x: (-x[1], x[3], x[0]))

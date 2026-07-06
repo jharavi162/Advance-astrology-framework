@@ -863,3 +863,29 @@ def test_bnn_quality_standing_witnesses_registered_and_fire():
     sep[Planet.RAHU] = 7
     sep[Planet.VENUS] = 7
     assert _w_karaka_conjunct_separator(_FakeV(sep), marriage) == -0.6
+
+
+def test_nadi_pinpoint_anchors_the_spouse_karaka_for_female():
+    """BNN pinpoint must anchor the SPOUSE/gender kāraka (Mars for a female =
+    husband), not only the event-kāraka Venus — so the husband-kāraka's
+    degree-return can stamp the day (R.G. Rao: the husband is read from Mars for a
+    female). MECHANICAL — asserts the spouse-kāraka is distinct for a female, the
+    same as the event-kāraka for a male (backward-compatible), and that the new
+    'spouse-kāraka degree-return' refinement is reachable over a multi-year span.
+    No native's date is asserted (blind-test integrity)."""
+    from interpreter.event_evidence import (nadi_pinpoint, nadi_karaka,
+                                            nadi_timing_karaka, DOMAIN_PROFILES, Planet)
+    p = DOMAIN_PROFILES["marriage"]
+    v = _chart()
+    # male-class: spouse-kāraka == event-kāraka (both Venus) → anchor set unchanged
+    v.gender = "male"
+    assert nadi_karaka(v, p) == nadi_timing_karaka(v, p) == Planet.VENUS
+    # female: husband-kāraka Mars distinct from the event-kāraka Venus
+    v.gender = "female"
+    assert nadi_karaka(v, p) == Planet.MARS and nadi_timing_karaka(v, p) == Planet.VENUS
+    pins = nadi_pinpoint(v, p, datetime(2010, 1, 1, tzinfo=UTC),
+                         datetime(2026, 1, 1, tzinfo=UTC), top=12)
+    assert pins
+    hits = [h for r in pins for h in r["hits"]]
+    assert any("spouse-kāraka degree-return" in h for h in hits), \
+        "husband-kāraka (Mars) anchor never fired — spouse-kāraka not wired into the funnel"
