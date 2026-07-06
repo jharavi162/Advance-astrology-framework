@@ -394,9 +394,16 @@ when that is exactly where the event occurred.** Follow it in order:
    & UL, an afflicted kāraka, a dusthāna Arudha)? Name the theme explicitly; it
    governs everything below.
 
-2. **Find the significator daśā-window** — the MD/AD in which the matter's own
-   significators run (the kāraka — e.g. Venus for marriage/kalatra — and/or the
-   7th-lord). This is the *frame* inside which the event must fall.
+2. **Identify the matter's SIGNIFICATOR PLANETS, then find the daśā-window where
+   they run.** First name the significators from the chart: for marriage — the
+   **7th lord, the kāraka (Venus), planets occupying or aspecting the 7th, the
+   2nd & 11th lords, and the nakṣatra-lords of all these**. The event's MD/AD/PD
+   lords must be drawn from this significator set — most decisively, the **MD (or
+   the cusp sub-lord) must itself signify the matter's houses (2/7/11)**; the AD
+   and PD then narrow it. Read the running Vimśottari list and mark every window
+   whose MD-AD-PD lords are significators. This is the *frame* the event falls in;
+   a window whose period-lords are NOT marriage-significators cannot carry it, no
+   matter how "convergent" it scores.
 
 3. **Let the theme choose the SUB-PERIOD (pratyantara/sūkṣma) that carries it.**
    The event does **not** wait for the "nicest" sub-lord — it arrives in the
@@ -409,9 +416,18 @@ when that is exactly where the event occurred.** Follow it in order:
    adjacent benefic sub-period is where the same event would have fallen had the
    union been karmically clean.
 
-4. **BNN degree-locks the exact day** inside that chosen sub-period (the transit
-   kāraka on its own natal degree / golden 1-5-9 relation — §4C-3). This is the
-   pinpoint; trust the degree-lock even when step 5 looks "weak."
+4. **BNN degree-locks the exact day** inside that chosen sub-period — and the
+   confirmation is that the **SAME significator planets trine/contact** on that
+   day (transit kāraka on its own natal degree, Guru-jeeva in golden 1-5-9 to the
+   kāraka — §4C-3). Take the **highest-score pinpoint** that falls in the
+   theme-matched significator sub-period as the day. **Trust this degree-lock over
+   the salience ranking and over the engine's committed 'call'** — that call is
+   the *salience/KP-fulfilment-weighted* favourite, and it systematically
+   *under-ranks* the true window of an afflicted / break-prone marriage (which,
+   by step 3, fires in a negation-lit separative sub-period the fulfilment-score
+   pushes down). When the BNN-locked, significator-matched, theme-matched day
+   disagrees with the salience call, the **method wins** — say so, and name the
+   call as the "clean-window" bias it is.
 
 5. **KP verifies — but read it THROUGH the theme, never as a raw gate.** When the
    fulfilment kāraka (Venus / the 7th) is signified AND BNN has locked the day, a
