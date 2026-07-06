@@ -11,6 +11,38 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Fold the canonical marriage-timing algorithm + AGE-based scan range
+
+- **Change (INTERPRETATION + APP wiring, no engine-rule change):**
+  1. **App scan RANGE is now AGE-based** (`webapp/server.py::_auto_scan_window`):
+     a PAST-tense timing question with the birth date known scans the ADULT band
+     (age 18 → today, span-capped 24 yrs) instead of a flat last-4-years — so a
+     marriage/event years ago is inside the scan, not silently missed. `_kick_scan`
+     already adapts the step (~24 samples, ≤120d) so the wide span stays bounded.
+  2. **Canonical step-order folded** into CHAT_NARRATOR + AI_TRIANGULATION §4C-bis:
+     STEP 0 KP promise (7th-cusp sub-lord 2/7/11) → STEP 1 MD by AGE carrying a
+     7th-ROLE (in-7th / 7th-lord / cusp-sub-lord) → STEP 2 AD by priority
+     (7th-occupant → 7th-lord → cusp-sub-lord → Lagna-lord → rāśi-lord → Venus),
+     KP-negation used only as a DISAMBIGUATOR for indirect contenders (never to
+     eliminate a strong Parashari role) → STEP 3 PD by 7th-role, separative-node
+     (Rāhu/Ketu) pratyantara often triggers, double-transit = CONFIRMING bonus
+     NOT a gate → STEP 4 Sūkṣma BNN degree-lock (incl. spouse/gender-kāraka
+     own-degree return) = exact day.
+  3. §4C-6 softened: the Jupiter+Saturn double-transit is confirming, not a hard
+     "decisive" gate.
+- **Why:** Reverse-engineered + validated across 3 charts (male 29-Jan-2024;
+  Female A 10-Feb-2022; a third, Moon-AD/Rāhu-PD). A blind run had over-weighted
+  the double-transit and pushed the date to a later AD; the actual fired in the
+  cusp-sub-lord's AD + separative Rāhu-PD with NO double-transit — so double-transit
+  is demoted to confirming, and the cusp-sub-lord AD + separative-PD are given due
+  weight. The male's real AD (Lagna-lord Mars, signifies no 2/7/11) proved KP-negation
+  must NOT eliminate a strong Parashari role.
+- **Source:** BPHS (planet gives its occupied-house results in its daśā; 7th/2nd/
+  11th marriage triad), KP (7th-cusp sub-lord promise + significators), Jaimini DK,
+  BNN (Jupiter-jeeva + kāraka degree-lock). General; no native/date hard-coded.
+- **Failure-mode:** DISCRIMINATION + COVERAGE — right MD band (age, not 4-yrs) and
+  right AD/PD ordering; double-transit no longer over-rides a true window.
+
 ## 2026-07-06 — Fix: a graha PLACED in the matter's house is a top-tier timer (weight 3)
 
 - **Change:** In `role_significators` the "in-primary-house" role weight was raised

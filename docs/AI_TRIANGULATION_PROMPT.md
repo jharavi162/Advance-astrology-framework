@@ -301,10 +301,11 @@ witness-registry computes this standing balance for you; add a node as one
    PD may look inert (e.g. a Rahu PD) while a benefic Sūkṣma (e.g. Jupiter)
    sitting exactly on the date is the real micro-trigger. Stopping at PD is a
    timing error.
-6. **The Double-Transit discriminator (Jupiter + Saturn) — the decisive
-   pinpoint when several windows compete.** Because ordinary daśā plus
-   single-planet transit will almost always throw up *multiple* plausible
-   windows across a life, you need a stronger filter to choose between them, and
+6. **The Double-Transit (Jupiter + Saturn) — a strong CONFIRMING factor when
+   windows compete (but NOT a mandatory gate; see §4C-bis step 3: marriages do
+   fire without it, so never push a date later merely to catch one).** Because
+   ordinary daśā plus single-planet transit will almost always throw up
+   *multiple* plausible windows across a life, this helps choose between them, and
    the classical one is the *double transit* of the two slow movers: an event of
    a given domain ripens only when **both Jupiter and Saturn simultaneously
    influence the matter's house AND the lord of that house** — where "influence"
@@ -474,6 +475,30 @@ when that is exactly where the event occurred.** Follow it in order:
 The output of 4C-bis is a single most-probable day (or tight cluster) plus a
 one-line reason of the form: *theme → significator window → theme-matched
 sub-period → BNN-locked day → KP read as \<fulfils / confirms-the-troubled-theme\>.*
+
+**CANONICAL MARRIAGE STEP-ORDER (validated across 3 charts — the operational
+recipe):**
+0. **Promise (KP):** 7th-cusp sub-lord → 2/7/11 = happens; 1/6/10/12 = denied/delayed.
+1. **MD by AGE:** among the mahādaśās running in the adult/marriageable band (use
+   the native's AGE — never a flat "last 4 years"), take the MD whose lord carries
+   a 7th-ROLE — **placed in the 7th, OR the 7th-lord, OR the 7th-cusp sub-lord**
+   (a graha in the 7th times as strongly as the lord).
+2. **AD:** priority 7th-occupants → 7th-lord → cusp-sub-lord → Lagna-lord →
+   rāśi-lord → Venus (kalatra-kāraka). **KP negation is a DISAMBIGUATOR, not an
+   eliminator:** apply it only to an *indirect* contender (no 7th-role, e.g. a
+   general kāraka in a dusthāna) — if it signifies no 2/7/11 and sits in 6/8/12 it
+   gives talk/proposals, weak conversion → deprioritise. A *strong* Parashari role
+   (7th-occupant/lord/cusp-sub-lord) delivers even when it KP-signifies negation
+   (the MD owns the promise) — do NOT filter it out (cross-checked: the male's
+   real marriage-AD Mars = Lagna-lord signifies no 2/7/11 yet delivered).
+3. **PD:** priority by 7th-role, **but a separative-node pratyantara (Rāhu/Ketu)
+   very often triggers the actual event** — seen repeatedly; don't dismiss it.
+   Pick the PD by BNN (highest degree-lock). The **Jupiter+Saturn double-transit
+   is a CONFIRMING bonus, NOT a required gate** — marriages fire without it, so
+   never push the date later merely to catch one. (This supersedes any earlier
+   reading of §4C-6 as a hard "decisive" gate.)
+4. **Sūkṣma:** the BNN degree-lock (Jupiter-jeeva + the spouse/gender kāraka's own
+   natal-degree return) fixes the exact day inside the chosen PD.
 
 ### 4D. Convergence, Ranking & Falsification
 Count how many independent systems converged per theme; **rank**; the call is the
