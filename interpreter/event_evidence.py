@@ -1215,6 +1215,114 @@ register_witness("nadi: Ketu-saṅga on kāraka (delay/break-prone)", "standing"
                  0.6, _w_nadi_ketu_sanga)
 
 
+# ---------------------------------------------------------------------------- #
+# MULTI-METHOD DAY CONVERGENCE (user-approved 2026-07-05) — the "wholesome
+# reading" made scalable. A fixed library of PURE, independent day-detectors
+# (each one classical technique, kept pure — never cross-contaminated), computed
+# for ANY chart/domain; a day's CONVERGENCE = how many independent methods light
+# it; a separate DIRECTION pass (benefics-on-the-axis vs separators) says whether
+# the energised day reads as UNION/fulfil or BREAK/separation. Adding coverage =
+# registering one more pure detector ONCE (serves every chart) — never a per-case
+# tweak, never a date-fit. The engine reports the energised days; it does NOT
+# assume any particular date is "the" event.
+# ---------------------------------------------------------------------------- #
+_BENEFICS = (Planet.JUPITER, Planet.VENUS, Planet.MOON)
+_SEPARATORS = (Planet.SATURN, Planet.RAHU, Planet.KETU)
+_DRISHTI = {Planet.JUPITER: (4, 6, 8), Planet.SATURN: (2, 6, 9),
+            Planet.MARS: (3, 6, 10)}          # special aspects (+ universal 7th)
+
+
+def _aspects_sign(planet, from_sign, target_sign):
+    return any((from_sign + a) % 12 == target_sign
+               for a in _DRISHTI.get(planet, (6,)))
+
+
+def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
+                    min_methods=3) -> list:
+    """Scan each day and report where the most INDEPENDENT pure methods converge,
+    with a fulfil-vs-break DIRECTION. Domain-general; deterministic. Methods:
+      • BNN-golden  — transit Venus/Mars/Jupiter golden (1/5/9/conj) + degree-lock
+        to the natal event-kāraka;
+      • deg-return  — a marital planet transiting its OWN natal degree
+        (conj/trine/opposition ±orb) — the BNN 'give much importance' rule;
+      • drishti     — transit Jupiter/Saturn casting a graha-dṛṣṭi on the domain
+        house OR the kāraka (Parāśari);
+      • Moon-hand   — transit Moon in the domain house or golden to the kāraka
+        (the fast day-hand);
+      • kāraka-return — the gender/descriptor kāraka (e.g. Mars=husband for a ♀
+        chart) golden + degree onto its own natal place.
+    DIRECTION per day = benefics vs separators contacting the kāraka/house:
+    'union' (fulfil), 'break' (separation), or 'mixed'."""
+    tr = v.transits()
+    ek = nadi_timing_karaka(v, profile)           # event kāraka (marriage→Venus)
+    gk = nadi_karaka(v, profile)                  # descriptor kāraka (♀→Mars)
+    ek_lon = float(v.longitudes[ek]); ek_sign = int(ek_lon // 30)
+    gk_lon = float(v.longitudes[gk]); gk_sign = int(gk_lon // 30)
+    house_sign = (v.ascendant_sign + profile.houses[0] - 1) % 12
+    nat = {p: float(v.longitudes[p]) for p in
+           (Planet.VENUS, Planet.MARS, Planet.JUPITER, Planet.SATURN)}
+    movers = [Planet.MOON, Planet.VENUS, Planet.MARS, Planet.JUPITER,
+              Planet.SATURN, Planet.RAHU, Planet.KETU]
+
+    def _rel(a, b):
+        return (int(b // 30) - int(a // 30)) % 12
+
+    out = []
+    d = datetime(start.year, start.month, start.day, tzinfo=start.tzinfo)
+    while d <= end:
+        pos = {p: float(x) for p, x in tr.positions(d, movers).items()}
+        active = []
+        if any(_rel(ek_lon, pos[p]) in _NADI_REL and _deg_close(pos[p], ek_lon)
+               for p in (Planet.VENUS, Planet.MARS, Planet.JUPITER)):
+            active.append("BNN-golden")
+        if any(_rel(nat[p], pos[p]) in (0, 4, 6, 8) and _deg_close(pos[p], nat[p])
+               for p in nat):
+            active.append("deg-return")
+        if any(_aspects_sign(p, int(pos[p] // 30), house_sign)
+               or _aspects_sign(p, int(pos[p] // 30), ek_sign)
+               for p in (Planet.JUPITER, Planet.SATURN)):
+            active.append("drishti")
+        if int(pos[Planet.MOON] // 30) == house_sign \
+                or _rel(ek_lon, pos[Planet.MOON]) in _NADI_REL:
+            active.append("Moon-hand")
+        if (_rel(gk_lon, pos[Planet.MARS]) in _NADI_REL
+                and _deg_close(pos[Planet.MARS], gk_lon)):
+            active.append("kāraka-return")
+        if len(active) < min_methods:
+            d += timedelta(days=1); continue
+        # DIRECTION — signed: benefics vs separators on the kāraka. A TIGHT
+        # (golden + degree-lock) contact to the kāraka weighs 2; a looser
+        # golden/drishti to the house weighs 1. Ketu/Śani conj-or-oppo the kāraka
+        # add a separative point (viyoga). union(+) / break(−) / mixed(0).
+        def _contact(p):
+            s = 0
+            if _rel(ek_lon, pos[p]) in _NADI_REL:
+                s = 2 if _deg_close(pos[p], ek_lon) else 1
+            elif _aspects_sign(p, int(pos[p] // 30), ek_sign) \
+                    or _aspects_sign(p, int(pos[p] // 30), house_sign):
+                s = 1
+            return s
+        ben = sum(_contact(p) for p in (Planet.JUPITER, Planet.VENUS))
+        sep = sum(_contact(p) for p in _SEPARATORS)
+        if _rel(ek_lon, pos[Planet.KETU]) in (0, 6):    # Ketu cut on the kāraka
+            sep += 1
+        score = ben - sep
+        direction = ("union" if score > 0 else "break" if score < 0 else "mixed")
+        out.append((d, len(active), active, direction, score))
+        d += timedelta(days=1)
+    # rank by method-count, then by |direction| (clearer signal first)
+    out.sort(key=lambda x: (-x[1], -abs(x[4]), x[0]))
+    picked = []
+    for row in out:
+        if all(abs((row[0] - p[0]).days) >= min_gap_days for p in picked):
+            picked.append(row)
+        if len(picked) >= top:
+            break
+    picked.sort(key=lambda x: x[0])
+    return [dict(date=f"{x[0]:%Y-%m-%d}", methods=x[1], active=x[2],
+                 direction=x[3], score=x[4]) for x in picked]
+
+
 def _trine_windows(tr, transit, natal_lon, start, end, orb=9.0):
     """Windows where a transit holds a Nāḍī golden relation (conjunction or the
     1/5/9 trine — NOT the 7th; professional BNN standard) to a natal point —

@@ -322,12 +322,26 @@ def _run_scan(job, params, domain, start, end, step_days):
                   [r.start for r in top[:2]]
         pins = nadi_pinpoint_multi(v, prof, anchors, start, end, top=5)
         # LAYER-1 per-school timing breakdown (two-layer convergence view)
-        from interpreter.event_evidence import school_report
+        from interpreter.event_evidence import school_report, day_convergence
         schools = school_report(v, prof, rows)
+        # MULTI-METHOD DAY convergence (pure detectors + direction), bounded to
+        # ±45d around the top elapsed windows so it stays fast.
+        conv, cseen = [], set()
+        for r in top[:3]:
+            if r.start > now:
+                continue
+            for c in day_convergence(v, prof,
+                                     max(r.start - timedelta(days=45), start),
+                                     min(r.start + timedelta(days=45), end), top=4):
+                if c["date"] not in cseen:
+                    cseen.add(c["date"]); conv.append(c)
+        conv.sort(key=lambda c: (-c["methods"], -abs(c["score"]), c["date"]))
+        conv = conv[:6]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
                            pinpoint=pins, nadi=nadi, schools=schools,
+                           convergence=conv,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
@@ -573,7 +587,15 @@ CHAT_NARRATOR = (
     "when it casts no vote. Present it as such and read the AGREEMENT: the more "
     "independent schools that cluster on the same window, the surer the call "
     "(that is the real confidence); where they diverge, say so honestly rather "
-    "than forcing one date. Do not treat a thin/abstaining school as a 'no'. If "
+    "than forcing one date. Do not treat a thin/abstaining school as a 'no'. "
+    "MULTI-METHOD CONVERGENCE: if the scan carries 'convergence', those are the "
+    "days where the most independent PURE methods (BNN golden, degree-return, "
+    "Parāśari drishti, Moon-hand, kāraka-return) light up together, each with a "
+    "'direction' (union = fulfil/event-type, break = separation-type, mixed). "
+    "Present the energised days + direction (more methods = stronger); a union "
+    "day reads as the event, a break day as a rupture. NEVER claim a single day "
+    "is THE event unless the user confirmed it — the engine reports where the "
+    "positioning is strongest, it does not assume the date. If "
     "the call carries a 'next' window, state it as the engine's committed "
     "UPCOMING window. CRITICAL KP rule: AFFLICTION ≠ DENIAL. An afflicted/"
     "troubled standing describes the event's QUALITY (troubled/with-friction), "

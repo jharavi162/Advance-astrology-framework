@@ -1230,3 +1230,27 @@ info-weighting naturally down-weights it in long scans — it simply stops being
 silent RED gap and contributes as a karmic-transition co-factor. Coverage matrix:
 Sade-Sati RED→wired; coverage-summary test updated (Bhinnāṣṭakavarga/yoga-engine
 remain the named RED gaps). Task 4 complete. Suite 173 green.
+
+## 2026-07-05 — Multi-method DAY convergence + direction (user-approved; anti-tweak design)
+
+`day_convergence(v, profile, start, end)` — the scalable "wholesome reading":
+a fixed library of PURE, independent day-detectors (BNN-golden, degree-return,
+Parāśari drishti, Moon-hand, gender-kāraka-return), each one classical technique
+kept pure (never cross-contaminated), computed for any chart/domain. A day's
+CONVERGENCE = how many independent methods light it; a separate signed DIRECTION
+pass (benefics vs separators on the kāraka: union/break/mixed) assigns meaning.
+Wired into the scan (bounded to ±45d around the top elapsed windows), the UI
+("🧭 Multi-method convergence" line) and the narrator.
+
+Principle (explicitly reaffirmed with the user): this is NOT date-tuned and never
+will be. Adding coverage = registering ONE more pure detector (serves every
+chart) — never a per-case tweak, never fitting a known date. Ground-truth dates
+are for BLIND VALIDATION only. If a future date doesn't match, we do NOT re-tune;
+we only add a genuinely-missing, TEXT-verified classical method (justified
+independent of the date). The direction layer is an honest v1 (crude for troubled
+charts) — to be refined, never calibrated.
+
+Verified blind on the sample chart: the scan surfaces ~10 energised days across
+2021-24 (incl. 2022-03-16 AND the separation-era 2022-09-05) — showing convergence
+alone shortlists, and direction is what must discriminate. Suite 174 green.
+Tests: `test_day_convergence_multi_method_and_direction`.

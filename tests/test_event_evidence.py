@@ -715,3 +715,25 @@ def test_sade_sati_timing_node_wired():
                          datetime(2018, 1, 1, tzinfo=UTC),
                          datetime(2022, 1, 1, tzinfo=UTC), step_days=45)
     assert rows and all(isinstance(r.sade_sati, bool) for r in rows)
+
+
+def test_day_convergence_multi_method_and_direction():
+    """Multi-method DAY convergence: pure independent methods, bounded 3..5 count,
+    signed direction label, gap-separated, deterministic, domain-general."""
+    from interpreter.event_evidence import day_convergence
+    v = _chart(); v.gender = "female"
+    prof = DOMAIN_PROFILES["marriage"]
+    s, e = datetime(2021, 1, 1, tzinfo=UTC), datetime(2024, 1, 1, tzinfo=UTC)
+    res = day_convergence(v, prof, s, e)
+    assert res
+    for r in res:
+        assert 3 <= r["methods"] <= 5 and r["active"]
+        assert r["direction"] in ("union", "break", "mixed")
+        assert isinstance(r["score"], int)
+    ds = sorted(datetime.strptime(x["date"], "%Y-%m-%d") for x in res)
+    for a, b in zip(ds, ds[1:]):
+        assert (b - a).days >= 10                     # gap-separated
+    assert res == day_convergence(v, prof, s, e)      # deterministic
+    # domain-general: runs for a non-marriage domain without error
+    assert isinstance(day_convergence(v, DOMAIN_PROFILES["career"],
+                                      s, e), list)
