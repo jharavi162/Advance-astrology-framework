@@ -38,12 +38,9 @@ ABBR = {Planet.SUN: "Su", Planet.MOON: "Mo", Planet.MARS: "Ma", Planet.MERCURY: 
 def _chart(q):
     when = datetime.strptime(q["when"][0], "%Y-%m-%d %H:%M").replace(
         tzinfo=ZoneInfo(q.get("tz", ["Asia/Kolkata"])[0]))
-    v = VedicChart.create(when=when, latitude=float(q["lat"][0]),
-                          longitude=float(q["lon"][0]),
-                          ayanamsa=q.get("ayanamsa", ["lahiri"])[0])
-    # Nāḍī kalatra-kāraka is gender-aware (Venus male / Mars female)
-    v.gender = q.get("gender", [""])[0]
-    return v, when
+    return VedicChart.create(when=when, latitude=float(q["lat"][0]),
+                             longitude=float(q["lon"][0]),
+                             ayanamsa=q.get("ayanamsa", ["lahiri"])[0]), when
 
 
 def _dig(v, p):
@@ -169,10 +166,6 @@ def _aspects(v):
 # slow for a synchronous request. Client starts a job and polls for the result.
 # --------------------------------------------------------------------------- #
 _SCANS: dict = {}
-# Only ONE scan computes at a time. On a small (free) instance parallel scan
-# threads saturate the CPU and the HTTP server can't even serve the page — the
-# app looks "stuck at loading". Later jobs wait at the gate (status "queued").
-_SCAN_GATE = threading.Lock()
 
 
 def _outcome_reads(v, prof, start, end, step_days):
@@ -190,17 +183,10 @@ def _outcome_reads(v, prof, start, end, step_days):
             return None
         row = min(rrows, key=lambda r: abs((r.start - when).days))
         return row.kind
-    return round(bal, 2), verdict, kind_at, rrows
+    return round(bal, 2), verdict, kind_at
 
 
 def _scan_worker(job, params, domain, start, end, step_days):
-    _SCANS[job]["status"] = "queued"
-    with _SCAN_GATE:
-        _SCANS[job]["status"] = "running"
-        _run_scan(job, params, domain, start, end, step_days)
-
-
-def _run_scan(job, params, domain, start, end, step_days):
     try:
         from interpreter.event_evidence import candidate_map
         from interpreter.significators import resolve
@@ -221,9 +207,9 @@ def _run_scan(job, params, domain, start, end, step_days):
                     continue
                 scores = [r.salience for r in rows]
                 peak = max(rows, key=lambda x: x.salience)
-                bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end,
-                                                           step_days)
-                vd = domain_verdict(v, prof, rows, now, rrows=rr)
+                bal, verdict, kind_at = _outcome_reads(v, prof, start, end,
+                                                       step_days)
+                vd = domain_verdict(v, prof, rows, now)
                 ranked.append(dict(
                     domain=name,
                     standout=round(peak.salience - sum(scores) / len(scores), 2),
@@ -232,8 +218,7 @@ def _run_scan(job, params, domain, start, end, step_days):
                     chain=">".join(peak.chain), systems=peak.systems_firing,
                     outcome=kind_at(peak.start), standing=bal, verdict=verdict,
                     call=dict(answer=vd.answer, confidence=vd.confidence,
-                              window=vd.best_window, quality=vd.quality,
-                              next=vd.next_window, next_chain=vd.next_chain),
+                              window=vd.best_window, quality=vd.quality),
                     nodes=[n for n, _ in peak.firing_nodes()][:5]))
             ranked.sort(key=lambda r: -r["standout"])
             _SCANS[job] = dict(status="done", macro=True, domain="macro",
@@ -241,112 +226,23 @@ def _run_scan(job, params, domain, start, end, step_days):
                                step=step_days, ts=time.time())
             return
         prof = resolve(domain)
-        from interpreter.event_evidence import (domain_verdict, nadi_karaka,
-                                                 nadi_nature, nadi_chain)
-        now = datetime.now(timezone.utc)
-        # NĀḌĪ (BNN) nature verdict + degree-ordered CHAIN — kāraka-centric,
-        # domain-general; the DATE (if a timing question) comes from the day-
-        # level pinpoint below.
-        nadi = dict(karaka=nadi_karaka(v, prof).value,
-                    nature=nadi_nature(v, prof) or "clean (smooth/straightforward)",
-                    chain=nadi_chain(v, prof))
-        if getattr(prof, "rupture_matter", False):
-            # RUPTURE matter (divorce/…): the fulfilment scan times the AXIS
-            # (which also spikes for the union itself) — time the BREAK with the
-            # reversal timer of the UNDERLYING matter (divorce = the marriage's
-            # reversal; the rupture profile's inverted KP groups would otherwise
-            # double-invert the reversal semantics), ranked by rupture-score.
-            from interpreter.event_evidence import (DOMAIN_PROFILES,
-                                                    reversal_map,
-                                                    standing_balance)
-            base = DOMAIN_PROFILES.get(getattr(prof, "base_domain", None) or "",
-                                       prof)
-            rrows = reversal_map(v, base, start, end, step_days=step_days)
-            bal, _f = standing_balance(v, prof)
-            verdict = ("blessed/PRO" if bal >= 1.0
-                       else "afflicted" if bal < 0 else "mixed")
-            vd = domain_verdict(v, prof, [], now, rrows=rrows)
-            top = sorted(rrows, key=lambda r: (-r.rupture_score, r.start))[:8]
-            def _rnodes(r):
-                out = []
-                if r.kp_rupture >= 2: out.append("KP rupture-houses in daśā")
-                if r.separators_running: out.append("separators running (Śani/nodes)")
-                if r.break_house_dt: out.append("break-house double-transit")
-                if r.reversal_saham_dt: out.append("reversal-Saham double-transit")
-                if r.lagna_dark_with_malefic: out.append("dark Lagna under malefic")
-                return out
-            windows = [dict(date=r.start.strftime("%Y-%m-%d"),
-                            chain=">".join(r.chain),
-                            salience=r.rupture_score, systems=r.rupture_score,
-                            kp=f"{r.kp_rupture}r/{r.kp_fulfil}f",
-                            outcome=r.kind, nodes=_rnodes(r)) for r in top]
-            # RUPTURE-mode Nāḍī day-pinpoint (Śani/Rāhu-Ketu/Maṅgal separators
-            # degree-locked on the break-axis) around the top LOSS/BREAK windows.
-            from interpreter.event_evidence import (nadi_pinpoint_multi,
-                                                    nadi_rupture_pinpoint)
-            r_anchors = [r.start for r in top
-                         if r.kind == "LOSS/BREAK" and r.start <= now][:6] \
-                or [r.start for r in top[:4]]
-            rpins = nadi_pinpoint_multi(v, prof, r_anchors, start, end, top=5,
-                                        min_gap_days=21,
-                                        funnel=nadi_rupture_pinpoint)
-            _SCANS[job] = dict(status="done", domain=prof.name, rupture=True,
-                               windows=windows, scanned=len(rrows),
-                               step=step_days, standing=round(bal, 2),
-                               verdict=verdict, nadi=nadi, pinpoint=rpins,
-                               call=dict(answer=vd.answer,
-                                         confidence=vd.confidence,
-                                         window=vd.best_window, chain=vd.chain,
-                                         systems=vd.systems, quality=vd.quality,
-                                         next=vd.next_window,
-                                         next_chain=vd.next_chain,
-                                         reasons=vd.reasons),
-                               ts=time.time())
-            return
         rows = candidate_map(v, prof, start, end, step_days=step_days)
         top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
-        bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end, step_days)
-        vd = domain_verdict(v, prof, rows, now, rrows=rr)
+        bal, verdict, kind_at = _outcome_reads(v, prof, start, end, step_days)
+        from interpreter.event_evidence import domain_verdict
+        vd = domain_verdict(v, prof, rows, datetime.now(timezone.utc))
         windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
                         salience=round(r.salience, 3), systems=r.systems_firing,
                         convergence=round(r.convergence, 1),
                         kp=f"{r.kp_fulfil}/{r.kp_negate}",
                         outcome=kind_at(r.start),
                         nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
-        # NĀḌĪ day-level pinpoint around the TOP-6 elapsed windows (±45d) — not
-        # just #1, so the ceremony AND the legal window both get day-pins.
-        from interpreter.event_evidence import nadi_pinpoint_multi
-        anchors = [r.start for r in
-                   sorted((r for r in top if r.start <= now),
-                          key=lambda x: (-x.salience, x.start))[:6]] or \
-                  [r.start for r in top[:2]]
-        pins = nadi_pinpoint_multi(v, prof, anchors, start, end, top=5)
-        # LAYER-1 per-school timing breakdown (two-layer convergence view)
-        from interpreter.event_evidence import school_report, day_convergence
-        schools = school_report(v, prof, rows)
-        # MULTI-METHOD DAY convergence (pure detectors + direction), bounded to
-        # ±45d around the top elapsed windows so it stays fast.
-        conv, cseen = [], set()
-        for r in top[:3]:
-            if r.start > now:
-                continue
-            for c in day_convergence(v, prof,
-                                     max(r.start - timedelta(days=45), start),
-                                     min(r.start + timedelta(days=45), end), top=4,
-                                     windows=rows, rwindows=rr):
-                if c["date"] not in cseen:
-                    cseen.add(c["date"]); conv.append(c)
-        conv.sort(key=lambda c: (-c["methods"], -abs(c["score"]), c["date"]))
-        conv = conv[:6]
         _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
                            scanned=len(rows), step=step_days,
                            standing=bal, verdict=verdict,
-                           pinpoint=pins, nadi=nadi, schools=schools,
-                           convergence=conv,
                            call=dict(answer=vd.answer, confidence=vd.confidence,
                                      window=vd.best_window, chain=vd.chain,
                                      systems=vd.systems, quality=vd.quality,
-                                     next=vd.next_window, next_chain=vd.next_chain,
                                      reasons=vd.reasons),
                            ts=time.time())
     except Exception as e:
@@ -361,12 +257,10 @@ def _kick_scan(params, domain, start, end, step_hint=30):
     """Start (or REUSE) a salience scan; returns the job id. Identical requests
     within ~15 min share one job, so repeated chat questions don't pile up
     duplicate CPU-heavy scans."""
-    key = (tuple(params.get(k, "") for k in
-                 ("when", "tz", "lat", "lon", "ayanamsa", "gender")),
+    key = (tuple(params.get(k, "") for k in ("when", "tz", "lat", "lon", "ayanamsa")),
            domain.lower(), start.date().isoformat(), end.date().isoformat())
     old = _SCAN_KEYS.get(key)
-    if old and old in _SCANS and _SCANS[old].get("status") in ("queued", "running",
-                                                               "done"):
+    if old and old in _SCANS and _SCANS[old].get("status") in ("running", "done"):
         return old
     # The scan's cost scales with the span (each node scans the ephemeris across
     # it), so ADAPT the step: sample ~24 points max so the job stays bounded.
@@ -396,8 +290,7 @@ def scan_start(q):
         end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
     except Exception:
         return dict(error="start/end (YYYY-MM-DD) required")
-    params = {k: q.get(k, [""])[0]
-              for k in ("when", "tz", "lat", "lon", "ayanamsa", "gender")}
+    params = {k: q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa")}
     step_hint = int(q.get("step", ["30"])[0] or "30")
     return dict(job=_kick_scan(params, domain, start, end, step_hint))
 
@@ -544,11 +437,7 @@ CHAT_SYSTEM = (
     "relevant Sahams. Draw on your own classical knowledge (BPHS, Phaladeepika, "
     "Saravali, Jaimini Sūtras, KP, etc.) to interpret — but if the chart JSON "
     "doesn't contain something, say so rather than guessing. "
-    "Answer in the user's language (Hinglish is fine). "
-    "ALWAYS end EVERY reply with a final section headed '📝 सरल सारांश' — 2 to 4 "
-    "short lines in very simple Hinglish/Hindi that a non-astrologer easily "
-    "understands: seedhe-seedhe kya answer hai (haan/nahi, kab, kaisa rahega), "
-    "bina jyotish jargon ke. Yeh section hamesha sabse aakhir me ho."
+    "Answer in the user's language (Hinglish is fine)."
 )
 CHAT_NARRATOR = (
     "ENGINE TRIANGULATION MODE: for this question the engine has ALREADY resolved "
@@ -562,10 +451,9 @@ CHAT_NARRATOR = (
     "dated window as if it were computed. Instead: (a) name the daśā/antardaśā "
     "periods that are astrologically SUPPORTIVE (using ONLY the exact dates in the "
     "Vimśottari list below — never a date not in it), respecting past-vs-future per "
-    "the TIME CONTEXT, and (b) if the engine's date-scan was auto-started for this "
-    "question, close by saying the committed verdict (YES/NO + window) is being "
-    "computed and will follow in a moment. NEVER ask the user to run a scan — it "
-    "runs automatically. Do NOT invent nodes, yogas or exact dates beyond the engine "
+    "the TIME CONTEXT, and (b) tell the user that the actual ranked dated windows "
+    "come from the 🔮 Salience scan (and to scan PAST years if the event may already "
+    "have happened). Do NOT invent nodes, yogas or exact dates beyond the engine "
     "read and the daśā list. If a Salience-scan result is present in the context, "
     "narrate THOSE ranked windows as the timing answer. Each scan window may carry "
     "the engine's OUTCOME-READ ('outcome': CHANGE/UPGRADE · LOSS/BREAK · "
@@ -574,63 +462,11 @@ CHAT_NARRATOR = (
     "assert a concrete real-world outcome (like 'divorce happened') beyond that "
     "type. If the scan carries a committed 'call' (answer/confidence/window/"
     "quality), START your reply with that call verbatim-in-spirit — e.g. 'HAAN — "
-    "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. "
-    "If the scan carries 'pinpoint' days, they are "
-    "the engine's CANONICAL Nāḍī funnel (R.G. Rao): the PRIMARY gate is "
-    "Guru(jeeva) contacting the kāraka or the 7th-from-kāraka, plus Śani "
-    "karma-approval (Jupiter+Saturn together = the double-approval = strongest); "
-    "Śukra/Maṅgal degree-locks only REFINE the exact day. Cite them as "
-    "the most probable SPECIFIC dates, highest score first (a smaller 'orb' = "
-    "a tighter degree-lock = stronger). "
-    "TWO-LAYER CONVERGENCE: if the scan carries 'schools', that is the Layer-1 "
-    "per-school breakdown — each of the 5 INDEPENDENT schools (Parāśari, Jaimini, "
-    "KP, Tājika, Nāḍī) with the window IT independently points to, or 'abstain' "
-    "when it casts no vote. Present it as such and read the AGREEMENT: the more "
-    "independent schools that cluster on the same window, the surer the call "
-    "(that is the real confidence); where they diverge, say so honestly rather "
-    "than forcing one date. Do not treat a thin/abstaining school as a 'no'. "
-    "MULTI-METHOD CONVERGENCE: if the scan carries 'convergence', those are the "
-    "days where the most independent PURE methods (BNN golden, degree-return, "
-    "Parāśari drishti, Moon-hand, kāraka-return) light up together, each with a "
-    "'direction' (union = fulfil/event-type, break = separation-type, mixed). "
-    "Present the energised days + direction (more methods = stronger); a union "
-    "day reads as the event, a break day as a rupture. NEVER claim a single day "
-    "is THE event unless the user confirmed it — the engine reports where the "
-    "positioning is strongest, it does not assume the date. If "
-    "the call carries a 'next' window, state it as the engine's committed "
-    "UPCOMING window. CRITICAL KP rule: AFFLICTION ≠ DENIAL. An afflicted/"
-    "troubled standing describes the event's QUALITY (troubled/with-friction), "
-    "NEVER whether it happened — existence comes only from the call's promise/"
-    "denial + elapsed-window logic. Do not hedge a committed call. HONESTY RULE: "
-    "questions the engine cannot decide mechanically — SAME person vs a NEW "
-    "person, kaun/kis se, anything about a third party without their chart — "
-    "answer briefly and label that part '(interpretive — engine-committed "
-    "nahi)'; never present it as an engine verdict. "
-    "NĀḌĪ VERDICT (give it for EVERY question, any domain, trine/golden-relation "
-    "method): the engine read carries a 'NĀḌĪ (BNN...)' line with the matter's "
-    "kāraka and its nature. ALWAYS include a short 'Nāḍī:' verdict — for a "
-    "'kaisa/nature' question state that nature line (Rahu-saṅga = sudden/"
-    "unconventional, Ketu-saṅga = delay/break-prone, vakri = repeat-pattern, or "
-    "clean = smooth); for a 'kab/when' question give the day-level 'pinpoint' "
-    "date(s) if the scan carries them. This Nāḍī voice is independent of KP/"
-    "Jaimini — present it as its own line, not merged into them. "
-    "NĀḌĪ CHAIN: the read also carries a 'NĀḌĪ CHAIN' — the hero (kāraka) and the "
-    "planets conjunct/trine (1/5/9) it, in DEGREE ORDER. Narrate this as the "
-    "Bhrigu-Nandi STORY, left→right: a member tagged [pre] (lower degree than the "
-    "hero) already acted BEFORE the event / was pre-existing; [post] (higher "
-    "degree) unfolds AFTER it. Apply each planet's significations from the chain "
-    "(e.g. Ketu=break/cut, Rahu=foreign/inter-caste/affair, Jupiter=blessing/"
-    "expansion, Saturn=delay/karmic, Mercury=business/communication, "
-    "Moon=instability/mood) and a '(R)' vakri member = repeat/revisit. Weave it "
-    "into one flowing sentence-story, not a dry list. "
-    "SECOND / NEXT PARTNER: if the domain is a 'second-…' / 'third-…' matter "
-    "(the engine has shifted it to the Nth-marriage axis — 9th house for the "
-    "2nd spouse, per the 3rd-from-7th rule), say so. ALSO read the BNN chain per "
-    "the transcript: a benefic AFTER the hero — especially one that follows a "
-    "Ketu-cut in the chain — is the NEXT/second partner, and Rahu just ahead of "
-    "the hero = multiple relationships / remarriage after a break. Keep the "
-    "house-based read (Vedic) and the chain-based read (BNN) as two independent "
-    "voices; do not merge them."
+    "high confidence, ~Mar-2024 ke aaspaas' — THEN explain the reasons. CRITICAL "
+    "KP rule: AFFLICTION ≠ DENIAL. An afflicted/troubled standing describes the "
+    "event's QUALITY (troubled/with-friction), NEVER whether it happened — "
+    "existence comes only from the call's promise/denial + elapsed-window logic. "
+    "Do not hedge a committed call."
 )
 GEMINI_MODELS = {"gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"}
 
@@ -641,8 +477,7 @@ def _chart_from(c):
         return None
     try:
         return _chart({k: [str(c.get(k, ""))]
-                       for k in ("when", "tz", "lat", "lon", "ayanamsa",
-                                 "gender")})[0]
+                       for k in ("when", "tz", "lat", "lon", "ayanamsa")})[0]
     except Exception:
         return None
 
@@ -662,8 +497,7 @@ def _dasha_tree_text(v):
 # ask WHEN, and does its tense point at the past (event may already have happened)?
 _TIMING_RE = re.compile(
     r"(kab|when|kis\s+(saal|varsh|year)|timing|window|date|hogi|hoga|hui|hua|"
-    r"milegi|milega|banega|banegi|payega|payegi|rahega|rahegi|hone\s*wala|"
-    r"hone\s*wali|kitne\s+(din|mahine|saal))", re.I)
+    r"milegi|milega|banega|banegi)", re.I)
 _PAST_RE = re.compile(
     r"(hui|hua|hue|huye|ho\s+(gaya|gayi|gaye|chuk\w*)|chuki|chuka|chuke|"
     r"\btha\b|\bthi\b|already|when\s+did|happened)", re.I)
@@ -672,9 +506,6 @@ _REL_PAST_RE = re.compile(
     r"(pichh?le|beete|last)\s+(\d{1,2})\s*(saal|varsh|years?|yrs?)", re.I)
 _REL_FUT_RE = re.compile(
     r"(agle|aane\s*wale|next)\s+(\d{1,2})\s*(saal|varsh|years?|yrs?)", re.I)
-_FUT_RE = re.compile(
-    r"(hogi|hoga|milegi|milega|banega|banegi|payega|payegi|rahega|rahegi|"
-    r"aayega|aayegi|hone\s*wal[ai]|\bwill\b|\bfuture\b|aage)", re.I)
 # Open "which life-events happened?" question → multi-domain MACRO scan.
 _MACRO_RE = re.compile(
     r"(kya\s*kya|hot\s*events?|big\s*events?|bade\s*events?|"
@@ -684,18 +515,13 @@ _MACRO_RE = re.compile(
 
 def _auto_scan_window(question, today):
     """(start, end) for the auto scan. Priority: explicit years ("2015 se 2018" →
-    that range, span capped at 6 yrs) → STORY-mode (past narrative + future ask →
-    last 2 yrs THROUGH next 3 yrs, one span) → relative ranges ("pichle 3 saal" /
+    that range, span capped at 6 yrs) → relative ranges ("pichle 3 saal" /
     "agle 2 saal") → tense (past → last 4 yrs, else next 3 yrs)."""
     years = sorted(int(y) for y in _YEAR_RE.findall(question))
     if years:
         y0, y1 = years[0], min(years[-1], years[0] + 6)
         return (datetime(y0, 1, 1, tzinfo=timezone.utc),
                 datetime(y1, 12, 31, tzinfo=timezone.utc))
-    if _PAST_RE.search(question) and _FUT_RE.search(question):
-        # "…hua tha / tal gayi … ab aage kab hogi?" → one span covering both,
-        # so the verdict reads the delivered/contested past AND the next window.
-        return today - timedelta(days=2 * 365), today + timedelta(days=3 * 365)
     m = _REL_PAST_RE.search(question)
     if m:
         n = min(int(m.group(2)), 6)
@@ -735,32 +561,6 @@ def _engine_read(v, question):
     for nm, c in sorted(fired, key=lambda x: -abs(x[1])):
         lines.append(f"  {'+' if c > 0 else '-'} {nm}: {c:+.2f}")
     lines += _fmt_tempo(pt)
-    # NĀḌĪ (BNN) verdict — kāraka-centric, trine/golden-relation method — always
-    # available (nature is a natal read; the DATE, if a timing question, comes
-    # from the salience scan's day-level 'pinpoint'). Domain-general.
-    try:
-        from interpreter.event_evidence import (nadi_karaka, nadi_nature,
-                                                 nadi_chain)
-        nkp = nadi_karaka(v, prof)
-        nn = nadi_nature(v, prof)
-        lines.append(
-            f"NĀḌĪ (BNN, 1/5/9 trine method): kāraka={nkp.value}; nature = "
-            + (nn or "clean — no Rahu/Ketu-saṅga or vakri on the kāraka "
-               "(smooth/straightforward rang)"))
-        chain = nadi_chain(v, prof)
-        if chain:
-            def _c(r):
-                tag = ("HERO" if "HERO" in r["when"]
-                       else "pre" if "before" in r["when"] else "post")
-                return (f"{r['planet']} {r['degree']}° {r['relation']}"
-                        f"[{tag}]{'(R)' if r['retrograde'] else ''} — "
-                        f"{r['signifies']}")
-            lines.append(
-                "NĀḌĪ CHAIN (BNN degree-order = chronology; pre = already/before "
-                "the event, post = after it — read the story left→right): "
-                + "  →  ".join(_c(r) for r in chain))
-    except Exception:
-        pass
     # A tier-3 derived domain is named after the raw query — show a tidy label.
     label = prof.name if len(prof.name) <= 20 else "house " + "/".join(
         str(h) for h in prof.houses)
@@ -882,11 +682,8 @@ def chat_json(body):
             # AUTO salience scan for timing questions: kick (or reuse) the heavy
             # dated-window scan in the background; the frontend polls the job and
             # asks for a follow-up narration once the engine windows land.
-            # Explicit years, past-tense ("ho chuki hai ya nahi?") and future
-            # markers all count as a timing ask — any of them kicks the scan
-            # that produces the committed verdict call.
+            # Explicit years in the question also count as a timing ask.
             if allow_kick and (_TIMING_RE.search(last_user)
-                               or _PAST_RE.search(last_user)
                                or _YEAR_RE.search(last_user)):
                 s0, e0 = _auto_scan_window(last_user, datetime.now(timezone.utc))
                 prev = (ctx or {}).get("last_salience_scan") or {}
@@ -896,11 +693,6 @@ def chat_json(body):
                     job = _kick_scan(body.get("chart") or {}, dom, s0, e0)
                     scan_meta = dict(job=job, domain=dom,
                                      from_y=s0.year, to_y=e0.year)
-    if scan_meta:
-        sys += ("\n\nNOTE: the engine's salience date-scan HAS been auto-started "
-                "for this question — the committed verdict (YES/NO + window) will "
-                "follow as a separate message in a minute or two. Say so; do not "
-                "hedge and do not ask the user to run anything.")
     contents = [dict(role=("user" if m.get("role") == "user" else "model"),
                      parts=[dict(text=str(m.get("content", "")))])
                 for m in messages]
@@ -933,10 +725,7 @@ def chat_json(body):
             break  # non-quota error (e.g. bad key) — other models won't help
     if not ok:
         code, msg = res
-        # Even when the LLM is out of quota, the ENGINE's scan was already
-        # kicked — hand its job back so the frontend can still show the
-        # deterministic windows + committed CALL (no Gemini needed for those).
-        return dict(error=_explain_gemini_error(code, msg), scan=scan_meta)
+        return dict(error=_explain_gemini_error(code, msg))
     j = res
     try:
         cand = j["candidates"][0]
