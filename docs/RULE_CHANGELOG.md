@@ -11,6 +11,24 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Fix: a graha PLACED in the matter's house is a top-tier timer (weight 3)
+
+- **Change:** In `role_significators` the "in-primary-house" role weight was raised
+  2 → 3, equal to owning the house. A graha placed IN the matter's house gives
+  that house's results in its daśā (BPHS) — it is as strong a timer as the
+  house-lord, and the user's Step-1 makes "planet in the 7th" a co-primary MD
+  candidate with the 7th-lord. §4C-bis step 2 clarified accordingly.
+- **Why:** A test chart (Sun + Mercury both in the 7th) exposed that 7th-occupancy
+  was under-weighted — the marriage ran in Mercury's MD (Mercury in 7th), which
+  the earlier weight wrongly deprioritised as a "silent MD". No calibration —
+  the occupant-gives-house-results rule is classical and general.
+- **Source:** BPHS (a planet gives, in its daśā, the results of the house it
+  occupies); confirmed for marriage by the Vimśottari-timing literature.
+- **Validation:** male Venus[14] (in Lagna) unchanged; Female A Jupiter[10]+Venus[9]
+  (both in 7th) both rise; new chart Sun[5]+Mercury[5] (7th-occupants) rise into
+  the significator set so the running Mercury-MD is correctly a marriage-MD.
+  Full suite 179 passed.
+
 ## 2026-07-06 — Role-DENSITY significator scoring (find the timer by ROLE, not by planet-name)
 
 - **Change:** ENGINE — new `role_significators(v, profile)`: ranks the nine grahas

@@ -1022,7 +1022,9 @@ def role_significators(v, profile) -> list:
             roles.append(("fulfil-house-lord", 2))
         h_ = house_of(p)
         if h_ in profile.houses:
-            roles.append((f"in-{h_}H(matter)", 2))
+            # a graha PLACED IN the matter's house gives that house's results in
+            # its daśā (BPHS) — as strong a timer as the house-lord itself.
+            roles.append((f"in-{h_}H(matter)", 3))
         elif h_ == 1:
             roles.append(("in-Lagna", 1))
         if aspects_prim(p):
