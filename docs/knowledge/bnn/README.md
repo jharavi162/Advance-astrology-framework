@@ -11,17 +11,20 @@ Division of labour (per CLAUDE.md):
 - **Interpretation** (meaning, judgment) → stays here as reference for the AI.
 
 Files (added pass by pass):
+- `00_significations.md` — the kārakatwa dictionary (grah kāraka per matter +
+  the reading procedure); rāśi notes secondary (BNN is kāraka-first).
 - `01_timing_method.md` — how BNN times events (Jupiter transit, Saturn, karakas).
-- (later) `00_significations.md`, `02_marriage.md`, `03_profession.md`,
+- `02_marriage.md` — marriage timing, quality, multiple/widowhood, partner
+  description; its 3 quality-nodes are now wired (approved 2026-07-06).
+- (later) `03_profession.md`,
   `04_children.md`, `05_education.md`, `06_disease_longevity.md`, `07_wealth.md`, …
 
-Status: **timing method distilled (pass 1).** Rest pending.
+Status: **timing (1) + significations (2) + marriage (3) distilled.**
+Remaining per-domain chapters pending.
 
-## TODO (pending — deferred by user 2026-07-05, do when asked)
-- Distil the REST of the book into this KB, in order: `00_significations.md`
-  (grah/rāśi kāraka for all domains), then per-domain `02_marriage.md`,
-  `03_profession.md`, `04_children.md`, `05_education.md`,
-  `06_disease_longevity.md`, `07_wealth.md`. Data/rules → engine (+tests);
-  interpretation → these docs. (Not automatic — runs in a session when asked.)
+## TODO (pending — do when asked)
+- Distil the per-domain chapters, in order: `03_profession.md`,
+  `04_children.md`, `05_education.md`, `06_disease_longevity.md`,
+  `07_wealth.md`. Data/rules → engine (+tests); interpretation → these docs.
 - Fine-tune (also deferred): natal-anchor the transit Venus≈Jupiter refine
   (currently chart-independent); validate dates once ground truth is shared.

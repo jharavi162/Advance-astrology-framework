@@ -11,6 +11,73 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Wire 3 BNN marriage-QUALITY standing nodes (user-approved)
+
+- **Change:** Added three domain-general **standing** witnesses (they shade the
+  matter's NATURE via `standing_balance`, never time it; soft, quality-only —
+  return ≤ 0, so they can never veto a window):
+  - `_w_jiva_12th_from_karaka` (−0.6): natal Jupiter in the 12th sign FROM the
+    domain kāraka ⇒ the jīva (enjoyer of results) is in the loss-house from the
+    matter → diminished enjoyment. Dormant when the kāraka is Jupiter.
+  - `_w_karaka_12th_from_descriptor` (−0.5): the Nāḍī event-kāraka in the 12th
+    FROM the matter's descriptor graha ⇒ delay. Dormant when the two coincide.
+  - `_w_karaka_conjunct_separator` (−0.6): the event-kāraka in a separator
+    (Rāhu/Ketu) node's sign-company ⇒ afflicted union.
+- **Why (śāstra):** BNN reads a matter from its kāraka's house-position and
+  company. Jupiter 12th-to-Venus = unhappy marriage; Venus 12th-to-Mars =
+  delayed marriage; Venus + Rāhu/Ketu = estrangement/progeny-trouble. Encoded in
+  the **domain-general** form (Jupiter-vs-kāraka; event-kāraka-vs-descriptor;
+  kāraka-vs-node), reading `profile.natural_karaka` / the Nāḍī kārakas — never a
+  native.
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao — L757 (Jupiter 12th-to-Venus),
+  L4292 (Venus 12th-to-Mars), L1372 / L322 (Venus + node). Distilled in
+  `docs/knowledge/bnn/02_marriage.md`.
+- **Failure-mode addressed:** DISCRIMINATION of outcome NATURE (quality), not
+  timing. No calibration — added because the śāstra reads these, independent of
+  any date. Regression test
+  `test_bnn_quality_standing_witnesses_registered_and_fire`; 3 coverage-matrix
+  rows added (wired); full suite 177 passed. Merged to `main`.
+
+---
+
+## 2026-07-06 — BNN knowledge base, pass 3: marriage (`02_marriage.md`)
+
+- **Change:** Distilled the marriage chapter — timing (Jupiter × Venus contacts,
+  age by Jupiter's rounds, Saturn sanction), quality (Jupiter-12th-from-Venus =
+  unhappy; Venus-12th-from-Mars = delay; Venus+separator = afflicted union),
+  multiple marriages / widowhood, and partner description. **Docs-only.**
+- **Why:** Reference for the narrator; the timing rules were verified already
+  wired (nadi_jeeva/nadi_karma, ♀ husband-kāraka, ordinal 2nd-spouse, rupture).
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (per-chart usages; L-refs in the doc).
+- **Candidate nodes (PROPOSED, not added — approval-gated per CLAUDE.md):** three
+  domain-general marriage-QUALITY standing witnesses — jīva-12th-from-kāraka
+  (BNN L757), kāraka-12th-from-descriptor delay (L4292), kāraka-conjunct-separator
+  affliction (L1372/L322). Listed at the end of `02_marriage.md`; each would ship
+  with a test + coverage row + main-merge if approved. No calibration.
+- **Failure-mode addressed:** knowledge-base coverage (not a prediction rule).
+
+---
+
+## 2026-07-06 — BNN knowledge base, pass 2: significations (`00_significations.md`)
+
+- **Change:** Distilled the kārakatwa dictionary from the source book into
+  `docs/knowledge/bnn/00_significations.md` — each graha's BNN significations,
+  the book's own reading procedure (kāraka → adjacent houses → 7th-from), and
+  secondary rāśi-flavour notes. **Docs-only; no engine/rule change.**
+- **Why:** The *calculable* half (planet→matter kāraka) was already encoded as
+  each domain's `natural_karaka` (THEME_LEXICON / DOMAIN_PROFILES) and verified
+  consistent with BNN in this pass; the *interpretive* half (what each kāraka
+  MEANS, how BNN reads it) now lives as narrator reference so a reading can be
+  explained without re-reading the 327-page PDF.
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao (Preface reading-instruction;
+  explicit "Jīva Kāraka Jupiter / Kāma-kāraka Saturn" labels; the per-chart
+  significator usages throughout).
+- **Failure-mode addressed:** none mechanical — this is coverage of the
+  *knowledge base*, not a prediction rule. No calibration. No new node proposed
+  (significations are data/judgment, not a new timing check).
+
+---
+
 ## 2026-07-06 — Wire Bhinnāṣṭakavarga DELIVERY (computed-but-unwired → wired)
 
 - **Change:** Added a domain-general timing node
