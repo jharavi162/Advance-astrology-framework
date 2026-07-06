@@ -11,6 +11,24 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — De-spaghetti: collapse the narrator to the SINGLE theme-first timing method
+
+- **Change:** PROMPT-LAYER ONLY (`webapp/server.py` CHAT_NARRATOR). Removed the
+  earlier, now-redundant timing-approach instructions that had accumulated
+  (the generic "TRIANGULATION — take the salience windows and converge", the
+  "narrate the ranked windows as the answer" directive, and the standalone
+  "MULTI-METHOD CONVERGENCE" day-list). Kept ONE timing approach — the
+  theme-first §4C-bis method — and re-cast 'pinpoint' (BNN degree-locks) and
+  'convergence' (union/break directions) as *labeled inputs to its steps 3–4*,
+  not rival answers. No engine/UI/payload change.
+- **Why:** The prior change left two "read the theme first" blocks side by side —
+  literal duplication that would compound into backend spaghetti. One coherent
+  method is clearer and prevents the narrator from presenting competing answers.
+- **Failure-mode addressed:** maintainability / instruction-coherence (no rule
+  math changed). No calibration.
+
+---
+
 ## 2026-07-06 — INTERPRETATION method: theme-first sub-period + read KP-negation through the theme (4C-bis)
 
 - **Change:** PROMPT-LAYER ONLY (no engine/app/UI change). Added §4C-bis to
