@@ -130,18 +130,6 @@ THEME_LEXICON: dict[str, dict] = {
     "surgery": dict(houses=[6, 8], fulfil_houses=[6, 8, 12], negate_houses=[1, 5, 11],
                     natural_karaka=Planet.MARS, arudhas=["A6"], varga=30,
                     synonyms=["operation", "accident", "injury", "wound", "chot"]),
-    # Divorce/separation — textbook KP: judged from the 7th cusp, but the
-    # FULFILMENT group is the marriage-NEGATION group (1/6/10: self-assertion,
-    # separation/litigation, 12th-from-11th) and the marriage-sustenance group
-    # (2/7/11) DENIES it. Saturn = the separative kāraka; UL axis carries the
-    # marriage's sustenance; D9 the marriage varga. (KP Readers VI; Jaimini
-    # Upapada doctrine for the break of the UL.)
-    "divorce": dict(houses=[7], fulfil_houses=[1, 6, 10], negate_houses=[2, 7, 11],
-                    natural_karaka=Planet.SATURN, arudhas=["UL"], varga=9,
-                    rupture_matter=True, base_domain="marriage",
-                    synonyms=["talaq", "talak", "separation", "alag hona",
-                              "alag hue", "breakup", "break up", "rishta toota",
-                              "divorce hua", "judai"]),
 }
 
 
@@ -150,56 +138,6 @@ THEME_LEXICON: dict[str, dict] = {
 # --------------------------------------------------------------------------- #
 def _normalize(query: str) -> str:
     return " ".join(query.strip().lower().split())
-
-
-# Successive-significator (ordinal) meta-rule -------------------------------- #
-# Classical serial rule: each next same-type relation is the 3rd from the
-# previous (co-borns, successive spouses/children step forward by 2 houses). So
-# the Nth instance of a matter shifts its primary house by 2·(N−1):
-#   2nd marriage 7→9, 3rd 7→11; 2nd child 5→7; 2nd sibling 3→5.
-# (User-approved 2026-07-04: 2nd spouse = 9th house, the 3rd-from-7th school —
-# 1st→7th, 2nd→9th, 3rd→11th. The BNN voice stays chain-based, no house.)
-_ORDINALS = (
-    (4, ("chauth", "fourth", "4th")),
-    (3, ("teesr", "tisr", "teesar", "third", "3rd", "tritiya")),
-    (2, ("doosr", "doosar", "dusr", "dusar", "second", "2nd", "dvitiya",
-         "dobara", "dubara", "next ", "agla", "agli", "another")),
-)
-_ORD_NAME = {2: "second", 3: "third", 4: "fourth"}
-
-
-def _ordinal(key: str) -> int:
-    for n, words in _ORDINALS:
-        if any(w in key for w in words):
-            return n
-    return 1
-
-
-def _strip_ordinal(key: str) -> str:
-    for _, words in _ORDINALS:
-        for w in words:
-            key = key.replace(w.strip(), " ")
-    return " ".join(key.split())
-
-
-def _ordinal_profile(base, n: int):
-    """Derive the Nth-instance profile from a base matter by the 3rd-from-previous
-    serial rule (primary house += 2·(N−1)); kāraka/varga inherited; base_domain
-    set so the Nāḍī kāraka stays gender-aware (2nd marriage still Venus/Mars)."""
-    shift = 2 * (n - 1)
-    houses = sorted({(h - 1 + shift) % 12 + 1 for h in base.houses})
-    name = f"{_ORD_NAME[n]}-{base.name}"
-    if name in DOMAIN_PROFILES:
-        return DOMAIN_PROFILES[name]
-    karaka = base.natural_karaka
-    bdom = base.base_domain or base.name
-    if karaka is None and 7 in base.houses:      # a bare 'partner' axis → marriage
-        karaka, bdom = Planet.VENUS, "marriage"
-    return register_domain(
-        name, houses=houses, fulfil_houses=sorted(set(houses) | {11}),
-        negate_houses=_dusthana_from(houses), karakas=base.karakas,
-        natural_karaka=karaka, arudhas=base.arudhas, varga=base.varga,
-        base_domain=bdom)
 
 
 def _synonym_index() -> dict[str, str]:
@@ -224,8 +162,6 @@ _SEEDED_SYNONYMS = {
     "bachche": "children", "bachcha": "children", "kids": "children", "progeny": "children",
     "paisa": "wealth", "dhan": "wealth", "money": "wealth", "daulat": "wealth",
     "maa": "mother", "mata": "mother", "pita": "father", "papa": "father",
-    "partner": "marriage", "life partner": "marriage", "lifepartner": "marriage",
-    "jeevan sathi": "marriage", "jeevansathi": "marriage", "jeevan saathi": "marriage",
     "bimari": "illness", "rog": "illness", "health": "illness", "disease": "illness",
     "padhai": "education", "shiksha": "education", "study": "education",
     "relocation": "relocation", "shift": "relocation", "move": "relocation",
@@ -267,20 +203,6 @@ def _complete(spec: dict) -> dict:
 def resolve(query: str):
     """Map any theme word to a DomainProfile (registering it if new)."""
     key = _normalize(query)
-
-    # ordinal / "Nth instance" — resolve the base matter, then shift its house
-    # by the successive-significator rule (2nd marriage → 9th, etc.).
-    n = _ordinal(key)
-    if n >= 2:
-        stripped = _strip_ordinal(key)
-        if stripped and stripped != key:
-            try:
-                base = resolve(stripped)
-            except ValueError:
-                base = None
-            if base is not None and base.houses:
-                return _ordinal_profile(base, n)
-
     idx = _synonym_index()
     canon = idx.get(key)
 
