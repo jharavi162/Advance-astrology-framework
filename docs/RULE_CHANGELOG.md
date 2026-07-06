@@ -11,6 +11,35 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Wire 3 BNN marriage-QUALITY standing nodes (user-approved)
+
+- **Change:** Added three domain-general **standing** witnesses (they shade the
+  matter's NATURE via `standing_balance`, never time it; soft, quality-only —
+  return ≤ 0, so they can never veto a window):
+  - `_w_jiva_12th_from_karaka` (−0.6): natal Jupiter in the 12th sign FROM the
+    domain kāraka ⇒ the jīva (enjoyer of results) is in the loss-house from the
+    matter → diminished enjoyment. Dormant when the kāraka is Jupiter.
+  - `_w_karaka_12th_from_descriptor` (−0.5): the Nāḍī event-kāraka in the 12th
+    FROM the matter's descriptor graha ⇒ delay. Dormant when the two coincide.
+  - `_w_karaka_conjunct_separator` (−0.6): the event-kāraka in a separator
+    (Rāhu/Ketu) node's sign-company ⇒ afflicted union.
+- **Why (śāstra):** BNN reads a matter from its kāraka's house-position and
+  company. Jupiter 12th-to-Venus = unhappy marriage; Venus 12th-to-Mars =
+  delayed marriage; Venus + Rāhu/Ketu = estrangement/progeny-trouble. Encoded in
+  the **domain-general** form (Jupiter-vs-kāraka; event-kāraka-vs-descriptor;
+  kāraka-vs-node), reading `profile.natural_karaka` / the Nāḍī kārakas — never a
+  native.
+- **Source:** *Bhrigu Nandi Nadi*, R.G. Rao — L757 (Jupiter 12th-to-Venus),
+  L4292 (Venus 12th-to-Mars), L1372 / L322 (Venus + node). Distilled in
+  `docs/knowledge/bnn/02_marriage.md`.
+- **Failure-mode addressed:** DISCRIMINATION of outcome NATURE (quality), not
+  timing. No calibration — added because the śāstra reads these, independent of
+  any date. Regression test
+  `test_bnn_quality_standing_witnesses_registered_and_fire`; 3 coverage-matrix
+  rows added (wired); full suite 177 passed. Merged to `main`.
+
+---
+
 ## 2026-07-06 — BNN knowledge base, pass 3: marriage (`02_marriage.md`)
 
 - **Change:** Distilled the marriage chapter — timing (Jupiter × Venus contacts,

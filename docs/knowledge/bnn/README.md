@@ -15,7 +15,7 @@ Files (added pass by pass):
   the reading procedure); rāśi notes secondary (BNN is kāraka-first).
 - `01_timing_method.md` — how BNN times events (Jupiter transit, Saturn, karakas).
 - `02_marriage.md` — marriage timing, quality, multiple/widowhood, partner
-  description; ends with 3 approval-gated candidate quality-nodes.
+  description; its 3 quality-nodes are now wired (approved 2026-07-06).
 - (later) `03_profession.md`,
   `04_children.md`, `05_education.md`, `06_disease_longevity.md`, `07_wealth.md`, …
 
@@ -26,8 +26,5 @@ Remaining per-domain chapters pending.
 - Distil the per-domain chapters, in order: `03_profession.md`,
   `04_children.md`, `05_education.md`, `06_disease_longevity.md`,
   `07_wealth.md`. Data/rules → engine (+tests); interpretation → these docs.
-- Decide on the 3 candidate marriage-quality nodes proposed at the end of
-  `02_marriage.md` (jīva-12th-from-kāraka; kāraka-12th-from-descriptor;
-  kāraka-conjunct-separator) — approval-gated, not yet wired.
 - Fine-tune (also deferred): natal-anchor the transit Venus≈Jupiter refine
   (currently chart-independent); validate dates once ground truth is shared.

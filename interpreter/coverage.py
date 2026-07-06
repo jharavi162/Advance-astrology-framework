@@ -52,6 +52,9 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("Kuja/Maṅgala dosha (marriage friction)", "signs vs lagna/Moon/Venus", "Kuja dosha", "wired"),
     CoverageItem("Strī-jātaka husband kāraka (Jupiter, ♀)", "gender + Jupiter company", "husband kāraka", "wired"),
     CoverageItem("Karakāṃśa 7th-from (AK in D9, spouse)", "karakamsha + navamsha", "Karakāṃśa 7th-spouse", "wired"),
+    CoverageItem("BNN jīva 12th-from-kāraka (quality-drag)", "signs: Jupiter vs kāraka", "jīva 12th-from-kāraka", "wired"),
+    CoverageItem("BNN kāraka 12th-from-descriptor (delay)", "signs: event-kāraka vs descriptor", "kāraka 12th-from-descriptor", "wired"),
+    CoverageItem("BNN kāraka conjunct separator (afflicted union)", "signs: kāraka vs Rāhu/Ketu", "kāraka conjunct separator", "wired"),
     # ---- TIMING ----------------------------------------------------------- #
     CoverageItem("Vimśottari daśā (kāraka in chain)", "current_dasha", "kāraka in MD", "wired"),
     CoverageItem("Vimśottari sūkṣma drill", "current_dasha levels=5", "kāraka at sūkṣma", "wired"),

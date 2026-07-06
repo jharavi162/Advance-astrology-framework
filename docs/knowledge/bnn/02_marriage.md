@@ -91,24 +91,27 @@ Jupiter-jīva × Venus timing; Saturn sanction; Moon day-hand; ♀ husband-kāra
 Mars (`_w_female_husband_karaka`); ordinal 2nd-spouse = 9th; rupture timing;
 divorce domain.
 
-**Calculable BUT not yet wired — proposed as candidate nodes (NOT added; each
-would change how every chart is judged, so needs approval per CLAUDE.md).** All
-three are the **domain-general** form of a BNN rule (they read the matter's
-kāraka/descriptor, never a native), and none is tuned to any date:
+**Calculable, now WIRED (user-approved 2026-07-06).** All three are the
+**domain-general** form of a BNN rule (they read the matter's kāraka/descriptor,
+never a native), soft & quality-only (never positive, never a veto), and none is
+tuned to any date. Each is a `register_witness(... "standing" ...)` with a
+regression test + coverage-matrix row, merged to `main`:
 
-1. **"Jīva in 12th-from-kāraka" — quality-drag on the matter.** Natal Jupiter in
-   the 12th sign from the domain kāraka ⇒ diminished enjoyment of that matter
-   (BNN: Jupiter 12th-to-Venus = unhappy marriage, L757). A *standing* negative
-   quality witness, domain-general.
-2. **"Kāraka in 12th-from-descriptor" — delay.** Natal event-kāraka in the 12th
-   from the domain's descriptor planet ⇒ the matter is delayed (BNN: Venus
-   12th-to-Mars = delayed marriage, L4292). Standing "late" signal.
-3. **"Kāraka conjunct a separator (Rāhu/Ketu)" — afflicted union.** The union
-   kāraka conjunct a node ⇒ estrangement / progeny-trouble flavour (BNN: Venus+
-   Ketu, Venus+Rahu, L1372/L322). A standing affliction witness scoped to the
-   kāraka (finer than the generic occupant-nature).
+1. ✅ **"Jīva in 12th-from-kāraka" — quality-drag** (`_w_jiva_12th_from_karaka`,
+   −0.6). Natal Jupiter in the 12th sign from the domain kāraka ⇒ diminished
+   enjoyment of that matter (BNN: Jupiter 12th-to-Venus = unhappy marriage,
+   L757). Dormant when the kāraka IS Jupiter.
+2. ✅ **"Kāraka in 12th-from-descriptor" — delay**
+   (`_w_karaka_12th_from_descriptor`, −0.5). Event-kāraka in the 12th from the
+   matter's descriptor graha ⇒ the matter is delayed (BNN: Venus 12th-to-Mars =
+   delayed marriage, L4292). Dormant when event-kāraka == descriptor (e.g. a
+   male's marriage, or non-marriage matters with no distinct descriptor).
+3. ✅ **"Kāraka conjunct a separator (Rāhu/Ketu)" — afflicted union**
+   (`_w_karaka_conjunct_separator`, −0.6). The event-kāraka in a node's company
+   ⇒ estrangement / progeny-trouble flavour (BNN: Venus+Ketu, Venus+Rahu,
+   L1372/L322) — scoped to the kāraka, finer than the generic occupant-nature.
 
-> These are **quality/standing** signals (they shade the verdict's *nature*),
-> not new timers. If approved, each lands as one `register_witness(... "standing"
-> ...)` reading `profile.natural_karaka` + a regression test + a coverage-matrix
-> row, and merges to `main` with its śāstra citation. Not added in this pass.
+> These are **quality/standing** signals (they shade the verdict's *nature* via
+> `standing_balance`), not timers — they never move a date, only colour how the
+> matter is enjoyed. Regression test:
+> `test_bnn_quality_standing_witnesses_registered_and_fire`.

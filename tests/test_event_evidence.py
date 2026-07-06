@@ -807,3 +807,59 @@ def test_bhinnashtakavarga_delivery_node_registered_and_domain_scoped():
                           datetime(2023, 1, 1, tzinfo=UTC),
                           datetime(2025, 6, 1, tzinfo=UTC))
     assert crows and all(0.0 <= r.karaka_kakshya <= 1.0 for r in crows)
+
+
+def test_bnn_quality_standing_witnesses_registered_and_fire():
+    """The three user-approved BNN marriage-QUALITY nodes (jīva 12th-from-kāraka;
+    kāraka 12th-from-descriptor delay; kāraka conjunct separator) are registered
+    domain-general STANDING witnesses. MECHANICAL — asserts registration, the
+    dormancy invariants (deterministic), that each FIRES on a controlled synthetic
+    placement (not dead code), that the sign is always in {0, -0.5, -0.6} (soft,
+    quality-only, never positive/never a veto), and the Nāḍī-school mapping. No
+    native date is asserted (that would be calibration)."""
+    from interpreter.event_evidence import (
+        _w_jiva_12th_from_karaka, _w_karaka_12th_from_descriptor,
+        _w_karaka_conjunct_separator, Planet, nadi_timing_karaka, nadi_karaka)
+    snames = [w.name for w in WITNESSES if w.layer == "standing"]
+    for needle in ("jīva 12th-from-kāraka", "kāraka 12th-from-descriptor",
+                   "kāraka conjunct separator"):
+        assert any(needle in n for n in snames), f"BNN standing node missing: {needle}"
+    # BNN principles are the Nāḍī corpus (standing → they don't enter the timing
+    # school-convergence count, but the mapping must be coherent)
+    assert _school("BNN: jīva 12th-from-kāraka (quality-drag)") == "nadi"
+
+    v = _chart()
+    marriage = DOMAIN_PROFILES["marriage"]
+    # valid range on a real chart: soft, quality-only, never positive → never a veto
+    for w in (_w_jiva_12th_from_karaka, _w_karaka_12th_from_descriptor,
+              _w_karaka_conjunct_separator):
+        val = w(v, marriage)
+        assert val in (0.0, -0.5, -0.6)
+    # dormancy invariants (deterministic, no chart needed to reason about):
+    #  #1 is dormant when the kāraka IS Jupiter (children: natural_karaka=Jupiter)
+    assert _w_jiva_12th_from_karaka(v, DOMAIN_PROFILES["children"]) == 0.0
+    #  #2 is dormant when event-kāraka == descriptor (career: no distinct descriptor)
+    assert _w_karaka_12th_from_descriptor(v, DOMAIN_PROFILES["career"]) == 0.0
+
+    # FIRING on controlled synthetic placements (proves not dead code) ----------
+    class _FakeV:
+        def __init__(self, signs, gender=""):
+            self.signs, self.gender = signs, gender
+
+    ve = nadi_timing_karaka(v, marriage)          # Venus (event-kāraka, both sexes)
+    # #1: Jupiter placed 12th-from-Venus → -0.6
+    base = {p: 0 for p in Planet}
+    base[Planet.VENUS] = 3
+    base[Planet.JUPITER] = (3 + 11) % 12
+    assert _w_jiva_12th_from_karaka(_FakeV(base), marriage) == -0.6
+    # #2 (female): event Venus 12th-from-descriptor Mars → -0.5
+    vf = _FakeV({p: 0 for p in Planet}, gender="female")
+    assert nadi_karaka(vf, marriage) == Planet.MARS and ve == Planet.VENUS
+    vf.signs[Planet.MARS] = 5
+    vf.signs[Planet.VENUS] = (5 + 11) % 12
+    assert _w_karaka_12th_from_descriptor(vf, marriage) == -0.5
+    # #3: Venus in the same sign as Rāhu (separator company) → -0.6
+    sep = {p: 0 for p in Planet}
+    sep[Planet.RAHU] = 7
+    sep[Planet.VENUS] = 7
+    assert _w_karaka_conjunct_separator(_FakeV(sep), marriage) == -0.6

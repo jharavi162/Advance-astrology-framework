@@ -247,6 +247,49 @@ register_witness("Vaiśeṣikāṃśa grade (multi-varga strength)", "standing",
 register_witness("maraka afflicts the matter", "standing", 0.8, _w_maraka)
 
 
+# --- BNN QUALITY standing witnesses (user-approved 2026-07-06; distilled in
+# docs/knowledge/bnn/02_marriage.md). Domain-general — each reads the matter's
+# kāraka / descriptor, never a native. These shade the NATURE of the outcome
+# (quality/promise), never time it; soft weights, and #2/#3 are dormant where a
+# matter has no distinct descriptor / clean kāraka. -------------------------- #
+def _w_jiva_12th_from_karaka(v, p):
+    """BNN: the Jīva (Jupiter, the enjoyer of results) in the 12th (loss) sign
+    FROM the matter's kāraka drains the enjoyment of that matter (R.G. Rao —
+    Jupiter 12th-to-Venus = unhappy marriage). Dormant when the kāraka IS Jupiter
+    (it cannot be 12th from itself)."""
+    k = p.natural_karaka
+    if k is None or k == Planet.JUPITER:
+        return 0.0
+    return -0.6 if (v.signs[Planet.JUPITER] - v.signs[k]) % 12 == 11 else 0.0
+
+
+def _w_karaka_12th_from_descriptor(v, p):
+    """BNN: the event-kāraka in the 12th FROM the matter's descriptor graha
+    delays the matter (R.G. Rao — Venus 12th-to-Mars = delayed marriage). Uses
+    the Nāḍī event-kāraka vs the gender/nature descriptor; dormant when the two
+    coincide (no distinct descriptor for the matter)."""
+    event, desc = nadi_timing_karaka(v, p), nadi_karaka(v, p)
+    if event == desc:
+        return 0.0
+    return -0.5 if (v.signs[event] - v.signs[desc]) % 12 == 11 else 0.0
+
+
+def _w_karaka_conjunct_separator(v, p):
+    """BNN: the union/event-kāraka in the COMPANY of a separator node (Rāhu/Ketu)
+    afflicts the matter — estrangement / progeny-trouble flavour (R.G. Rao —
+    Venus+Ketu, Venus+Rahu). Sign-based company (the Nāḍī 'saṅga')."""
+    ks = v.signs[nadi_timing_karaka(v, p)]
+    return -0.6 if ks in (v.signs[Planet.RAHU], v.signs[Planet.KETU]) else 0.0
+
+
+register_witness("BNN: jīva 12th-from-kāraka (quality-drag)", "standing", 0.7,
+                 _w_jiva_12th_from_karaka)
+register_witness("BNN: kāraka 12th-from-descriptor (delay)", "standing", 0.6,
+                 _w_karaka_12th_from_descriptor)
+register_witness("BNN: kāraka conjunct separator (afflicted union)", "standing", 0.7,
+                 _w_karaka_conjunct_separator)
+
+
 # --- OUTCOME-precision witnesses (user-approved 2026-07-02; see RULE_CHANGELOG).
 # Domain-general: each reads the matter's Arudha / lords / kārakas, never a native.
 def _w_arudha_sustenance(v, p):
