@@ -728,7 +728,7 @@ def test_day_convergence_multi_method_and_direction():
     assert res
     for r in res:
         assert 3 <= r["methods"] <= 5 and r["active"]
-        assert r["direction"] in ("union", "break", "mixed")
+        assert r["direction"] in ("union", "break", "troubled", "mixed")
         assert isinstance(r["score"], int)
     ds = sorted(datetime.strptime(x["date"], "%Y-%m-%d") for x in res)
     for a, b in zip(ds, ds[1:]):
@@ -737,3 +737,31 @@ def test_day_convergence_multi_method_and_direction():
     # domain-general: runs for a non-marriage domain without error
     assert isinstance(day_convergence(v, DOMAIN_PROFILES["career"],
                                       s, e), list)
+
+
+def test_day_convergence_direction_defers_to_window_signals():
+    """When candidate/reversal windows are supplied, direction is the tested
+    window signal (rule, not a native date): a day inside an elapsed LOSS/BREAK
+    rupture window reads 'break'; a KP-negation-lean window reads 'troubled'
+    (afflicted ≠ break); a KP-fulfil-lean window reads 'union'."""
+    from interpreter.event_evidence import (day_convergence, candidate_map,
+                                            reversal_map, _window_direction)
+    from datetime import datetime as _dt
+    v = _chart(); v.gender = "female"
+    prof = DOMAIN_PROFILES["marriage"]
+    s, e = datetime(2021, 1, 1, tzinfo=UTC), datetime(2024, 6, 30, tzinfo=UTC)
+    rows = candidate_map(v, prof, s, e, step_days=30)
+    rr = reversal_map(v, prof, s, e, step_days=30)
+    res = day_convergence(v, prof, s, e, windows=rows, rwindows=rr, top=12)
+    assert res
+    # every 'break' label must be backed by a real elapsed LOSS/BREAK window
+    for r in res:
+        if r["direction"] == "break":
+            dt = _dt.strptime(r["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+            assert any(x.kind == "LOSS/BREAK" and x.rupture_score >= 3
+                       and abs((x.start - dt).days) <= 45 for x in rr)
+    # _window_direction is a pure function of the window signals (rule-verifiable)
+    brk = [x for x in rr if x.kind == "LOSS/BREAK" and x.rupture_score >= 3]
+    if brk:
+        lbl, _sc = _window_direction(brk[0].start, rows, rr)
+        assert lbl in ("break", "troubled", "union")

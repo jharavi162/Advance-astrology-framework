@@ -1254,3 +1254,23 @@ Verified blind on the sample chart: the scan surfaces ~10 energised days across
 2021-24 (incl. 2022-03-16 AND the separation-era 2022-09-05) — showing convergence
 alone shortlists, and direction is what must discriminate. Suite 174 green.
 Tests: `test_day_convergence_multi_method_and_direction`.
+
+## 2026-07-05 — Direction layer refined: window-anchored, 3-label (union/troubled/break)
+
+The day-level benefic-vs-separator heuristic was too coarse (marriage AND
+separation energise the SAME axis). Refined `day_convergence` direction to defer
+FIRST to the engine's canonical, already-tested window signals (`_window_direction`,
+using the candidate rows' KP fulfil/negate + the reversal-timer's rupture-score):
+  • rupture-timer LOSS/BREAK (score ≥3) → **break** (a real separation);
+  • KP fulfil > negate → **union**;
+  • KP negate-lean (no rupture) → **troubled** (afflicted axis, NOT a break —
+    Affliction ≠ Denial);
+  • no covering window → fall back to the day-level lean.
+Also added the fulfil-house (union) vs dusthana-from-house (break) axis to the
+fallback. NOT calibrated: the labels come from tested signals, not any date.
+Blind on the sample chart, the ONLY 'break' flagged across 2021-24 is the
+separation-era window (backed by the rupture-timer), the fulfil windows read
+'union', the rest 'troubled' — consistent with an afflicted marriage that later
+broke, with no date-fitting. Wired windows/rwindows into the scan call; UI adds a
+'troubled' colour. Suite 175 green. Test:
+`test_day_convergence_direction_defers_to_window_signals`.

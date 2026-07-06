@@ -1237,8 +1237,30 @@ def _aspects_sign(planet, from_sign, target_sign):
                for a in _DRISHTI.get(planet, (6,)))
 
 
+def _window_direction(dt, windows, rwindows, radius_days=45):
+    """Direction of the day from the engine's tested window signals. Only a
+    rupture-timer LOSS/BREAK (rupture-score ≥3) is a real 'break'; a KP
+    negation-lean is 'troubled' (afflicted quality, NOT a break — Affliction ≠
+    Denial), a KP fulfil-lean is 'union'. Returns (label, signed_score) or None."""
+    if rwindows:
+        rn = min((r for r in rwindows if abs((r.start - dt).days) <= radius_days),
+                 key=lambda r: abs((r.start - dt).days), default=None)
+        if rn is not None and rn.kind == "LOSS/BREAK" and rn.rupture_score >= 3:
+            return "break", -int(rn.rupture_score)
+    if windows:
+        wn = min((w for w in windows if abs((w.start - dt).days) <= radius_days),
+                 key=lambda w: abs((w.start - dt).days), default=None)
+        if wn is not None and (wn.kp_fulfil or wn.kp_negate):
+            net = int(wn.kp_fulfil) - int(wn.kp_negate)
+            if net > 0:
+                return "union", net
+            if net < 0:
+                return "troubled", net       # afflicted axis, not a break
+    return None
+
+
 def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
-                    min_methods=3) -> list:
+                    min_methods=3, windows=None, rwindows=None) -> list:
     """Scan each day and report where the most INDEPENDENT pure methods converge,
     with a fulfil-vs-break DIRECTION. Domain-general; deterministic. Methods:
       • BNN-golden  — transit Venus/Mars/Jupiter golden (1/5/9/conj) + degree-lock
@@ -1251,14 +1273,24 @@ def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
         (the fast day-hand);
       • kāraka-return — the gender/descriptor kāraka (e.g. Mars=husband for a ♀
         chart) golden + degree onto its own natal place.
-    DIRECTION per day = benefics vs separators contacting the kāraka/house:
-    'union' (fulfil), 'break' (separation), or 'mixed'."""
+    DIRECTION per day is taken FIRST from the engine's canonical, already-tested
+    window signals when `windows` (candidate rows) / `rwindows` (reversal rows)
+    are supplied — an elapsed LOSS/BREAK rupture window ⇒ 'break', a KP
+    fulfil>negate window ⇒ 'union' — because those (not a fresh day-heuristic)
+    are what reliably separate a union from a rupture (both energise the SAME
+    axis). Only when no window covers the day does it fall back to the day-level
+    benefic-vs-separator lean. 'union' / 'break' / 'mixed'."""
     tr = v.transits()
     ek = nadi_timing_karaka(v, profile)           # event kāraka (marriage→Venus)
     gk = nadi_karaka(v, profile)                  # descriptor kāraka (♀→Mars)
     ek_lon = float(v.longitudes[ek]); ek_sign = int(ek_lon // 30)
     gk_lon = float(v.longitudes[gk]); gk_sign = int(gk_lon // 30)
     house_sign = (v.ascendant_sign + profile.houses[0] - 1) % 12
+    # DIRECTION axes (classical): union happens on the SUSTENANCE group
+    # (fulfil houses, e.g. 2/7/11 for marriage); a break on the matter's own
+    # DUSTHANA axis (6/8/12 counted FROM its primary house).
+    fulfil_signs = {(v.ascendant_sign + h - 1) % 12 for h in profile.fulfil_houses}
+    rupture_signs = {(house_sign + off) % 12 for off in (5, 7, 11)}
     nat = {p: float(v.longitudes[p]) for p in
            (Planet.VENUS, Planet.MARS, Planet.JUPITER, Planet.SATURN)}
     movers = [Planet.MOON, Planet.VENUS, Planet.MARS, Planet.JUPITER,
@@ -1290,24 +1322,37 @@ def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
             active.append("kāraka-return")
         if len(active) < min_methods:
             d += timedelta(days=1); continue
-        # DIRECTION — signed: benefics vs separators on the kāraka. A TIGHT
-        # (golden + degree-lock) contact to the kāraka weighs 2; a looser
-        # golden/drishti to the house weighs 1. Ketu/Śani conj-or-oppo the kāraka
-        # add a separative point (viyoga). union(+) / break(−) / mixed(0).
+        # DIRECTION — signed. Two classical axes combined:
+        #   (i) WHO contacts the kāraka — benefic (Guru/Śukra) = union, separator
+        #       (Śani/Rāhu/Ketu) = break; tight golden/degree contact weighs 2,
+        #       a looser golden/drishti 1; Ketu/Śani conj-or-oppo the kāraka +1.
+        #   (ii) WHICH axis a separator/benefic sits on — a benefic on the
+        #       SUSTENANCE (fulfil) signs = +1 union; a separator on the matter's
+        #       DUSTHANA (rupture) signs = +1 break.
         def _contact(p):
-            s = 0
             if _rel(ek_lon, pos[p]) in _NADI_REL:
-                s = 2 if _deg_close(pos[p], ek_lon) else 1
-            elif _aspects_sign(p, int(pos[p] // 30), ek_sign) \
+                return 2 if _deg_close(pos[p], ek_lon) else 1
+            if _aspects_sign(p, int(pos[p] // 30), ek_sign) \
                     or _aspects_sign(p, int(pos[p] // 30), house_sign):
-                s = 1
-            return s
+                return 1
+            return 0
         ben = sum(_contact(p) for p in (Planet.JUPITER, Planet.VENUS))
         sep = sum(_contact(p) for p in _SEPARATORS)
+        ben += sum(1 for p in (Planet.JUPITER, Planet.VENUS)
+                   if int(pos[p] // 30) in fulfil_signs)          # benefic on union axis
+        sep += sum(1 for p in _SEPARATORS
+                   if int(pos[p] // 30) in rupture_signs)          # separator on break axis
         if _rel(ek_lon, pos[Planet.KETU]) in (0, 6):    # Ketu cut on the kāraka
             sep += 1
         score = ben - sep
-        direction = ("union" if score > 0 else "break" if score < 0 else "mixed")
+        # PRIMARY direction = the engine's tested window signal covering this day;
+        # the day-lean above is only the fallback.
+        wdir = _window_direction(d, windows, rwindows)
+        if wdir is not None:
+            direction, score = wdir
+        else:
+            direction = ("union" if score > 0
+                         else "troubled" if score < 0 else "mixed")
         out.append((d, len(active), active, direction, score))
         d += timedelta(days=1)
     # rank by method-count, then by |direction| (clearer signal first)

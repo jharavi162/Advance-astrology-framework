@@ -462,7 +462,7 @@ function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
       :`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
     html+=callLine(res.call);
     html+=schoolLine(res.schools);
-    if(res.convergence&&res.convergence.length){const dc=d=>({union:'#7fe0c0',break:'#ff9bb0',mixed:'var(--mut)'})[d]||'var(--mut)';
+    if(res.convergence&&res.convergence.length){const dc=d=>({union:'#7fe0c0',break:'#ff9bb0',troubled:'#e0c060',mixed:'var(--mut)'})[d]||'var(--mut)';
       html+=`<div class="refrow" style="margin:0 0 8px">🧭 <b style="color:var(--acc)">Multi-method convergence</b> (energised days): ${res.convergence.map(c=>`<b>${c.date}</b> ${c.methods}/5 <span style="color:${dc(c.direction)}">[${c.direction}]</span>`).join(' · ')}<div class="sub">${res.convergence[0].active.join(', ')}</div></div>`;}
     html+=nadiLine(res.nadi);
     if(res.pinpoint&&res.pinpoint.length)html+=`<div class="refrow" style="margin:0 0 8px">${res.rupture?'💔':'📍'} <b style="color:var(--acc)">Nāḍī ${res.rupture?'rupture-pinpoint':'pinpoint'}</b> (din-level): ${res.pinpoint.map(p=>`<b>${p.date}</b> (${p.score})`).join(' · ')}<div class="sub">${res.pinpoint[0].hits.join(', ')}</div></div>`;

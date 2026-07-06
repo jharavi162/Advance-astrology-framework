@@ -332,7 +332,8 @@ def _run_scan(job, params, domain, start, end, step_days):
                 continue
             for c in day_convergence(v, prof,
                                      max(r.start - timedelta(days=45), start),
-                                     min(r.start + timedelta(days=45), end), top=4):
+                                     min(r.start + timedelta(days=45), end), top=4,
+                                     windows=rows, rwindows=rr):
                 if c["date"] not in cseen:
                     cseen.add(c["date"]); conv.append(c)
         conv.sort(key=lambda c: (-c["methods"], -abs(c["score"]), c["date"]))
