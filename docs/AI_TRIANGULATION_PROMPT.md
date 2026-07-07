@@ -475,7 +475,16 @@ when that is exactly where the event occurred.** Follow it in order:
    degree** is a primary stamp (e.g. transit Mars ≈ natal Mars°); anchoring the
    BNN funnel only on Venus and ignoring Mars is a known miss on female charts.
    The engine's `pinpoint` now anchors both the event-kāraka and the
-   spouse/gender kāraka. Take the **highest-score pinpoint** that falls in the
+   spouse/gender kāraka. **Always ALSO run `day_convergence` over the chosen
+   sub-period** — its independent day-hands now include the transit **Moon
+   degree-locked on the spouse/descriptor kāraka** (the fast hand stamping the
+   spouse-significator itself), the **kāraka-pair transit yuti** (event-kāraka
+   ∧ descriptor conjunct in the sky, golden to the natal kāraka), and the
+   **Lagna-lord's own natal-degree return** (the self's stamp) — and read its
+   output as a day-CLUSTER (days sample at 00:00, so a fast-Moon lock can sit
+   on the ±1 neighbour). The event day is where the most independent hands
+   pile up, not necessarily the single tidiest degree-orb. Take the
+   **highest-score pinpoint** that falls in the
    theme-matched significator sub-period as the day. **Trust this degree-lock over
    the salience ranking and over the engine's committed 'call'** — that call is
    the *salience/KP-fulfilment-weighted* favourite, and it systematically

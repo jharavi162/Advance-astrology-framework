@@ -1434,7 +1434,24 @@ def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
       • Moon-hand   — transit Moon in the domain house or golden to the kāraka
         (the fast day-hand);
       • kāraka-return — the gender/descriptor kāraka (e.g. Mars=husband for a ♀
-        chart) golden + degree onto its own natal place.
+        chart) golden + degree onto its own natal place;
+      • Moon-spouse — transit Moon golden + degree-locked onto the
+        gender/descriptor kāraka's NATAL degree (♀: Moon on natal Mars; ♂: on
+        natal Venus) — the fast day-hand stamping the spouse-significator
+        itself (BNN Moon day-hand × R.G. Rao's husband-from-Mars). Dormant
+        when the descriptor IS the event-kāraka;
+      • pair-yuti   — the event-kāraka and the descriptor kāraka CONJUNCT in
+        transit (≤3° nāḍī orb) while either stands golden to the natal
+        event-kāraka — the union-pair standing together in the sky (R.G. Rao
+        reads the Venus↔Mars geometry as the union axis). Dormant when the
+        two kārakas coincide;
+      • lagnesh-return — the Lagna-lord transiting its OWN natal degree
+        (conj/trine/opposition ±nāḍī orb) — the self's hand stamping the day
+        (BNN: a planet on its own natal degree is 'given much importance',
+        applied to the self-lord; works for any graha, luminaries included).
+    Days are sampled at 00:00 of the scan timezone, so a fast-Moon lock that
+    perfects later in the civil day can surface on the ±1 neighbour — read the
+    result as a day-CLUSTER, never a single-row verdict.
     DIRECTION per day is taken FIRST from the engine's canonical, already-tested
     window signals when `windows` (candidate rows) / `rwindows` (reversal rows)
     are supplied — an elapsed LOSS/BREAK rupture window ⇒ 'break', a KP
@@ -1455,8 +1472,13 @@ def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
     rupture_signs = {(house_sign + off) % 12 for off in (5, 7, 11)}
     nat = {p: float(v.longitudes[p]) for p in
            (Planet.VENUS, Planet.MARS, Planet.JUPITER, Planet.SATURN)}
+    lagnesh = v.house_lord(1)
+    lag_lon = float(v.longitudes[lagnesh])
     movers = [Planet.MOON, Planet.VENUS, Planet.MARS, Planet.JUPITER,
               Planet.SATURN, Planet.RAHU, Planet.KETU]
+    for extra in (ek, gk, lagnesh):          # kārakas/lagnesh may be a luminary
+        if extra not in movers:
+            movers.append(extra)
 
     def _rel(a, b):
         return (int(b // 30) - int(a // 30)) % 12
@@ -1482,6 +1504,18 @@ def day_convergence(v, profile, start, end, top=8, min_gap_days=10,
         if (_rel(gk_lon, pos[Planet.MARS]) in _NADI_REL
                 and _deg_close(pos[Planet.MARS], gk_lon)):
             active.append("kāraka-return")
+        if gk is not ek and _rel(gk_lon, pos[Planet.MOON]) in _NADI_REL \
+                and _deg_close(pos[Planet.MOON], gk_lon):
+            active.append("Moon-spouse")
+        if gk is not ek:
+            gap = abs(pos[ek] - pos[gk])
+            if min(gap, 360.0 - gap) <= 3.0 and (
+                    _rel(ek_lon, pos[ek]) in _NADI_REL
+                    or _rel(ek_lon, pos[gk]) in _NADI_REL):
+                active.append("pair-yuti")
+        if _rel(lag_lon, pos[lagnesh]) in (0, 4, 6, 8) \
+                and _deg_close(pos[lagnesh], lag_lon):
+            active.append("lagnesh-return")
         if len(active) < min_methods:
             d += timedelta(days=1); continue
         # DIRECTION — signed. Two classical axes combined:

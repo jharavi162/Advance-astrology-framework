@@ -718,7 +718,7 @@ def test_sade_sati_timing_node_wired():
 
 
 def test_day_convergence_multi_method_and_direction():
-    """Multi-method DAY convergence: pure independent methods, bounded 3..5 count,
+    """Multi-method DAY convergence: pure independent methods, bounded 3..8 count,
     signed direction label, gap-separated, deterministic, domain-general."""
     from interpreter.event_evidence import day_convergence
     v = _chart(); v.gender = "female"
@@ -727,7 +727,7 @@ def test_day_convergence_multi_method_and_direction():
     res = day_convergence(v, prof, s, e)
     assert res
     for r in res:
-        assert 3 <= r["methods"] <= 5 and r["active"]
+        assert 3 <= r["methods"] <= 8 and r["active"]
         assert r["direction"] in ("union", "break", "troubled", "mixed")
         assert isinstance(r["score"], int)
     ds = sorted(datetime.strptime(x["date"], "%Y-%m-%d") for x in res)
@@ -956,3 +956,77 @@ def test_shukra_guru_refine_is_natal_anchored_not_chart_independent():
     # non-empty fire-set by construction (the old bug fired for everyone)
     assert not (fire_days[0] and fire_days[0] == fire_days[1]), \
         "Śukra≈Guru fired identically across two different charts"
+
+
+def test_day_convergence_moon_spouse_and_pair_yuti_fire_by_their_predicates():
+    """The two new day-hands are PROPERTY-tested (no native event dates):
+    every reported 'Moon-spouse' day must satisfy transit-Moon golden+degree
+    onto the DESCRIPTOR kāraka's natal degree; every 'pair-yuti' day must have
+    the event-kāraka and descriptor within 3° in transit with a golden tie to
+    the natal event-kāraka; and both are DORMANT when descriptor == kāraka."""
+    from interpreter.event_evidence import (
+        day_convergence, nadi_karaka, nadi_timing_karaka, _deg_close, _NADI_REL)
+    from advance_astrology.vedic.transits import Planet
+    v = _chart(); v.gender = "female"
+    prof = DOMAIN_PROFILES["marriage"]
+    ek, gk = nadi_timing_karaka(v, prof), nadi_karaka(v, prof)
+    assert gk is not ek                      # ♀ chart: Mars ≠ Venus
+    tr = v.transits()
+    ek_lon, gk_lon = float(v.longitudes[ek]), float(v.longitudes[gk])
+
+    def _rel(a, b):
+        return (int(b // 30) - int(a // 30)) % 12
+
+    s, e = datetime(2021, 6, 1, tzinfo=UTC), datetime(2022, 6, 1, tzinfo=UTC)
+    res = day_convergence(v, prof, s, e, top=40, min_gap_days=1, min_methods=2)
+    seen_ms = seen_py = False
+    for r in res:
+        d = datetime.strptime(r["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+        pos = {p: float(x) for p, x in
+               tr.positions(d, [Planet.MOON, ek, gk]).items()}
+        if "Moon-spouse" in r["active"]:
+            seen_ms = True
+            assert _rel(gk_lon, pos[Planet.MOON]) in _NADI_REL
+            assert _deg_close(pos[Planet.MOON], gk_lon)
+        if "pair-yuti" in r["active"]:
+            seen_py = True
+            gap = abs(pos[ek] - pos[gk])
+            assert min(gap, 360.0 - gap) <= 3.0
+            assert (_rel(ek_lon, pos[ek]) in _NADI_REL
+                    or _rel(ek_lon, pos[gk]) in _NADI_REL)
+    assert seen_ms, "Moon-spouse never fired across a full year of days"
+    # pair-yuti is rarer (needs a Venus-Mars transit conjunction); allow absence
+    # in a short span but the male-dormancy guard below must always hold.
+    v2 = _chart(); v2.gender = "male"
+    ek2, gk2 = nadi_timing_karaka(v2, prof), nadi_karaka(v2, prof)
+    if ek2 is gk2:                           # ♂: descriptor == kāraka ⇒ dormant
+        res2 = day_convergence(v2, prof, s, e, top=40, min_gap_days=1,
+                               min_methods=1)
+        for r in res2:
+            assert "Moon-spouse" not in r["active"]
+            assert "pair-yuti" not in r["active"]
+
+
+def test_day_convergence_lagnesh_return_stamps_the_self_lord():
+    """'lagnesh-return' must fire exactly when the Lagna-lord transits its own
+    natal degree (conj/trine/opp, nāḍī same-degree orb) — the self's day-stamp;
+    property-checked against the predicate, no native dates."""
+    from interpreter.event_evidence import day_convergence, _deg_close
+    from advance_astrology.vedic.transits import Planet
+    v = _chart(); v.gender = "female"
+    prof = DOMAIN_PROFILES["marriage"]
+    lagnesh = v.house_lord(1)
+    lag_lon = float(v.longitudes[lagnesh])
+    tr = v.transits()
+    s, e = datetime(2021, 6, 1, tzinfo=UTC), datetime(2022, 6, 1, tzinfo=UTC)
+    res = day_convergence(v, prof, s, e, top=40, min_gap_days=1, min_methods=2)
+    seen = False
+    for r in res:
+        if "lagnesh-return" not in r["active"]:
+            continue
+        seen = True
+        d = datetime.strptime(r["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+        pos = float(tr.positions(d, [lagnesh])[lagnesh])
+        assert (int(pos // 30) - int(lag_lon // 30)) % 12 in (0, 4, 6, 8)
+        assert _deg_close(pos, lag_lon)
+    assert seen, "lagnesh-return never fired across a full year of days"
