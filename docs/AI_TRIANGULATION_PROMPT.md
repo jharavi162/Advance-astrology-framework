@@ -501,8 +501,24 @@ The output of 4C-bis is a single most-probable day (or tight cluster) plus a
 one-line reason of the form: *theme → significator window → theme-matched
 sub-period → BNN-locked day → KP read as \<fulfils / confirms-the-troubled-theme\>.*
 
+> **THE STEP-ORDER BELOW IS THE ARCHETYPE FOR EVERY DOMAIN, not a
+> marriage-only recipe.** Whatever the asked life-area, run the SAME
+> multi-POV sequence with that domain's own bundle (house · cusp-sub-lord ·
+> Arudha · chara-kāraka, per the §4C mapping table): promise from the cusp
+> sub-lord → MD/AD by ROLE-density in the age-band → the materialised-vs-broke
+> filter across ALL competing ADs → theme-elected sub-period (a separative
+> node/Saturn carries a karmically-troubled instance of ANY matter — a job
+> taken-and-lost, a house bought-and-sold, not just a break-prone marriage;
+> and the node colours the TYPE everywhere: an unconventional/foreign job,
+> an out-of-community partner, a sudden windfall) → kāraka degree-locks as
+> WEIGHTS converging with gochara patterns (nodes/slow-movers on the domain
+> kāraka's sign and the domain-Arudha axis, double-transit tested on the
+> house AND its lord AND the Arudha/UL). Every lock, count and stamp is a
+> convergence weight, never a rigid gate — these per-domain step-orders are
+> built the same way this one was: pattern-by-pattern from verified cases.
+
 **CANONICAL MARRIAGE STEP-ORDER (validated across 3 charts — the operational
-recipe):**
+recipe, and the worked TEMPLATE for the per-domain archetype above):**
 0. **Promise (KP):** 7th-cusp sub-lord → 2/7/11 = happens; 1/6/10/12 = denied/delayed.
 1. **MD by AGE:** among the mahādaśās running in the adult/marriageable band (use
    the native's AGE — never a flat "last 4 years"), take the MD whose lord carries

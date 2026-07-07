@@ -11,6 +11,28 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-07 — The 4C-bis step-order declared the ARCHETYPE for every domain (multi-POV everywhere)
+
+- **Change (PROMPT-LAYER only):** Added a block before the canonical marriage
+  step-order declaring it the **domain-general archetype**: for ANY life-area,
+  run the same sequence with that domain's own bundle (house · cusp-sub-lord ·
+  Arudha · chara-kāraka): promise → role-density MD/AD in the age-band →
+  materialised-vs-broke filter on all competing ADs → theme-elected sub-period
+  (separative carriers + node TYPE-colouring apply to every matter, not just
+  marriage) → kāraka degree-locks as weights converging with gochara (nodes on
+  the kāraka's sign / the domain-Arudha axis; double-transit on house AND lord
+  AND Arudha). All locks/counts/stamps are convergence weights, never gates.
+- **Why:** User direction — the multi-POV approach validated on marriage must
+  be the standard reading for every domain; per-domain step-orders are to be
+  grown the same way, pattern-by-pattern from verified cases.
+- **Source:** the §4C domain-mapping table (already in the doc) + the validated
+  4C-bis sequence; no new astrology — a scope declaration.
+- **Failure-mode addressed:** COVERAGE — prevents the corrected marriage
+  method from staying a marriage-only special case while other domains regress
+  to single-signature reads.
+
+---
+
 ## 2026-07-07 — Node-sub-period doctrine: one-way inference, TYPE-colouring, and de-gating the natal BNN stamp
 
 - **Change (PROMPT-LAYER only):** Expanded §4C-bis step 3 and canonical step-3
