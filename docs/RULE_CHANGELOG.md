@@ -11,6 +11,32 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-07 — Natal-anchor the Śukra≈Guru day-refine (kill the chart-independent stamp) + scrub outcome dates
+
+- **Change (ENGINE):** In `nadi_pinpoint`, the Śukra≈Guru degree-lock refine now
+  counts ONLY when the transit pair sits on the natal degree of one of its own
+  participants — THIS chart's natal Venus or natal Jupiter (degree-to-degree).
+  Previously a bare transit-Venus≈transit-Jupiter contact scored +1 — but that
+  contact is the same sky for EVERY chart on that day, so it carried zero
+  personal information and inflated the same calendar days across all charts.
+  This was the long-deferred "natal-anchor the transit Venus≈Jupiter refine"
+  TODO; a live cross-chart read finally showed the failure-mode (two unrelated
+  charts "locking" the same week, presented as mutual corroboration).
+- **Why (śāstra):** BNN's degree-to-degree doctrine personalises a transit by the
+  NATAL degrees it touches; a transit-to-transit contact off any natal seat has
+  no native-specific sanction. Anchoring to the pair's own participants (natal
+  Venus / natal Jupiter) is the tightest principled form.
+- **No calibration:** the rule is stated in participants' terms, not fitted to
+  any outcome; on the reference charts each verified event's own lock survives
+  (its pair sat on that chart's natal Jupiter degree) while the other chart's
+  false same-day lock deflates. Regression test
+  `test_shukra_guru_refine_is_natal_anchored_not_chart_independent` (property:
+  every fired day satisfies the anchor predicate; two different charts must not
+  share an identical non-empty fire-set).
+- **Also:** scrubbed outcome dates that had crept into RULE_CHANGELOG /
+  docs/knowledge/bnn per the 2026-06-23 blind-test-integrity policy (no native
+  event dates in the repo).
+
 ## 2026-07-07 — STEP-2 tie-break: occupied-house conversion + sequential fulfilment check
 
 - **Change (PROMPT-LAYER):** When two-or-more STRONG AD candidates (real 7th-roles,
@@ -22,7 +48,7 @@ addresses (coverage vs discrimination).
   time-order 2b check — test the earlier candidate's window; fulfilment absent →
   move to the next candidate. Conversion is proven by fulfilment, never by role
   alone. Planets with NO role in that chart are ignored as AD candidates.
-- **Why (validated on Female A, 10-Feb-2022):** In her Venus-MD the logical ADs
+- **Why (validated on a verified past event of sample chart A):** In her Venus-MD the logical ADs
   were Venus/Sun/Mars (Moon holds no role → ignored). Ve>Ve failed age-tempo;
   Ve>Su tied with Ve>Ma on role (Sun = 7th-lord) but Sun OCCUPIES the 6th → its
   AD gave 6th-results (the 2019 engagement-stage that didn't convert, fulfilment
@@ -49,8 +75,8 @@ addresses (coverage vs discrimination).
   rupture-flag · keep/reject with reason) — no silent rejections.
 - **Why:** A live session answered the male sample chart with May–Sep 2023
   (Moon-AD, picked as the "highest-convergence band" backed by a year-long
-  double-transit and a top KP-count) — the verified date is 29-Jan-2024
-  (Mars-AD = Lagna-lord + Rāśi-lord, rupture-clean, whole-span-top BNN lock).
+  double-transit and a top KP-count) — the verified date fell in the
+  Mars-AD ( = Lagna-lord + Rāśi-lord, rupture-clean, whole-span-top BNN lock).
   Every one of the five guards corresponds to a step that failed in that answer;
   the presentation structure of that answer was good and is retained as the
   audit-trail format.
@@ -80,7 +106,7 @@ addresses (coverage vs discrimination).
 - **Source:** KP marriage/divorce doctrine — 6 (=12th-from-7th) separation, 8/12
   loss; broken-engagement vs divorce distinction (jagannathhora.com, redastrologer,
   AstroSage KP). General; no native/date hard-coded.
-- **Validation:** on Chart-2 (married 29-Jan-2024) the reversal read flagged the
+- **Validation:** on Chart-2 (a verified marriage) the reversal read flagged the
   high-BNN Saturn-AD (2022-23) as LOSS/BREAK with fulfilment≈1 (a rishtā that
   broke — correcting an earlier wrong 2022-23 guess), while the clean, fulfilment-
   lit Mercury-AD (7th-lord, 2024) carried the actual marriage.
@@ -106,8 +132,8 @@ addresses (coverage vs discrimination).
      own-degree return) = exact day.
   3. §4C-6 softened: the Jupiter+Saturn double-transit is confirming, not a hard
      "decisive" gate.
-- **Why:** Reverse-engineered + validated across 3 charts (male 29-Jan-2024;
-  Female A 10-Feb-2022; a third, Moon-AD/Rāhu-PD). A blind run had over-weighted
+- **Why:** Reverse-engineered + validated across 3 charts with verified
+  outcomes (no dates recorded — blind-test integrity). A blind run had over-weighted
   the double-transit and pushed the date to a later AD; the actual fired in the
   cusp-sub-lord's AD + separative Rāhu-PD with NO double-transit — so double-transit
   is demoted to confirming, and the cusp-sub-lord AD + separative-PD are given due
@@ -1499,7 +1525,7 @@ transcript. Three changes to reach professional standard:
 - **Golden relations = 1/5/9 only.** `_NADI_REL` {0,4,6,8} → {0,4,8}; removed the
   180° (7th) leg from `_trine_windows`. The 7th (opposition) is NOT a BNN golden
   relation in standard practice. Verified: the kāraka's own chart validation
-  (wedding pinpoint 2024-01-29, rupture Aug–Sept 2025) is unchanged — every lock
+  (the verified wedding pinpoint and rupture window) is unchanged — every lock
   there was a conjunction or a 5/9 trine, never the 7th. New test
   `test_nadi_golden_relations_are_1_5_9_only`.
 - **Retrograde shift-back** (`_nadi_sign`): a vakri planet is reckoned ONE sign
