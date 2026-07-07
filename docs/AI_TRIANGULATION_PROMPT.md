@@ -514,6 +514,33 @@ recipe):**
 4. **Sūkṣma:** the BNN degree-lock (Jupiter-jeeva + the spouse/gender kāraka's own
    natal-degree return) fixes the exact day inside the chosen PD.
 
+**DECISION-ORDER GUARDS — each has caused a verified wrong-date miss; enforce all:**
+- **G1 · Structure first, score later.** Never pre-select the band/AD because it
+  carries the highest convergence/salience/KP-count and then fit the steps onto
+  it. The roles (steps 1–2) and the rupture-filter (2b) choose the candidates;
+  scores and BNN only pick the day among the *survivors*. An AD whose lord holds
+  NO 7th-role does not beat a role-carrying AD (e.g. Lagna-lord + Rāśi-lord)
+  merely by out-scoring it. *(Verified miss: a "highest-convergence" Moon-AD was
+  chosen over the role-carrying Mars-AD; the wedding was in the Mars-AD.)*
+- **G2 · Run 2b on ALL competing ADs side-by-side** — not only the early windows.
+  Report each candidate's LOSS/BREAK count; a clean fulfilment-lit AD beats a
+  rupture-flagged one.
+- **G3 · A transit spanning more than one candidate AD cannot tie-break between
+  them.** A year-long Jupiter stay / double-transit covering both candidates is
+  no reason to prefer either — never cite it as the discriminator.
+- **G4 · Compare BNN degree-locks ACROSS all surviving ADs**, never only inside a
+  pre-chosen band (anchoring): the whole-span strongest lock inside a surviving
+  AD is the day-anchor.
+- **G5 · KP-count is for the promise (step 0) and indirect-contender
+  disambiguation (step 2)** — never a ranking metric for picking the date.
+
+**AUDIT-TRAIL OUTPUT (the presentation shape to keep):** 1) Chart Evidence →
+2) Promise & Tempo → 3) Candidate scan as a **table of ALL candidate ADs**
+(window · 7th-role or "none" · rupture-flag · keep/reject **with the reason**) →
+4) Pinpoint (PD + BNN locks compared across survivors) → 5) Core Synthesis (one
+committed window + quality + confidence + which steps converged). Every rejected
+AD's rejection must be stated, never silent.
+
 ### 4D. Convergence, Ranking & Falsification
 Count how many independent systems converged per theme; **rank**; the call is the
 top-ranked theme. Actively seek contradicting signatures; if strong methods
