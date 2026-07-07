@@ -11,6 +11,34 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-06 — Materialised-vs-broke AD filter (rupture ≠ no-marriage; divorce-bound marriages carry a break-signature)
+
+- **Change (PROMPT-LAYER):** Added STEP 2b to the marriage-timing method
+  (CHAT_NARRATOR + AI_TRIANGULATION §4C-bis). When several ADs "hit" (talks/
+  proposals come in all), pick the CONVERTING one via the rupture/negation check
+  (reversal_map): a window with NO marriage-fulfilment (2/7/11) but only
+  separative 6/8/12 = a BROKEN engagement → reject; a window WITH marriage-
+  fulfilment = a marriage happened, and a CO-OCCURRING rupture/separative
+  signature does NOT reject it — it means the marriage is DIVORCE-BOUND/troubled
+  (the seed of separation is present at the wedding). Reject only PURE rupture
+  WITHOUT fulfilment.
+- **Why:** A naive "reject any LOSS/BREAK window" filter would throw away exactly
+  the divorce-bound marriages (which materialise WITH a break-signature — e.g. the
+  Rāhu/Ketu-PD weddings of the two divorce-followed sample charts). Research (KP)
+  confirms: broken engagement = separative houses active but marriage NOT delivered
+  in a favourable dasha; divorce = marriage DID occur (2/7/11 delivered) with
+  separative signatures present. This is the §4B CHANGE/UPGRADE-vs-LOSS/BREAK
+  fulfilment-co-occurrence test, applied to choose the converting AD.
+- **Source:** KP marriage/divorce doctrine — 6 (=12th-from-7th) separation, 8/12
+  loss; broken-engagement vs divorce distinction (jagannathhora.com, redastrologer,
+  AstroSage KP). General; no native/date hard-coded.
+- **Validation:** on Chart-2 (married 29-Jan-2024) the reversal read flagged the
+  high-BNN Saturn-AD (2022-23) as LOSS/BREAK with fulfilment≈1 (a rishtā that
+  broke — correcting an earlier wrong 2022-23 guess), while the clean, fulfilment-
+  lit Mercury-AD (7th-lord, 2024) carried the actual marriage.
+- **Failure-mode:** DISCRIMINATION — separating a materialised marriage (incl.
+  divorce-bound) from a broken engagement among competing dasha windows.
+
 ## 2026-07-06 — Fold the canonical marriage-timing algorithm + AGE-based scan range
 
 - **Change (INTERPRETATION + APP wiring, no engine-rule change):**

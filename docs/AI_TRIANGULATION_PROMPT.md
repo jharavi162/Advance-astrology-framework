@@ -491,6 +491,20 @@ recipe):**
    (7th-occupant/lord/cusp-sub-lord) delivers even when it KP-signifies negation
    (the MD owns the promise) — do NOT filter it out (cross-checked: the male's
    real marriage-AD Mars = Lagna-lord signifies no 2/7/11 yet delivered).
+2b. **MATERIALISED-vs-BROKE filter (when several ADs "hit"):** proposals/talks
+   come in ALL the hit-ADs; only one converts. For each candidate AD run the
+   rupture/negation check (`reversal_map`): **(i)** marriage-fulfilment (2/7/11
+   lit + a BNN lock) ABSENT while only separative 6/8/12 fire → a **broken
+   engagement** → reject that AD (a high-BNN window the reversal read flags
+   LOSS/BREAK with fulfilment≈0 is a rishtā that broke, not the wedding);
+   **(ii)** marriage-fulfilment PRESENT → a marriage DID happen there, and a
+   co-occurring separative/rupture signature is **NOT** a rejection — it means the
+   marriage is **divorce-bound / troubled** (the seed of separation sits at the
+   wedding itself, e.g. a Rāhu/Ketu-PD wedding — as in the two divorce-followed
+   sample charts). **Never reject a fulfilment-lit window merely for carrying a
+   break-signature; reject only PURE rupture WITHOUT fulfilment.** (This is the
+   same CHANGE/UPGRADE-vs-LOSS/BREAK fulfilment-co-occurrence test as §4B, applied
+   to pick the converting AD.)
 3. **PD:** priority by 7th-role, **but a separative-node pratyantara (Rāhu/Ketu)
    very often triggers the actual event** — seen repeatedly; don't dismiss it.
    Pick the PD by BNN (highest degree-lock). The **Jupiter+Saturn double-transit
