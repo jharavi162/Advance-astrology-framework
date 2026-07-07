@@ -442,6 +442,31 @@ when that is exactly where the event occurred.** Follow it in order:
    adjacent benefic sub-period is where the same event would have fallen had the
    union been karmically clean.
 
+   **Node-sub-period doctrine — the inference runs ONE WAY only.** (a) A
+   Rāhu/Ketu sub-period needs **no in-window rupture-flag and no KP-fulfilment
+   count** to be eligible to marry: the **standing** break-prone theme alone
+   (nodes/Saturn gripping the 7th or the UL, Kuja doṣa, an afflicted kāraka)
+   already elects the separative sub-lord as the carrier — demanding that the
+   reversal map also flag LOSS/BREAK *inside the wedding window itself* is a
+   verified wrong-date error (the rupture is timed as its OWN event, later).
+   (b) Direction: **standing separation-markers ⇒ expect the first marriage
+   under separative influence** (classically Rāhu and/or Mars jointly touching
+   the window — daśā lords or gochara); the converse is FALSE — a node-period
+   wedding does **not** imply divorce. (c) A node sub-lord also colours the
+   event's **TYPE**, not only its karma: Rāhu is the **mleccha-kāraka** (BPHS
+   graha-guṇa; R.G. Rao: Rāhu = foreign/sudden/māyā), so a Rāhu-carried
+   marriage leans **unconventional — inter-community/inter-caste, love or
+   self-arranged, court/secret, or foreign-linked** — and in KP the node is the
+   *strongest agent* of its star-lord/sign-lord (nodes routinely deliver
+   marriage as agents of 2/7/11 with no break implied at all when the standing
+   theme is clean). (d) The BNN **natal-degree stamp (Śukra≈Guru on the natal
+   degree) is a WEIGHT among competing locks, never a gate**: a theme-matched
+   separative sub-period whose day carries the **spouse/gender-kāraka
+   degree-lock + Śukra-golden + Guru-jeeva contact** stands on its own even
+   when the natal-stamp day lies in a different sub-period — rank locks by
+   theme-match first, stamp second. These are dynamic patterns under active
+   collection — read them as weights to converge, never as rigid vetoes.
+
 4. **BNN degree-locks the exact day** inside that chosen sub-period — and the
    confirmation is that the **SAME significator planets trine/contact** on that
    day: the kāraka on its own natal degree, Guru-jeeva in golden 1-5-9 to the
@@ -528,7 +553,18 @@ recipe):**
    Pick the PD by BNN (highest degree-lock). The **Jupiter+Saturn double-transit
    is a CONFIRMING bonus, NOT a required gate** — marriages fire without it, so
    never push the date later merely to catch one. (This supersedes any earlier
-   reading of §4C-6 as a hard "decisive" gate.)
+   reading of §4C-6 as a hard "decisive" gate.) A **node PD needs no
+   in-window rupture-flag and no KP-fulfilment count to qualify** — the standing
+   break-prone theme alone elects it (see the node-sub-period doctrine in
+   §4C-bis step 3), it colours the TYPE (unconventional/inter-community/love/
+   foreign — Rāhu the mleccha-kāraka), and when the daśā-side (e.g. a Mars AD ×
+   node PD) and the gochara-side (nodes on the spouse-kāraka's sign / the
+   UL-axis) show **Rāhu and Mars jointly touching the same window**, that joint
+   influence is itself a classical first-marriage signature of a
+   separation-marked chart — a positive vote FOR that window, never against it.
+   Test the double-transit **on the UL sign too**, not only the 7th and its
+   lord (a joint Jupiter+Saturn dṛṣṭi on the Upapada is a full marriage
+   sanction even when the 7th itself is untouched).
 4. **Sūkṣma:** the BNN degree-lock (Jupiter-jeeva + the spouse/gender kāraka's own
    natal-degree return) fixes the exact day inside the chosen PD.
 
