@@ -11,6 +11,46 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-07 — Three day-level hands wired into `day_convergence` (user-approved): Moon-spouse · pair-yuti · lagnesh-return
+
+- **Change (CODE, `interpreter/event_evidence.py::day_convergence`):** three new
+  independent day-methods, all domain-general (read the profile's kārakas /
+  the Lagna-lord — never a native):
+  1. **Moon-spouse** — transit Moon golden (conj/1-5-9) **and degree-locked**
+     onto the gender/descriptor kāraka's NATAL degree (♀: Moon on natal Mars;
+     ♂: on natal Venus). Dormant when descriptor == event-kāraka.
+  2. **pair-yuti** — the event-kāraka and the descriptor kāraka **conjunct in
+     transit (≤3° nāḍī orb)** while either holds a golden tie to the natal
+     event-kāraka — the union-pair standing together in the sky. Dormant when
+     the two coincide.
+  3. **lagnesh-return** — the **Lagna-lord transiting its own natal degree**
+     (conj/trine/opp, nāḍī same-degree orb) — the self's day-stamp; covers
+     luminary/Mercury lagneshas the marital-planet deg-return misses.
+  Docstring also fixes the reading contract: days are sampled at 00:00, so a
+  fast-Moon lock can surface on the ±1 neighbour — read a day-CLUSTER.
+- **Why (found on a verified chart, rule stated generally):** on a verified
+  wedding day the scanner registered only 2 methods (deg-return + dṛṣṭi) and
+  the day fell out of the ranking, because the Moon stood degree-locked on the
+  spouse-kāraka (with a node co-present, in the 7th-from-Moon), the
+  Venus↔Mars transit yuti sat in the Arudha-Lagna golden-trine to the natal
+  kāraka, and the Lagna-lord was in exact natal-degree return — three real
+  hands the scanner had no method for. With them wired the band lights at 5
+  methods. No native date is encoded anywhere; the methods are predicates.
+- **Source:** BNN Moon day-hand (R.G. Rao; `docs/knowledge/bnn/01_timing_method.md`)
+  × Rao's husband-from-Mars (♀); Rao's Venus↔Mars union-axis geometry
+  (`02_marriage.md`); BNN "a planet transiting its own natal degree — give
+  much importance", applied to the self-lord. Muhūrta corroboration: the
+  Moon is the classical day-chooser (chandra-bala).
+- **Failure-mode addressed:** COVERAGE at the DAY layer (computed-but-unread
+  hands). Regression tests (property-based, no native event dates):
+  `test_day_convergence_moon_spouse_and_pair_yuti_fire_by_their_predicates`,
+  `test_day_convergence_lagnesh_return_stamps_the_self_lord`; existing
+  day-convergence test updated for the 3..8 method bound. Day-methods are
+  scanner predicates, not panel witnesses — per existing convention they are
+  not COVERAGE-matrix rows (the matrix tracks the window-level panel).
+
+---
+
 ## 2026-07-07 — The 4C-bis step-order declared the ARCHETYPE for every domain (multi-POV everywhere)
 
 - **Change (PROMPT-LAYER only):** Added a block before the canonical marriage
