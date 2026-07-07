@@ -1,0 +1,3993 @@
+{
+  "aggregate": {
+    "n_people": 50,
+    "node_frequency": [
+      {
+        "node": "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "count": 49,
+        "pct": 98.0
+      },
+      {
+        "node": "da\u015b\u0101[ashtottari]: significator running",
+        "count": 49,
+        "pct": 98.0
+      },
+      {
+        "node": "da\u015b\u0101[sudas\u0101]: significator running",
+        "count": 49,
+        "pct": 98.0
+      },
+      {
+        "node": "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "count": 48,
+        "pct": 96.0
+      },
+      {
+        "node": "da\u015b\u0101[mudd\u0101]: significator running",
+        "count": 48,
+        "pct": 96.0
+      },
+      {
+        "node": "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "count": 48,
+        "pct": 96.0
+      },
+      {
+        "node": "da\u015b\u0101[yogini]: significator running",
+        "count": 47,
+        "pct": 94.0
+      },
+      {
+        "node": "da\u015b\u0101[chara]: significator running",
+        "count": 47,
+        "pct": 94.0
+      },
+      {
+        "node": "KP transit: slow planet in significator's star",
+        "count": 46,
+        "pct": 92.0
+      },
+      {
+        "node": "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "count": 45,
+        "pct": 90.0
+      },
+      {
+        "node": "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "count": 43,
+        "pct": 86.0
+      },
+      {
+        "node": "Kak\u1e63y\u0101 window",
+        "count": 39,
+        "pct": 78.0
+      },
+      {
+        "node": "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "count": 31,
+        "pct": 62.0
+      },
+      {
+        "node": "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "count": 30,
+        "pct": 60.0
+      },
+      {
+        "node": "Lagna materialization",
+        "count": 29,
+        "pct": 58.0
+      },
+      {
+        "node": "KP fulfilment \u2265 negation",
+        "count": 28,
+        "pct": 56.0
+      },
+      {
+        "node": "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "count": 26,
+        "pct": 52.0
+      },
+      {
+        "node": "nadi: \u015aani karma-sanction (BNN)",
+        "count": 26,
+        "pct": 52.0
+      },
+      {
+        "node": "fulfilment-houses double-transit (+lords)",
+        "count": 18,
+        "pct": 36.0
+      },
+      {
+        "node": "Lagne\u015ba in da\u015b\u0101",
+        "count": 15,
+        "pct": 30.0
+      },
+      {
+        "node": "Sudar\u015bana wheel",
+        "count": 13,
+        "pct": 26.0
+      },
+      {
+        "node": "double-transit (house/lord)",
+        "count": 12,
+        "pct": 24.0
+      },
+      {
+        "node": "gochara from Moon (Chandra-lagna double-transit)",
+        "count": 8,
+        "pct": 16.0
+      },
+      {
+        "node": "Var\u1e63aphal Muntha",
+        "count": 7,
+        "pct": 14.0
+      },
+      {
+        "node": "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "count": 6,
+        "pct": 12.0
+      },
+      {
+        "node": "Sade-Sati / Ka\u1e47\u1e6daka (Saturn-from-Moon)",
+        "count": 5,
+        "pct": 10.0
+      },
+      {
+        "node": "domain Saham double-transit",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "node": "BNN degree-trigger",
+        "count": 1,
+        "pct": 2.0
+      }
+    ],
+    "field_frequency": [
+      {
+        "field": "arudha_axis",
+        "count": 48,
+        "pct": 96.0
+      },
+      {
+        "field": "kp_star_transit",
+        "count": 46,
+        "pct": 92.0
+      },
+      {
+        "field": "kakshya",
+        "count": 39,
+        "pct": 78.0
+      },
+      {
+        "field": "bb_active",
+        "count": 31,
+        "pct": 62.0
+      },
+      {
+        "field": "karaka_in_chain",
+        "count": 30,
+        "pct": 60.0
+      },
+      {
+        "field": "nadi_karma",
+        "count": 26,
+        "pct": 52.0
+      },
+      {
+        "field": "karaka_sukshma",
+        "count": 26,
+        "pct": 52.0
+      },
+      {
+        "field": "fulfil_house_dt",
+        "count": 18,
+        "pct": 36.0
+      },
+      {
+        "field": "lagnesh_in_chain",
+        "count": 15,
+        "pct": 30.0
+      },
+      {
+        "field": "sudarshana_hit",
+        "count": 13,
+        "pct": 26.0
+      },
+      {
+        "field": "gochara_from_moon",
+        "count": 8,
+        "pct": 16.0
+      },
+      {
+        "field": "varshaphal_muntha",
+        "count": 7,
+        "pct": 14.0
+      },
+      {
+        "field": "house_double_transit",
+        "count": 6,
+        "pct": 12.0
+      },
+      {
+        "field": "nadi_jeeva",
+        "count": 6,
+        "pct": 12.0
+      },
+      {
+        "field": "lord_double_transit",
+        "count": 6,
+        "pct": 12.0
+      },
+      {
+        "field": "sade_sati",
+        "count": 5,
+        "pct": 10.0
+      },
+      {
+        "field": "saham_double_transit",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "field": "bnn",
+        "count": 1,
+        "pct": 2.0
+      }
+    ],
+    "dasha_signifies_marriage_pct": 88.0,
+    "kp_fulfil_ge_negate_pct": 56.0
+  },
+  "results": [
+    {
+      "name": "Barack Obama",
+      "rating": "AA",
+      "marriage": "1992-10-03",
+      "lagna": "Capricorn",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Moon",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Venus",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Venus": [
+          "5L",
+          "10L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Mercury": [
+          "6L",
+          "9L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 2,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Virgo",
+      "transit_saturn_sign": "Capricorn",
+      "seventh_sign": "Cancer",
+      "upapada_sign": "Aquarius",
+      "standing_balance": 0.58,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 13,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)",
+          "Saturn(in)"
+        ]
+      }
+    },
+    {
+      "name": "Donald Trump",
+      "rating": "AA",
+      "marriage": "2005-01-22",
+      "lagna": "Leo",
+      "lagnesh": "Sun",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Saturn",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Saturn": [
+          "6L",
+          "7L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Venus": [
+          "3L",
+          "10L",
+          "Venus/kalatra-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 5,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Virgo",
+      "transit_saturn_sign": "Gemini",
+      "seventh_sign": "Aquarius",
+      "upapada_sign": "Pisces",
+      "standing_balance": -2.62,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "King Charles III",
+      "rating": "AA",
+      "marriage": "1981-07-29",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Moon",
+        "Jupiter",
+        "Ketu"
+      ],
+      "dasha_roles": {
+        "Moon": [
+          "1L"
+        ],
+        "Jupiter": [
+          "6L",
+          "9L",
+          "Jupiter/j\u012bva",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 1,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Virgo",
+      "transit_saturn_sign": "Virgo",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Aquarius",
+      "standing_balance": -1.86,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 13,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Queen Elizabeth II",
+      "rating": "AA",
+      "marriage": "1947-11-20",
+      "lagna": "Sagittarius",
+      "lagnesh": "Jupiter",
+      "seventh_lord": "Mercury",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Venus",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "6L",
+          "11L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Moon": [
+          "8L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 2,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Scorpio",
+      "transit_saturn_sign": "Cancer",
+      "seventh_sign": "Gemini",
+      "upapada_sign": "Pisces",
+      "standing_balance": -4.42,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sade-Sati / Ka\u1e47\u1e6daka (Saturn-from-Moon)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 15,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": true,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Angelina Jolie",
+      "rating": "AA",
+      "marriage": "2014-08-23",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Venus",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Ketu",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "4L",
+          "11L",
+          "Venus/kalatra-k\u0101raka",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 0,
+      "transit_jupiter_sign": "Cancer",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Aries",
+      "standing_balance": -2.65,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "domain Saham double-transit",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 19,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": true,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(in)",
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "George Clooney",
+      "rating": "AA",
+      "marriage": "2014-09-27",
+      "lagna": "Capricorn",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Moon",
+      "darakaraka": "Moon",
+      "dasha_MD_AD_PD": [
+        "Jupiter",
+        "Rahu",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Jupiter": [
+          "3L",
+          "12L",
+          "Jupiter/j\u012bva"
+        ],
+        "Rahu": [],
+        "Moon": [
+          "7L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 5,
+      "kp_negate": 1,
+      "transit_jupiter_sign": "Cancer",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Cancer",
+      "upapada_sign": "Aquarius",
+      "standing_balance": -1.01,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running"
+      ],
+      "n_firing": 18,
+      "fields": {
+        "house_double_transit": true,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": true,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Marilyn Monroe",
+      "rating": "AA",
+      "marriage": "1956-06-29",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Jupiter",
+        "Mercury",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Jupiter": [
+          "6L",
+          "9L",
+          "Jupiter/j\u012bva",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Mercury": [
+          "3L",
+          "12L"
+        ],
+        "Saturn": [
+          "7L",
+          "8L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Leo",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Aries",
+      "standing_balance": 0.52,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "Sudar\u015bana wheel",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 18,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": true,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": true,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Grace Kelly",
+      "rating": "AA",
+      "marriage": "1956-04-19",
+      "lagna": "Libra",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Mars",
+      "dasha_MD_AD_PD": [
+        "Mercury",
+        "Mercury",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Mercury": [
+          "9L",
+          "12L"
+        ],
+        "Saturn": [
+          "4L",
+          "5L"
+        ]
+      },
+      "dasha_signifies_marriage": false,
+      "kp_fulfil": 3,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Cancer",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Aries",
+      "upapada_sign": "Scorpio",
+      "standing_balance": -1.39,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 19,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": true,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Whitney Houston",
+      "rating": "AA",
+      "marriage": "1992-07-18",
+      "lagna": "Aquarius",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Sun",
+      "darakaraka": "Rahu",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Saturn",
+        "Ketu"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "4L",
+          "9L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Saturn": [
+          "1L",
+          "12L"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Leo",
+      "transit_saturn_sign": "Capricorn",
+      "seventh_sign": "Leo",
+      "upapada_sign": "Libra",
+      "standing_balance": 0.82,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "KP fulfilment \u2265 negation",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 16,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Muhammad Ali",
+      "rating": "AA",
+      "marriage": "1986-11-19",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Sun",
+      "dasha_MD_AD_PD": [
+        "Saturn",
+        "Saturn",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Saturn": [
+          "7L",
+          "8L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 6,
+      "kp_negate": 6,
+      "transit_jupiter_sign": "Aquarius",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Leo",
+      "standing_balance": 0.14,
+      "firing_nodes": [
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 16,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Steve Jobs",
+      "rating": "AA",
+      "marriage": "1991-03-18",
+      "lagna": "Leo",
+      "lagnesh": "Sun",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Mars",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Rahu",
+        "Ketu"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "3L",
+          "10L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Rahu": [],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 0,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Cancer",
+      "transit_saturn_sign": "Capricorn",
+      "seventh_sign": "Aquarius",
+      "upapada_sign": "Scorpio",
+      "standing_balance": -1.36,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 14,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Madonna",
+      "rating": "AA",
+      "marriage": "2000-12-22",
+      "lagna": "Leo",
+      "lagnesh": "Sun",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Saturn",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Saturn": [
+          "6L",
+          "7L"
+        ],
+        "Moon": [
+          "12L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 5,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Taurus",
+      "seventh_sign": "Aquarius",
+      "upapada_sign": "Virgo",
+      "standing_balance": 0.02,
+      "firing_nodes": [
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "Sudar\u015bana wheel",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": true,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": true,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Robert De Niro",
+      "rating": "AA",
+      "marriage": "1997-06-17",
+      "lagna": "Gemini",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Sun",
+      "dasha_MD_AD_PD": [
+        "Ketu",
+        "Rahu",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Ketu": [],
+        "Rahu": [],
+        "Saturn": [
+          "8L",
+          "9L"
+        ]
+      },
+      "dasha_signifies_marriage": false,
+      "kp_fulfil": 3,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Capricorn",
+      "transit_saturn_sign": "Pisces",
+      "seventh_sign": "Sagittarius",
+      "upapada_sign": "Leo",
+      "standing_balance": -1.2,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "Sade-Sati / Ka\u1e47\u1e6daka (Saturn-from-Moon)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 18,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": true,
+        "bb_active": true,
+        "sade_sati": true,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Clint Eastwood",
+      "rating": "AA",
+      "marriage": "1996-03-31",
+      "lagna": "Libra",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Mercury",
+      "dasha_MD_AD_PD": [
+        "Moon",
+        "Saturn",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Moon": [
+          "10L"
+        ],
+        "Saturn": [
+          "4L",
+          "5L"
+        ],
+        "Mercury": [
+          "9L",
+          "12L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Sagittarius",
+      "transit_saturn_sign": "Pisces",
+      "seventh_sign": "Aries",
+      "upapada_sign": "Capricorn",
+      "standing_balance": -0.18,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "KP fulfilment \u2265 negation",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 14,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": false,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": true,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Michael Douglas",
+      "rating": "AA",
+      "marriage": "2000-11-18",
+      "lagna": "Libra",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Venus",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Venus",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Venus": [
+          "1L",
+          "8L",
+          "Venus/kalatra-k\u0101raka",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 6,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Taurus",
+      "seventh_sign": "Aries",
+      "upapada_sign": "Cancer",
+      "standing_balance": 0.02,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "KP fulfilment \u2265 negation",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Sylvester Stallone",
+      "rating": "AA",
+      "marriage": "1997-05-17",
+      "lagna": "Sagittarius",
+      "lagnesh": "Jupiter",
+      "seventh_lord": "Mercury",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Saturn",
+        "Mars",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Saturn": [
+          "2L",
+          "3L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Mars": [
+          "5L",
+          "12L"
+        ],
+        "Mercury": [
+          "7L",
+          "10L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Capricorn",
+      "transit_saturn_sign": "Pisces",
+      "seventh_sign": "Gemini",
+      "upapada_sign": "Aquarius",
+      "standing_balance": -2.38,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Julia Roberts",
+      "rating": "AA",
+      "marriage": "2002-07-04",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Moon",
+      "dasha_MD_AD_PD": [
+        "Moon",
+        "Rahu",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Moon": [
+          "1L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Rahu": [],
+        "Venus": [
+          "4L",
+          "11L",
+          "Venus/kalatra-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 1,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Gemini",
+      "transit_saturn_sign": "Taurus",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Aquarius",
+      "standing_balance": -1.17,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "Lagna materialization",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 19,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Tom Hanks",
+      "rating": "AA",
+      "marriage": "1988-04-30",
+      "lagna": "Leo",
+      "lagnesh": "Sun",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Rahu",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "3L",
+          "10L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Rahu": [],
+        "Jupiter": [
+          "5L",
+          "8L",
+          "Jupiter/j\u012bva"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 1,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Aries",
+      "transit_saturn_sign": "Sagittarius",
+      "seventh_sign": "Aquarius",
+      "upapada_sign": "Aries",
+      "standing_balance": -2.73,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 13,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Denzel Washington",
+      "rating": "AA",
+      "marriage": "1983-06-25",
+      "lagna": "Virgo",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Moon",
+        "Rahu"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Moon": [
+          "11L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 1,
+      "kp_negate": 0,
+      "transit_jupiter_sign": "Scorpio",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Pisces",
+      "upapada_sign": "Aries",
+      "standing_balance": -0.17,
+      "firing_nodes": [
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 18,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": true,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Jane Fonda",
+      "rating": "AA",
+      "marriage": "1991-12-21",
+      "lagna": "Capricorn",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Moon",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Jupiter",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Jupiter": [
+          "3L",
+          "12L",
+          "Jupiter/j\u012bva"
+        ]
+      },
+      "dasha_signifies_marriage": false,
+      "kp_fulfil": 3,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Leo",
+      "transit_saturn_sign": "Capricorn",
+      "seventh_sign": "Cancer",
+      "upapada_sign": "Aquarius",
+      "standing_balance": 0.96,
+      "firing_nodes": [
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 15,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": true,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(in)"
+        ]
+      }
+    },
+    {
+      "name": "Meryl Streep",
+      "rating": "AA",
+      "marriage": "1978-09-30",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Rahu",
+      "dasha_MD_AD_PD": [
+        "Mars",
+        "Venus",
+        "Sun"
+      ],
+      "dasha_roles": {
+        "Mars": [
+          "5L",
+          "10L"
+        ],
+        "Venus": [
+          "4L",
+          "11L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Sun": [
+          "2L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Cancer",
+      "transit_saturn_sign": "Leo",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Aries",
+      "standing_balance": -1.15,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 14,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(in)"
+        ]
+      }
+    },
+    {
+      "name": "Harrison Ford",
+      "rating": "AA",
+      "marriage": "2010-06-15",
+      "lagna": "Virgo",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Mercury",
+      "dasha_MD_AD_PD": [
+        "Sun",
+        "Moon",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Sun": [
+          "12L"
+        ],
+        "Moon": [
+          "11L"
+        ],
+        "Saturn": [
+          "5L",
+          "6L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Pisces",
+      "transit_saturn_sign": "Virgo",
+      "seventh_sign": "Pisces",
+      "upapada_sign": "Aries",
+      "standing_balance": 1.08,
+      "firing_nodes": [
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "domain Saham double-transit",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 18,
+      "fields": {
+        "house_double_transit": true,
+        "lord_double_transit": false,
+        "saham_double_transit": true,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)",
+          "Saturn(in)"
+        ]
+      }
+    },
+    {
+      "name": "Paul Newman",
+      "rating": "AA",
+      "marriage": "1958-01-29",
+      "lagna": "Sagittarius",
+      "lagnesh": "Jupiter",
+      "seventh_lord": "Mercury",
+      "darakaraka": "Mars",
+      "dasha_MD_AD_PD": [
+        "Saturn",
+        "Saturn",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Saturn": [
+          "2L",
+          "3L"
+        ],
+        "Moon": [
+          "8L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Libra",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Gemini",
+      "upapada_sign": "Virgo",
+      "standing_balance": -0.68,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 15,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Joanne Woodward",
+      "rating": "AA",
+      "marriage": "1958-01-29",
+      "lagna": "Sagittarius",
+      "lagnesh": "Jupiter",
+      "seventh_lord": "Mercury",
+      "darakaraka": "Moon",
+      "dasha_MD_AD_PD": [
+        "Jupiter",
+        "Ketu",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Jupiter": [
+          "1L",
+          "4L",
+          "Jupiter/j\u012bva"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": false,
+      "kp_fulfil": 2,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Libra",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Gemini",
+      "upapada_sign": "Pisces",
+      "standing_balance": -5.35,
+      "firing_nodes": [
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 12,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Sean Connery",
+      "rating": "AA",
+      "marriage": "1975-05-06",
+      "lagna": "Sagittarius",
+      "lagnesh": "Jupiter",
+      "seventh_lord": "Mercury",
+      "darakaraka": "Moon",
+      "dasha_MD_AD_PD": [
+        "Jupiter",
+        "Mercury",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Jupiter": [
+          "1L",
+          "4L",
+          "Jupiter/j\u012bva"
+        ],
+        "Mercury": [
+          "7L",
+          "10L"
+        ],
+        "Moon": [
+          "8L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 1,
+      "transit_jupiter_sign": "Pisces",
+      "transit_saturn_sign": "Gemini",
+      "seventh_sign": "Gemini",
+      "upapada_sign": "Capricorn",
+      "standing_balance": 0.34,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "KP fulfilment \u2265 negation",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 19,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Ben Affleck",
+      "rating": "AA",
+      "marriage": "2005-06-29",
+      "lagna": "Gemini",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Saturn",
+        "Mercury",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Saturn": [
+          "8L",
+          "9L"
+        ],
+        "Mercury": [
+          "1L",
+          "4L"
+        ],
+        "Jupiter": [
+          "7L",
+          "10L",
+          "Jupiter/j\u012bva",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Virgo",
+      "transit_saturn_sign": "Cancer",
+      "seventh_sign": "Sagittarius",
+      "upapada_sign": "Cancer",
+      "standing_balance": 3.6,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 16,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Barbra Streisand",
+      "rating": "AA",
+      "marriage": "1998-07-01",
+      "lagna": "Pisces",
+      "lagnesh": "Jupiter",
+      "seventh_lord": "Mercury",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Moon",
+        "Ketu",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Moon": [
+          "5L"
+        ],
+        "Ketu": [],
+        "Venus": [
+          "3L",
+          "8L",
+          "Venus/kalatra-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 1,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Pisces",
+      "transit_saturn_sign": "Aries",
+      "seventh_sign": "Virgo",
+      "upapada_sign": "Taurus",
+      "standing_balance": -4.33,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 13,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(in)"
+        ]
+      }
+    },
+    {
+      "name": "Cindy Crawford",
+      "rating": "AA",
+      "marriage": "1998-05-29",
+      "lagna": "Gemini",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Venus",
+      "dasha_MD_AD_PD": [
+        "Saturn",
+        "Ketu",
+        "Rahu"
+      ],
+      "dasha_roles": {
+        "Saturn": [
+          "8L",
+          "9L"
+        ],
+        "Ketu": [],
+        "Rahu": []
+      },
+      "dasha_signifies_marriage": false,
+      "kp_fulfil": 2,
+      "kp_negate": 1,
+      "transit_jupiter_sign": "Pisces",
+      "transit_saturn_sign": "Aries",
+      "seventh_sign": "Sagittarius",
+      "upapada_sign": "Virgo",
+      "standing_balance": -0.62,
+      "firing_nodes": [
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 16,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Kevin Costner",
+      "rating": "AA",
+      "marriage": "2004-09-25",
+      "lagna": "Virgo",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Mercury",
+        "Rahu"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "2L",
+          "9L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Mercury": [
+          "1L",
+          "10L"
+        ],
+        "Rahu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Virgo",
+      "transit_saturn_sign": "Cancer",
+      "seventh_sign": "Pisces",
+      "upapada_sign": "Gemini",
+      "standing_balance": 0.28,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Jupiter(in)",
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Elvis Presley",
+      "rating": "AA",
+      "marriage": "1967-05-01",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Saturn",
+        "Saturn",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Saturn": [
+          "3L",
+          "4L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ],
+        "Venus": [
+          "7L",
+          "12L",
+          "Venus/kalatra-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 6,
+      "transit_jupiter_sign": "Cancer",
+      "transit_saturn_sign": "Pisces",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Capricorn",
+      "standing_balance": -0.76,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sade-Sati / Ka\u1e47\u1e6daka (Saturn-from-Moon)",
+        "Lagna materialization",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 15,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": true,
+        "kp_star_transit": false,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Brigitte Bardot",
+      "rating": "AA",
+      "marriage": "1952-12-20",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Mercury",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Mercury",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Mercury": [
+          "8L",
+          "11L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 1,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Aries",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Gemini",
+      "standing_balance": -0.98,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "Sudar\u015bana wheel",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": true,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Michelle Pfeiffer",
+      "rating": "AA",
+      "marriage": "1993-11-13",
+      "lagna": "Taurus",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Venus",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Jupiter",
+        "Mars"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Jupiter": [
+          "8L",
+          "11L",
+          "Jupiter/j\u012bva"
+        ],
+        "Mars": [
+          "7L",
+          "12L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Libra",
+      "transit_saturn_sign": "Aquarius",
+      "seventh_sign": "Scorpio",
+      "upapada_sign": "Sagittarius",
+      "standing_balance": -0.19,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": true,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Maria Shriver",
+      "rating": "AA",
+      "marriage": "1986-04-26",
+      "lagna": "Taurus",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Rahu",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Jupiter",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "1L",
+          "6L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Jupiter": [
+          "8L",
+          "11L",
+          "Jupiter/j\u012bva"
+        ],
+        "Moon": [
+          "3L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Aquarius",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Scorpio",
+      "upapada_sign": "Aquarius",
+      "standing_balance": -1.89,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "Lagna materialization",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 19,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Justin Timberlake",
+      "rating": "AA",
+      "marriage": "2012-10-19",
+      "lagna": "Leo",
+      "lagnesh": "Sun",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Moon",
+      "dasha_MD_AD_PD": [
+        "Sun",
+        "Venus",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Sun": [
+          "1L"
+        ],
+        "Venus": [
+          "3L",
+          "10L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Moon": [
+          "12L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 2,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Aquarius",
+      "upapada_sign": "Taurus",
+      "standing_balance": -2.01,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 15,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Jessica Biel",
+      "rating": "AA",
+      "marriage": "2012-10-19",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Rahu",
+      "dasha_MD_AD_PD": [
+        "Jupiter",
+        "Mercury",
+        "Moon"
+      ],
+      "dasha_roles": {
+        "Jupiter": [
+          "2L",
+          "5L",
+          "Jupiter/j\u012bva"
+        ],
+        "Mercury": [
+          "8L",
+          "11L"
+        ],
+        "Moon": [
+          "9L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 5,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Capricorn",
+      "standing_balance": 0.7,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Var\u1e63aphal Muntha",
+        "Sudar\u015bana wheel",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": true,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Matt Damon",
+      "rating": "AA",
+      "marriage": "2005-12-09",
+      "lagna": "Capricorn",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Moon",
+      "darakaraka": "Mercury",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Venus",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Venus": [
+          "5L",
+          "10L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Jupiter": [
+          "3L",
+          "12L",
+          "Jupiter/j\u012bva"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 2,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Libra",
+      "transit_saturn_sign": "Cancer",
+      "seventh_sign": "Cancer",
+      "upapada_sign": "Leo",
+      "standing_balance": 0.73,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "fulfilment-houses double-transit (+lords)",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": false,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Gwyneth Paltrow",
+      "rating": "AA",
+      "marriage": "2003-12-05",
+      "lagna": "Aquarius",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Sun",
+      "darakaraka": "Rahu",
+      "dasha_MD_AD_PD": [
+        "Jupiter",
+        "Saturn",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Jupiter": [
+          "2L",
+          "11L",
+          "Jupiter/j\u012bva"
+        ],
+        "Saturn": [
+          "1L",
+          "12L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Leo",
+      "transit_saturn_sign": "Gemini",
+      "seventh_sign": "Leo",
+      "upapada_sign": "Virgo",
+      "standing_balance": -2.02,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Lagne\u015ba in da\u015b\u0101",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sade-Sati / Ka\u1e47\u1e6daka (Saturn-from-Moon)",
+        "Lagna materialization",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 18,
+      "fields": {
+        "house_double_transit": true,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": false,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": true,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "John F. Kennedy",
+      "rating": "A",
+      "marriage": "1953-09-12",
+      "lagna": "Virgo",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Mercury",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Mercury": [
+          "1L",
+          "10L"
+        ],
+        "Jupiter": [
+          "4L",
+          "7L",
+          "Jupiter/j\u012bva",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Gemini",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Pisces",
+      "upapada_sign": "Scorpio",
+      "standing_balance": -1.47,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 20,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": true,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Jacqueline Kennedy",
+      "rating": "A",
+      "marriage": "1953-09-12",
+      "lagna": "Libra",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Mercury",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "1L",
+          "8L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Mercury": [
+          "9L",
+          "12L"
+        ],
+        "Saturn": [
+          "4L",
+          "5L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 5,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Gemini",
+      "transit_saturn_sign": "Libra",
+      "seventh_sign": "Aries",
+      "upapada_sign": "Taurus",
+      "standing_balance": -0.11,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Lagne\u015ba in da\u015b\u0101",
+        "BNN degree-trigger",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "Lagna materialization",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 23,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": true,
+        "nadi_karma": true,
+        "bnn": true,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Jupiter(asp)",
+          "Saturn(in)"
+        ]
+      }
+    },
+    {
+      "name": "Bill Clinton",
+      "rating": "A",
+      "marriage": "1975-10-11",
+      "lagna": "Leo",
+      "lagnesh": "Sun",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Saturn",
+        "Ketu"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Saturn": [
+          "6L",
+          "7L"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Pisces",
+      "transit_saturn_sign": "Cancer",
+      "seventh_sign": "Aquarius",
+      "upapada_sign": "Libra",
+      "standing_balance": -2.08,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sudar\u015bana wheel",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": true,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": true,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Brad Pitt",
+      "rating": "A",
+      "marriage": "2000-07-29",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Venus",
+      "dasha_MD_AD_PD": [
+        "Rahu",
+        "Sun",
+        "Jupiter"
+      ],
+      "dasha_roles": {
+        "Rahu": [],
+        "Sun": [
+          "10L"
+        ],
+        "Jupiter": [
+          "2L",
+          "5L",
+          "Jupiter/j\u012bva"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 2,
+      "kp_negate": 1,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Taurus",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Capricorn",
+      "standing_balance": -0.98,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 16,
+      "fields": {
+        "house_double_transit": true,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)",
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Jennifer Aniston",
+      "rating": "A",
+      "marriage": "2000-07-29",
+      "lagna": "Libra",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Mars",
+      "dasha_MD_AD_PD": [
+        "Sun",
+        "Mercury",
+        "Mars"
+      ],
+      "dasha_roles": {
+        "Sun": [
+          "11L"
+        ],
+        "Mercury": [
+          "9L",
+          "12L"
+        ],
+        "Mars": [
+          "2L",
+          "7L",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 6,
+      "kp_negate": 1,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Taurus",
+      "seventh_sign": "Aries",
+      "upapada_sign": "Taurus",
+      "standing_balance": -1.49,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "fulfilment-houses double-transit (+lords)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 19,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": true,
+        "saham_double_transit": false,
+        "fulfil_house_dt": true,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Arnold Schwarzenegger",
+      "rating": "A",
+      "marriage": "1986-04-26",
+      "lagna": "Gemini",
+      "lagnesh": "Mercury",
+      "seventh_lord": "Jupiter",
+      "darakaraka": "Venus",
+      "dasha_MD_AD_PD": [
+        "Mars",
+        "Rahu",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Mars": [
+          "6L",
+          "11L"
+        ],
+        "Rahu": [],
+        "Venus": [
+          "5L",
+          "12L",
+          "Venus/kalatra-k\u0101raka",
+          "DK/d\u0101r\u0101-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Aquarius",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Sagittarius",
+      "upapada_sign": "Virgo",
+      "standing_balance": -1.97,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Sade-Sati / Ka\u1e47\u1e6daka (Saturn-from-Moon)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 16,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": true,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Elizabeth Taylor",
+      "rating": "A",
+      "marriage": "1964-03-15",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Mercury",
+        "Mercury",
+        "Ketu"
+      ],
+      "dasha_roles": {
+        "Mercury": [
+          "8L",
+          "11L"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Aries",
+      "transit_saturn_sign": "Aquarius",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Leo",
+      "standing_balance": -0.63,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "gochara from Moon (Chandra-lagna double-transit)",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": true,
+        "arudha_axis": true,
+        "nadi_jeeva": true,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Nicole Kidman",
+      "rating": "A",
+      "marriage": "2006-06-25",
+      "lagna": "Libra",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Sun",
+      "dasha_MD_AD_PD": [
+        "Venus",
+        "Ketu",
+        "Saturn"
+      ],
+      "dasha_roles": {
+        "Venus": [
+          "1L",
+          "8L",
+          "Venus/kalatra-k\u0101raka"
+        ],
+        "Ketu": [],
+        "Saturn": [
+          "4L",
+          "5L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 0,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Libra",
+      "transit_saturn_sign": "Cancer",
+      "seventh_sign": "Aries",
+      "upapada_sign": "Sagittarius",
+      "standing_balance": 0.42,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Lagne\u015ba in da\u015b\u0101",
+        "double-transit (house/lord)",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 14,
+      "fields": {
+        "house_double_transit": true,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": false,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": false,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Jupiter(in)"
+        ]
+      }
+    },
+    {
+      "name": "Warren Buffett",
+      "rating": "A",
+      "marriage": "1952-04-19",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Mars",
+      "dasha_MD_AD_PD": [
+        "Mercury",
+        "Saturn",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Mercury": [
+          "8L",
+          "11L"
+        ],
+        "Saturn": [
+          "3L",
+          "4L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 0,
+      "kp_negate": 4,
+      "transit_jupiter_sign": "Aries",
+      "transit_saturn_sign": "Virgo",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Leo",
+      "standing_balance": -0.52,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 15,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Will Smith",
+      "rating": "A",
+      "marriage": "1997-12-31",
+      "lagna": "Taurus",
+      "lagnesh": "Venus",
+      "seventh_lord": "Mars",
+      "darakaraka": "Saturn",
+      "dasha_MD_AD_PD": [
+        "Mercury",
+        "Venus",
+        "Venus"
+      ],
+      "dasha_roles": {
+        "Mercury": [
+          "2L",
+          "5L"
+        ],
+        "Venus": [
+          "1L",
+          "6L",
+          "Venus/kalatra-k\u0101raka"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 4,
+      "kp_negate": 5,
+      "transit_jupiter_sign": "Capricorn",
+      "transit_saturn_sign": "Pisces",
+      "seventh_sign": "Scorpio",
+      "upapada_sign": "Sagittarius",
+      "standing_balance": -2.57,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka in MD>AD>PD",
+        "Lagne\u015ba in da\u015b\u0101",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: Guru-jeeva activates k\u0101raka (BNN)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 17,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": true,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": true,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": true,
+        "lagna_activators": [
+          "Jupiter(asp)",
+          "Saturn(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Demi Moore",
+      "rating": "A",
+      "marriage": "1987-11-21",
+      "lagna": "Aquarius",
+      "lagnesh": "Saturn",
+      "seventh_lord": "Sun",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Mars",
+        "Moon",
+        "Ketu"
+      ],
+      "dasha_roles": {
+        "Mars": [
+          "3L",
+          "10L"
+        ],
+        "Moon": [
+          "6L"
+        ],
+        "Ketu": []
+      },
+      "dasha_signifies_marriage": false,
+      "kp_fulfil": 4,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Pisces",
+      "transit_saturn_sign": "Scorpio",
+      "seventh_sign": "Leo",
+      "upapada_sign": "Libra",
+      "standing_balance": -2.15,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 13,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": false,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": []
+      }
+    },
+    {
+      "name": "Celine Dion",
+      "rating": "A",
+      "marriage": "1994-12-17",
+      "lagna": "Cancer",
+      "lagnesh": "Moon",
+      "seventh_lord": "Saturn",
+      "darakaraka": "Jupiter",
+      "dasha_MD_AD_PD": [
+        "Sun",
+        "Saturn",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Sun": [
+          "2L"
+        ],
+        "Saturn": [
+          "7L",
+          "8L"
+        ],
+        "Mercury": [
+          "3L",
+          "12L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 2,
+      "kp_negate": 3,
+      "transit_jupiter_sign": "Scorpio",
+      "transit_saturn_sign": "Aquarius",
+      "seventh_sign": "Capricorn",
+      "upapada_sign": "Libra",
+      "standing_balance": -0.73,
+      "firing_nodes": [
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "T\u0101jika Var\u1e63e\u015ba/Muntha signifies the matter",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "Bh\u1e5bgu Bindu activation (N\u0101\u1e0d\u012b)",
+        "da\u015b\u0101[yogini]: significator running",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[chara]: significator running",
+        "da\u015b\u0101[n\u0101r\u0101ya\u1e47a]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 14,
+      "fields": {
+        "house_double_transit": false,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": false,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": true,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": false,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)"
+        ]
+      }
+    },
+    {
+      "name": "Catherine Zeta-Jones",
+      "rating": "A",
+      "marriage": "2000-11-18",
+      "lagna": "Scorpio",
+      "lagnesh": "Mars",
+      "seventh_lord": "Venus",
+      "darakaraka": "Rahu",
+      "dasha_MD_AD_PD": [
+        "Mercury",
+        "Saturn",
+        "Mercury"
+      ],
+      "dasha_roles": {
+        "Mercury": [
+          "8L",
+          "11L"
+        ],
+        "Saturn": [
+          "3L",
+          "4L"
+        ]
+      },
+      "dasha_signifies_marriage": true,
+      "kp_fulfil": 3,
+      "kp_negate": 2,
+      "transit_jupiter_sign": "Taurus",
+      "transit_saturn_sign": "Taurus",
+      "seventh_sign": "Taurus",
+      "upapada_sign": "Gemini",
+      "standing_balance": 0.47,
+      "firing_nodes": [
+        "da\u015b\u0101: k\u0101raka at s\u016bk\u1e63ma (micro-trigger)",
+        "KP fulfilment \u2265 negation",
+        "double-transit (house/lord)",
+        "Kak\u1e63y\u0101 window",
+        "Bhinn\u0101\u1e63\u1e6dakavarga delivery (k\u0101raka in bindu-bearing Kak\u1e63y\u0101)",
+        "Lagna materialization",
+        "KP transit: slow planet in significator's star",
+        "da\u015b\u0101-lord functional valence (Laghu P\u0101r\u0101\u015bar\u012b)",
+        "nadi: \u015aani karma-sanction (BNN)",
+        "Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)",
+        "da\u015b\u0101[ashtottari]: significator running",
+        "da\u015b\u0101[mudd\u0101]: significator running",
+        "da\u015b\u0101[sudas\u0101]: significator running"
+      ],
+      "n_firing": 13,
+      "fields": {
+        "house_double_transit": true,
+        "lord_double_transit": false,
+        "saham_double_transit": false,
+        "fulfil_house_dt": false,
+        "gochara_from_moon": false,
+        "arudha_axis": true,
+        "nadi_jeeva": false,
+        "nadi_karma": true,
+        "bnn": false,
+        "kakshya": true,
+        "sudarshana_hit": false,
+        "varshaphal_muntha": false,
+        "bb_active": false,
+        "sade_sati": false,
+        "kp_star_transit": true,
+        "karaka_in_chain": false,
+        "karaka_sukshma": true,
+        "lagnesh_in_chain": false,
+        "lagna_activators": [
+          "Jupiter(asp)",
+          "Saturn(asp)"
+        ]
+      }
+    }
+  ],
+  "failures": []
+}
