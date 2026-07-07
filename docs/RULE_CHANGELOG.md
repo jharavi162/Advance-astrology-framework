@@ -11,6 +11,70 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-07 — The 4C-bis step-order declared the ARCHETYPE for every domain (multi-POV everywhere)
+
+- **Change (PROMPT-LAYER only):** Added a block before the canonical marriage
+  step-order declaring it the **domain-general archetype**: for ANY life-area,
+  run the same sequence with that domain's own bundle (house · cusp-sub-lord ·
+  Arudha · chara-kāraka): promise → role-density MD/AD in the age-band →
+  materialised-vs-broke filter on all competing ADs → theme-elected sub-period
+  (separative carriers + node TYPE-colouring apply to every matter, not just
+  marriage) → kāraka degree-locks as weights converging with gochara (nodes on
+  the kāraka's sign / the domain-Arudha axis; double-transit on house AND lord
+  AND Arudha). All locks/counts/stamps are convergence weights, never gates.
+- **Why:** User direction — the multi-POV approach validated on marriage must
+  be the standard reading for every domain; per-domain step-orders are to be
+  grown the same way, pattern-by-pattern from verified cases.
+- **Source:** the §4C domain-mapping table (already in the doc) + the validated
+  4C-bis sequence; no new astrology — a scope declaration.
+- **Failure-mode addressed:** COVERAGE — prevents the corrected marriage
+  method from staying a marriage-only special case while other domains regress
+  to single-signature reads.
+
+---
+
+## 2026-07-07 — Node-sub-period doctrine: one-way inference, TYPE-colouring, and de-gating the natal BNN stamp
+
+- **Change (PROMPT-LAYER only):** Expanded §4C-bis step 3 and canonical step-3
+  with the node-sub-period doctrine, correcting a live-session misreading that
+  rejected a theme-matched Rāhu PD:
+  (a) a Rāhu/Ketu sub-period needs **no in-window rupture-flag and no
+  KP-fulfilment count** to be eligible — the STANDING break-prone theme alone
+  (nodes/Saturn gripping the 7th/UL, Kuja doṣa, afflicted kāraka) elects the
+  separative carrier; the rupture is timed as its own, later event.
+  (b) **One-way inference:** standing separation-markers ⇒ expect the first
+  marriage under separative influence (classically Rāhu and Mars jointly
+  touching the window, by daśā and/or gochara); the converse (node-PD ⇒
+  divorce) is FALSE.
+  (c) A node sub-lord colours the event's **TYPE**: Rāhu = mleccha-kāraka ⇒
+  unconventional / inter-community / love / court / foreign-linked union; in KP
+  the node is the strongest agent of its star/sign-lord and routinely delivers
+  clean marriages.
+  (d) The **Śukra≈Guru natal-degree stamp is a WEIGHT, never a gate**; a
+  theme-matched separative window carrying the spouse/gender-kāraka degree-lock
+  + Śukra-golden + Guru-jeeva stands on its own.
+  (e) Double-transit must also be tested **on the UL sign** (joint dṛṣṭi on the
+  Upapada = full sanction even when the 7th is untouched).
+- **Why:** A live session rejected a Rāhu PD for demanding an in-window
+  rupture-flag + KP-count — inverting the already-logged 4C-bis step-3 rule —
+  and hard-gated the day on the natal Śukra≈Guru stamp. User correction +
+  research confirmed the doctrine above; these patterns are under active
+  collection and must be read as convergence weights, not rigid vetoes.
+- **Source:** BPHS graha-guṇa (Rāhu = mleccha-kāraka); KP node-agency doctrine
+  (nodes deliver their star/sign-lord's houses — KP Readers); *Bhrigu Nandi
+  Nadi*, R.G. Rao (Rāhu = foreign/sudden/separator; Venus+Rāhu = estrangement
+  as QUALITY, not denial — L322, distilled in `docs/knowledge/bnn/02_marriage.md`);
+  Jaimini Upapada doctrine (UL/2nd-from-UL as the marriage axis). Consistent
+  with the 2026-07-06/07 entries validating two break-followed marriages at
+  Ve-MD→Ma-AD→separative-PD with independent BNN day-locks.
+- **Failure-mode addressed:** DISCRIMINATION — a wrongly-inverted rule turned a
+  positive first-marriage signature (Rāhu+Mars joint influence on a
+  separation-marked chart) into a veto, and a day-refine weight into a gate.
+  Interpretive judgment ⇒ PROMPT layer per CLAUDE.md (no engine change; the
+  witnesses involved are already wired).
+
+---
+
 ## 2026-07-07 — Natal-anchor the Śukra≈Guru day-refine (kill the chart-independent stamp) + scrub outcome dates
 
 - **Change (ENGINE):** In `nadi_pinpoint`, the Śukra≈Guru degree-lock refine now
