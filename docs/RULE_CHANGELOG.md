@@ -11,6 +11,31 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-07 — Decision-order GUARDS + audit-trail output format (structure-first, score-later)
+
+- **Change (PROMPT-LAYER only):** Added five enforcement guards + a mandated
+  audit-trail output format to CHAT_NARRATOR and AI_TRIANGULATION §4C-bis:
+  G1 structure-first (roles + rupture-filter choose the candidates; convergence/
+  salience/KP scores only pick the day among survivors — a no-7th-role AD never
+  beats a role-carrying AD on score alone); G2 run the materialised-vs-broke
+  filter on ALL competing ADs side-by-side (report each LOSS/BREAK count); G3 a
+  transit spanning more than one candidate AD cannot tie-break between them;
+  G4 compare BNN degree-locks across ALL surviving ADs, never inside a
+  pre-chosen band; G5 KP-count is promise/disambiguation, never a date-ranking
+  metric. Output must show the candidate-AD table (window · 7th-role ·
+  rupture-flag · keep/reject with reason) — no silent rejections.
+- **Why:** A live session answered the male sample chart with May–Sep 2023
+  (Moon-AD, picked as the "highest-convergence band" backed by a year-long
+  double-transit and a top KP-count) — the verified date is 29-Jan-2024
+  (Mars-AD = Lagna-lord + Rāśi-lord, rupture-clean, whole-span-top BNN lock).
+  Every one of the five guards corresponds to a step that failed in that answer;
+  the presentation structure of that answer was good and is retained as the
+  audit-trail format.
+- **Source:** decision-order derived from the validated STEP 0→4 method (BPHS/KP/
+  BNN as previously logged); the guards are procedural, not new astrology rules.
+- **Failure-mode:** DISCRIMINATION — score-first band selection overriding the
+  dasha-structure; anchoring; non-discriminating transit cited as a tie-break.
+
 ## 2026-07-06 — Materialised-vs-broke AD filter (rupture ≠ no-marriage; divorce-bound marriages carry a break-signature)
 
 - **Change (PROMPT-LAYER):** Added STEP 2b to the marriage-timing method
