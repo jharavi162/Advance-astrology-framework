@@ -188,6 +188,20 @@ calculations in your astrology playbook):
 - KP sub-lords and significators
 - True lunar node and additional bodies (Chiron, asteroids)
 
+## Marriage-timing research pipeline
+
+`src/` + `data/` hold a research pipeline that builds a dataset of verified
+birth charts with known marriage dates (Astro-Databank, Rodden AA/A only),
+computes full Vedic data for each **with this engine**, and writes an Excel
+workbook for pattern analysis. How to re-run everything:
+[docs/RESEARCH_PIPELINE.md](docs/RESEARCH_PIPELINE.md).
+
+```bash
+pip install -r requirements-research.txt
+python src/adb_scraper.py --samples 5    # Phase 1: review 5 entries
+python src/adb_scraper.py --limit 200    # Phase 1: pilot batch (raw CSV)
+```
+
 ## License
 
 MIT

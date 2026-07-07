@@ -17,3 +17,6 @@ interpreter/playbook.txt
 # Generated dry-run prompt (embeds proprietary playbook) — keep out of git
 interpreter/dryrun_prompt.txt
 interpreter/*_prompt.txt
+# Research pipeline: cached raw HTML pages are bulky; the raw CSV is the
+# committed permanent record (data/raw/*.csv IS tracked — never overwritten)
+data/raw/html/
