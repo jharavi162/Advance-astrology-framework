@@ -11,6 +11,29 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-07 — STEP-2 tie-break: occupied-house conversion + sequential fulfilment check
+
+- **Change (PROMPT-LAYER):** When two-or-more STRONG AD candidates (real 7th-roles,
+  age-fitting) tie, resolve by: (a) tempo-vs-age (a "late" chart rejects a
+  too-early AD); (b) the AD-lord's OCCUPIED house — a graha gives its occupied
+  house's results in its own period (BPHS), so even a 7th-LORD sitting in a
+  dusthāna delivers dusthāna results in its AD (weak marriage conversion, e.g. a
+  7th-lord in the 6th → conflict/talks without the wedding); (c) sequential
+  time-order 2b check — test the earlier candidate's window; fulfilment absent →
+  move to the next candidate. Conversion is proven by fulfilment, never by role
+  alone. Planets with NO role in that chart are ignored as AD candidates.
+- **Why (validated on Female A, 10-Feb-2022):** In her Venus-MD the logical ADs
+  were Venus/Sun/Mars (Moon holds no role → ignored). Ve>Ve failed age-tempo;
+  Ve>Su tied with Ve>Ma on role (Sun = 7th-lord) but Sun OCCUPIES the 6th → its
+  AD gave 6th-results (the 2019 engagement-stage that didn't convert, fulfilment
+  absent) → sequential check moved to Ve>Ma (husband-kāraka + rāśi-lord), which
+  fulfilled — the actual wedding window. Same logic already explained the Mumbai
+  chart (Venus-in-6th AD = talks; conversion elsewhere).
+- **Source:** BPHS occupied-house daśā-phala; KP fulfilment doctrine. General —
+  stated in role/house terms, no native or date hard-coded.
+- **Failure-mode:** DISCRIMINATION among tied strong ADs (role-tie broken by
+  placement + sequential fulfilment, not by score).
+
 ## 2026-07-07 — Decision-order GUARDS + audit-trail output format (structure-first, score-later)
 
 - **Change (PROMPT-LAYER only):** Added five enforcement guards + a mandated

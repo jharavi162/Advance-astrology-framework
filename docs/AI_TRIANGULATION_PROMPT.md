@@ -491,6 +491,24 @@ recipe):**
    (7th-occupant/lord/cusp-sub-lord) delivers even when it KP-signifies negation
    (the MD owns the promise) — do NOT filter it out (cross-checked: the male's
    real marriage-AD Mars = Lagna-lord signifies no 2/7/11 yet delivered).
+
+   **Tie-break between two-or-more STRONG candidates** (both hold real 7th-roles
+   and fit the age):
+   (a) drop any candidate whose AD age contradicts the chart's own tempo (a
+   "late" chart rejects a too-early AD — e.g. a Ve>Ve AD at age 18-21);
+   (b) look at each AD-lord's **OCCUPIED house** — a graha gives its *occupied*
+   house's results in its own period (BPHS), so even a **7th-LORD sitting in a
+   dusthāna delivers that dusthāna's results in its AD** (a 7th-lord in the 6th
+   → disputes/conflict, talks without the wedding: weak conversion);
+   (c) confirm **sequentially in time-order** with the 2b check below: test the
+   earlier candidate's window first — if marriage-fulfilment is ABSENT there
+   (engagement/talks only), move to the NEXT candidate and re-check. Conversion
+   is proven by fulfilment in the window, never by the role alone. *(Verified:
+   Female A — Ve>Ve too early for the late tempo; Ve>Su strong-role but Sun sits
+   in the 6th and its window showed no fulfilment → engagement-stage; Ve>Ma
+   (husband-kāraka + rāśi-lord) fulfilled → the actual wedding.)* A planet with
+   NO role at all in that chart (not lagna/rāśi-lord, not cusp-sub-lord, not
+   in/aspecting the 7th) is simply ignored as an AD candidate.
 2b. **MATERIALISED-vs-BROKE filter (when several ADs "hit"):** proposals/talks
    come in ALL the hit-ADs; only one converts. For each candidate AD run the
    rupture/negation check (`reversal_map`): **(i)** marriage-fulfilment (2/7/11
