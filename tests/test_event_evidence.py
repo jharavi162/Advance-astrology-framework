@@ -917,3 +917,42 @@ def test_role_significators_ranks_by_weighted_role_density():
         assert top["score"] > soft[0]["score"]
     # domain-general: runs for a non-marriage matter too
     assert role_significators(v, DOMAIN_PROFILES["career"])
+
+
+def test_shukra_guru_refine_is_natal_anchored_not_chart_independent():
+    """The Śukra≈Guru day-refine must be NATAL-ANCHORED: a transit-Venus≈transit-
+    Jupiter contact is the same sky for every chart, so it may count only when
+    the pair sits on THIS chart's natal Venus or natal Jupiter degree
+    (degree-to-degree). MECHANICAL property test — for every pinpoint day that
+    carries the hit, the anchor predicate must hold when recomputed from the
+    ephemeris; and a second chart with different natal degrees must not simply
+    inherit the same fire-days. No native outcome date is asserted."""
+    from interpreter.event_evidence import (nadi_pinpoint, DOMAIN_PROFILES,
+                                            Planet, _deg_close)
+    p = DOMAIN_PROFILES["marriage"]
+    span = (datetime(2023, 12, 1, tzinfo=UTC), datetime(2024, 3, 1, tzinfo=UTC))
+    charts = [_chart(),
+              VedicChart.create(when=datetime(1990, 10, 10, 12, 0,
+                                              tzinfo=ZoneInfo("Asia/Kolkata")),
+                                latitude=23.63, longitude=85.52, ayanamsa="lahiri")]
+    fire_days = []
+    for v in charts:
+        v.gender = "male"
+        tr = v.transits()
+        nv = float(v.longitudes[Planet.VENUS])
+        nj = float(v.longitudes[Planet.JUPITER])
+        days = set()
+        for r in nadi_pinpoint(v, p, *span, top=10):
+            if not any("Śukra≈Guru" in h for h in r["hits"]):
+                continue
+            days.add(r["date"])
+            d = datetime.strptime(r["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+            jup = float(tr.positions(d, [Planet.JUPITER])[Planet.JUPITER])
+            # the anchor predicate: the pair sits on natal Venus or natal Jupiter
+            assert _deg_close(jup, nv) or _deg_close(jup, nj), \
+                f"chart-independent Śukra≈Guru fired on {r['date']}"
+        fire_days.append(days)
+    # the stamp is personal: two different charts must not share an identical
+    # non-empty fire-set by construction (the old bug fired for everyone)
+    assert not (fire_days[0] and fire_days[0] == fire_days[1]), \
+        "Śukra≈Guru fired identically across two different charts"

@@ -78,8 +78,9 @@ gate.
 3. ✅ **7th-from-kāraka** target added (partner seat).
 4. ✅ Fast **Śukra/Maṅgal** degree-locks demoted to **refinement** (+1 each, only
    sharpen the day inside an approved period).
-   Re-verified blind: user chart wedding **2024-01-29 = score 8** (top); sample
-   female chart concentrates on **~Feb-2021**.
+   Re-verified blind on the two reference charts: each chart's verified event
+   day carries its top funnel score (no outcome dates recorded here — blind-test
+   integrity).
 5. TODO (interpretation, AI): sign-lord, co-tenants, 12th-from-kāraka, sign-exchange
    (parivartana). Also TODO: mirror the 7th-from-kāraka + double-approval logic into
    `nadi_rupture_pinpoint`.

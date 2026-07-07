@@ -1161,10 +1161,12 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
     A day with NEITHER slow-planet approval is not an event-time (skipped).
 
     FAST REFINEMENT (picks the exact DAY inside an approved period, +1 each):
-      • Śukra≈Guru degree-lock, Śukra→kāraka golden relation, Maṅgal degree-lock
-        onto the kāraka/natal-Jupiter (the universal executor). These no longer
-        drive the call — they only sharpen the day (demoted from the earlier
-        over-weighting).
+      • Śukra≈Guru degree-lock (NATAL-ANCHORED — counts only when the transit
+        pair sits on this chart's kāraka / natal-Jupiter / spouse-kāraka degree;
+        a bare transit-to-transit contact is the same sky for every chart and
+        carries no personal information), Śukra→kāraka golden relation, Maṅgal
+        degree-lock onto the kāraka/natal-Jupiter (the universal executor).
+        These no longer drive the call — they only sharpen the day.
     TIE-BREAK: within an equal score, the TIGHTEST combined degree-lock orb wins
     (Nāḍī exactness = strength). Returns top clusters (≥ min_gap_days apart)."""
     tr = v.transits()
@@ -1213,9 +1215,18 @@ def nadi_pinpoint(v, profile, start, end, top=6, min_gap_days=7) -> list:
             score += 2
             hits.append("Śani karma-approval (double-approval)" if jup_gate
                         else "Śani karma-approval (late)")
+        # Śukra≈Guru refine — NATAL-ANCHORED: a transit-Venus≈transit-Jupiter
+        # contact is the same sky for EVERY chart on that day, so by itself it
+        # carries no personal information. It counts only when the pair sits ON
+        # the natal degree of one of its OWN participants — THIS chart's natal
+        # Venus or natal Jupiter (degree-to-degree, BNN). Verified failure-mode:
+        # two different charts "locking" the same calendar day purely on this
+        # stamp, presented as mutual corroboration.
         if _nrel(js, vs) and _deg_close(ven, jup):
-            score += 1; orb += _dd(ven, jup); locked = True
-            hits.append("Śukra≈Guru degree-lock (refine)")
+            nv_lon = float(v.longitudes[Planet.VENUS])
+            if _deg_close(jup, nv_lon) or _deg_close(jup, nj_lon):
+                score += 1; orb += _dd(ven, jup); locked = True
+                hits.append("Śukra≈Guru degree-lock on natal degree (refine)")
         if _nrel(nk_sign, vs):
             score += 1; hits.append("Śukra→kāraka golden (refine)")
         m_orbs = [_dd(mar, a) for a, ok in
