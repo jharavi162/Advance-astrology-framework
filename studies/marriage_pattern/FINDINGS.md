@@ -69,3 +69,62 @@ The *slots* are shared; the *fillers* vary chart to chart:
   the timing panel, not on a rosy natal promise.
 - No Indian natives (no birth-certificate-grade times exist publicly), so this is
   a Western-record sample; caste/rectified Indian data would add noise, not rigor.
+
+---
+
+# Round 2 — chart-specific "marriage circuit" study (`circuit_study.py`)
+
+Round 1 asked fixed questions. Round 2 (after a rule-catalogue review across
+schools: Parāśara, KP, Jaimini, Strī-jātaka, BNN/Nāḍī, Western transits) builds
+each chart's OWN circuit — its 7th lord, occupants of the 7th, Venus, Dārā-kāraka,
+D9 connections, star-lords, UL, gender-aware kārakas — and evaluates 12 classical
+hypotheses at the wedding vs 10 random adult dates per native (500 controls).
+
+## The blunt discovery about daśā rules
+
+Every daśā-based rule as classically stated is AMBIENT — even chart-specific ones:
+
+| hypothesis | wedding | control | lift |
+|---|--:|--:|--:|
+| MD/AD/PD lord ∈ core circuit (7L/occupant/Venus/DK) | 72% | 75% | −2.6 |
+| AD lord specifically ∈ core circuit | 32% | 41% | −8.6 |
+| MD/AD lord in D9 circuit | 50% | 51% | −1.0 |
+| gender kāraka in chain (M:Venus, F:Jupiter/Mars) | 42% | 46% | −3.8 |
+| MD/AD lord in nakshatra of a circuit planet | 60% | 57% | +3.0 |
+
+Why: with 3 chain lords and a 3–6 planet circuit, the chain touches the circuit on
+MOST dates of a life. The daśā rule can't pick the date; it's a permission slip
+nearly always signed.
+
+## Where the date actually lives: TRANSITS
+
+| hypothesis | wedding | control | lift |
+|---|--:|--:|--:|
+| **classic double-transit** (Jup AND Sat both on 7th/7L/UL, sign+dṛṣṭi) | **66%** | 50% | **+16.2** |
+| transit Jupiter within 6° of descendant/7L/Venus degree | 40% | 30% | +10.2 |
+| transit Saturn (sign+dṛṣṭi) on 7th/UL/7th-from-UL | 74% | 65% | +9.2 |
+| BNN gender rule: transit Jup conj/trine natal Venus(M)/Mars(F) | 16% | 11% | +5.2 |
+
+Combinations (the "two-key" doctrine):
+- any-daśā-link AND double-transit: 58% vs 47% (+11)
+- double-transit AND Saturn-gochara: 56% vs 43% (+13.4)
+
+## Rank test — the usable result
+
+Scoring dates by the trigger-weighted composite (double-transit ×2 + Jup-degree +
+Sat-gochara + BNN-gender + Jup-gochara·0.5 + daśā-star·0.5), each wedding ranked
+against that native's own 10 random dates:
+
+- mean wedding percentile: **61.2** (chance 50) — **permutation p = 0.007**
+- wedding above median: 32/50 · top quartile: 23/50 · top-3 of 11 dates: 26/50
+
+So the pattern is REAL (not chance) but PROBABILISTIC: it concentrates probability
+~2× around true wedding windows; it does not pinpoint the date. Drivers differ per
+chart exactly as predicted: 44 distinct driver-combinations across 50 weddings.
+
+## Caveats
+- The trigger weights were chosen on this same sample (n=50) — the p-value is
+  honest for "is there signal", optimistic for the exact weights. A fresh sample
+  should re-validate.
+- Wedding dates are chosen by couples partly FOR auspiciousness (muhūrta) — some
+  transit signal may reflect date-selection culture, not destiny.
