@@ -172,3 +172,52 @@ edge (61.2 pctl, p=0.007) did NOT transfer.
   a held-out validation sample (≥50 fresh charts), weights frozen in advance,
   and per-chart score normalization; ideally separate cohorts for planned vs
   impulsive weddings.
+
+---
+
+# Round 4 — nakshatra-lord transit study (`nakshatra_study.py`)
+
+User hypothesis: the fine timing should live at the NAKSHATRA level — transits
+through stars whose lords belong to the chart's marriage circuit, and the
+daśā-lord's own transit star (KP's transit rule). 12 star-level hypotheses,
+50 weddings vs 500 seed-matched controls.
+
+## In-sample: two real star-level channels
+
+| hypothesis | wedding | control | lift |
+|---|--:|--:|--:|
+| **N5: MD lord's own TRANSIT position in a circuit-lord's star** | 46% | 33% | **+12.6** |
+| **N1: transit Jupiter in a circuit-lord's star** | 44% | 32% | **+12.4** |
+| C2: slow-planet star-window AND Moon day-key | 30% | 21% | +8.6 |
+| N6: AD lord's transit in circuit star | 38% | 34% | +3.8 |
+
+The N5 finding is conceptually important: the daśā finally shows discrimination —
+but only through its **transit position** (daśā × gochara cross-term, exactly
+KP's "the daśā lord delivers when it transits the star of a significator"), never
+through its name alone (all Round-2 daśā-name rules were ambient).
+
+## The day-picker is still unfound
+
+Transit **Moon in a circuit star** (KP day marker): 38% vs 38% — **zero lift** at
+the exact wedding day. Sun star: +0.8. Transit-over-natal-stars: ~0. Transit
+Venus in circuit star: **−10.4** (if real, Venus's own star-position is
+anti-selected at weddings — unexplained; possibly noise). So "which day inside
+the window" is NOT answered by luminaries' star positions in this sample.
+
+## Blind check (Willis + Sinatra, 6 weddings)
+
+N5/N1 fired at 1 of 6 blind weddings (~17%, below the 33% baseline); the
+augmented composite percentiles: 3, 75, 5, 5, 39, 60 — same non-transfer as
+Round 3. Every in-sample channel found so far (sign-level and star-level) fails
+on these two serial-marrier charts.
+
+## Standing conclusion after 4 rounds
+1. In-sample, wedding dates consistently show +10-16-pt elevated transit
+   signatures across independent channels (sign double-transit, Jupiter degree,
+   MD-transit-star, Jupiter-star) — too consistent to be pure chance (the
+   round-2 permutation test held at p=0.007).
+2. No recipe yet transfers to out-of-sample charts. Either the 2 blind charts
+   are atypical (impulsive serial marriages), or in-sample lifts are inflated
+   by muhūrta-selection + multiple comparisons.
+3. Decisive next step is DATA, not more hypotheses: a fresh held-out sample of
+   50+ Rodden-rated weddings, current channels frozen, tested once.
