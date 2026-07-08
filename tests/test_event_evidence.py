@@ -1030,3 +1030,94 @@ def test_day_convergence_lagnesh_return_stamps_the_self_lord():
         assert (int(pos // 30) - int(lag_lon // 30)) % 12 in (0, 4, 6, 8)
         assert _deg_close(pos, lag_lon)
     assert seen, "lagnesh-return never fired across a full year of days"
+
+
+# --- Nāḍī female-Mars timing channel + Arudha double-transit (approved 2026-07-08,
+# validated on the public 50-chart Rodden study in studies/marriage_pattern) ---- #
+def test_nadi_timing_karakas_female_mars_channel_is_additive():
+    """R.G. Rao (BNN): Venus times marriage for EVERY chart; a female chart ADDS
+    Mars as her causative planet. Additive — never a substitution — and the
+    singular Venus event-kāraka doctrine stays untouched."""
+    from interpreter.event_evidence import (nadi_karaka, nadi_timing_karaka,
+                                            nadi_timing_karakas, Planet)
+    v = _chart()
+    p = DOMAIN_PROFILES["marriage"]
+    v.gender = "male"
+    assert nadi_timing_karakas(v, p) == [Planet.VENUS]
+    v.gender = "female"
+    assert nadi_timing_karakas(v, p) == [Planet.VENUS, Planet.MARS]
+    v.gender = ""                       # unknown gender → universal Venus only
+    assert nadi_timing_karakas(v, p) == [Planet.VENUS]
+    # the singular event-kāraka rule is unchanged (Venus for both sexes)
+    v.gender = "female"
+    assert nadi_timing_karaka(v, p) == Planet.VENUS
+    # non-kalatra matters keep their single domain kāraka
+    career = DOMAIN_PROFILES["career"]
+    assert nadi_timing_karakas(v, career) == [nadi_karaka(v, career)]
+
+
+def test_female_jeeva_windows_superset_of_male():
+    """The ♀ Mars channel only ADDS Guru-jeeva windows: every male-chart window
+    (Venus-based) must survive on the same chart read as female. Mechanical,
+    property-based — no native dates."""
+    from interpreter.event_evidence import nadi_timing_karakas, _trine_windows, Planet
+    v = _chart()
+    p = DOMAIN_PROFILES["marriage"]
+    tr = v.transits()
+    s, e = datetime(2024, 1, 1, tzinfo=UTC), datetime(2026, 1, 1, tzinfo=UTC)
+
+    def jeeva(gender):
+        v.gender = gender
+        out = []
+        for nk in nadi_timing_karakas(v, p):
+            out += _trine_windows(tr, Planet.JUPITER, float(v.longitudes[nk]), s, e)
+        return out
+
+    male, female = jeeva("male"), jeeva("female")
+    assert set(male).issubset(set(female))
+    assert len(female) >= len(male)
+
+
+def test_arudha_double_transit_witness_registered_and_votes():
+    """New Jaimini timing node: Jupiter AND Saturn simultaneously on the matter's
+    Arudha(s) (marriage: UL/A7). School attribution must be Jaimini, not Parāśari."""
+    from interpreter.event_evidence import WITNESSES, WindowEvidence, _school
+    w = next(x for x in WITNESSES if "Arudha double-transit" in x.name)
+    assert w.layer == "timing"
+    assert _school(w.name) == "jaimini"
+
+    def mk(flag):
+        return WindowEvidence(
+            start=datetime(2024, 1, 1, tzinfo=UTC), chain=["Ve"], kp_fulfil=0,
+            kp_negate=0, karaka_in_chain=False, karaka_sukshma=False,
+            lagnesh_in_chain=False, lagna_activators=[], house_double_transit=False,
+            lord_double_transit=False, saham_double_transit=False, bnn=False,
+            kakshya=False, varshaphal_muntha=False, chara_ad="",
+            sudarshana_hit=False, arudha_double_transit=flag)
+
+    assert w.vote(mk(True)) == 1.0
+    assert w.vote(mk(False)) == 0.0
+
+
+def test_arudha_double_transit_windows_consistent_with_transits():
+    """Inside any arudha-dt window BOTH slow planets must touch (occupy/aspect)
+    one of the matter's Arudha signs — self-consistency against the transit
+    engine, no native dates."""
+    from interpreter.event_evidence import candidate_map, _ASPECT_OFFSETS, Planet
+    v = _chart()
+    p = DOMAIN_PROFILES["marriage"]
+    tr = v.transits()
+    ar = v.arudhas()
+    targets = {ar[k] for k in p.arudhas if ar.get(k) is not None}
+    s, e = datetime(2024, 1, 1, tzinfo=UTC), datetime(2025, 1, 1, tzinfo=UTC)
+    rows = candidate_map(v, p, s, e)
+    assert rows, "no evaluation rows produced"
+
+    def touches(planet, when):
+        ps = tr.transit_sign(when, planet)
+        return any(ps == t or any((ps + a) % 12 == t for a in _ASPECT_OFFSETS[planet])
+                   for t in targets)
+
+    for r in rows:
+        if r.arudha_double_transit:
+            assert touches(Planet.JUPITER, r.start) and touches(Planet.SATURN, r.start)

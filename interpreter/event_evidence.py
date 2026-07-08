@@ -668,6 +668,7 @@ class WindowEvidence:
     kp_star_transit: bool = False          # slow planet transiting a fulfilment-significator's star
     tajika_sig: bool = False               # Varṣeśa / Muntha-lord signifies the matter (annual)
     arudha_axis: bool = False              # slow benefic/kāraka activating the Arudha axis (UL/2nd-from-UL …)
+    arudha_double_transit: bool = False    # Jupiter AND Saturn BOTH on the matter's Arudha(s) (UL/A7 …) — Jaimini gochara
     bb_active: bool = False                # Bhṛgu Bindu activated by a slow mover (Nāḍī timing)
     func_valence: float = 0.0              # signed: chain lords functional benefic(+) vs malefic/māraka(−)
     nadi_jeeva: bool = False               # transit Jupiter conj/trine the Nāḍī kāraka (BNN year-marker)
@@ -775,6 +776,8 @@ register_witness("nadi: Śani karma-sanction (BNN)", "timing", 0.7,
 # benefic (Jupiter/Saturn occupation OR dṛṣṭi) or the domain kāraka (conjunction).
 # Source: Jaimini Sūtras / BPHS Upapada doctrine; Common-Timing-Miss #3. This was a
 # computed-but-UNWIRED quantity (arudhas existed in the profile, no node read them).
+register_witness("Arudha double-transit (Jaimini gochara: Jup+Sat on UL/A7)", "timing", 1.0,
+                 lambda w: 1.0 if w.arudha_double_transit else 0.0)
 register_witness("Jaimini Arudha-axis activation (UL / 2nd-from-Arudha)", "timing", 0.8,
                  lambda w: 1.0 if w.arudha_axis else 0.0)
 # Bhṛgu Bindu (Moon–Rāhu midpoint) — a Nāḍī sensitive point; slow-transit activation
@@ -957,6 +960,28 @@ def nadi_timing_karaka(v, profile) -> Planet:
     if spec == "kalatra":
         return Planet.VENUS
     return nadi_karaka(v, profile)
+
+
+def nadi_timing_karakas(v, profile) -> list[Planet]:
+    """ALL kārakas whose transit-activation can TIME the event — the plural,
+    gender-aware form used by the Guru-jeeva / Śani-sanction windows. Venus stays
+    the universal marriage event-kāraka for every chart (the singular
+    `nadi_timing_karaka` doctrine is untouched); for a FEMALE chart the BNN adds
+    Mars as an additional causative channel (R.G. Rao, Bhrigu Nandi Nadi: "Mars is
+    the causative planet for the female native" — transit Jupiter connecting natal
+    Mars times her marriage). ADDITIVE, never a substitution; unknown gender reads
+    Venus only. Non-kalatra matters keep their single kāraka. Validated on the
+    50-chart Rodden-rated study (studies/marriage_pattern): the gender-aware
+    Jupiter-on-kāraka trigger out-lifted the Venus-only form (+5.2 vs +2.0 pts
+    over random-date baseline) — a doctrine-sourced rule checked against public
+    data, not fitted to any native."""
+    spec = (NADI_KARAKAS.get(profile.name)
+            or NADI_KARAKAS.get(getattr(profile, "base_domain", None) or ""))
+    if spec == "kalatra":
+        g = (getattr(v, "gender", "") or "").lower()
+        return ([Planet.VENUS, Planet.MARS] if g.startswith("f")
+                else [Planet.VENUS])
+    return [nadi_karaka(v, profile)]
 
 
 def role_significators(v, profile) -> list:
@@ -1787,6 +1812,18 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             axis_signs.add(s)
             axis_signs.add((s + 1) % 12)            # 2nd-from-the-Arudha (sustenance)
 
+    # --- node: Arudha DOUBLE-transit — Jupiter AND Saturn simultaneously on the
+    # matter's Arudha pada(s) (marriage: UL/A7). Jaimini gochara (Sanjay Rath:
+    # Jupiter and Saturn transiting/aspecting the Upapada give marriage) — the
+    # Arudha-as-target twin of the Parāśari house/lord double-transit. Validated
+    # on the 50-chart public study: the {7th, 7L, UL} double-transit was the
+    # single strongest wedding-date discriminator (+16 pts over baseline).
+    arudha_dt = []
+    for k in profile.arudhas:
+        s = ar.get(k)
+        if s is not None:
+            arudha_dt += _dt_windows(tr, (s - lagna_sign) % 12 + 1, start, end)
+
     def _arudha_axis_hit(when) -> bool:
         for p in (Planet.JUPITER, Planet.SATURN):   # slow benefic: occupation OR dṛṣṭi
             ps = tr.transit_sign(when, p)
@@ -1799,13 +1836,16 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
         return False
 
     # --- NĀḌĪ: Guru-jeeva × kāraka + Śani karma-sanction ----------------------
-    nk = nadi_timing_karaka(v, profile)     # marriage-class → Venus (event-kāraka)
-    nk_lon = float(v.longitudes[nk])
-    nadi_jeeva_w = _trine_windows(tr, Planet.JUPITER, nk_lon, start, end)
-    nadi_sat_w = (_trine_windows(tr, Planet.SATURN, nk_lon, start, end)
-                  + _trine_windows(tr, Planet.SATURN,
-                                   float(v.longitudes[Planet.JUPITER]),
-                                   start, end))
+    # Plural, gender-aware kāraka set: Venus for every chart; a female chart adds
+    # Mars (R.G. Rao — Mars is her causative planet). Additive channel.
+    nadi_jeeva_w, nadi_sat_w = [], []
+    for nk in nadi_timing_karakas(v, profile):
+        nk_lon = float(v.longitudes[nk])
+        nadi_jeeva_w += _trine_windows(tr, Planet.JUPITER, nk_lon, start, end)
+        nadi_sat_w += _trine_windows(tr, Planet.SATURN, nk_lon, start, end)
+    nadi_sat_w += _trine_windows(tr, Planet.SATURN,
+                                 float(v.longitudes[Planet.JUPITER]),
+                                 start, end)
     fulfil_signs = {(lagna_sign + h - 1) % 12 for h in profile.fulfil_houses}
 
     def _nadi_sanction(when) -> bool:
@@ -1885,6 +1925,7 @@ def candidate_map(v, profile, start, end, step_days=7) -> list[WindowEvidence]:
             kp_star_transit=_kp_star_hit(d),
             tajika_sig=tajika.get(d.year, False),
             arudha_axis=_arudha_axis_hit(d),
+            arudha_double_transit=_in(d, arudha_dt),
             bb_active=_bb_hit(d),
             func_valence=_chain_valence(chain),
             nadi_jeeva=_in(d, nadi_jeeva_w),
@@ -2181,7 +2222,8 @@ def _row_line(r: WindowEvidence) -> str:
             f"{'Y' if r.sudarshana_hit else '-'} "
             f"{'Y' if r.gochara_from_moon else '-'}{'Y' if r.fulfil_house_dt else '-'}"
             f"{'Y' if r.kp_star_transit else '-'}{'Y' if r.tajika_sig else '-'}"
-            f"{'Y' if r.arudha_axis else '-'}{'Y' if r.bb_active else '-'}  "
+            f"{'Y' if r.arudha_axis else '-'}{'Y' if r.arudha_double_transit else '-'}"
+            f"{'Y' if r.bb_active else '-'}  "
             f"D:{sum(1 for x in r.signals.values() if x)}/{len(r.signals)}  "
             f"{r.convergence}")
 
@@ -2210,7 +2252,7 @@ def render_domain(v, profile, start, end) -> str:
         L.append(f"    {'＋' if c > 0 else '－'} {nm}: {c:+.2f}")
     L += ["", "  CANDIDATE LEDGER (cols: KPf/n · kār+sūkṣ · lgnś · Lagna-activation · "
           "Hdt+Ldt · Sdt · BNN · Kakṣ · Muntha · Sud · "
-          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Arudha-axis·BhṛguBindu] · D:daśā-catalogue/n · conv):"]
+          "[Moon-gochara·Fulfil-dt·KPstar·Tājika·Arudha-axis·Arudha-dt·BhṛguBindu] · D:daśā-catalogue/n · conv):"]
     for r in sorted(rows, key=lambda x: x.start):
         L.append(_row_line(r))
     top = sorted(rows, key=lambda x: (-x.salience, x.start))[:5]

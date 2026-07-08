@@ -74,6 +74,8 @@ COVERAGE: list[CoverageItem] = [
     CoverageItem("KP transit-of-significator star", "transits.positions + nakṣatra", "KP transit:", "wired"),
     CoverageItem("Tājika Varṣeśa / Muntha-lord", "varshaphal", "Tājika Varṣeśa", "wired"),
     CoverageItem("Jaimini Arudha-axis gochara", "arudhas", "Arudha-axis", "wired"),
+    CoverageItem("Jaimini Arudha double-transit (Jup+Sat on UL/A7)",
+                 "transits.double_transit_* + arudhas", "Arudha double-transit", "wired"),
     CoverageItem("Bhṛgu Bindu activation", "bhrigu_bindu", "Bhṛgu Bindu", "wired"),
     CoverageItem("Nāḍī: Guru-jeeva × kāraka gochar (BNN)", "transits.conjunction_windows (conj+trine)", "nadi: Guru-jeeva", "wired"),
     CoverageItem("Nāḍī: Śani karma-sanction (BNN)", "transits (conj/trine kāraka + fulfil-signs)", "nadi: Śani karma-sanction", "wired"),

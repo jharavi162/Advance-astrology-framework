@@ -1787,3 +1787,39 @@ Honest note: on charts with a genuinely BROAD eligible period (e.g. a long Venus
 MD where many windows are KP-3/3), this correctly does NOT collapse to a single
 date — the honest output stays a shortlist + direction; a single date needs the
 finest hand (Moon/muhurta), inherently uncertain. Suite 175 green.
+
+## 2026-07-08 — Nāḍī ♀-Mars timing channel + Jaimini Arudha double-transit node
+
+Two timing additions, both approved by the user and both validated (not fitted)
+on the public 50-chart Rodden-rated study in `studies/marriage_pattern/`
+(50 weddings vs 500 random-date controls, permutation p=0.007 for the
+transit-trigger composite):
+
+1. **`nadi_timing_karakas` (plural, gender-aware — ADDITIVE).** Venus remains the
+   universal marriage event-kāraka for every chart (the singular
+   `nadi_timing_karaka` doctrine is untouched, its tests unchanged). For a
+   FEMALE chart the Guru-jeeva / Śani-sanction windows now ALSO read natal Mars —
+   śāstra: R.G. Rao, *Bhrigu Nandi Nadi* ("Mars is the causative planet for the
+   female native"; transit Jupiter connecting natal Mars times her marriage).
+   Study check: the gender-aware Jupiter-on-kāraka trigger out-lifted the
+   Venus-only form (+5.2 vs +2.0 pts over baseline). Unknown gender → Venus only.
+
+2. **New timing witness "Arudha double-transit (Jaimini gochara: Jup+Sat on
+   UL/A7)".** Jupiter AND Saturn simultaneously occupying/aspecting one of the
+   matter's Arudha padas (marriage: UL, A7; domain-general via
+   `profile.arudhas`). Śāstra: Jaimini gochara as taught by Sanjay Rath —
+   Jupiter and Saturn transiting/aspecting the Upapada give marriage; the
+   Arudha-target twin of the Parāśari house/lord double-transit. Study check:
+   the {7th, 7th-lord, UL} double-transit was the single strongest wedding-date
+   discriminator found (66% at weddings vs 50% baseline, +16 pts) — while the
+   soft one-planet Arudha-axis node is ambient (fires ~100% of dates), the
+   BOTH-planets form is what discriminates. School attribution: jaimini (kept
+   separate from the Parāśari node so convergence counting stays honest).
+
+Coverage matrix updated (new wired row). Tests:
+`test_nadi_timing_karakas_female_mars_channel_is_additive`,
+`test_female_jeeva_windows_superset_of_male`,
+`test_arudha_double_transit_witness_registered_and_votes`,
+`test_arudha_double_transit_windows_consistent_with_transits`.
+No calibration/hindsight: rules come from the named texts; the 50-chart study is
+public-figure data used as a blind check, never a per-native fit.
