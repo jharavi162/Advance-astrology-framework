@@ -128,3 +128,47 @@ chart exactly as predicted: 44 distinct driver-combinations across 50 weddings.
   should re-validate.
 - Wedding dates are chosen by couples partly FOR auspiciousness (muhūrta) — some
   transit signal may reflect date-selection culture, not destiny.
+
+---
+
+# Round 3 — BLIND forward test (`predict_marriage.py`): the recipe does NOT yet generalize
+
+The predictor applies the validated trigger composite to a fresh chart and emits
+top-15% windows over a span. Blind protocol: rankings computed from birth data
+only; actual wedding dates revealed after.
+
+Subjects (Rodden A, NOT in the training 50): Bruce Willis (2 weddings, span
+1985–2012) and Frank Sinatra (4 weddings, span 1938–1978).
+
+| wedding | score percentile in span | in a top-5 window? |
+|---|--:|:-:|
+| Willis 1987-11-21 | 6 | ✘ |
+| Willis 2009-03-21 | 70 | ✘ |
+| Sinatra 1939-02-04 | 9 | ✘ |
+| Sinatra 1951-11-07 | 9 | ✘ |
+| Sinatra 1966-07-19 | 48 | ✘ |
+| Sinatra 1976-07-11 | 70 | ✘ (window #5 ended 1976-06-10 — missed by ~4 weeks) |
+
+Mean percentile **35 — at/below chance** on these two charts. The in-sample
+edge (61.2 pctl, p=0.007) did NOT transfer.
+
+## Honest reading
+1. **The aggregate signal is real; the per-chart recipe is not.** A +10-to-16-pt
+   frequency lift across 50 charts is too weak/heterogeneous to rank ONE chart's
+   timeline. In-sample weight selection inflated the apparent usability (flagged
+   in Round 2's caveats — now demonstrated).
+2. **Population mismatch.** Both blind subjects are serial marriers with several
+   impulsive weddings (Sinatra married Gardner days after his divorce). The
+   training weddings skew toward long-planned first marriages — precisely the
+   ones most likely to be (consciously or culturally) scheduled under favorable
+   transits. Supports the muhūrta-selection confound.
+3. Near-misses (Sinatra's 1976 window off by 4 weeks; a 1964–65 window vs the
+   1966 Farrow wedding) are suggestive but score as misses — no partial credit.
+
+## Status
+- The engine's new nodes (Arudha double-transit, ♀-Mars Nāḍī channel) remain
+  justified: doctrine-sourced, and genuinely elevated AT weddings in-sample.
+- A "marriage-date predictor" is NOT validated. Required before any such claim:
+  a held-out validation sample (≥50 fresh charts), weights frozen in advance,
+  and per-chart score normalization; ideally separate cohorts for planned vs
+  impulsive weddings.
