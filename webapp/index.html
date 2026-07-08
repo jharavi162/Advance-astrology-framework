@@ -29,6 +29,14 @@
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 3px rgba(201,139,255,.15)}
   textarea{resize:vertical}
   .timebox{display:flex;gap:5px}.timebox input,.timebox select{width:58px;text-align:center;padding:10px 4px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+  .chips:empty{display:none}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:#2a2140;border:1px solid var(--line);
+    color:var(--ink);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;user-select:none}
+  .chip:hover{border-color:var(--acc2)}
+  .chip.on{border-color:var(--acc);background:#332752;box-shadow:0 0 0 2px rgba(230,180,80,.18)}
+  .chip .x{color:var(--mut);font-weight:700;padding:0 2px;border-radius:50%;line-height:1}
+  .chip .x:hover{color:#ff9bb0}
   button{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer;font-size:15px;min-height:44px}
   button.sec{background:#2a2140;color:var(--ink);border:1px solid var(--line)}
   .grid{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:18px;margin-top:18px}
@@ -75,6 +83,7 @@
 <header><h1><img src="/icon-192.png" alt="" style="height:34px;vertical-align:-9px;margin-right:9px;border-radius:50%">HoraSutra</h1><p>Ancient wisdom · Precise predictions — Kundalī · Gochar · Daśā · Analysis</p></header>
 <div class="wrap">
   <div class="card">
+    <div id="saved" class="chips"></div>
     <form id="f">
       <label>Date<input id="date" type="date" value="1990-01-01"></label>
       <label>Time<div class="timebox"><input id="hh" type="number" min="1" max="12" value="12"><input id="mm" type="number" min="0" max="59" value="00"><select id="ap"><option>AM</option><option selected>PM</option></select></div></label>
@@ -85,7 +94,9 @@
       <label>Gender<select id="gender"><option value="">—</option><option value="male">Male</option><option value="female">Female</option></select></label>
       <label>System<select id="ay"><option value="lahiri">Lahiri</option><option value="kp">KP</option><option value="raman">Raman</option><option value="multi">Multi (all 3)</option></select></label>
       <button type="submit">Cast chart</button>
+      <button type="button" class="sec" onclick="saveChart()" title="Is chart ko device par save karo">💾 Save</button>
     </form>
+    <div class="sub" style="margin-top:6px">💾 Saved charts sirf IS device ke browser me rehte hain (server par kuch store nahi hota). Chip par tap = seedha chart switch.</div>
   </div>
 
   <div id="out" class="grid" style="display:none">
@@ -397,6 +408,49 @@ async function toggleDasha(tr,level,path){const cell=tr.querySelector('td');
   }catch(e){cell.textContent=cell.textContent.replace('▾','▸');}}
 
 document.getElementById('f').addEventListener('submit',load);
+
+// ---- SAVED CHARTS (device-local only: localStorage, kuch bhi server par nahi) ----
+const CKEY='horasutra_saved_charts';
+function getSaved(){try{return JSON.parse(localStorage.getItem(CKEY))||[];}catch(e){return[];}}
+function setSaved(l){try{localStorage.setItem(CKEY,JSON.stringify(l));}catch(e){}}
+function snapshotForm(){return{
+  date:document.getElementById('date').value,hh:document.getElementById('hh').value,
+  mm:document.getElementById('mm').value,ap:document.getElementById('ap').value,
+  place:document.getElementById('place').value,
+  lat:document.querySelector('[name=lat]').value,lon:document.querySelector('[name=lon]').value,
+  tz:document.querySelector('[name=tz]').value,gender:document.getElementById('gender').value,
+  ay:document.getElementById('ay').value};}
+function fillForm(c){
+  document.getElementById('date').value=c.date;document.getElementById('hh').value=c.hh;
+  document.getElementById('mm').value=c.mm;document.getElementById('ap').value=c.ap;
+  document.getElementById('place').value=c.place||'';
+  document.querySelector('[name=lat]').value=c.lat;document.querySelector('[name=lon]').value=c.lon;
+  document.querySelector('[name=tz]').value=c.tz;document.getElementById('gender').value=c.gender||'';
+  document.getElementById('ay').value=c.ay||'lahiri';}
+function saveChart(){
+  const snap=snapshotForm();
+  const def=(snap.place?snap.place+' ':'')+snap.date;
+  const label=(prompt('Is chart ka naam? (e.g. Meri kundali)',def)||'').trim();
+  if(!label)return;
+  const l=getSaved().filter(c=>c.label!==label);
+  l.push({label,...snap});setSaved(l);renderChips(label);}
+function delChart(label){
+  if(!confirm('"'+label+'" delete karein?'))return;
+  setSaved(getSaved().filter(c=>c.label!==label));renderChips();}
+function useChart(label){
+  const c=getSaved().find(x=>x.label===label);if(!c)return;
+  fillForm(c);renderChips(label);
+  HIST.length=0;const ch=document.getElementById('chat');if(ch)ch.innerHTML='';  // naya native = naya chat context
+  load();}
+function renderChips(active){
+  const el=document.getElementById('saved');if(!el)return;el.innerHTML='';
+  getSaved().forEach(c=>{
+    const d=document.createElement('span');d.className='chip'+(c.label===active?' on':'');
+    const t=document.createElement('span');t.textContent='👤 '+c.label;d.appendChild(t);
+    const x=document.createElement('span');x.className='x';x.textContent='×';
+    x.onclick=e=>{e.stopPropagation();delChart(c.label);};d.appendChild(x);
+    d.onclick=()=>useChart(c.label);el.appendChild(d);});}
+renderChips();
 
 // Analysis chat (Gemini via backend proxy — key stays on server)
 let HIST=[];
