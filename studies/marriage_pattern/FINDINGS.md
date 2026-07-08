@@ -221,3 +221,29 @@ on these two serial-marrier charts.
    by muhūrta-selection + multiple comparisons.
 3. Decisive next step is DATA, not more hypotheses: a fresh held-out sample of
    50+ Rodden-rated weddings, current channels frozen, tested once.
+
+---
+
+# Round 5 — first volunteer blind test (Indian chart, anonymized)
+
+The framework's owner volunteered their own chart (details withheld — no native
+data in the repo). Protocol: full engine pack + sign-composite + star channels
+run over a 19-year span; ranked windows DECLARED before the real date was
+revealed.
+
+- Declared: #1 Jul–Oct 2023 · #2 Feb–Oct 2020 · #3 Feb–Apr 2024 · #4 Sep–Nov
+  2021 — with an explicit note that 2023→late-2024 formed one extended hot zone.
+- Actual wedding: late Jan 2024.
+- Blind score of the true date: **84th percentile** of the native's 231-month
+  timeline; engine convergence top-decile (between ledger rows 13.75/14.43;
+  span peak 16.15 fell ~10 weeks after the wedding). Drivers: Venus-MD(7L+kāraka)
+  > lagneśa-AD > Rahu; Jupiter transiting the lagna + Saturn aspect; 7th-axis
+  double-transit; MD-lord transit star; Moon in circuit star on the day.
+- Verdict: window #1 missed by ~4 months; the date fell 3 days from window #3's
+  edge (monthly-grid artifact) inside the declared hot zone. Best blind result
+  so far (vs 3/75/5/5/39/60 pctl on the two Western serial-marrier charts) —
+  consistent with the muhūrta hypothesis: the method reads PLANNED weddings
+  better than impulsive ones.
+
+n = 1; anecdote, not validation. The frozen-channel held-out study (50 fresh
+charts) remains the decisive next step.
