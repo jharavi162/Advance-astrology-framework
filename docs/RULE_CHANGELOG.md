@@ -11,6 +11,32 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-09 — New DATA domain: `engagement` (betrothal) on the KP courtship group 5-7-11
+
+- **Change (DATA, `interpreter/significators.py::THEME_LEXICON`):** registered an
+  `engagement` domain — `houses=[7]`, `fulfil_houses=[5, 7, 11]`,
+  `negate_houses=[6, 8, 12]`, kāraka Venus, arudhas `UL`/`A7`, saham `Vivaha`,
+  D9, `base_domain="marriage"`. Synonyms: sagai/mangni/roka/betrothal/…
+- **Why (śāstra):** an engagement is the **promise** of marriage, not the union.
+  KP times the *fixing* on the courtship-and-agreement group — **5th** (the
+  love-affair that ripens toward commitment), **7th** (the partner) and **11th**
+  (desire secured / friendship formalised, the "getting-what-one-wants" house) —
+  and denies it with the union-dusthānas **6-8-12** (separation / rupture /
+  withdrawal). Deliberately **not** the 2-7-11 family-union set (which only fully
+  matures at the wedding) and **not** the 1/6/10 marriage-negation set — so an
+  engagement running concurrently with a divorce (whose KP fulfilment houses ARE
+  1/6/10) is no longer falsely negated by the marriage meter.
+- **Source:** KP Readers VI (7th cusp sub-lord promises; 5th signifies the affair
+  preceding the fixing); Phaladeepika/BPHS 5th = romance, 11th = fulfilment of
+  desire. `base_domain=marriage` keeps the Nāḍī kāraka gender-aware (♂ Venus / ♀
+  Mars) and the UL reversal logic intact.
+- **Failure-mode addressed (coverage):** the engine had no engagement life-area,
+  forcing engagements to be scored on the 7th-centric *marriage* fulfil/negate
+  meter, which structurally under-calls a betrothal (misses the 5th) and inverts
+  against a co-occurring divorce. Regression test:
+  `tests/test_significators.py::test_engagement_domain_reads_courtship_group_not_marriage_group`.
+  No native dates in the test (blind-test integrity).
+
 ## 2026-07-07 — Three day-level hands wired into `day_convergence` (user-approved): Moon-spouse · pair-yuti · lagnesh-return
 
 - **Change (CODE, `interpreter/event_evidence.py::day_convergence`):** three new

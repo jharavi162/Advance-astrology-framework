@@ -48,6 +48,28 @@ def test_divorce_domain_resolves_with_kp_groups():
     assert "UL" in prof.arudhas and prof.varga == 9
 
 
+def test_engagement_domain_reads_courtship_group_not_marriage_group():
+    # Engagement = the PROMISE of marriage. KP reads it on the 5-7-11 courtship/
+    # agreement group (5th love-affair that ripens, 7th partner, 11th desire
+    # secured) and denies it with the union-dusthānas 6-8-12 — deliberately NOT
+    # the 1/6/10 marriage-negation set, so an engagement is not falsely negated
+    # by a concurrent divorce (whose fulfilment houses ARE 1/6/10).
+    for q in ("engagement", "sagai", "mangni", "roka", "betrothal"):
+        assert resolve(q).name == "engagement", q
+    prof = resolve("engagement")
+    assert set(prof.fulfil_houses) == {5, 7, 11}
+    assert set(prof.negate_houses) == {6, 8, 12}
+    assert prof.natural_karaka == Planet.VENUS
+    assert prof.base_domain == "marriage" and prof.varga == 9
+    # the distinguishing 5th (courtship) is present, and it does NOT collide with
+    # the divorce fulfilment axis (1/6/10) the way the plain marriage meter does.
+    assert 5 in prof.fulfil_houses
+    assert not (set(prof.negate_houses) & {1, 10})
+    marriage = resolve("marriage")
+    assert set(prof.fulfil_houses) != set(marriage.fulfil_houses)
+    assert build_panel(prof)
+
+
 def test_freeform_question_matches_words_not_substrings():
     # A full-sentence question resolves on word boundaries: "career" must NOT be
     # mis-mapped to vehicle via the substring "car", and the right domain wins.

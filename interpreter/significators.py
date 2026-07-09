@@ -99,6 +99,24 @@ THEME_LEXICON: dict[str, dict] = {
                     natural_karaka=Planet.VENUS, arudhas=["A5", "UL"], varga=9,
                     synonyms=["love", "prem", "pyar", "pyaar", "affair", "dating",
                               "girlfriend", "boyfriend", "crush", "ishq"]),
+    # Engagement / betrothal — the PROMISE of marriage, not the union itself.
+    # KP: read on the 7th (partner) axis but the fructifying group is the
+    # COURTSHIP-and-agreement set 5-7-11 (5th = love/affair that ripens, 7th =
+    # the partner, 11th = desire secured / friendship formalised — the classic
+    # "getting what one wants"), NOT the 2-7-11 family-union set that only fully
+    # matures at the wedding. Denial group is the union-dusthānas 6-8-12
+    # (separation / rupture / withdrawal) — deliberately NOT 1/6/10, so an
+    # engagement is not falsely negated by a concurrent divorce whose fulfilment
+    # houses are 1/6/10. (KP Readers VI: sub-lord of 7th promises; 5th signifies
+    # the affair that precedes the fixing. base_domain=marriage keeps the Nāḍī
+    # kāraka gender-aware and the reversal/UL logic intact.)
+    "engagement": dict(houses=[7], fulfil_houses=[5, 7, 11], negate_houses=[6, 8, 12],
+                       natural_karaka=Planet.VENUS, arudhas=["UL", "A7"],
+                       saham="Vivaha", varga=9, base_domain="marriage",
+                       synonyms=["sagai", "sagaai", "mangni", "mangani", "roka",
+                                 "betrothal", "engaged", "ring ceremony",
+                                 "rishta pakka", "rishta tay", "proposal accepted",
+                                 "shagun"]),
     "business": dict(houses=[7, 10], fulfil_houses=[7, 10, 11], negate_houses=[5, 8, 12],
                      natural_karaka=Planet.MERCURY, arudhas=["A7", "A10"],
                      saham="Karma", varga=10,
