@@ -11,6 +11,29 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-14 — KP pulled out as the first ISOLATED engine (architecture, no rule change)
+
+- **Change (CODE, `interpreter/engines/`):** introduced a standardized engine
+  contract (`base.py`: `Engine` protocol + `EngineResult`/`TimelinePoint`, every
+  timeline point a normalized `score ∈ [0,1]`) and the first isolated paddhati,
+  `kp_engine.py::KPEngine`. KP now answers **in isolation** — its own promise
+  verdict (primary-cusp sub-lord signifies fulfil ⇒ YES, only negate ⇒ NO) and a
+  per-window normalized timeline (`kp_window_grade(fulfil, negate)`).
+- **Why (śāstra):** no NEW rule. The engine WRAPS existing computation and never
+  recomputes a number — significators from `advance_astrology/vedic/kp.py`, the
+  KP ayanāṃśa+Placidus sub-chart and Vimśottari spine reused from
+  `event_evidence`. The KP interpretation (sub-lord as final arbiter of
+  fructification; fulfil-vs-negate of the running MD>AD>PD chain) is standard KP.
+  - **Source:** Krishnamurti Paddhati Readers III & VI (cuspal sub-lord promise/
+    denial; significators by star-lord occupation/ownership).
+- **Failure-mode addressed (coverage/observability, NOT discrimination):** makes
+  a single school's testimony visible and independently testable before any
+  cross-school fan-in, so a wrong engine is caught in isolation rather than
+  blended away. **No calibration** — the self-test (`tests/test_kp_engine.py`,
+  15 cases) asserts KP *doctrine* and *contract* only (sub-lord arc math,
+  significator rules, grade mapping, determinism); **zero native event dates**,
+  blind-test integrity intact. Full suite 201 passed.
+
 ## 2026-07-07 — Three day-level hands wired into `day_convergence` (user-approved): Moon-spouse · pair-yuti · lagnesh-return
 
 - **Change (CODE, `interpreter/event_evidence.py::day_convergence`):** three new
