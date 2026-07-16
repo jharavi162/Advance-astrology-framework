@@ -9,13 +9,17 @@ top of trustworthy parts.
 
 from interpreter.engines.base import Engine, EngineResult, TimelinePoint
 from interpreter.engines.kp_engine import KPEngine, kp_window_grade
+from interpreter.engines.dasha_timing import DashaTimingEngine, DashaTimingReport
 
 # Registry of isolated engines (grows one entry per school as they're pulled out).
-ENGINES: dict[str, Engine] = {
-    "kp": KPEngine(),
+ENGINES: dict[str, object] = {
+    "kp": KPEngine(),                     # promise / quality / yes-no
+    "dasha_timing": DashaTimingEngine(),  # event clock (data-only)
 }
 
 __all__ = [
     "Engine", "EngineResult", "TimelinePoint",
-    "KPEngine", "kp_window_grade", "ENGINES",
+    "KPEngine", "kp_window_grade",
+    "DashaTimingEngine", "DashaTimingReport",
+    "ENGINES",
 ]
