@@ -69,12 +69,33 @@ def test_report_is_data_only_no_score_or_verdict():
             assert not hasattr(p, banned)
 
 
-def test_chara_seventh_from_lagna_role_is_mechanical():
-    v, rep = _report()
-    seventh = SIGNS[(v.ascendant_sign + 6) % 12]
-    for c in rep.chara:
-        if "7th-from-Lagna" in c.roles:
-            assert c.sign == seventh
+def test_chara_roles_are_domain_general():
+    """Chara rāśi roles must derive from the QUERIED domain's houses — not be
+    hard-coded to marriage. For any domain, an 'Nth-from-Lagna' role must have N
+    among that domain's houses and the sign must actually be N-th from Lagna."""
+    v = _chart()
+    for word in ("marriage", "vehicle", "career"):
+        prof = resolve(word)
+        rep = DashaTimingEngine().evaluate(
+            v, prof, datetime(2010, 1, 1, tzinfo=UTC), datetime(2030, 1, 1, tzinfo=UTC))
+        for c in rep.chara:
+            for role in c.roles:
+                if role.endswith("-from-Lagna"):
+                    n = int(role.split("th")[0].split("st")[0]
+                            .split("nd")[0].split("rd")[0])
+                    assert n in prof.houses
+                    assert c.sign == SIGNS[(v.ascendant_sign + n - 1) % 12]
+
+
+def test_vehicle_chara_tags_fourth_not_seventh():
+    """Concrete anti-regression for the marriage-hardcoding bug: a vehicle query
+    tags the 4th-from-Lagna sign, and never emits marriage's 7th-from-Lagna."""
+    v = _chart()
+    rep = DashaTimingEngine().evaluate(
+        v, resolve("vehicle"), datetime(2010, 1, 1, tzinfo=UTC),
+        datetime(2030, 1, 1, tzinfo=UTC))
+    roles = {r for c in rep.chara for r in c.roles}
+    assert "7th-from-Lagna" not in roles
 
 
 def test_transit_triggers_well_formed():

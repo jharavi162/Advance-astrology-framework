@@ -129,20 +129,31 @@ class DashaTimingEngine:
                 vim.append(VimPeriod(ad.start, ad.end, md.lord.value, ad.lord.value,
                                      tuple(dict.fromkeys(labels))))
 
-        # --- Jaimini Chara rāśi daśā, annotated with marriage-timing roles --- #
+        # --- Jaimini Chara rāśi daśā, tagged by the DOMAIN's own rāśi roles ----
+        # Domain-general (never marriage-only): a rāśi period matters when its
+        # sign is one of the matter's bhāva-signs (Hth-from-Lagna for each house)
+        # or holds the matter's chara-kāraka (Darakaraka / Amātyakāraka / …) or
+        # its natural kāraka. The AI reads which role is active for the question.
         asc = v.ascendant_sign
-        seventh_sign = SIGNS[(asc + 6) % 12]
-        dk = v.chara_karakas().get("Darakaraka")
-        dk_sign = SIGNS[v.signs[dk]] if dk else None
+        ck = v.chara_karakas()
+        house_signs = {SIGNS[(asc + h - 1) % 12]: _ord(h) for h in profile.houses}
+        karaka_signs: dict = {}
+        for kname in profile.karakas:                      # e.g. Darakaraka, Amatyakaraka
+            kp = ck.get(kname)
+            if kp:
+                karaka_signs.setdefault(SIGNS[v.signs[kp]], []).append(kname)
+        if profile.natural_karaka:
+            karaka_signs.setdefault(SIGNS[v.signs[profile.natural_karaka]], []).append(
+                f"kāraka:{profile.natural_karaka.value}")
         chara: list[CharaPeriod] = []
         for cp in _chara_periods(v):
             if not _overlaps(cp["start"], cp["end"], start, end):
                 continue
             roles = []
-            if cp["sign"] == seventh_sign:
-                roles.append("7th-from-Lagna")
-            if dk_sign and cp["sign"] == dk_sign:
-                roles.append("holds Darakaraka")
+            if cp["sign"] in house_signs:
+                roles.append(f"{house_signs[cp['sign']]}-from-Lagna")
+            for k in karaka_signs.get(cp["sign"], []):
+                roles.append(f"holds {k}")
             chara.append(CharaPeriod(cp["start"], cp["end"], cp["sign"], tuple(roles)))
 
         # --- Gochara double-transit triggers on the bhāva and its lord ------- #
