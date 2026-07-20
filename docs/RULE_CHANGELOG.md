@@ -11,6 +11,29 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-20 — AI event-timing interpretation guide (PROMPT/judgment, no engine rule)
+
+- **Change (DOCS, `docs/AI_EVENT_TIMING_GUIDE.md`):** codified the reading
+  discipline for **timing** questions — the judgment layer the AI applies to the
+  engine's timing data. Event-agnostic, no native data. Core principles, all
+  established by blind testing this session:
+  1. the engine gives data, the AI gives the verdict — a salience/convergence
+     score is never the call;
+  2. KP = promise/quality/yes-no; **Daśā × Gochara double-transit = timing**;
+  3. the **bhāva double-transit is a PRIMARY trigger**, not a confirmation —
+     every double-transit window on the matter's house is a candidate date;
+  4. **do not over-constrain** (don't demand lord+kāraka co-fire; don't wait for
+     the "ideal" significator AD when the bhāva double-transit is live);
+  5. weak/debilitated lords deliver via their **dispositor**; events cluster at
+     daśā **onsets**; read the **pratyantar lord's nature** (delivery vs a
+     cancelled attempt); respect **life-stage** (student's 10th ≠ a job);
+     two-body events can be triggered from the **partner's** chart.
+- **Why:** the ENGINE computes correctly; the misses were interpretive. This is a
+  PROMPT-tier learning per CLAUDE.md's classification (judgment, not a bool), so
+  it lives in docs, **not** as new engine rules. No calibration — the principles
+  are classical timing doctrine (BPHS daśā-phala; K.N. Rao double-transit;
+  dispositor-delivery of neecha grahas), never fitted to a known date.
+
 ## 2026-07-14 — KP pulled out as the first ISOLATED engine (architecture, no rule change)
 
 - **Change (CODE, `interpreter/engines/`):** introduced a standardized engine

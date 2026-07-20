@@ -54,6 +54,12 @@ gap or answer from a missing capability. Two cases, two approval levels:
 
 ## Key files
 - `docs/AI_TRIANGULATION_PROMPT.md` — the analysis director (interpretive).
+- `docs/AI_EVENT_TIMING_GUIDE.md` — **read for any "WHEN" question.** The timing
+  judgment layer: KP is quality/yes-no (never timing); the bhāva double-transit is
+  the primary trigger; don't over-constrain the daśā; read the pratyantar's nature.
+- `interpreter/engines/` — isolated per-school engines behind one contract
+  (`kp` = promise/quality; `dasha_timing` = the event clock, data-only). The AI
+  interprets the data; engines carry no verdict.
 - `interpreter/event_evidence.py` — domain-general mechanical evidence builder.
   Nodes are an open registry; `register_family`/`build_panel` generate the whole
   element×technique panel per domain; `DASHA_SYSTEMS` is the daśā catalogue;
