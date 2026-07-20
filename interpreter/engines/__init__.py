@@ -7,8 +7,8 @@ testimony first, validate each in isolation, THEN build the Samanvaya fan-in on
 top of trustworthy parts.
 """
 
-from interpreter.engines.base import Engine, EngineResult, TimelinePoint
-from interpreter.engines.kp_engine import KPEngine, kp_window_grade
+from interpreter.engines.base import Engine
+from interpreter.engines.kp_engine import KPEngine, KPReport
 from interpreter.engines.dasha_timing import DashaTimingEngine, DashaTimingReport
 from interpreter.engines.jaimini import JaiminiEngine, JaiminiReport
 from interpreter.engines.tajika import TajikaEngine, TajikaReport
@@ -31,8 +31,8 @@ def samanvaya(v, profile, start, end, *, intent=None, question=None):
 
 
 __all__ = [
-    "Engine", "EngineResult", "TimelinePoint",
-    "KPEngine", "kp_window_grade",
+    "Engine",
+    "KPEngine", "KPReport",
     "DashaTimingEngine", "DashaTimingReport",
     "JaiminiEngine", "JaiminiReport",
     "TajikaEngine", "TajikaReport",
