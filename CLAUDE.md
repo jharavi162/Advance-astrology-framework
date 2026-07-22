@@ -1,66 +1,75 @@
 # CLAUDE.md — how this repo evolves (read every session)
 
-## Division of labour
-- The ENGINE (`advance_astrology/`) computes; never recompute/guess a number.
-- The AI THINKS: triangulate + synthesize. No calibration, no hindsight,
-  no native-specific hardcoding ever.
+## Division of labour (the whole design in one line)
+- The **ENGINE computes; the AI interprets.** Never recompute/guess a number the
+  engine owns. No calibration, no hindsight, no native-specific hardcoding, ever.
+- Engines emit **DATA** (significations, daśā windows, transit triggers, annual
+  charts) — **no score, no verdict.** The AI reads the data across schools and
+  states its own triangulated call. A convergence/salience *number* is never the
+  answer (blind testing proved the leaderboard misleads).
 
-## Where a NEW LEARNING goes (classify FIRST, then place)
-| Learning kind | Destination | Example |
-|---|---|---|
-| Mechanical/deterministic check the engine can compute | **CODE** `interpreter/event_evidence.py` (+ a regression TEST) | Lagna materialization, sūkṣma drill, double-transit, BNN, reversal |
-| New life-area, or its houses/kāraka/saham/varga | **DATA** `DOMAIN_PROFILES` / `register_domain()` — one row | adding a domain |
-| "How to INTERPRET" judgment, not reducible to a bool | **PROMPT** `docs/AI_TRIANGULATION_PROMPT.md` (descriptive, event-agnostic) | node = TYPE; dark Lagna = intensity; don't fixate on one rule |
-| A true known event to never regress | **TEST** `tests/` fixture (mechanical, **no native dates** — blind-test integrity) | a verified past event |
-
-Rule: push as much as possible into CODE+DATA (guarantee); PROMPT only for genuine
-judgment; every code-learning gets a test. Log each change in
-`docs/RULE_CHANGELOG.md`.
-
-## Evolve the engine yourself — don't work around a missing piece (EVERY SESSION)
-If a question needs a **domain** or a **node/witness** that the engine does not yet
-have, **add it to the engine and merge it to `main`** — never hand-wave around the
-gap or answer from a missing capability. Two cases, two approval levels:
-- **DOMAIN missing** (a new life-area or its houses/kāraka/saham/varga — e.g.
-  `relocation`): add the one `DOMAIN_PROFILES` / `register_domain()` data row
-  **autonomously** (no approval needed), then run the pack and answer.
-- **NODE/WITNESS or mechanical check missing** (a new `register_witness(...)`, a new
-  deterministic check, a new timing factor in `event_evidence.py`): it is the AI's
-  **standing responsibility to proactively IDENTIFY** — from astrological research
-  and the best classical texts (BPHS, Phaladeepika, Saravali, Jaimini Sūtras,
-  Tājika, KP/Krishnamurti, Sanjay Rath/K.N. Rao) — which additional node(s) a given
-  assessment genuinely needs, **name the classical source for each**, and **present
-  them to the user for approval FIRST** (a node changes how every chart is judged).
-  Only after approval, add it **with a regression test**. The node must stay
-  domain-general (read the domain's houses/kāraka, never hard-code a native).
-- **COVERAGE matrix is the anti-miss guard.** A "node miss" is usually a
-  *computed-but-unwired* quantity (the engine calculates it, but no witness reads
-  it). `interpreter/coverage.py` is the single source of truth (technique × wired?);
-  two tests keep it in sync with the live panel (no wired-claim without a witness; no
-  witness without a matrix entry), and every pack prints `coverage_summary()` with
-  the RED gaps. **Whenever you add an engine capability or a witness, update the
-  matrix** — and prefer closing a RED item (wire a computed-but-unwired quantity)
-  over inventing a brand-new computation.
-- **Always**: after adding either, **merge the change into `main`** (do not leave
-  engine evolution stranded on a feature branch) and **log it in
-  `docs/RULE_CHANGELOG.md`** with its śāstra justification. No calibration/hindsight
-  — add the piece because the śāstra/question needs it, never to fit a known date.
+## Architecture — the Samanvaya engine stack
+```
+advance_astrology/            ONE shared ephemeris core (Skyfield) + all calculators
+        │                     (vargas, shadbala, KP sub-lords, chara daśā,
+        │                      ashtakavarga, transits, sahams, varshaphal …)
+interpreter/engines/          isolated per-school engines, one contract, DATA-only
+   ├─ kp_engine.py            KP → promise / denial / quality (yes-no)
+   ├─ dasha_timing.py         the CLOCK → Vimśottari + Chara + Gochara double-transit
+   ├─ jaimini.py              Arudha / Upapada / chara-kāraka / Chara rāśi
+   ├─ tajika.py               annual Varṣaphal / Muntha / Sāham
+   ├─ router.py               question intent → engine order (timing→clock; yes/no→KP)
+   ├─ samanvaya.py            route + run + bundle raw {engine: report} for the AI
+   └─ _shared.py              Vimśottari spine + KP sub-chart (engines depend on
+                              advance_astrology ONLY — not on the legacy monolith)
+interpreter/significators.py  resolve(word) → DomainProfile (the domain dictionary)
+```
+The engine stack is fully decoupled and is the **official path** for answering
+questions. `interpreter/event_evidence.py` + `interpreter/coverage.py` (the old
+witness/salience/convergence/verdict monolith) are **DEPRECATED** — kept only
+until the webapp's legacy endpoints are migrated; do **not** answer from them or
+extend them.
 
 ## Procedure for any astrology question
-1. Run the mechanical pack FIRST:
-   `python -m interpreter.event_evidence --domain <matter|scan> --when ... --start ... --end ...`
-2. Then synthesize MULTIVALENTLY per `docs/AI_TRIANGULATION_PROMPT.md` — never let
-   one rule/system be sole judge.
+1. `resolve(word)` → the `DomainProfile`.
+2. Build the `samanvaya(...)` bundle (or call the relevant engine(s) directly) to
+   get each school's **data**.
+3. **Interpret** — for a "WHEN" question follow `docs/AI_EVENT_TIMING_GUIDE.md`;
+   for judgment/quality follow `docs/AI_TRIANGULATION_PROMPT.md`. Triangulate
+   across schools; never let one system be sole judge; the score is never the verdict.
+
+## Where a NEW LEARNING goes (classify FIRST, then place)
+| Learning kind | Destination |
+|---|---|
+| Mechanical/deterministic quantity the engine can compute but no engine yet exposes | **CODE** — add it as DATA on the right engine in `interpreter/engines/` (+ a doctrine/contract TEST, no native dates) |
+| New life-area (its houses/kāraka/sāham/varga) | **DATA** — one `register_domain()` / `DomainProfile` row |
+| "How to INTERPRET" judgment (not reducible to a bool) | **PROMPT** — `docs/AI_EVENT_TIMING_GUIDE.md` (timing) or `docs/AI_TRIANGULATION_PROMPT.md` (general), descriptive & event-agnostic |
+| A true known event to never regress | **TEST** — a mechanical fixture, **no native dates** (blind-test integrity) |
+
+Push mechanics into engine DATA; keep judgment in the guides (the AI's job, not
+new engine rules). Log every change in `docs/RULE_CHANGELOG.md` with its śāstra
+source. **No calibration** — add a piece because the śāstra/question needs it,
+never to fit a known date.
+
+## Evolve the stack yourself — don't work around a gap
+- **DOMAIN missing** (a new life-area): add the one `register_domain()` row
+  **autonomously**, then answer.
+- **A computed-but-unexposed quantity** an engine should surface (a classical
+  timer/significator the śāstra calls for): name the **classical source** (BPHS,
+  Phaladeepika, Saravali, Jaimini Sūtras, Tājika, KP, Sanjay Rath/K.N. Rao),
+  **present it for approval FIRST** (it changes how every chart reads), then add it
+  as engine DATA **with a doctrine test**. Keep it domain-general (read the
+  domain's houses/kāraka; never hard-code a native).
+- After either, **log it in `docs/RULE_CHANGELOG.md`** with the justification.
 
 ## Key files
-- `docs/AI_TRIANGULATION_PROMPT.md` — the analysis director (interpretive).
-- `interpreter/event_evidence.py` — domain-general mechanical evidence builder.
-  Nodes are an open registry; `register_family`/`build_panel` generate the whole
-  element×technique panel per domain; `DASHA_SYSTEMS` is the daśā catalogue;
-  `salience` ranks windows (convergence-gating + information-weighting).
-- `interpreter/significators.py` — the DICTIONARY: `resolve(word)` maps any theme
-  word (Hinglish ok) to a `DomainProfile`, so the CLI takes `--domain <any word>`.
-- `interpreter/coverage.py` — the COVERAGE MATRIX (technique × wired?) + completeness
-  gate; keeps misses visible as RED items. Update it when adding capabilities/nodes.
-- `interpreter/build_matrix.py` — natal+period dump (`--events` appends the pack).
+- `docs/AI_EVENT_TIMING_GUIDE.md` — **read for any "WHEN" question.** KP is
+  quality/yes-no (never timing); the bhāva double-transit is a PRIMARY trigger;
+  don't over-constrain the daśā; read the pratyantar's nature; weak lords deliver
+  via their dispositor; events cluster at daśā onsets.
+- `docs/AI_TRIANGULATION_PROMPT.md` — the general analysis director (interpretive).
+- `interpreter/engines/` — the per-school engines (data-only) + router + Samanvaya.
+- `interpreter/significators.py` — `resolve(word)` → `DomainProfile` (Hinglish ok).
 - `advance_astrology/vedic/chart.py` — `VedicChart`, the single calculation door.
+- *(deprecated)* `interpreter/event_evidence.py`, `interpreter/coverage.py` — the
+  legacy convergence monolith; do not extend or answer from it.

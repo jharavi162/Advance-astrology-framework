@@ -11,6 +11,52 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-20 — AI event-timing interpretation guide (PROMPT/judgment, no engine rule)
+
+- **Change (DOCS, `docs/AI_EVENT_TIMING_GUIDE.md`):** codified the reading
+  discipline for **timing** questions — the judgment layer the AI applies to the
+  engine's timing data. Event-agnostic, no native data. Core principles, all
+  established by blind testing this session:
+  1. the engine gives data, the AI gives the verdict — a salience/convergence
+     score is never the call;
+  2. KP = promise/quality/yes-no; **Daśā × Gochara double-transit = timing**;
+  3. the **bhāva double-transit is a PRIMARY trigger**, not a confirmation —
+     every double-transit window on the matter's house is a candidate date;
+  4. **do not over-constrain** (don't demand lord+kāraka co-fire; don't wait for
+     the "ideal" significator AD when the bhāva double-transit is live);
+  5. weak/debilitated lords deliver via their **dispositor**; events cluster at
+     daśā **onsets**; read the **pratyantar lord's nature** (delivery vs a
+     cancelled attempt); respect **life-stage** (student's 10th ≠ a job);
+     two-body events can be triggered from the **partner's** chart.
+- **Why:** the ENGINE computes correctly; the misses were interpretive. This is a
+  PROMPT-tier learning per CLAUDE.md's classification (judgment, not a bool), so
+  it lives in docs, **not** as new engine rules. No calibration — the principles
+  are classical timing doctrine (BPHS daśā-phala; K.N. Rao double-transit;
+  dispositor-delivery of neecha grahas), never fitted to a known date.
+
+## 2026-07-14 — KP pulled out as the first ISOLATED engine (architecture, no rule change)
+
+- **Change (CODE, `interpreter/engines/`):** introduced a standardized engine
+  contract (`base.py`: `Engine` protocol + `EngineResult`/`TimelinePoint`, every
+  timeline point a normalized `score ∈ [0,1]`) and the first isolated paddhati,
+  `kp_engine.py::KPEngine`. KP now answers **in isolation** — its own promise
+  verdict (primary-cusp sub-lord signifies fulfil ⇒ YES, only negate ⇒ NO) and a
+  per-window normalized timeline (`kp_window_grade(fulfil, negate)`).
+- **Why (śāstra):** no NEW rule. The engine WRAPS existing computation and never
+  recomputes a number — significators from `advance_astrology/vedic/kp.py`, the
+  KP ayanāṃśa+Placidus sub-chart and Vimśottari spine reused from
+  `event_evidence`. The KP interpretation (sub-lord as final arbiter of
+  fructification; fulfil-vs-negate of the running MD>AD>PD chain) is standard KP.
+  - **Source:** Krishnamurti Paddhati Readers III & VI (cuspal sub-lord promise/
+    denial; significators by star-lord occupation/ownership).
+- **Failure-mode addressed (coverage/observability, NOT discrimination):** makes
+  a single school's testimony visible and independently testable before any
+  cross-school fan-in, so a wrong engine is caught in isolation rather than
+  blended away. **No calibration** — the self-test (`tests/test_kp_engine.py`,
+  15 cases) asserts KP *doctrine* and *contract* only (sub-lord arc math,
+  significator rules, grade mapping, determinism); **zero native event dates**,
+  blind-test integrity intact. Full suite 201 passed.
+
 ## 2026-07-07 — Three day-level hands wired into `day_convergence` (user-approved): Moon-spouse · pair-yuti · lagnesh-return
 
 - **Change (CODE, `interpreter/event_evidence.py::day_convergence`):** three new
