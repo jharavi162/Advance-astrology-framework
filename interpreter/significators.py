@@ -10,8 +10,8 @@ or Hindi/Hinglish) to a `DomainProfile`, so the engine can answer a question abo
 
 This is DATA only (CLAUDE.md routing: a new life-area / its houses-kāraka-saham-
 varga is DATA), grounded in classical bhāva/graha/varga significations (BPHS;
-Phaladeepika). It registers the resolved profile into `DOMAIN_PROFILES`, after
-which the full generative panel (build_panel) judges it like any other matter.
+Phaladeepika). It registers the resolved profile into `DOMAIN_PROFILES`
+(interpreter.domains), after which every engine reads it like any other matter.
 
 Three-tier resolution:
   1. an already-registered domain (the curated 8 + relocation),

@@ -164,33 +164,15 @@ def _aspects(v):
 
 
 # --------------------------------------------------------------------------- #
-# Salience date-scan (the heavy triangulation timeline) — run as a background job
-# because candidate_map is ~2s/window (a multi-year span takes 1–2 min), far too
-# slow for a synchronous request. Client starts a job and polls for the result.
+# Engine-stack date-scan — the daśā clock + KP + Nāḍī bundled as DATA. Run as a
+# background job (kept from the old design) so the client starts a job and polls;
+# the engine stack is fast, so most scans return almost immediately.
 # --------------------------------------------------------------------------- #
 _SCANS: dict = {}
 # Only ONE scan computes at a time. On a small (free) instance parallel scan
 # threads saturate the CPU and the HTTP server can't even serve the page — the
 # app looks "stuck at loading". Later jobs wait at the gate (status "queued").
 _SCAN_GATE = threading.Lock()
-
-
-def _outcome_reads(v, prof, start, end, step_days):
-    """The engine's OUTCOME machinery for a domain over a window: the standing
-    verdict (blessed/afflicted) + a date→kind lookup from the reversal map
-    (CHANGE/UPGRADE · LOSS/BREAK · transition-watch)."""
-    from interpreter.event_evidence import reversal_map, standing_balance
-    bal, _ = standing_balance(v, prof)
-    verdict = ("blessed/PRO" if bal >= 1.0
-               else "afflicted" if bal < 0 else "mixed")
-    rrows = reversal_map(v, prof, start, end, step_days=step_days)
-
-    def kind_at(when):
-        if not rrows:
-            return None
-        row = min(rrows, key=lambda r: abs((r.start - when).days))
-        return row.kind
-    return round(bal, 2), verdict, kind_at, rrows
 
 
 def _scan_worker(job, params, domain, start, end, step_days):
@@ -201,158 +183,78 @@ def _scan_worker(job, params, domain, start, end, step_days):
 
 
 def _run_scan(job, params, domain, start, end, step_days):
+    """Engine-stack date-scan (data-only): the daśā clock's candidate windows
+    (bhāva double-transits + significator antardaśās) tagged with the running
+    chain + KP fulfil/negate + the Nāḍī kāraka/chain. No salience/verdict math —
+    the AI reads the data. Keeps the _SCANS[job] shape the frontend polls."""
     try:
-        from interpreter.event_evidence import candidate_map
         from interpreter.significators import resolve
+        from interpreter.engines import samanvaya
         v = _chart_from(params)
         if v is None:
             raise ValueError("chart params invalid")
+        now = datetime.now(timezone.utc)
         if domain == "__macro__":
-            # Open "kya-kya hua?" → rank ALL registered life-areas by stand-out
-            # spike (scan_domains logic, structured). The shared transit-position
-            # cache makes domains after the first ~6× cheaper.
-            from interpreter.event_evidence import (DOMAIN_PROFILES,
-                                                    domain_verdict)
-            now = datetime.now(timezone.utc)
+            from interpreter.domains import DOMAIN_PROFILES
+            from interpreter.engines import ENGINES
             ranked = []
             for name, prof in DOMAIN_PROFILES.items():
-                rows = candidate_map(v, prof, start, end, step_days=step_days)
-                if not rows:
-                    continue
-                scores = [r.salience for r in rows]
-                peak = max(rows, key=lambda x: x.salience)
-                bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end,
-                                                           step_days)
-                vd = domain_verdict(v, prof, rows, now, rrows=rr)
+                b = samanvaya(v, prof, start, end, intent="timing")
+                dt = b.get("dasha_timing")
+                kp = ENGINES["kp"].evaluate(v, prof, start, end)
+                trigs = list(dt.transit_triggers) if dt else []
+                upcoming = [t for t in trigs if t[1] >= now] or trigs
+                nxt = upcoming[0] if upcoming else None
+                promise = ("promised" if (kp and kp.hits_fulfil)
+                           else "afflicted" if (kp and kp.hits_negate) else "mixed")
                 ranked.append(dict(
-                    domain=name,
-                    standout=round(peak.salience - sum(scores) / len(scores), 2),
-                    salience=round(peak.salience, 3),
-                    date=peak.start.strftime("%Y-%m-%d"),
-                    chain=">".join(peak.chain), systems=peak.systems_firing,
-                    outcome=kind_at(peak.start), standing=bal, verdict=verdict,
-                    call=dict(answer=vd.answer, confidence=vd.confidence,
-                              window=vd.best_window, quality=vd.quality,
-                              next=vd.next_window, next_chain=vd.next_chain),
-                    nodes=[n for n, _ in peak.firing_nodes()][:5]))
-            ranked.sort(key=lambda r: -r["standout"])
+                    domain=name, verdict=promise, triggers=len(trigs),
+                    next_trigger=(nxt[0].strftime("%Y-%m-%d") if nxt else ""),
+                    trigger=(nxt[2] if nxt else "")))
+            ranked.sort(key=lambda r: -r["triggers"])
             _SCANS[job] = dict(status="done", macro=True, domain="macro",
-                               windows=ranked[:8], scanned=len(ranked),
+                               windows=ranked[:9], scanned=len(ranked),
                                step=step_days, ts=time.time())
             return
         prof = resolve(domain)
-        from interpreter.event_evidence import (domain_verdict, nadi_karaka,
-                                                 nadi_nature, nadi_chain)
-        now = datetime.now(timezone.utc)
-        # NĀḌĪ (BNN) nature verdict + degree-ordered CHAIN — kāraka-centric,
-        # domain-general; the DATE (if a timing question) comes from the day-
-        # level pinpoint below.
-        nadi = dict(karaka=nadi_karaka(v, prof).value,
-                    nature=nadi_nature(v, prof) or "clean (smooth/straightforward)",
-                    chain=nadi_chain(v, prof))
-        if getattr(prof, "rupture_matter", False):
-            # RUPTURE matter (divorce/…): the fulfilment scan times the AXIS
-            # (which also spikes for the union itself) — time the BREAK with the
-            # reversal timer of the UNDERLYING matter (divorce = the marriage's
-            # reversal; the rupture profile's inverted KP groups would otherwise
-            # double-invert the reversal semantics), ranked by rupture-score.
-            from interpreter.event_evidence import (DOMAIN_PROFILES,
-                                                    reversal_map,
-                                                    standing_balance)
-            base = DOMAIN_PROFILES.get(getattr(prof, "base_domain", None) or "",
-                                       prof)
-            rrows = reversal_map(v, base, start, end, step_days=step_days)
-            bal, _f = standing_balance(v, prof)
-            verdict = ("blessed/PRO" if bal >= 1.0
-                       else "afflicted" if bal < 0 else "mixed")
-            vd = domain_verdict(v, prof, [], now, rrows=rrows)
-            top = sorted(rrows, key=lambda r: (-r.rupture_score, r.start))[:8]
-            def _rnodes(r):
-                out = []
-                if r.kp_rupture >= 2: out.append("KP rupture-houses in daśā")
-                if r.separators_running: out.append("separators running (Śani/nodes)")
-                if r.break_house_dt: out.append("break-house double-transit")
-                if r.reversal_saham_dt: out.append("reversal-Saham double-transit")
-                if r.lagna_dark_with_malefic: out.append("dark Lagna under malefic")
-                return out
-            windows = [dict(date=r.start.strftime("%Y-%m-%d"),
-                            chain=">".join(r.chain),
-                            salience=r.rupture_score, systems=r.rupture_score,
-                            kp=f"{r.kp_rupture}r/{r.kp_fulfil}f",
-                            outcome=r.kind, nodes=_rnodes(r)) for r in top]
-            # RUPTURE-mode Nāḍī day-pinpoint (Śani/Rāhu-Ketu/Maṅgal separators
-            # degree-locked on the break-axis) around the top LOSS/BREAK windows.
-            from interpreter.event_evidence import (nadi_pinpoint_multi,
-                                                    nadi_rupture_pinpoint)
-            r_anchors = [r.start for r in top
-                         if r.kind == "LOSS/BREAK" and r.start <= now][:6] \
-                or [r.start for r in top[:4]]
-            rpins = nadi_pinpoint_multi(v, prof, r_anchors, start, end, top=5,
-                                        min_gap_days=21,
-                                        funnel=nadi_rupture_pinpoint)
-            _SCANS[job] = dict(status="done", domain=prof.name, rupture=True,
-                               windows=windows, scanned=len(rrows),
-                               step=step_days, standing=round(bal, 2),
-                               verdict=verdict, nadi=nadi, pinpoint=rpins,
-                               call=dict(answer=vd.answer,
-                                         confidence=vd.confidence,
-                                         window=vd.best_window, chain=vd.chain,
-                                         systems=vd.systems, quality=vd.quality,
-                                         next=vd.next_window,
-                                         next_chain=vd.next_chain,
-                                         reasons=vd.reasons),
-                               ts=time.time())
-            return
-        rows = candidate_map(v, prof, start, end, step_days=step_days)
-        top = sorted(rows, key=lambda x: (-x.salience, x.start))[:8]
-        bal, verdict, kind_at, rr = _outcome_reads(v, prof, start, end, step_days)
-        vd = domain_verdict(v, prof, rows, now, rrows=rr)
-        windows = [dict(date=r.start.strftime("%Y-%m-%d"), chain=">".join(r.chain),
-                        salience=round(r.salience, 3), systems=r.systems_firing,
-                        convergence=round(r.convergence, 1),
-                        kp=f"{r.kp_fulfil}/{r.kp_negate}",
-                        outcome=kind_at(r.start),
-                        nodes=[n for n, _ in r.firing_nodes()][:6]) for r in top]
-        # NĀḌĪ day-level pinpoint around the TOP-6 elapsed windows (±45d) — not
-        # just #1, so the ceremony AND the legal window both get day-pins.
-        from interpreter.event_evidence import nadi_pinpoint_multi
-        anchors = [r.start for r in
-                   sorted((r for r in top if r.start <= now),
-                          key=lambda x: (-x.salience, x.start))[:6]] or \
-                  [r.start for r in top[:2]]
-        pins = nadi_pinpoint_multi(v, prof, anchors, start, end, top=5)
-        from interpreter.event_evidence import day_convergence
-        # MULTI-METHOD DAY convergence (pure detectors + direction), bounded to
-        # ±45d around the top elapsed windows so it stays fast.
-        conv, cseen = [], set()
-        for r in top[:3]:
-            if r.start > now:
-                continue
-            for c in day_convergence(v, prof,
-                                     max(r.start - timedelta(days=45), start),
-                                     min(r.start + timedelta(days=45), end), top=4,
-                                     windows=rows, rwindows=rr):
-                if c["date"] not in cseen:
-                    cseen.add(c["date"]); conv.append(c)
-        conv.sort(key=lambda c: (-c["methods"], -abs(c["score"]), c["date"]))
-        conv = conv[:6]
-        # ROLE-DENSITY significators: which grahas carry the matter's roles (the
-        # timer is found by ROLE, not a hard-coded planet) — the top one's daśā
-        # frames the event (§4C-bis step 2).
-        from interpreter.event_evidence import role_significators
-        sigs = [dict(planet=r["planet"].value, score=r["score"], roles=r["roles"])
-                for r in role_significators(v, prof)[:5]]
-        _SCANS[job] = dict(status="done", domain=prof.name, windows=windows,
-                           scanned=len(rows), step=step_days,
-                           standing=bal, verdict=verdict,
-                           pinpoint=pins, nadi=nadi, significators=sigs,
-                           convergence=conv,
-                           call=dict(answer=vd.answer, confidence=vd.confidence,
-                                     window=vd.best_window, chain=vd.chain,
-                                     systems=vd.systems, quality=vd.quality,
-                                     next=vd.next_window, next_chain=vd.next_chain,
-                                     reasons=vd.reasons),
-                           ts=time.time())
+        from interpreter.engines import ENGINES
+        b = samanvaya(v, prof, start, end, intent="timing")
+        dt, na = b.get("dasha_timing"), b.get("nadi")
+        kp = ENGINES["kp"].evaluate(v, prof, start, end)   # promise/quality (KP is not routed for timing)
+
+        def _chain_at(when):
+            if not dt or not dt.vimshottari:
+                return ""
+            p = min(dt.vimshottari, key=lambda p: abs((p.start - when).days))
+            return f"{p.md}>{p.ad}"
+
+        def _kp_at(when):
+            if not kp or not kp.windows:
+                return ""
+            w = min(kp.windows, key=lambda w: abs((w.when - when).days))
+            return f"{w.fulfil}/{w.negate}"
+
+        windows = []
+        for s, e, what in (dt.transit_triggers if dt else []):
+            windows.append(dict(date=s.strftime("%Y-%m-%d"), chain=_chain_at(s),
+                                kp=_kp_at(s), trigger=what, kind="double-transit"))
+        for p in (dt.vimshottari if dt else []):
+            if p.active:
+                windows.append(dict(date=p.start.strftime("%Y-%m-%d"),
+                                    chain=f"{p.md}>{p.ad}", kp=_kp_at(p.start),
+                                    trigger="daśā onset: " + ", ".join(p.active),
+                                    kind="dasha-onset"))
+        windows.sort(key=lambda w: w["date"])
+        verdict = ("promised" if (kp and kp.hits_fulfil)
+                   else "afflicted/denied" if (kp and kp.hits_negate) else "mixed")
+        nadi = dict(karaka=(na.descriptor_karaka if na else ""),
+                    nature=("; ".join(na.nature) if (na and na.nature) else "clean"),
+                    chain=[dict(planet=m.planet, degree=m.degree, relation=m.relation,
+                                when=m.when, signifies=m.signifies)
+                           for m in (na.chain if na else [])])
+        _SCANS[job] = dict(status="done", domain=prof.name, windows=windows[:30],
+                           scanned=len(windows), step=step_days, verdict=verdict,
+                           nadi=nadi, ts=time.time())
     except Exception as e:
         _SCANS[job] = dict(status="error", error=f"{type(e).__name__}: {e}",
                            ts=time.time())
@@ -507,34 +409,6 @@ def dasha_json(q):
         lst = lst[idx].sub_periods or []
     return dict(sub=[dict(lord=d.lord.value, start=d.start.date().isoformat(),
                           end=d.end.date().isoformat()) for d in lst])
-
-
-def _summary(pack):
-    """Hide the per-window CANDIDATE LEDGER (Multi-system toggle OFF)."""
-    out, skip = [], False
-    for ln in pack.splitlines():
-        if "CANDIDATE LEDGER" in ln:
-            skip = True
-            out.append("  [per-window ledger hidden — Multi-system OFF]")
-            continue
-        if "TOP-RANKED WINDOWS" in ln:
-            skip = False
-        if not skip:
-            out.append(ln)
-    return "\n".join(out)
-
-
-def events_json(q):
-    from interpreter.event_evidence import render_domain
-    from interpreter.significators import resolve
-    v, _ = _chart(q)
-    prof = resolve(q["domain"][0])
-    start = datetime.strptime(q["start"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    end = datetime.strptime(q["end"][0], "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    pack = render_domain(v, prof, start, end)
-    if q.get("mode", ["full"])[0] != "full":
-        pack = _summary(pack)
-    return dict(domain=prof.name, pack=pack)
 
 
 CHAT_SYSTEM = (
@@ -844,61 +718,69 @@ def _auto_scan_window(question, today, born=None):
 
 
 def _engine_read(v, question):
-    """Fast deterministic triangulation read for a question's domain — the natal
-    standing-witness balance + fired nodes + promise/tempo (NO slow timeline scan).
-    Returns (domain_name, text) or (None, None) if the question maps to no domain."""
+    """Deterministic grounding for the AI from the data-only engine stack — KP
+    promise/quality + the daśā clock (significators + bhāva double-transits) +
+    Jaimini + Nāḍī. No convergence math; the AI narrates. Returns
+    (domain_label, text) or (None, None) if the question maps to no domain."""
     try:
         from interpreter.significators import resolve
+        from interpreter.engines import samanvaya
         prof = resolve(question)
     except Exception:
         return None, None
+    now = datetime.now(timezone.utc)
+    start, end = now - timedelta(days=6 * 365), now + timedelta(days=4 * 365)
     try:
-        from interpreter.event_evidence import (standing_balance,
-                                                promise_and_tempo, _fmt_tempo)
-        bal, fired = standing_balance(v, prof)
-        pt = promise_and_tempo(v, prof)
+        b = samanvaya(v, prof, start, end, question=question)
     except Exception:
         return None, None
-    verdict = ("blessed/PRO (tends to upgrade, not break)" if bal >= 1.0
-               else "afflicted (loss/obstruction possible)" if bal < 0 else "mixed")
-    nk = prof.natural_karaka.value if prof.natural_karaka else "-"
-    lines = [f"domain={prof.name} | houses={prof.houses} karakas={prof.karakas}+{nk} "
-             f"saham={prof.saham} varga=D{prof.varga}",
-             f"STANDING-WITNESS net balance = {bal:+.2f} → {verdict}",
-             "fired nodes (node: weight):"]
-    for nm, c in sorted(fired, key=lambda x: -abs(x[1])):
-        lines.append(f"  {'+' if c > 0 else '-'} {nm}: {c:+.2f}")
-    lines += _fmt_tempo(pt)
-    # NĀḌĪ (BNN) verdict — kāraka-centric, trine/golden-relation method — always
-    # available (nature is a natal read; the DATE, if a timing question, comes
-    # from the salience scan's day-level 'pinpoint'). Domain-general.
-    try:
-        from interpreter.event_evidence import (nadi_karaka, nadi_nature,
-                                                 nadi_chain)
-        nkp = nadi_karaka(v, prof)
-        nn = nadi_nature(v, prof)
-        lines.append(
-            f"NĀḌĪ (BNN, 1/5/9 trine method): kāraka={nkp.value}; nature = "
-            + (nn or "clean — no Rahu/Ketu-saṅga or vakri on the kāraka "
-               "(smooth/straightforward rang)"))
-        chain = nadi_chain(v, prof)
-        if chain:
-            def _c(r):
-                tag = ("HERO" if "HERO" in r["when"]
-                       else "pre" if "before" in r["when"] else "post")
-                return (f"{r['planet']} {r['degree']}° {r['relation']}"
-                        f"[{tag}]{'(R)' if r['retrograde'] else ''} — "
-                        f"{r['signifies']}")
-            lines.append(
-                "NĀḌĪ CHAIN (BNN degree-order = chronology; pre = already/before "
-                "the event, post = after it — read the story left→right): "
-                + "  →  ".join(_c(r) for r in chain))
-    except Exception:
-        pass
-    # A tier-3 derived domain is named after the raw query — show a tidy label.
+    L = [f"domain={prof.name} | houses={prof.houses} | intent={b.intent}"]
+    kp = b.get("kp")
+    if kp:
+        promise = ("promised (sub-lord signifies fulfil %s)" % list(kp.hits_fulfil)
+                   if kp.hits_fulfil else
+                   "denied/afflicted (sub-lord signifies only negation %s)"
+                   % list(kp.hits_negate) if kp.hits_negate else "unclear")
+        L.append(f"KP (promise/quality): H{prof.houses[0]}-cusp sub-lord "
+                 f"{kp.cusp_sublord} signifies {list(kp.cusp_signifies)} → {promise}")
+    dt = b.get("dasha_timing")
+    if dt:
+        L.append("SIGNIFICATORS (the clock): " + ", ".join(
+            f"{s.label}={s.planet.value}" for s in dt.significators))
+        act = [p for p in dt.vimshottari if p.active]
+        if act:
+            L.append("significator antardaśās: " + "; ".join(
+                f"{p.start.date()}→{p.end.date()} {p.md}>{p.ad} [{','.join(p.active)}]"
+                for p in act[:8]))
+        if dt.transit_triggers:
+            L.append("bhāva double-transits (PRIMARY triggers — a window on the "
+                     "matter's house is a candidate date): " + "; ".join(
+                         f"{s.date()}→{e.date()} {w}"
+                         for s, e, w in dt.transit_triggers[:6]))
+    ja = b.get("jaimini")
+    if ja:
+        x = []
+        if ja.upapada_sign:
+            x.append(f"UL={ja.upapada_sign}")
+        if ja.domain_arudha:
+            x.append("Arudha " + str(ja.domain_arudha))
+        if ja.chara_karakas:
+            x.append("chara-kāraka " + str(ja.chara_karakas))
+        if x:
+            L.append("JAIMINI: " + " | ".join(x))
+    na = b.get("nadi")
+    if na:
+        L.append(f"NĀḌĪ (BNN): kāraka={na.descriptor_karaka}; nature="
+                 + ("; ".join(na.nature) or "clean (smooth/straightforward)"))
+        if na.chain:
+            L.append("NĀḌĪ chain (degree-order = chronology, read left→right): "
+                     + "  →  ".join(
+                         f"{m.planet} {m.degree}° {m.relation}"
+                         f"[{'HERO' if 'HERO' in m.when else 'pre' if 'before' in m.when else 'post'}]"
+                         f" — {m.signifies}" for m in na.chain))
     label = prof.name if len(prof.name) <= 20 else "house " + "/".join(
         str(h) for h in prof.houses)
-    return label, "\n".join(lines)
+    return label, "\n".join(L)
 
 
 def _gemini_post(model, payload, key):
@@ -1135,8 +1017,6 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(scan_start(q)))
             if u.path == "/api/scan_status":
                 return self._send(200, json.dumps(scan_status(q)))
-            if u.path == "/api/events":
-                return self._send(200, json.dumps(events_json(q)))
             return self._send(404, json.dumps({"error": "not found"}))
         except Exception as e:
             return self._send(500, json.dumps({"error": f"{type(e).__name__}: {e}"}))
