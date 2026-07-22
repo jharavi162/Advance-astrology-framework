@@ -12,16 +12,18 @@ from interpreter.engines.kp_engine import KPEngine, KPReport
 from interpreter.engines.dasha_timing import DashaTimingEngine, DashaTimingReport
 from interpreter.engines.jaimini import JaiminiEngine, JaiminiReport
 from interpreter.engines.tajika import TajikaEngine, TajikaReport
+from interpreter.engines.nadi import NadiEngine, NadiReport
 from interpreter.engines.samanvaya import assemble, SamanvayaBundle
 from interpreter.engines.router import classify, route
 
-# Registry of isolated per-school engines behind one contract. Each is data-only
-# (or, for KP, promise/quality) — none carries a verdict; the AI interprets.
+# Registry of the five isolated per-school engines behind one contract. Each is
+# data-only (or, for KP, promise/quality) — none carries a verdict; the AI reads.
 ENGINES: dict[str, object] = {
     "kp": KPEngine(),                     # promise / quality / yes-no
     "dasha_timing": DashaTimingEngine(),  # event clock (Vimśottari + Chara + transit)
     "jaimini": JaiminiEngine(),           # Arudha / UL / chara-kāraka / Chara rāśi
     "tajika": TajikaEngine(),             # annual Varṣaphal / Muntha / Sāham
+    "nadi": NadiEngine(),                 # Bhṛgu-Nandi kāraka chain + jeeva/sanction
 }
 
 
@@ -36,6 +38,7 @@ __all__ = [
     "DashaTimingEngine", "DashaTimingReport",
     "JaiminiEngine", "JaiminiReport",
     "TajikaEngine", "TajikaReport",
+    "NadiEngine", "NadiReport",
     "SamanvayaBundle", "assemble", "samanvaya",
     "classify", "route", "ENGINES",
 ]

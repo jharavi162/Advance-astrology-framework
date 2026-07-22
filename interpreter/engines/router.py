@@ -12,9 +12,9 @@ from __future__ import annotations
 # intent -> ordered engines (primary first). The AI still reads every engine it
 # is handed; ordering only signals which testimony leads for that question type.
 _ROUTING = {
-    "timing":  ["dasha_timing", "jaimini", "tajika"],   # WHEN
-    "yes_no":  ["kp", "dasha_timing"],                  # WILL it / did it
-    "quality": ["kp", "jaimini"],                       # HOW / will it last / afflicted
+    "timing":  ["dasha_timing", "jaimini", "tajika", "nadi"],   # WHEN
+    "yes_no":  ["kp", "dasha_timing"],                          # WILL it / did it
+    "quality": ["kp", "jaimini", "nadi"],                       # HOW / will it last / afflicted
 }
 
 # keyword → intent (first match wins; order matters — timing words are checked
