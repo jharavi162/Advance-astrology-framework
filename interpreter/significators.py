@@ -23,7 +23,7 @@ Three-tier resolution:
 from __future__ import annotations
 
 from advance_astrology import Planet
-from interpreter.event_evidence import DOMAIN_PROFILES, register_domain
+from interpreter.domains import DOMAIN_PROFILES, register_domain
 
 # --------------------------------------------------------------------------- #
 # Classical significations — the alphabet for the unknown-word fallback (BPHS).

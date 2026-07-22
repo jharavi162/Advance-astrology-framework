@@ -1,7 +1,7 @@
 """Phase 2 — significator dictionary: pick a domain from any theme word."""
 
 from advance_astrology import Planet
-from interpreter.event_evidence import DOMAIN_PROFILES, build_panel
+from interpreter.domains import DOMAIN_PROFILES
 from interpreter.significators import THEME_LEXICON, resolve
 
 
@@ -21,9 +21,8 @@ def test_lexicon_theme_builds_a_full_profile():
     assert prof.houses == (4,)
     assert prof.natural_karaka == Planet.VENUS
     assert prof.varga == 16
-    # registered, so the generative panel judges it like any other matter
+    # registered, so every engine can read it like any other matter
     assert "vehicle" in DOMAIN_PROFILES
-    assert build_panel(prof)
 
 
 def test_every_lexicon_theme_is_resolvable_and_complete():
@@ -89,12 +88,12 @@ def test_second_marriage_nadi_karaka_is_gender_aware():
     from datetime import datetime
     from zoneinfo import ZoneInfo
     from advance_astrology import VedicChart
-    from interpreter.event_evidence import nadi_karaka
+    from interpreter.engines.nadi import _descriptor_karaka
     v = VedicChart.create(
         when=datetime(1991, 4, 4, 6, 23, tzinfo=ZoneInfo("Asia/Kolkata")),
         latitude=23.63, longitude=85.52, ayanamsa="lahiri")
     prof = resolve("second marriage")
     v.gender = "male"
-    assert nadi_karaka(v, prof) == Planet.VENUS
+    assert _descriptor_karaka(v, prof) == Planet.VENUS
     v.gender = "female"
-    assert nadi_karaka(v, prof) == Planet.MARS
+    assert _descriptor_karaka(v, prof) == Planet.MARS
