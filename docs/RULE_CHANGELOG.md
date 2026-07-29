@@ -11,6 +11,35 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-07-29 — Gochara (transit) engine + an in-app transit READING section
+
+- **Change (CODE, `interpreter/engines/gochara.py`):** a sixth data-only engine
+  answering "what are the CURRENT transits doing to this chart?" in three
+  layers: (1) **transit↔natal** contacts (conjunction / graha-dṛṣṭi with the
+  degree gap, ≤3° flagged as the tight event-grade lock), (2) **transit↔bhāva**
+  activation reckoned BOTH from Lagna and from the Moon (Janma-rāśi gochara),
+  with the transited sign's SAV bindus, kakṣyā fruitfulness, Sade-Sati, the
+  Jupiter+Saturn double-transit, and Saturn/Jupiter/Rāhu returns, and (3)
+  **sky-only** patterns (mutual transit conjunctions, retrogrades, upcoming
+  slow-mover ingresses) that are collective, not native-specific.
+- **Why (śāstra):** no new rule — it EXPOSES what the transit calculator already
+  computes. Gochara from the Moon is the classical Janma-rāśi reckoning (BPHS
+  gochara-phala); the Jupiter+Saturn double-transit is the classic bhāva trigger
+  (K.N. Rao); Aṣṭakavarga bindus/kakṣyā grade a transit's fruitfulness (BPHS
+  Aṣṭakavarga gochara); Sade-Sati is Śani from the Janma-rāśi.
+- **Router:** new `gochara` intent (cues: gochar/transit/abhi kya/sade-sati/
+  vakri…) routed to `[gochara, dasha_timing]`; a plain "kab hoga" still routes to
+  the daśā clock, so transit questions never hijack timing questions.
+- **App:** `/api/gochara` + a "Gochar reading" card rendering the three layers,
+  and an "AI se interpretation" button; the chat now grounds on the transit DATA
+  (`_gochara_text`), including for pure transit questions that name no life-area.
+- **Division of labour preserved:** the engine emits DATA only — no score, no
+  verdict. The grounding explicitly tells the AI to separate the personal layer
+  from the collective one, and that a transit triggers only what the daśā and the
+  natal promise already allow. 10 doctrine/contract tests (house arithmetic from
+  Lagna/Moon, degree-lock rule, double-transit definition, no retrograde
+  luminaries/nodes, ordered ingresses, routing); **no native dates**.
+
 ## 2026-07-20 — AI event-timing interpretation guide (PROMPT/judgment, no engine rule)
 
 - **Change (DOCS, `docs/AI_EVENT_TIMING_GUIDE.md`):** codified the reading

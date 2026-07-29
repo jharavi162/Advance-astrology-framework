@@ -13,6 +13,7 @@ from interpreter.engines.dasha_timing import DashaTimingEngine, DashaTimingRepor
 from interpreter.engines.jaimini import JaiminiEngine, JaiminiReport
 from interpreter.engines.tajika import TajikaEngine, TajikaReport
 from interpreter.engines.nadi import NadiEngine, NadiReport
+from interpreter.engines.gochara import GocharaEngine, GocharaReport
 from interpreter.engines.samanvaya import assemble, SamanvayaBundle
 from interpreter.engines.router import classify, route
 
@@ -24,6 +25,7 @@ ENGINES: dict[str, object] = {
     "jaimini": JaiminiEngine(),           # Arudha / UL / chara-kāraka / Chara rāśi
     "tajika": TajikaEngine(),             # annual Varṣaphal / Muntha / Sāham
     "nadi": NadiEngine(),                 # Bhṛgu-Nandi kāraka chain + jeeva/sanction
+    "gochara": GocharaEngine(),           # current transits: natal contacts + sky-only
 }
 
 
@@ -39,6 +41,7 @@ __all__ = [
     "JaiminiEngine", "JaiminiReport",
     "TajikaEngine", "TajikaReport",
     "NadiEngine", "NadiReport",
+    "GocharaEngine", "GocharaReport",
     "SamanvayaBundle", "assemble", "samanvaya",
     "classify", "route", "ENGINES",
 ]

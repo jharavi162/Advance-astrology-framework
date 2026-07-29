@@ -397,6 +397,39 @@ def transit_json(q):
     return dict(date=d, lagna=int(v.ascendant_sign), planets=pl)
 
 
+def gochara_json(q):
+    """Current-transit READING data for this chart (/api/gochara) — the three
+    layers the AI interprets: transit↔natal contacts, bhāva activation (from
+    Lagna and Moon), and the sky-only patterns. Data only, no verdict."""
+    from interpreter.engines import ENGINES
+    v, _ = _chart(q)
+    d = (q.get("date", [""])[0] or datetime.now(timezone.utc).strftime("%Y-%m-%d"))
+    when = datetime.strptime(d, "%Y-%m-%d").replace(hour=12, tzinfo=timezone.utc)
+    r = ENGINES["gochara"].evaluate(v, None, when, when + timedelta(days=365))
+    return dict(
+        as_of=d,
+        positions=[dict(planet=p.planet, sign=p.sign, deg=p.degree,
+                        nak=p.nakshatra, retro=p.retrograde,
+                        h_lagna=p.house_from_lagna, h_moon=p.house_from_moon,
+                        sav=p.sav_bindus, kakshya=p.kakshya_fruitful)
+                   for p in r.positions],
+        natal_contacts=[dict(transit=c.transit_planet, natal=c.natal_planet,
+                             relation=c.relation, orb=c.orb, lock=c.degree_lock)
+                        for c in r.natal_contacts if c.degree_lock
+                        or c.relation != "conjunction"][:24],
+        activation=[dict(house=a.house, ref=a.reference,
+                         occupied=list(a.occupied_by), aspected=list(a.aspected_by))
+                    for a in r.house_activation],
+        sade_sati=r.sade_sati,
+        double_transit=list(r.double_transit_houses),
+        returns=list(r.returns),
+        sky=list(r.sky_conjunctions),
+        retrogrades=list(r.retrogrades),
+        ingresses=[dict(planet=i.planet, frm=i.from_sign, to=i.to_sign,
+                        on=i.on.strftime("%Y-%m-%d"))
+                   for i in r.upcoming_ingresses[:8]])
+
+
 def dasha_json(q):
     """Lazy daśā drill: path = dot-separated indices (maha.antar.pratyantar).
     Returns the children of the node at that path (antar / pratyantar / sūkṣma)."""
@@ -717,24 +750,82 @@ def _auto_scan_window(question, today, born=None):
     return today, today + timedelta(days=3 * 365)
 
 
+def _gochara_text(v, when):
+    """Current-transit DATA as grounding text for the AI (three layers: transit↔
+    natal, bhāva activation from Lagna+Moon, sky-only). Never a verdict."""
+    from interpreter.engines import ENGINES
+    try:
+        r = ENGINES["gochara"].evaluate(v, None, when, when + timedelta(days=365))
+    except Exception:
+        return ""
+    L = [f"GOCHARA (current transits, as of {r.as_of:%Y-%m-%d}) — DATA; you interpret:"]
+    L.append("  positions (bhāva from Lagna / from Moon · natal SAV of that sign · kakṣyā):")
+    for p in r.positions:
+        L.append(f"    {p.planet} {p.degree}° {p.sign} ({p.nakshatra}) → "
+                 f"H{p.house_from_lagna} from Lagna, H{p.house_from_moon} from Moon; "
+                 f"SAV={p.sav_bindus}"
+                 + ("; kakṣyā-fruitful" if p.kakshya_fruitful else "")
+                 + ("; RETROGRADE" if p.retrograde else ""))
+    tight = [c for c in r.natal_contacts if c.degree_lock]
+    if tight:
+        L.append("  TIGHT transit↔natal contacts (degree-locked ≤3° — the live personal pattern):")
+        for c in tight[:10]:
+            L.append(f"    transit {c.transit_planet} conjunct natal "
+                     f"{c.natal_planet} (orb {c.orb}°)")
+    asp = [c for c in r.natal_contacts if c.relation != "conjunction"][:12]
+    if asp:
+        L.append("  transit dṛṣṭi on natal grahas: "
+                 + "; ".join(f"{c.transit_planet} {c.relation} natal {c.natal_planet}"
+                             for c in asp))
+    if r.double_transit_houses:
+        L.append(f"  DOUBLE-TRANSIT (Jupiter AND Saturn both activating) on house(s): "
+                 f"{list(r.double_transit_houses)} — a primary bhāva trigger")
+    ss = r.sade_sati or {}
+    L.append(f"  Sade-Sati: active={ss.get('active')} phase={ss.get('phase')} "
+             f"(Saturn in {ss.get('saturn_sign')})")
+    if r.returns:
+        L.append("  returns: " + "; ".join(r.returns))
+    L.append("  SKY-ONLY (collective, not native-specific): "
+             + (("conjunctions " + ", ".join(r.sky_conjunctions)) if r.sky_conjunctions
+                else "no close conjunctions")
+             + ("; retrograde: " + ", ".join(r.retrogrades) if r.retrogrades else ""))
+    if r.upcoming_ingresses:
+        L.append("  upcoming slow-mover sign changes: "
+                 + "; ".join(f"{i.planet} {i.from_sign}→{i.to_sign} on {i.on:%Y-%m-%d}"
+                             for i in r.upcoming_ingresses[:5]))
+    L.append("  READ IT IN THREE LAYERS: (1) what the transits do to THIS chart "
+             "(natal contacts + which bhāva/kāraka they light), (2) the bhāva "
+             "picture from Lagna AND from the Moon, (3) the sky-only weather that "
+             "is true for everyone — say plainly which part is personal and which "
+             "is collective. Transit alone does not deliver an event: it triggers "
+             "what the daśā and the natal promise already allow.")
+    return "\n".join(L)
+
+
 def _engine_read(v, question):
     """Deterministic grounding for the AI from the data-only engine stack — KP
     promise/quality + the daśā clock (significators + bhāva double-transits) +
     Jaimini + Nāḍī. No convergence math; the AI narrates. Returns
     (domain_label, text) or (None, None) if the question maps to no domain."""
+    from interpreter.engines import classify
+    now = datetime.now(timezone.utc)
+    intent = classify(question)
     try:
         from interpreter.significators import resolve
         from interpreter.engines import samanvaya
         prof = resolve(question)
     except Exception:
-        return None, None
-    now = datetime.now(timezone.utc)
+        # A pure transit question ("abhi kya gochar chal raha hai") names no
+        # life-area — still answerable: the gochara read is chart-wide.
+        return ("gochar", _gochara_text(v, now)) if intent == "gochara" else (None, None)
     start, end = now - timedelta(days=6 * 365), now + timedelta(days=4 * 365)
     try:
         b = samanvaya(v, prof, start, end, question=question)
     except Exception:
         return None, None
     L = [f"domain={prof.name} | houses={prof.houses} | intent={b.intent}"]
+    if intent == "gochara":
+        L.append(_gochara_text(v, now))
     kp = b.get("kp")
     if kp:
         promise = ("promised (sub-lord signifies fulfil %s)" % list(kp.hits_fulfil)
@@ -1011,6 +1102,8 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(dasha_json(q)))
             if u.path == "/api/transit":
                 return self._send(200, json.dumps(transit_json(q)))
+            if u.path == "/api/gochara":
+                return self._send(200, json.dumps(gochara_json(q)))
             if u.path == "/api/cusps":
                 return self._send(200, json.dumps(cusps_json(q)))
             if u.path == "/api/scan":

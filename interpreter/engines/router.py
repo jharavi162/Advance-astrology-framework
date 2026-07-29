@@ -15,11 +15,18 @@ _ROUTING = {
     "timing":  ["dasha_timing", "jaimini", "tajika", "nadi"],   # WHEN
     "yes_no":  ["kp", "dasha_timing"],                          # WILL it / did it
     "quality": ["kp", "jaimini", "nadi"],                       # HOW / will it last / afflicted
+    "gochara": ["gochara", "dasha_timing"],                     # what are transits doing NOW
 }
 
 # keyword → intent (first match wins; order matters — timing words are checked
 # before the generic yes/no "will").
 _INTENT_CUES = [
+    # transit questions first: "abhi kya chal raha hai" is a gochara ask, not a
+    # WHEN-will-it-happen ask, even though it carries time words.
+    ("gochara", ("gochar", "gochara", "transit", "abhi kya", "abhi kaisa",
+                 "right now", "currently", "current transit", "chal raha",
+                 "chal rahi", "sade sati", "sade-sati", "dhaiya", "retrograde",
+                 "vakri")),
     ("timing",  ("when", "date", "time", "kab", "which year", "which month",
                  "how soon", "by when")),
     ("quality", ("how good", "quality", "will it last", "happy", "afflict",

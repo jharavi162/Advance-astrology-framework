@@ -124,6 +124,14 @@
         <div id="tmeta" class="lgnd"></div>
       </div>
       <div class="card">
+        <h2>Gochar reading — is chart par kya asar</h2>
+        <div class="row" style="margin-bottom:9px">
+          <button class="sec" onclick="showGochara()">Reading nikalo</button>
+          <button class="sec" onclick="askGocharaAI()">AI se interpretation</button>
+        </div>
+        <div id="gout" class="lgnd">Engine transit-data deta hai; interpretation AI karta hai.</div>
+      </div>
+      <div class="card">
         <h2>Divisional charts</h2>
         <div class="tabs" id="vtabs"></div>
         <div class="nwrap"><svg id="varga" class="nchart"></svg></div>
@@ -393,6 +401,47 @@ async function showTransit(){const j=window.NATAL;if(!j)return;
     drawNorth(document.getElementById('tchart'),j.lagna,c);
     document.getElementById('tmeta').textContent='Transit '+t.date+' · houses from natal Lagna '+j.lagna_name;
   }catch(e){document.getElementById('tmeta').textContent='transit error: '+e;}
+}
+
+// Gochar reading — engine DATA in three layers (personal / bhāva / sky-only)
+async function showGochara(){const j=window.NATAL,out=document.getElementById('gout');
+  if(!j){out.textContent='Pehle Cast chart karo.';return;}
+  out.textContent='…';
+  const d=document.getElementById('tdate').value||new Date().toISOString().slice(0,10);
+  try{const g=await(await fetch('/api/gochara?'+params()+'&date='+d)).json();
+    const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    const L=[];
+    L.push('<b>1 · Aapke chart par (personal)</b>');
+    const tight=(g.natal_contacts||[]).filter(c=>c.lock);
+    L.push(tight.length?('<ul>'+tight.slice(0,8).map(c=>
+      `<li>transit <b>${esc(c.transit)}</b> conjunct natal <b>${esc(c.natal)}</b> — orb ${c.orb}°</li>`).join('')+'</ul>')
+      :'<div class="sub">koi degree-locked contact nahi (≤3°)</div>');
+    if((g.double_transit||[]).length)
+      L.push(`<div>⭐ <b>Double-transit</b> (Guru + Śani dono) on house: ${g.double_transit.join(', ')}</div>`);
+    if((g.returns||[]).length) L.push('<div>'+g.returns.map(esc).join('<br>')+'</div>');
+    L.push(`<div>Sade-Sati: <b>${g.sade_sati.active?'ACTIVE — '+esc(g.sade_sati.phase):'nahi chal rahi'}</b> (Śani ${esc(g.sade_sati.saturn_sign)})</div>`);
+    L.push('<b style="display:block;margin-top:9px">2 · Bhāva par asar (Lagna se / Chandra se)</b>');
+    L.push('<table><tr><th>Graha</th><th>Rāśi</th><th>Lagna se</th><th>Chandra se</th><th>SAV</th></tr>'
+      +g.positions.map(p=>`<tr><td>${esc(p.planet)}${p.retro?' <span class="sub">(R)</span>':''}</td>`
+      +`<td>${esc(p.sign)} ${p.deg}°</td><td>H${p.h_lagna}</td><td>H${p.h_moon}</td>`
+      +`<td>${p.sav}${p.kakshya?' ✓':''}</td></tr>`).join('')+'</table>');
+    L.push('<b style="display:block;margin-top:9px">3 · Sirf aakash (sabke liye same)</b>');
+    L.push('<div class="sub">'+((g.sky||[]).length?g.sky.map(esc).join(' · '):'koi close conjunction nahi')
+      +((g.retrogrades||[]).length?('<br>vakri: '+g.retrogrades.map(esc).join(', ')):'')+'</div>');
+    if((g.ingresses||[]).length)
+      L.push('<div class="sub">Aage rāśi-parivartan: '+g.ingresses.slice(0,5).map(i=>
+        `${esc(i.planet)} ${esc(i.frm)}→${esc(i.to)} (${esc(i.on)})`).join(' · ')+'</div>');
+    out.innerHTML=L.join('');
+  }catch(e){out.textContent='gochara error: '+e;}
+}
+
+function askGocharaAI(){const inp=document.getElementById('cin');
+  if(!window.NATAL){alert('Pehle Cast chart karo.');return;}
+  inp.value='Abhi ke gochar (transits) ka mere chart par kya asar hai? Teen layer me '
+    +'batao: (1) mere natal grahas/bhāvas par kya pattern ban raha hai, (2) Lagna aur '
+    +'Chandra dono se bhāva-picture, (3) sirf aakash ka collective effect. Kaun sa hissa '
+    +'personal hai aur kaun sa sabke liye same — clearly alag karo.';
+  sendChat();document.getElementById('chat').scrollIntoView({behavior:'smooth'});
 }
 
 // Vimśottari lazy drill
