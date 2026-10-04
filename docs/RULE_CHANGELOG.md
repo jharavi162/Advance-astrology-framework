@@ -11,6 +11,24 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-04 — Current-life reading: choose the headline theme by the mind's link, not the transit cluster (PROMPT, no engine rule)
+
+- **Change (DOCS, `docs/AI_TRIANGULATION_PROMPT.md` §5-bis):** added a
+  headline-theme selection order for present-tense readings: (1) Moon-to-domain
+  link (natal/D9 Moon in a domain's UL / A7 / bhāva / D9-7th or with its kāraka),
+  (2) the running MD lord's ruled houses, (3) the life-stage pending matter of
+  that lord — inferred from age + the chart's own delay signatures, never by
+  asking the user for context, (4) only then the transit cluster, read multivalently through the
+  matter selected above (e.g. 12th = vyaya AND śayyā-sukha).
+- **Why:** a reading defaulted to the densest transit cluster and translated it
+  through the wrong bhāva-meaning (expense/authority instead of
+  isolation/partnership). This is interpretive order (judgment), so it is
+  PROMPT-tier per CLAUDE.md. Śāstra basis: BPHS — the Moon as manas, the mind
+  judged from its placement; Phaladeepika/BPHS — daśā results follow the houses
+  the lord owns; Jaimini Sūtras — the Upapada as the marriage point; BPHS
+  bhāva-phala of the 12th including śayyā-sukha. No timing window moves; no
+  native data encoded.
+
 ## 2026-10-04 — Current-life ("abhi kya chal raha hai") reading format (PROMPT, no engine rule)
 
 - **Change (DOCS, `docs/AI_TRIANGULATION_PROMPT.md` §5-bis):** added the output
