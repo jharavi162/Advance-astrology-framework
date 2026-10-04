@@ -11,6 +11,20 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-04 — Current-life ("abhi kya chal raha hai") reading format (PROMPT, no engine rule)
+
+- **Change (DOCS, `docs/AI_TRIANGULATION_PROMPT.md` §5-bis):** added the output
+  structure for a present-tense reading: *mind right now → stress points → what
+  is giving comfort → the live desire, timed (near-term PD table + primary and
+  secondary window)*. Added a tone rule: check a house's standing strength
+  (dignified lord, mahāpuruṣa yoga, 11th SAV) before calling it troubled, and
+  read a node on the Arudha as colouring image/feeling, not substance.
+- **Why:** a user-requested output format (judgment/presentation, not a bool),
+  so it is PROMPT-tier per CLAUDE.md. Śāstra basis for the tone rule: BPHS on
+  judging a bhāva by its lord's dignity and yogas before transits; Jaimini Sūtras
+  on the Arudha as the *perceived* (māyā) image of a matter. No calibration: user
+  corrections may fix the reading's tone, never move a timing window.
+
 ## 2026-07-20 — AI event-timing interpretation guide (PROMPT/judgment, no engine rule)
 
 - **Change (DOCS, `docs/AI_EVENT_TIMING_GUIDE.md`):** codified the reading
