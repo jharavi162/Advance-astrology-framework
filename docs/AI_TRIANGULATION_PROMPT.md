@@ -658,6 +658,31 @@ person-centred**, not a natal catalogue. Use this structure:
    (PD level), then a **primary and a secondary dated window**, each naming its
    converging systems. Close with one committed call and 1–2 practical pointers.
 
+**Choosing the headline theme (do this BEFORE writing §1).** The densest
+transit cluster is *where* pressure falls, not *what* it is about. Pick the
+headline in this order, then read the cluster THROUGH it:
+1. **The mind's preoccupation — Moon-to-domain link.** Check whether the natal
+   Moon (and/or the D9 Moon) occupies or joins a domain's key point: the
+   Upapada (UL) sign, the A7, the 7th/5th/10th bhāva, the D9 7th, or sits with
+   that domain's kāraka/lord in D9. A Moon placed in a domain's key point means
+   that matter is what the mind keeps returning to; a weak Moon there
+   (debilitated, Kemadruma, Duḥkhita) makes it the felt ache. Name it.
+2. **The running MD lord's own houses.** What the Mahādaśā lord *rules* is the
+   chapter's agenda (e.g. an MD of the 7th lord makes partnership the decade's
+   question). An unfulfilled matter of the MD lord outranks a generic transit
+   reading.
+3. **Life-stage pending matter.** If the MD lord's matter is still pending at
+   the native's age (status unknown → ask once, plainly), it is the default
+   headline.
+4. **Only then the transit cluster** — and read each house *multivalently*,
+   choosing the meaning the steps above select. E.g. the 12th = expenses/
+   distance AND śayyā-sukha (bed comforts)/isolation; under a 7th-lord MD with
+   the Moon on the UL, a 12th-house cluster reads as *loneliness / missing
+   conjugal comfort*, not first as money or career. Likewise a transit on a
+   5th-lord Sun can be romance/progeny before it is father/authority.
+
+State the headline in ONE plain sentence; do not dilute it across five themes.
+
 Tone discipline:
 - **A transit/sign-lord signal is not a struggle by default.** Before calling a
   life-area troubled, check its *standing* strength (dignified lord, mahāpuruṣa
