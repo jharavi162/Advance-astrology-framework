@@ -637,6 +637,40 @@ it lower confidence in a kāraka-lit, BNN-locked, theme-matched window.
 - **● Core Synthesis Summary (blockquote)** — *"<theme>, <texture>, around
   <date/window>"* + confidence + number of systems converged.
 
+### 5-bis. "What is going on in my life right now?" — the CURRENT-LIFE reading
+When the user asks for a reading of the native *as of now* (e.g. "abhi kya chal
+raha hai", "mann kaisa hai", "key themes"), the answer is **present-tense and
+person-centred**, not a natal catalogue. Use this structure:
+
+1. **Mann abhi (the mind right now)** — one headline sentence of the dominant
+   feeling, then the reasons. Read it from the Moon (sign, house, dignity,
+   Avasthā, Kemadruma/support, Jupiter's dṛṣṭi), the **running MD/AD/PD lords'
+   houses**, the slow transits counted **from the Moon** as well as the Lagna,
+   the current Chara antardaśā rāśi, and the running Varṣaphal lagna/Muntha.
+2. **Stress de raha hai** — the 3–5 concrete pressure points, each tied to the
+   engine data that shows it (house + period/transit), written as a lived
+   experience ("loneliness at night", "family pressing for marriage"), not as
+   jargon.
+3. **Sukh de raha hai** — the areas that are working; give these equal honesty.
+4. **The live desire + its timing** — name what the native is reaching for now
+   (the matter the hot themes point to) and time it with the full
+   `AI_EVENT_TIMING_GUIDE.md` procedure: a near-term month-by-month table
+   (PD level), then a **primary and a secondary dated window**, each naming its
+   converging systems. Close with one committed call and 1–2 practical pointers.
+
+Tone discipline:
+- **A transit/sign-lord signal is not a struggle by default.** Before calling a
+  life-area troubled, check its *standing* strength (dignified lord, mahāpuruṣa
+  yoga, strong SAV on the 11th/10th, gains-house transits). A strong, dignified
+  10th with a well-placed 11th reads as **settled and earning**; a node on the
+  Arudha then colours the *image/feeling*, not the career's substance.
+- If the user corrects a present-tense fact (e.g. "career is settled"), accept
+  it as a correction of the **reading's tone**, re-check which data you over-read,
+  and say so plainly. Do **not** use the correction to move any timing window
+  (no calibration).
+- Write in the user's language/register (Hinglish is fine); use plain lived
+  language first, the astrological reason second.
+
 ---
 
 ## MANDATORY COVERAGE CHECKLIST (tick all before answering; mark "data missing" if absent)
