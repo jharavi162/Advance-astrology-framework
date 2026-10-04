@@ -17,7 +17,8 @@ addresses (coverage vs discrimination).
   headline-theme selection order for present-tense readings: (1) Moon-to-domain
   link (natal/D9 Moon in a domain's UL / A7 / bhāva / D9-7th or with its kāraka),
   (2) the running MD lord's ruled houses, (3) the life-stage pending matter of
-  that lord, (4) only then the transit cluster, read multivalently through the
+  that lord — inferred from age + the chart's own delay signatures, never by
+  asking the user for context, (4) only then the transit cluster, read multivalently through the
   matter selected above (e.g. 12th = vyaya AND śayyā-sukha).
 - **Why:** a reading defaulted to the densest transit cluster and translated it
   through the wrong bhāva-meaning (expense/authority instead of

@@ -671,9 +671,14 @@ headline in this order, then read the cluster THROUGH it:
    chapter's agenda (e.g. an MD of the 7th lord makes partnership the decade's
    question). An unfulfilled matter of the MD lord outranks a generic transit
    reading.
-3. **Life-stage pending matter.** If the MD lord's matter is still pending at
-   the native's age (status unknown → ask once, plainly), it is the default
-   headline.
+3. **Life-stage pending matter — inferred from the chart, not asked.** The
+   user gives only birth details; do not require or wait for context. From the
+   native's age and the chart itself (delay signatures on the matter: Saturn's
+   dṛṣṭi on its bhāva, a weak/afflicted dispositor of its lord, a weak Avasthā
+   of its kāraka, KP negation in the running PDs), judge whether the MD lord's
+   matter is probably still pending, and if so make it the headline — stated
+   as the chart's reading, with its reasons. Ask nothing up front; a later
+   user correction only re-tones the reading (never moves a window).
 4. **Only then the transit cluster** — and read each house *multivalently*,
    choosing the meaning the steps above select. E.g. the 12th = expenses/
    distance AND śayyā-sukha (bed comforts)/isolation; under a 7th-lord MD with
