@@ -96,7 +96,8 @@ def _arudhas(v):
 
 
 def _upagrahas(v):
-    return {k: _pt(float(x)) for k, x in v.calculated_upagrahas().items()}
+    pts = {**v.calculated_upagrahas(), **v.time_upagrahas()}
+    return {k: _pt(float(x)) for k, x in pts.items()}
 
 
 def _special_lagnas(v):

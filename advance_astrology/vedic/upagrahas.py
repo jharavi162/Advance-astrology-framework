@@ -56,6 +56,40 @@ _WEEKDAY = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
             "Saturday", "Sunday"]
 
 
+def vedic_weekday(preceding_sunrise_utc: datetime, longitude: float) -> str:
+    """Weekday (vāra) of the Vedic day, which runs sunrise-to-sunrise.
+
+    Taken from the local-mean-time date of the sunrise that opened the day, so
+    a pre-sunrise birth belongs to the PREVIOUS civil weekday, and a sunrise
+    that falls on the previous UTC date (far-east longitudes) is still read in
+    local time.
+    """
+    local = preceding_sunrise_utc + timedelta(hours=longitude / 15.0)
+    return _WEEKDAY[local.weekday()]
+
+
+def _saturn_portion(
+    birth_utc: datetime,
+    sunrise: datetime,
+    sunset: datetime,
+    next_sunrise: datetime,
+    *,
+    use_night: bool | None = None,
+    weekday: str | None = None,
+) -> tuple[datetime, timedelta]:
+    """(start, length) of Saturn's eighth-part of the birth day or night."""
+    weekday = weekday or _WEEKDAY[sunrise.weekday()]
+    is_night = use_night
+    if is_night is None:
+        is_night = not (sunrise <= birth_utc < sunset)
+
+    if not is_night:
+        segment = (sunset - sunrise) / 8.0
+        return sunrise + _GULIKA_DAY_PART[weekday] * segment, segment
+    segment = (next_sunrise - sunset) / 8.0
+    return sunset + _GULIKA_NIGHT_PART[weekday] * segment, segment
+
+
 def gulika_time(
     birth_utc: datetime,
     sunrise: datetime,
@@ -63,24 +97,38 @@ def gulika_time(
     next_sunrise: datetime,
     *,
     use_night: bool | None = None,
+    weekday: str | None = None,
 ) -> datetime:
-    """Time at which the Gulika segment begins.
+    """Time at which the Gulika segment (Saturn's portion) begins.
 
     The ascendant computed for this instant is the longitude of Gulika.
+    `sunrise` is the sunrise that opened the Vedic day containing the birth;
+    pass `weekday` (see :func:`vedic_weekday`) to fix the vāra explicitly,
+    otherwise the sunrise's UTC weekday is used.
     """
-    weekday = _WEEKDAY[birth_utc.weekday()]
-    is_night = use_night
-    if is_night is None:
-        is_night = not (sunrise <= birth_utc < sunset)
+    start, _ = _saturn_portion(birth_utc, sunrise, sunset, next_sunrise,
+                               use_night=use_night, weekday=weekday)
+    return start
 
-    if not is_night:
-        part = _GULIKA_DAY_PART[weekday]
-        segment = (sunset - sunrise) / 8.0
-        return sunrise + part * segment
-    else:
-        part = _GULIKA_NIGHT_PART[weekday]
-        segment = (next_sunrise - sunset) / 8.0
-        return sunset + part * segment
+
+def mandi_time(
+    birth_utc: datetime,
+    sunrise: datetime,
+    sunset: datetime,
+    next_sunrise: datetime,
+    *,
+    use_night: bool | None = None,
+    weekday: str | None = None,
+) -> datetime:
+    """Time at the MIDDLE of Saturn's portion; its ascendant is Mandi.
+
+    Gulika rises at the start of Saturn's eighth-part and Mandi at its middle
+    (the BPHS Upagraha-adhyāya reading followed by Jagannātha Horā). Where a
+    tradition treats the two as one point, read Gulika.
+    """
+    start, segment = _saturn_portion(birth_utc, sunrise, sunset, next_sunrise,
+                                     use_night=use_night, weekday=weekday)
+    return start + segment / 2.0
 
 
 def gulika_longitude(ascendant_fn, gulika_dt: datetime) -> float:

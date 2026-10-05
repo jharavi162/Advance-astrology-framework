@@ -208,6 +208,33 @@ class VedicChart:
     def calculated_upagrahas(self) -> dict[str, float]:
         return upagrahas.calculated_upagrahas(self.longitudes[Planet.SUN])
 
+    def time_upagrahas(self) -> dict[str, float]:
+        """Gulika and Mandi longitudes — the sidereal ascendant rising at the
+        start (Gulika) and middle (Mandi) of Saturn's eighth-part of the birth
+        day or night (BPHS, Upagraha-adhyāya). Empty if the Sun does not rise
+        or set at the birthplace."""
+        eph = self.natal._ephemeris
+        lat, lon = self.natal.latitude, self.natal.longitude
+        rise, setting, next_rise, is_day = eph.day_portions(self.when_utc, lat, lon)
+        if rise is None:
+            return {}
+        vara = upagrahas.vedic_weekday(rise, lon)
+        args = (self.when_utc, rise, setting, next_rise)
+        kw = dict(use_night=not is_day, weekday=vara)
+
+        def asc(dt: datetime) -> float:
+            from ..ayanamsa import ayanamsa as compute_ayanamsa
+            from ..houses import ascendant
+            t = eph.time(dt)
+            trop = ascendant(eph.local_sidereal_time(t, lon), eph.obliquity(t), lat)
+            return norm360(trop - compute_ayanamsa(eph.julian_day(t),
+                                                   self.natal.ayanamsa_name))
+
+        return {
+            "Gulika": upagrahas.gulika_longitude(asc, upagrahas.gulika_time(*args, **kw)),
+            "Mandi": upagrahas.gulika_longitude(asc, upagrahas.mandi_time(*args, **kw)),
+        }
+
     def special_lagnas(self) -> dict[str, float]:
         """Bhava/Hora/Ghati (sunrise-based) and Sree lagna longitudes."""
         eph = self.natal._ephemeris

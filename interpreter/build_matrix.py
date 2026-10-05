@@ -173,9 +173,8 @@ def build_matrix(when_local: datetime, lat: float, lon: float,
         L.append(f"  Upapada Lagna (UL): {_sign(ar['UL'])}")
     L.append(f"  Bhrigu Bindu: {to_zodiac(v.bhrigu_bindu())}")
     L.append(f"  Indu Lagna (wealth): {_sign(v.indu_lagna())}")
-    for nm, lon in v.calculated_upagrahas().items():
-        if nm.lower() in ("gulika", "mandi"):
-            L.append(f"  {nm}: {to_zodiac(lon)}")
+    for nm, lon in v.time_upagrahas().items():
+        L.append(f"  {nm}: {to_zodiac(lon)}  [H{(int(lon // 30) - v.ascendant_sign) % 12 + 1}]")
     L.append("  Special Lagnas: " +
              "  ".join(f"{nm}:{to_zodiac(lon)}" for nm, lon in v.special_lagnas().items()))
 

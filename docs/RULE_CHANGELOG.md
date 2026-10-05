@@ -11,6 +11,24 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-05 — Gulika & Mandi exposed as engine DATA (CODE, mechanical quantity)
+
+- **Change (CODE):** `VedicChart.time_upagrahas()` → `{"Gulika", "Mandi"}`
+  sidereal longitudes, printed by `build_matrix` (with house) and returned in the
+  webapp's natal `upagrahas`. `upagrahas.mandi_time()` and
+  `upagrahas.vedic_weekday()` added. **Bug fix:** `gulika_time` took the vāra
+  from the birth instant's *UTC* weekday; it now uses the weekday of the local
+  sunrise that opened the Vedic day, so a pre-sunrise birth (and any birth whose
+  UTC date differs from local) gets the correct Saturn's portion.
+- **Why (śāstra):** BPHS, Upagraha-adhyāya — divide the day (or night) into
+  eight parts ruled from the vāra lord (night: from the 5th lord); the longitude
+  rising at Saturn's part is Gulika. Mandi is taken at the middle of that part
+  (the BPHS reading followed by Jagannātha Horā); Phaladeepika/Kerala practice
+  may read the two as one point — the AI decides which to weigh. The Vedic day
+  runs sunrise-to-sunrise (Sūrya Siddhānta), hence the vāra fix.
+- **Data only:** no score, no verdict, no timing rule changed. Doctrine tests in
+  `tests/test_upagrahas.py` use synthetic times, no native dates.
+
 ## 2026-10-04 — Current-life reading: choose the headline theme by the mind's link, not the transit cluster (PROMPT, no engine rule)
 
 - **Change (DOCS, `docs/AI_TRIANGULATION_PROMPT.md` §5-bis):** added a
