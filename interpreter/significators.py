@@ -154,11 +154,19 @@ def _normalize(query: str) -> str:
 
 # Successive-significator (ordinal) meta-rule -------------------------------- #
 # Classical serial rule: each next same-type relation is the 3rd from the
-# previous (co-borns, successive spouses/children step forward by 2 houses). So
-# the Nth instance of a matter shifts its primary house by 2·(N−1):
-#   2nd marriage 7→9, 3rd 7→11; 2nd child 5→7; 2nd sibling 3→5.
-# (User-approved 2026-07-04: 2nd spouse = 9th house, the 3rd-from-7th school —
-# 1st→7th, 2nd→9th, 3rd→11th. The BNN voice stays chain-based, no house.)
+# previous (co-borns, successive children step forward by 2 houses). So the Nth
+# instance of a matter shifts its primary house by 2·(N−1):
+#   2nd child 5→7; 2nd sibling 3→5.
+# SPOUSES are the exception — the next spouse is the 8th from the previous
+# (house += 7·(N−1)): 1st→7th, 2nd→2nd, 3rd→9th. Uttara Kālāmṛta (Kālidāsa):
+# "the eighth house therefrom [the 7th], which is the second from lagna, enables
+# us to predict about the second wife"; KP Reader IV (KSK): "cusp of 7 for first
+# marriage, cusp of 2 for second marriage and so on". A successive spouse keeps
+# the marriage KP sets (2-7-11 fulfil / 1-6-10 negate): KSK judges remarriage on
+# the same 2-7-11, with house 2 a FULFILMENT house, never a negation.
+# (User-approved 2026-10-18, superseding the 2026-07-04 9th-house convention.
+# The BNN voice stays chain-based, no house.)
+_SERIAL_STEP = {"marriage": 7}           # 8th-from-previous; default step is 2
 _ORDINALS = (
     (4, ("chauth", "fourth", "4th")),
     (3, ("teesr", "tisr", "teesar", "third", "3rd", "tritiya")),
@@ -183,21 +191,27 @@ def _strip_ordinal(key: str) -> str:
 
 
 def _ordinal_profile(base, n: int):
-    """Derive the Nth-instance profile from a base matter by the 3rd-from-previous
-    serial rule (primary house += 2·(N−1)); kāraka/varga inherited; base_domain
-    set so the Nāḍī kāraka stays gender-aware (2nd marriage still Venus/Mars)."""
-    shift = 2 * (n - 1)
-    houses = sorted({(h - 1 + shift) % 12 + 1 for h in base.houses})
-    name = f"{_ORD_NAME[n]}-{base.name}"
-    if name in DOMAIN_PROFILES:
-        return DOMAIN_PROFILES[name]
+    """Derive the Nth-instance profile from a base matter by the serial rule
+    (primary house += step·(N−1); step 2, or 7 for spouses); kāraka/varga
+    inherited; base_domain set so the Nāḍī kāraka stays gender-aware (2nd
+    marriage still Venus/Mars). Spouses inherit the marriage KP sets."""
     karaka = base.natural_karaka
     bdom = base.base_domain or base.name
     if karaka is None and 7 in base.houses:      # a bare 'partner' axis → marriage
         karaka, bdom = Planet.VENUS, "marriage"
+    shift = _SERIAL_STEP.get(bdom, 2) * (n - 1)
+    houses = sorted({(h - 1 + shift) % 12 + 1 for h in base.houses})
+    name = f"{_ORD_NAME[n]}-{base.name}"
+    if name in DOMAIN_PROFILES:
+        return DOMAIN_PROFILES[name]
+    if bdom in _SERIAL_STEP:
+        ref = DOMAIN_PROFILES[bdom]
+        fulfil, negate = sorted(ref.fulfil_houses), sorted(ref.negate_houses)
+    else:
+        fulfil, negate = sorted(set(houses) | {11}), _dusthana_from(houses)
     return register_domain(
-        name, houses=houses, fulfil_houses=sorted(set(houses) | {11}),
-        negate_houses=_dusthana_from(houses), karakas=base.karakas,
+        name, houses=houses, fulfil_houses=fulfil,
+        negate_houses=negate, karakas=base.karakas,
         natural_karaka=karaka, arudhas=base.arudhas, varga=base.varga,
         base_domain=bdom)
 
@@ -269,7 +283,7 @@ def resolve(query: str):
     key = _normalize(query)
 
     # ordinal / "Nth instance" — resolve the base matter, then shift its house
-    # by the successive-significator rule (2nd marriage → 9th, etc.).
+    # by the successive-significator rule (2nd marriage → 2nd, 2nd child → 7th).
     n = _ordinal(key)
     if n >= 2:
         stripped = _strip_ordinal(key)

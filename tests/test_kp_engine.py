@@ -117,3 +117,28 @@ def test_engine_is_deterministic():
     assert a.cusp_sublord == b.cusp_sublord
     assert [(w.when, w.fulfil, w.negate) for w in a.windows] == \
            [(w.when, w.fulfil, w.negate) for w in b.windows]
+
+
+def test_plurality_data_follows_ksk_dual_tests_for_marriage_family_only():
+    # KP Reader IV: 7th-cusp sub-lord Mercury / in a dual sign / star-lord or
+    # conjunct planet dual → more than one marriage; 2nd-cusp sub-lord ↔ 7/11.
+    # Raw flags only — each must be re-derivable from the KP sub-chart itself.
+    from interpreter.engines._shared import kp_view
+    from interpreter.engines.kp_engine import _DUAL_SIGNS
+    v = _chart()
+    span = (datetime(2026, 1, 1, tzinfo=UTC), datetime(2026, 6, 1, tzinfo=UTC))
+    vkp, kps = kp_view(v)
+    for q in ("marriage", "second marriage"):
+        pl = KPEngine().evaluate(v, resolve(q), *span).plurality
+        csl = kp_chain(kps.cusps[7]).sub_lord
+        assert pl["csl7"] == csl.value
+        assert pl["csl7_in_dual_sign"] == (vkp.signs[csl] in _DUAL_SIGNS)
+        assert pl["csl7_is_mercury"] == (csl == Planet.MERCURY)
+        assert pl["csl7_conjoined_dual"] == any(
+            p == "Mercury" or vkp.signs[Planet(p)] in _DUAL_SIGNS
+            for p in pl["csl7_conjoined"])
+        assert pl["csl2"] == kp_chain(kps.cusps[2]).sub_lord.value
+        assert "verdict" not in pl and "score" not in pl
+    # not a marriage matter, or a rupture matter → no plurality data
+    for q in ("career", "divorce"):
+        assert KPEngine().evaluate(v, resolve(q), *span).plurality is None

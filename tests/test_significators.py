@@ -69,19 +69,31 @@ def test_unmappable_word_raises():
 
 
 def test_ordinal_meta_rule_shifts_by_third_from_previous():
-    # 2nd spouse = 9th (7 + 2), 3rd = 11th; generic serial rule: 2nd child = 7th.
+    # Spouses step 8th-from-previous (Uttara Kālāmṛta; KP Reader IV "cusp of 2
+    # for second marriage"): 2nd spouse = 2nd, 3rd = 9th. Generic serial rule
+    # (3rd-from-previous) for everything else: 2nd child = 7th.
     m2 = resolve("second marriage")
-    assert m2.houses == (9,) and m2.base_domain == "marriage"
+    assert m2.houses == (2,) and m2.base_domain == "marriage"
     assert m2.natural_karaka == Planet.VENUS and m2.varga == 9
-    assert resolve("dusri shaadi").houses == (9,)
-    assert resolve("teesri shaadi").houses == (11,)          # 7 + 4
+    assert resolve("dusri shaadi").houses == (2,)
+    assert resolve("teesri shaadi").houses == (9,)           # 7 + 14 → 9
     assert resolve("doosra bachcha").houses == (7,)          # children 5 + 2
     # a bare 'doosri partner' still lands on the marriage axis (not a stray house)
     dp = resolve("doosri partner life me kya aa chuki h")
-    assert dp.houses == (9,) and dp.natural_karaka == Planet.VENUS
+    assert dp.houses == (2,) and dp.natural_karaka == Planet.VENUS
     # a plain (1st) matter is NOT shifted
     assert resolve("meri shaadi kab hui").houses == (7,)
     assert resolve("career kaisa rahega").houses == (10,)
+
+
+def test_successive_spouse_keeps_marriage_kp_sets():
+    # KSK judges remarriage on the same 2-7-11; house 2 is fulfilment, never
+    # negation (it was wrongly derived as a dusthāna-of-9th before).
+    marriage = resolve("marriage")
+    for q in ("second marriage", "teesri shaadi"):
+        p = resolve(q)
+        assert p.fulfil_houses == marriage.fulfil_houses == frozenset({2, 7, 11})
+        assert p.negate_houses == marriage.negate_houses == frozenset({1, 6, 10})
 
 
 def test_second_marriage_nadi_karaka_is_gender_aware():

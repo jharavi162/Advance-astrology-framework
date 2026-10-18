@@ -1901,3 +1901,39 @@ Coverage matrix updated (new wired row). Tests:
 `test_arudha_double_transit_windows_consistent_with_transits`.
 No calibration/hindsight: rules come from the named texts; the 50-chart study is
 public-figure data used as a blind check, never a per-native fit.
+
+## 2026-10-18 — Successive spouse = 8th-from-previous (2nd house) + KSK plurality DATA (user-approved)
+
+Supersedes the 2026-07-04 "2nd spouse = 9th house" convention. That profile also
+derived its KP sets as dusthāna-from-the-9th, which made **house 2 a negation**
+for a second marriage — the opposite of KSK.
+
+- **Ordinal rule, spouses only** (`interpreter/significators.py`): the next
+  spouse is the **8th from the previous** (house += 7·(N−1)): 1st → 7th,
+  2nd → **2nd**, 3rd → 9th. Other matters keep the 3rd-from-previous step
+  (2nd child → 7th). A successive spouse keeps the marriage KP sets
+  (fulfil 2/7/11, negate 1/6/10).
+- **KP engine DATA** (`interpreter/engines/kp_engine.py`, `KPReport.plurality`,
+  marriage family only, not divorce): the raw KSK more-than-one-marriage tests
+  — 7th-cusp sub-lord is Mercury / in a dual sign / its star-lord dual / the
+  planets conjoined with it and whether any is Mercury or in a dual sign; the
+  2nd-cusp sub-lord and whether it signifies 7 or 11. Flags only, no verdict.
+- **Sources (primary text read on archive.org):**
+  - KP Reader IV, *Marriage, Married Life and Children* (K.S. Krishnamurti):
+    p.84 "if the sublord of 7th cusp is either Mercury or any planet occupying
+    dual Sign, more than one wife"; p.~86 "cusp of 7 for first marriage, cusp
+    of 2 for second marriage and so on"; p.~147 "if the sub lord of the second
+    cusp is connected with 7th house, second marriage; if connected with 11th
+    house, one will keep a keep"; p.~153 "if it is in any manner connected with
+    a dual sign or a dual planet, second marriage is shown" (example: 7th
+    sub-lord Venus conjoined Mercury).
+  - Uttara Kālāmṛta (Kālidāsa, tr. P.S. Sastri): "The prediction about the
+    first wife is to be made from the seventh house … The eighth house
+    therefrom, which is the second from lagna, enables us to predict about the
+    second wife"; and "from the eighth houses of these two arudhas [A7, UL] we
+    can know about the second wife."
+- **Tests:** `test_ordinal_meta_rule_shifts_by_third_from_previous` (updated:
+  2nd marriage → (2,), 3rd → (9,)), `test_successive_spouse_keeps_marriage_kp_sets`,
+  `test_plurality_data_follows_ksk_dual_tests_for_marriage_family_only`.
+  Suite 162 green. No native dates asserted; the change follows the texts, not
+  a known event.

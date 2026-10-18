@@ -122,3 +122,26 @@ Yeh hissa archive.org par uplabdh asli scan-text se milaaya gaya hai: **KP Reade
 ### Saar
 
 Asli KSK text se: (1) KP mein doosri shaadi ka **sabse seedha KSK-udaaharan wala sanket is chart mein maujood hai** (7th CSL Venus + Mercury yuti); (2) house 2 doosri shaadi ka ghar hai, negation nahi, isliye engine ki `second-marriage` profile (9th cusp, 2 = negation) KSK ke text se mel nahi khaati; (3) Shani ka niyam "der, rukaavat, par inkaar nahi" hai. Parashari ke specific do-patni yog nahi lagte; BPHS ka Upapada niyam milajula par suraksha ki taraf jhukta hai. Birth-time ±2 minute wali chetavani jas ki tas hai.
+
+---
+
+## Addendum 2: sabse puraane granth (archive.org scan, engine data par laagu)
+
+Kaal-kram (lagbhag, vidwanon ke anusaar): **Yavanajātaka** (Sphujidhvaja, ~2–3 sadi CE, tr. Pingree) → **Bṛhat Jātaka** (Varāhamihira, ~6 sadi; Bhaṭṭotpala ṭīkā, tr. B. Suryanarain Rao 1957) → **BPHS** (paramparāgat roop, baad ka sankalan) → **Phaladeepika** (~14–16 sadi) → **Uttara Kālāmṛta** (Kālidāsa, ~17 sadi) → **KP** (20 sadi). Saravali aur Jaimini Sūtra ke scan ka OCR padhne layak nahi tha (ya server error), isliye unhe chhod diya.
+
+**Yavanajātaka (sabse purana), saptam sthaan:** *"If (the sign) in the seventh place is occupied by a malefic planet and is not aspected by its lord, (the native) does not obtain a wife."* Is chart mein Libra (7th) mein koi graha nahi hai aur uska lord Venus use dekhta hai, isliye **patni-abhaav ka yog nahi lagta.**
+
+**Bṛhat Jātaka XXIII (Bhaṭṭotpala/Yavaneśvara ṭīkā):**
+- *"If the 7th house from Lagna or Chandra is combined or aspected by benefics or its lord is there, there will be prosperity to wife. If there is no conjunction or aspect for the 7th then there will be no wife."* Yahan 7th par lord Venus aur Mercury (shubh) ki drishti hai, isliye shubh.
+- *"If the 7th from birth or Moon … is combined or aspected by malefics there will be loss or destruction to wife."* Yahan Saturn ki drishti hai, isliye tootan ka nishaan bhi hai.
+- *"If Sukra occupies or aspects the 7th there will be many wives."* (ṭīkā) Venus 7th ko dekhta hai, yaani **ek se adhik vivaah ka sanket.**
+
+**Uttara Kālāmṛta:** *"The eighth house therefrom [7th], which is the second from lagna, enables us to predict about the second wife"* aur *"From the eighth houses of these two arudhas [A7, UL] we can know about the second wife … If these arudhas are benefic, then the wife … brings happiness and lives long."* Engine ke anusaar:
+- 8th from A7 (Cancer) = **Aquarius**: koi graha nahi; rāśi-dṛṣṭi Mercury, Venus, Jupiter (teeno shubh) aur Ketu. Doosri patni ke liye **shubh**.
+- 8th from UL (Scorpio) = **Gemini**: Mars baitha hai (krūra). Yeh **milajula** hai.
+- Natal 2nd (Taurus): khaali; uska lord Venus lagna mein Mercury ke saath. Inkaar nahi.
+- UK ka Upapada niyam: *"If a malefic is posited in [UL] and that malefic is debilitated two wives of the native will be lost."* UL Scorpio mein **neech Chandra** hai, aur engine ke hisaab se Moon–Sun elongation 234.7° hai, yaani kṛṣṇa-pakṣa (kṣīṇa) Chandra, jo naisargik paap mana jaata hai. Yeh **chetavani** ka sanket hai, use chhupaaya nahi gaya.
+
+**Saar:** sabse purane (Yavanajātaka) se lekar KP tak, **kisi granth mein is chart ke liye vivaah ka inkaar nahi milta.** Bṛhat Jātaka-ṭīkā aur KSK dono ek se adhik vivaah ka sanket dete hain. Doosre jeevansathi ke ghar (2nd house / 8th from A7) par shubh prabhaav hai. Chetavani do jagah hai: 8th from UL mein Mars, aur UL mein kṣīṇa neech Chandra.
+
+**Engine badlaav (2026-10-18, user-approved):** doosri shaadi ab 9th ki jagah **2nd house** se padhi jaati hai (KSK + Uttara Kālāmṛta), KP sets 2/7/11 aur 1/6/10 rakhe gaye hain, aur KP engine KSK ke plurality tests DATA ke roop mein deta hai. Is chart par: `csl7_conjoined = (Mercury,)`, `csl7_conjoined_dual = True`; `csl7_in_dual_sign = False`; 2nd CSL Mercury 7 ya 11 signify nahi karta. `docs/RULE_CHANGELOG.md` mein darj hai.

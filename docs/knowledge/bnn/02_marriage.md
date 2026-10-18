@@ -66,8 +66,9 @@ BNN reads marriage **kāraka-first** (see `00_significations.md`):
   widow"* (L563); *"When Jupiter transits Libra … the native will become a
   widow"* (L3739); *"lost their husbands because of the placement of Venus"*
   (L5509).
-- ✅ **Engine already wires:** the **ordinal meta-rule** (2nd spouse = 9th house,
-  Nth shifts by 2×(N−1)) in `significators.py`; the **rupture/separator** timing
+- ✅ **Engine already wires:** the **ordinal meta-rule** (2nd spouse = 2nd house,
+  the 8th-from-previous spouse rule; other matters shift by 2×(N−1)) in
+  `significators.py`; the **rupture/separator** timing
   (`nadi_rupture`: Śani + Rāhu/Ketu) for a break; divorce as its own domain.
 
 ---
