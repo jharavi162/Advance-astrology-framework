@@ -164,7 +164,11 @@ def _normalize(query: str) -> str:
 # marriage, cusp of 2 for second marriage and so on". A successive spouse keeps
 # the marriage KP sets (2-7-11 fulfil / 1-6-10 negate): KSK judges remarriage on
 # the same 2-7-11, with house 2 a FULFILMENT house, never a negation.
-# (User-approved 2026-10-18, superseding the 2026-07-04 9th-house convention.
+# The popular modern reading (3rd-from-previous: 2nd spouse → 9th, 3rd → 11th)
+# has no verse in the texts checked, but is widely used, so it rides along as a
+# SECONDARY house after the text-backed one: 2nd spouse houses = (2, 9), 3rd =
+# (9, 11). Every engine reads both; the AI weighs the primary first.
+# (User-approved 2026-10-18, superseding the 2026-07-04 9th-only convention.
 # The BNN voice stays chain-based, no house.)
 _SERIAL_STEP = {"marriage": 7}           # 8th-from-previous; default step is 2
 _ORDINALS = (
@@ -194,13 +198,19 @@ def _ordinal_profile(base, n: int):
     """Derive the Nth-instance profile from a base matter by the serial rule
     (primary house += step·(N−1); step 2, or 7 for spouses); kāraka/varga
     inherited; base_domain set so the Nāḍī kāraka stays gender-aware (2nd
-    marriage still Venus/Mars). Spouses inherit the marriage KP sets."""
+    marriage still Venus/Mars). Spouses inherit the marriage KP sets and carry
+    the 3rd-from-previous house as a secondary (ordered: primary first)."""
     karaka = base.natural_karaka
     bdom = base.base_domain or base.name
     if karaka is None and 7 in base.houses:      # a bare 'partner' axis → marriage
         karaka, bdom = Planet.VENUS, "marriage"
-    shift = _SERIAL_STEP.get(bdom, 2) * (n - 1)
-    houses = sorted({(h - 1 + shift) % 12 + 1 for h in base.houses})
+
+    def shifted(step):
+        return sorted({(h - 1 + step * (n - 1)) % 12 + 1 for h in base.houses})
+
+    houses = shifted(_SERIAL_STEP.get(bdom, 2))
+    if bdom in _SERIAL_STEP:
+        houses += [h for h in shifted(2) if h not in houses]
     name = f"{_ORD_NAME[n]}-{base.name}"
     if name in DOMAIN_PROFILES:
         return DOMAIN_PROFILES[name]
@@ -209,6 +219,7 @@ def _ordinal_profile(base, n: int):
         fulfil, negate = sorted(ref.fulfil_houses), sorted(ref.negate_houses)
     else:
         fulfil, negate = sorted(set(houses) | {11}), _dusthana_from(houses)
+    # (the `houses` order is kept: houses[0] is the matter's primary cusp)
     return register_domain(
         name, houses=houses, fulfil_houses=fulfil,
         negate_houses=negate, karakas=base.karakas,

@@ -145,3 +145,16 @@ Kaal-kram (lagbhag, vidwanon ke anusaar): **Yavanajātaka** (Sphujidhvaja, ~2–
 **Saar:** sabse purane (Yavanajātaka) se lekar KP tak, **kisi granth mein is chart ke liye vivaah ka inkaar nahi milta.** Bṛhat Jātaka-ṭīkā aur KSK dono ek se adhik vivaah ka sanket dete hain. Doosre jeevansathi ke ghar (2nd house / 8th from A7) par shubh prabhaav hai. Chetavani do jagah hai: 8th from UL mein Mars, aur UL mein kṣīṇa neech Chandra.
 
 **Engine badlaav (2026-10-18, user-approved):** doosri shaadi ab 9th ki jagah **2nd house** se padhi jaati hai (KSK + Uttara Kālāmṛta), KP sets 2/7/11 aur 1/6/10 rakhe gaye hain, aur KP engine KSK ke plurality tests DATA ke roop mein deta hai. Is chart par: `csl7_conjoined = (Mercury,)`, `csl7_conjoined_dual = True`; `csl7_in_dual_sign = False`; 2nd CSL Mercury 7 ya 11 signify nahi karta. `docs/RULE_CHANGELOG.md` mein darj hai.
+
+---
+
+## Addendum 3: 9th bhav wali prachalit paddhati
+
+Aaj ke zyaadatar astrologer doosri shaadi 9th bhav (7th se 3rd, bhavat bhavam) se dekhte hain. Jitne granth padhe gaye, unme is niyam ka koi shlok nahi mila. BPHS 9th bhav ko *"wife's brother, brother's wife"* kehta hai. Web par jo sources ise "classical" kehte hain, woh bhi koi shlok quote nahi karte. Saravali, Jaimini Sūtra, Jātaka Pārijāta aur Sarvārtha Cintāmaṇi nahi padhe gaye, isliye "kisi granth mein nahi hai" pakka nahi kaha ja sakta.
+
+Isliye engine ab dono ghar deta hai: doosri shaadi = **(2, 9)**. 2nd primary hai (granth ka praman), 9th secondary hai (prachalit paddhati). Is chart par 9th wala data:
+- 9th cusp sub-lord **Venus (1, 2, 7)**. Sahi KP sets (2/7/11) ke saath yeh bhi **vaada** deta hai.
+- 9th lord **Jupiter** (uchch). Guru antardaśā Feb 2028 se, jisme 2nd-lord (Venus) aur 9th-lord (Jupiter) dono sakriya hain.
+- H9 par double-transit Jan–Jun 2026, Oct 2026–Jan 2027, Oct–Nov 2027. H2 par Nov 2027–Feb 2028.
+
+**Nateeja:** 2nd se dekhein ya 9th se, dono raaste shaadi ka vaada dikhate hain aur dono Feb 2028 ke baad ke samay ko mazboot batate hain.

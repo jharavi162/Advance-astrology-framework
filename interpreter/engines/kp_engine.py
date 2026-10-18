@@ -44,6 +44,8 @@ class KPReport:
     hits_negate: tuple[int, ...]      # of those, the negation houses (raw)
     windows: tuple[KPWindow, ...]     # running-chain fulfil/negate per pratyantar
     plurality: dict | None = None     # marriage family: KSK more-than-one-marriage data
+    # the matter's secondary houses (houses[1:]): (house, cusp sub-lord, signifies)
+    other_cusps: tuple[tuple[int, str, tuple[int, ...]], ...] = ()
 
 
 _DUAL_SIGNS = frozenset({2, 5, 8, 11})   # Gemini, Virgo, Sagittarius, Pisces
@@ -114,4 +116,8 @@ class KPEngine:
             hits_fulfil=tuple(sorted(sset & profile.fulfil_houses)),
             hits_negate=tuple(sorted(sset & profile.negate_houses)),
             windows=tuple(windows),
-            plurality=plurality_data(vkp, kps) if _is_marriage_family(profile) else None)
+            plurality=plurality_data(vkp, kps) if _is_marriage_family(profile) else None,
+            other_cusps=tuple(
+                (h, sl.value, tuple(kps.planet_signifies(sl)))
+                for h in profile.houses[1:]
+                for sl in (kp_chain(kps.cusps[h]).sub_lord,)))

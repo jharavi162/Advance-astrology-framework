@@ -1937,3 +1937,14 @@ for a second marriage — the opposite of KSK.
   `test_plurality_data_follows_ksk_dual_tests_for_marriage_family_only`.
   Suite 162 green. No native dates asserted; the change follows the texts, not
   a known event.
+- **Follow-up (same day, user-approved): the 9th rides along as SECONDARY.** The
+  popular "2nd spouse = 9th (3rd-from-7th)" reading had no verse in the texts
+  checked (BPHS gives the 9th as "wife's brother"; Uttara Kālāmṛta, KP Reader
+  IV, Bṛhat Jātaka, Phaladeepika and Yavanajātaka give no 9th-house rule), but
+  it is widely practised, so it is kept as data rather than dropped: spouse
+  ordinals now carry `houses = (text-backed, 3rd-from-previous)` — 2nd spouse
+  `(2, 9)`, 3rd `(9, 11)`. `houses[0]` stays the KP arbiter cusp; the KP engine
+  reports each secondary house as `KPReport.other_cusps` (house, sub-lord,
+  signifies); the daśā engine already lists every house's lord and
+  double-transit. Test: `test_secondary_houses_get_their_own_cusp_sublord_data`.
+  Suite 163 green.

@@ -70,17 +70,18 @@ def test_unmappable_word_raises():
 
 def test_ordinal_meta_rule_shifts_by_third_from_previous():
     # Spouses step 8th-from-previous (Uttara Kālāmṛta; KP Reader IV "cusp of 2
-    # for second marriage"): 2nd spouse = 2nd, 3rd = 9th. Generic serial rule
-    # (3rd-from-previous) for everything else: 2nd child = 7th.
+    # for second marriage") as PRIMARY, with the popular 3rd-from-previous house
+    # as secondary: 2nd spouse = (2, 9), 3rd = (9, 11). Everything else keeps
+    # the generic 3rd-from-previous rule only: 2nd child = 7th.
     m2 = resolve("second marriage")
-    assert m2.houses == (2,) and m2.base_domain == "marriage"
+    assert m2.houses == (2, 9) and m2.base_domain == "marriage"
     assert m2.natural_karaka == Planet.VENUS and m2.varga == 9
-    assert resolve("dusri shaadi").houses == (2,)
-    assert resolve("teesri shaadi").houses == (9,)           # 7 + 14 → 9
+    assert resolve("dusri shaadi").houses == (2, 9)
+    assert resolve("teesri shaadi").houses == (9, 11)        # 7+14 → 9; 7+4 → 11
     assert resolve("doosra bachcha").houses == (7,)          # children 5 + 2
     # a bare 'doosri partner' still lands on the marriage axis (not a stray house)
     dp = resolve("doosri partner life me kya aa chuki h")
-    assert dp.houses == (2,) and dp.natural_karaka == Planet.VENUS
+    assert dp.houses == (2, 9) and dp.natural_karaka == Planet.VENUS
     # a plain (1st) matter is NOT shifted
     assert resolve("meri shaadi kab hui").houses == (7,)
     assert resolve("career kaisa rahega").houses == (10,)
