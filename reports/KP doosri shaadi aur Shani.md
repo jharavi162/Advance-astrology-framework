@@ -89,3 +89,36 @@ Iske baad bhi double-transit windows hain: Saturn AD (Dec 2033 tak), phir **Merc
 Is chart ka asli sawaal "shaadi likhi hai ya nahi" nahi hai. Woh to likhi thi aur ho bhi chuki hai. Asli sawaal yeh hai ki **doosri shaadi ka KP mein koi vishesh marker na hone ke bawajood baaki schools use kitna sahara dete hain.** Teeno schools ek alag-alag pattern dikhate hain. KP tootan ko saaf dikhata hai par doosri shaadi par "chup" hai. Parashari zyadatar pehli tootan ke yoga deta hai. Jaimini akela aisa school hai jo doosre spouse ke point par pehle se *zyada* suraksha (uchcha Guru) dikhata hai. Isliye sabse imaandaar triangulated raay yeh hai: **doosra rishta sambhav hai aur use tikne ka sahara hai, par KP ki taraf se vaada kamzor hai, aur Shani-Rahu ka dabaav use mehnat waala banata hai.** Shani ko "engagement pakki karne wala" maanna doctrine se aage jaana hoga. Is chart mein Shani ki ek hi saaf bhoomika hai, aur woh Rahu AD ke dauraan rukawat aur deri ki hai.
 
 Aage ke liye do kaam is reading ko kisi bhi bhavishyavaani se zyada mazboot banayenge. Pehla, **birth time ki pushti ya rectification**, kyunki 7th CSL ka Venus se Ketu ya Sun ho jaana KP ka poora jawab ulat deta hai. Dusra, engine se **Shani, Rahu aur Guru ke sub-lords** aur Rahu ke agent-breakdown nikalna, kyunki KP mein antim faisla wahi karte hain aur woh abhi data mein nahi hain. Saath hi engine ke second-marriage profile ka "2 = negation" wala logic notes ke mainstream KP doctrine se takraata hai. Use theek karne ka prastav approval ke liye uthaya jaana chahiye aur badlaav `docs/RULE_CHANGELOG.md` mein darj hona chahiye.
+
+---
+
+## Addendum: original granth se jaanch (network khulne ke baad)
+
+Yeh hissa archive.org par uplabdh asli scan-text se milaaya gaya hai: **KP Reader IV** (*Marriage, Married Life and Children*, K.S. Krishnamurti; archive.org `kp-readers`), **BPHS** (R. Santhanam anuvaad; archive.org `brihatparasarahorashastrabyr.santhanam`), **Phaladeepika** (V. Subrahmanya Sastri, 2nd ed. 1950). Page numbers scan ke hain; OCR mein chhoti galtiyan sambhav hain. Chart ke saare numbers pehle jaise engine ke hain.
+
+### KP Reader IV: doosri shaadi ka niyam, KSK ke apne shabdon mein
+
+- p.84: *"As per K.P. if the sublord of 7th cusp is either Mercury or any planet occupying dual Sign, more than one wife."*
+- p.~153 (horary udaaharan): *"We have to find out the sub-lord of the 7th, and if it is **in any manner connected with a dual sign or a dual planet**, second marriage is shown. Venus is the sub-lord of the 7th and **Venus is conjoined with Mercury** in Mercury's sign. Therefore ... second marriage will take place after legal separation from first wife."*
+- p.~147: *"if the sub lord of the second cusp is connected with 7th house, second marriage; if connected with 11th house, one will keep a keep ... as 7th house significator shows legal bondage."*
+- p.~84–86: doosre partner ki pehchaan **2nd cusp** ke sign/star/sub lord se (*"cusp of 7 for first marriage, cusp of 2 for second marriage"*), yaani KSK ke yahan **house 2 doosri shaadi ka ghar hai, negation nahi.**
+
+**Is chart par:** 7th CSL **Venus**, aur Venus **Mercury (dual planet) ke saath yuti** mein hai (dono Aries, 1H). KSK ke apne udaaharan mein bilkul yahi sanyog (7th CSL Venus + Mercury yuti) doosri shaadi ka aadhaar bana. Antar itna hai ki udaaharan mein yuti Mercury ki rashi mein thi, yahan Aries (chara) mein hai. "In any manner connected" wali bhasha ke hisaab se yeh test **pass** hota hai; sakht p.84 wali bhasha (CSL khud dual sign mein) ke hisaab se nahi. 2nd CSL Mercury hai, jo engine ke hisaab se 4, 1, 3 signify karta hai, par woh 7th lord Venus ke saath yuti mein hai: yuti se 7th se "connection" maana jaaye ya nahi, yeh KSK ke udaaharan (jahan 2nd CSL khud 7th lord tha) se seedha tay nahi hota. **Sudhaar:** pichhle hisse mein "plurality test: teeno raaste band" likha tha; asli text ke baad sahi baat hai: **sabse mazboot KSK test (CSL ki dual planet se yuti) pass hota hai**.
+
+### KP Reader IV: Shani "fixer" ya "delayer"?
+
+- p.~75 (Punarphoo): *"Whenever Saturn has got any connection whatsoever with Moon, there will be some obstacle or impediment, not only during negotiation but also at the time of fixation and even at the time of celebration of the marriage. This connection between Moon and Saturn causes delay, **though ultimately both of them do much more good with a better partner.**"*
+- p.~125: *"Saturn in 1, 3, 5, 7 or 10 counted from Lagna delays the time of fixation and celebration of the marriage."*
+- p.~127: *"Saturn's favourable aspect to 7th house and lord of 7, **causes delay, but it does not deny.**"*
+
+**Is chart par (engine data):** Moon Saturn ke nakshatra mein hai aur Saturn Moon ke nakshatra mein (paraspar nakshatra-parivartan); Saturn lagna se 10th mein hai; Saturn 7th house ko dekhta hai. Teeno KSK sharten lagti hain. KSK ka niyam: **Shani rokta aur der karta hai, inkaar nahi karta; aakhir mein behtar partner ke saath achha phal.** Isliye user ka "Shani fix karta hai" wala tark aadha sahi hai: Shani *ant mein tikaau* phal ki taraf ishara karta hai, lekin raaste mein negotiation, fixation aur shaadi ke din tak rukaavat ka niyam bhi isi ke saath aata hai.
+
+### BPHS (Santhanam) aur Phaladeepika
+
+- BPHS, Upapada adhyay, sl. 7–12: *"If the 2nd from Upa Pada is a benefic sign or is aspected by or conjunct with a benefic, the same good results (as for wife and sons) will come to pass."* Santhanam ki tippani mein udaaharan: *"the 2nd from Upa Pada is well fortified as its lord Jupiter is exalted ... Hence the native is happily married."* **Is chart par:** 2nd from UL = Sagittarius (Guru ki shubh rashi), uska lord Guru Cancer mein **uchch** hai. Yeh suraksha ka nishaan hai; par Sagittarius par Mangal ki drishti hai aur Guru khud is rashi ko nahi dekhta, isliye suraksha poori nahi.
+- BPHS 7th-house adhyay, sl. 19–21: do patni ke yog (7th lord neech; Venus dual sign mein aur uska lord uchch) — **is chart mein nahi lagte** (Venus Aries mein, neech nahi).
+- Phaladeepika X.5: *"If the lord of the 7th house and Venus be each posited in a dual Rasi or Amsa, the person will have two wives."* — Venus D1 Aries, D9 Scorpio: **nahi lagta**.
+
+### Saar
+
+Asli KSK text se: (1) KP mein doosri shaadi ka **sabse seedha KSK-udaaharan wala sanket is chart mein maujood hai** (7th CSL Venus + Mercury yuti); (2) house 2 doosri shaadi ka ghar hai, negation nahi, isliye engine ki `second-marriage` profile (9th cusp, 2 = negation) KSK ke text se mel nahi khaati; (3) Shani ka niyam "der, rukaavat, par inkaar nahi" hai. Parashari ke specific do-patni yog nahi lagte; BPHS ka Upapada niyam milajula par suraksha ki taraf jhukta hai. Birth-time ±2 minute wali chetavani jas ki tas hai.
