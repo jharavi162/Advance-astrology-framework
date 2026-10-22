@@ -1226,8 +1226,9 @@ class H(BaseHTTPRequestHandler):
                     return self._send(200, f.read(), "text/html; charset=utf-8")
             # static assets (PWA manifest + icons) — served from the webapp dir
             if u.path in ("/manifest.json", "/icon-192.png", "/icon-512.png",
-                          "/apple-touch-icon.png"):
-                fn = os.path.basename(u.path)
+                          "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"):
+                # iOS also probes the -precomposed name; it is the same icon.
+                fn = os.path.basename(u.path).replace("-precomposed", "")
                 ctype = ("application/manifest+json" if fn.endswith(".json")
                          else "image/png")
                 with open(os.path.join(HERE, fn), "rb") as f:
