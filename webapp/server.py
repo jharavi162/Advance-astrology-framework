@@ -354,7 +354,7 @@ def _card_cache_put(key, res):
 
 def _card_worker(job, q, card, key):
     from interpreter.claude_reader import ReaderError, fill_prompt, load_cards, read
-    from interpreter.reading_bundle import build_bundle
+    from interpreter.reading_bundle import Reading
     st = _CARDS[job]
     st["status"] = "queued"
     with _SCAN_GATE:
@@ -365,10 +365,10 @@ def _card_worker(job, q, card, key):
             place = q.get("place", [""])[0]
             gender = q.get("gender", [""])[0]
             now = datetime.now(timezone.utc)
-            bundle = build_bundle(when, float(q["lat"][0]), float(q["lon"][0]),
-                                  place=place, gender=gender,
-                                  ayanamsa=q.get("ayanamsa", ["lahiri"])[0] or "lahiri",
-                                  as_of=now)
+            reading = Reading(when, float(q["lat"][0]), float(q["lon"][0]),
+                              place=place, gender=gender,
+                              ayanamsa=q.get("ayanamsa", ["lahiri"])[0] or "lahiri",
+                              as_of=now)
             spec = load_cards()["cards"][card]
             marital = {"no": "unmarried", "yes": "married"}.get(
                 q.get("marital", [""])[0], "")
@@ -377,16 +377,34 @@ def _card_worker(job, q, card, key):
                                  time=when.strftime("%I:%M %p").lstrip("0").lower(),
                                  gender=gender, marital=marital)
             st["status"] = "claude"
-            out = read(prompt, bundle, now.astimezone(when.tzinfo).strftime("%Y-%m-%d"))
+            out = read(prompt, reading, now.astimezone(when.tzinfo).strftime("%Y-%m-%d"),
+                       on_step=lambda calls: st.update(steps=len(calls)))
             res = dict(status="done", card=card, title=spec["title"],
                        text=out["text"], truncated=out["truncated"],
+                       plan=out["plan"], gaps=out["gaps"], steps=len(out["calls"]),
                        as_of=now.date().isoformat(), ts=time.time())
             _card_cache_put(key, res)
+            _log_card(card, out)
             st.update(res)
         except ReaderError as e:
             st.update(status="error", error=str(e), ts=time.time())
         except Exception as e:
             st.update(status="error", error=f"{type(e).__name__}: {e}", ts=time.time())
+
+
+def _log_card(card, out):
+    """One line per generated answer: tool calls, usage, and the engine gaps
+    Claude named (calculations the granthas call for that no tool provides)."""
+    rec = dict(ts=time.time(), card=card, model=out["model"], usage=out["usage"],
+               calls=[c["tool"] + ("!" if c["error"] else "") for c in out["calls"]],
+               gaps=out["gaps"])
+    print("[card]", json.dumps(rec, ensure_ascii=False), flush=True)
+    try:
+        os.makedirs(CARD_CACHE_DIR, exist_ok=True)
+        with open(os.path.join(CARD_CACHE_DIR, "gaps.jsonl"), "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
 
 
 def card_start(q, ip=""):

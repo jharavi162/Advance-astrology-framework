@@ -119,6 +119,7 @@
   .ans blockquote{margin:8px 0;padding:8px 12px;border-left:3px solid var(--acc);background:#1f1730;border-radius:6px}
   .ans table{margin:8px 0}.ans hr{border:0;border-top:1px solid var(--line);margin:12px 0}
   .ans code{background:#120c1d;padding:1px 5px;border-radius:4px}
+  .plan summary{cursor:pointer;font-size:12.5px;color:var(--mut);font-weight:600}.plan .ans{overflow-x:auto}.plan td{font-size:12px;vertical-align:top}
   .qcard.open{grid-column:1/-1}
   .cta h3{margin:0 0 4px;font:600 18px var(--serif);color:#fff}
   .cta ul{margin:8px 0 12px;padding-left:18px;color:#d9cdee;font-size:13px}
@@ -805,19 +806,24 @@ function cardParams(id){const P=params();if(P.get('ayanamsa')==='multi')P.set('a
 async function openCard(id){
   if(!window.NATAL){alert('Pehle kundli banao.');return;}
   const box=document.querySelector('#qc_'+id+' .qbody');document.getElementById('qc_'+id).classList.add('open');
-  const msg={queued:'Line mein hai…',engine:'Engine saare calculations kar raha hai…',claude:'Jawab likha ja raha hai… (1–3 minute)'};
+  const msg={queued:'Line mein hai…',engine:'Engine saare calculations kar raha hai…',claude:'Claude granth ke hisaab se calculations chun raha hai… (2–5 minute)'};
   box.innerHTML='<div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div><div class="sub" style="margin-top:8px">Shuru ho raha hai…</div>';
-  const show=r=>{if(r.status==='done'){box.innerHTML=`<div class="ans">${md(r.text)}</div><div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`;return true;}
+  const show=r=>{if(r.status==='done'){box.innerHTML=`<div class="ans">${md(r.text)}</div>${planHtml(r)}<div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`;return true;}
     if(r.status==='error'){box.innerHTML=`<div class="bad" style="margin-top:10px">⚠ ${esc(r.error||'Jawab nahi ban paya.')}</div><button class="sec" style="margin-top:8px" onclick="openCard('${id}')">Dobara try karein</button>`;return true;}
-    box.querySelector('.sub').textContent=msg[r.status]||'Kaam chal raha hai…';return false;};
+    box.querySelector('.sub').textContent=(r.status==='claude'&&r.steps?`Claude ne engine se ${r.steps} calculations maangi… jawab ban raha hai`:msg[r.status])||'Kaam chal raha hai…';return false;};
   try{let r=await(await fetch('/api/card?'+cardParams(id))).json();if(show(r))return;
     const job=r.job;
-    for(let i=0;i<150;i++){await new Promise(z=>setTimeout(z,3000));
+    for(let i=0;i<240;i++){await new Promise(z=>setTimeout(z,3000));
       try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
       if(r.status==='unknown'){show({status:'error',error:'Server restart ho gaya. Dobara try karein.'});return;}
       if(show(r))return;}
     show({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
   }catch(e){show({status:'error',error:String(e)});}}
+// The grantha-based plan Claude recorded before fetching the engine data.
+function planHtml(r){const p=r.plan||[];if(!p.length)return '';
+  const rows=p.map(x=>`<tr><td>${esc(x.calculation||'')}</td><td>${esc(x.source||'')}</td><td>${esc(x.why||'')}</td></tr>`).join('');
+  const gaps=(r.gaps||[]).length?`<p class="sub" style="margin-top:8px">Engine mein abhi nahi: ${(r.gaps||[]).map(g=>esc(g.calculation+' ('+g.source+')')).join('; ')}</p>`:'';
+  return `<details class="plan" style="margin-top:12px"><summary>Is jawab ke liye kya-kya dekha gaya (${p.length})</summary><div class="ans"><table><tr><th>Calculation</th><th>Granth</th><th>Kyon</th></tr>${rows}</table></div>${gaps}</details>`;}
 // Minimal Markdown → HTML for card answers (headings, bold/italic, lists, tables, quotes, rules).
 function md(src){const lines=esc(src).split('\n');let h='',list=null,para=[];
   const inl=t=>t.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g,'$1<i>$2</i>').replace(/`(.+?)`/g,'<code>$1</code>');

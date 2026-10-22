@@ -112,6 +112,13 @@ THEME_LEXICON: dict[str, dict] = {
                        natural_karaka=Planet.MARS, arudhas=["A6"], varga=9,
                        synonyms=["mukadma", "case", "lawsuit", "court", "dispute",
                                "legal", "kanooni"]),
+    # Manas: Moon is the mind (BPHS ch.3 "candro manaḥ"); 4th is the heart/
+    # inner contentment and 5th the buddhi (BPHS ch.11; Phaladeepika ch.1).
+    "mind": dict(houses=[4, 5], fulfil_houses=[4, 5, 11], negate_houses=[6, 8, 12],
+                 natural_karaka=Planet.MOON, arudhas=["A4"], varga=9,
+                 synonyms=["mann", "man", "manas", "mental peace", "mann ki shanti",
+                           "peace of mind", "stress", "tension", "anxiety", "chinta",
+                           "worry", "pareshani", "mental health", "emotions"]),
     "debt": dict(houses=[6], fulfil_houses=[6, 11], negate_houses=[8, 12],
                  natural_karaka=Planet.SATURN, arudhas=["A6"], varga=2,
                  synonyms=["karza", "karz", "loan", "borrowing", "udhaar", "emi"]),
