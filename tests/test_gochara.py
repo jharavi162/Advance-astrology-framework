@@ -166,3 +166,70 @@ def test_houses_from_and_snapshot_agree(tr):
         assert d["tara"] == tr.tara_bala(START)[p]
     assert snap["planets"][P.RAHU]["kakshya_active"] is None
     assert snap["saturn"]["house_from_moon"] == hm[P.SATURN]
+
+
+# --------------------------------------------------------------------------- #
+# Sarvatobhadra Chakra (nakṣatra ring geometry; inner rings not encoded)
+# --------------------------------------------------------------------------- #
+
+from advance_astrology.vedic import sarvatobhadra as sbc  # noqa: E402
+
+
+def test_sbc_ring_has_28_distinct_border_cells():
+    cells = list(sbc.CELLS.values())
+    assert len(sbc.CELLS) == 28 and len(set(cells)) == 28
+    corners = {(0, 0), (0, 8), (8, 0), (8, 8)}
+    for r, c in cells:
+        assert (r in (0, 8) or c in (0, 8)) and (r, c) not in corners
+    sides = {}
+    for n, s in sbc.SIDE.items():
+        sides.setdefault(s, []).append(n)
+    assert {s: len(v) for s, v in sides.items()} == dict(east=7, south=7, west=7, north=7)
+    assert sbc.SIDE["Krittika"] == "east" and sbc.SIDE["Magha"] == "south"
+    assert sbc.SIDE["Anuradha"] == "west" and sbc.SIDE["Dhanishta"] == "north"
+
+
+def test_sbc_krittika_lines():
+    lands = {k: v["lands"] for k, v in sbc.vedha_lines("Krittika").items()}
+    assert lands == dict(front="Shravana", diagonal_cw="Vishakha",
+                         diagonal_ccw="Bharani")
+
+
+def test_sbc_lines_are_reciprocal():
+    # A straight line drawn from A that lands on B is the same line from B.
+    for n in sbc.CELLS:
+        lines = sbc.vedha_lines(n)
+        back = sbc.vedha_lines(lines["front"]["lands"])
+        assert back["front"]["lands"] == n
+        for d in ("diagonal_cw", "diagonal_ccw"):
+            tgt = lines[d]["lands"]
+            assert tgt is not None
+            assert n in {v["lands"] for v in sbc.vedha_lines(tgt).values()}
+
+
+def test_sbc_abhijit_span():
+    assert sbc.nakshatra_28(277.0) == "Abhijit"
+    assert sbc.nakshatra_28(276.5) == "Uttara Ashadha"
+    assert sbc.nakshatra_28(281.0) == "Shravana"
+    assert sbc.nakshatra_28(0.5) == "Ashwini"
+    assert sbc.nakshatra_28(359.9) == "Revati"
+
+
+def test_sbc_motion_class():
+    assert sbc.motion_class(P.RAHU, -0.05) == "vakri"
+    assert sbc.motion_class(P.MARS, -0.2) == "vakri"
+    assert sbc.motion_class(P.JUPITER, 0.2) == "shighra"
+    assert sbc.motion_class(P.SATURN, 0.01) == "madhya"
+
+
+def test_transit_sarvatobhadra_contract(tr):
+    r = tr.sarvatobhadra(START)
+    assert r["janma_nakshatra"] == sbc.nakshatra_28(tr.chart.longitudes[P.MOON])
+    for p, d in r["planets"].items():
+        assert d["nakshatra"] == sbc.nakshatra_28(tr.positions(START, [p])[p])
+        assert set(d["lands"]) == {"front", "diagonal_cw", "diagonal_ccw"}
+        for line, pts in d["hits"].items():
+            tgt = d["lands"][line]
+            for q in pts:
+                natal = P.MOON if q == "janma" else P(q)
+                assert r["natal_nakshatras"][natal] == tgt

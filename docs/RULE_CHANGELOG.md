@@ -11,6 +11,35 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Sarvatobhadra Chakra: nakṣatra ring and vedha lines (ENGINE DATA, not in the app)
+
+- **Change (CODE, `advance_astrology/vedic/sarvatobhadra.py` +
+  `Transits.sarvatobhadra`):** the 9×9 Sarvatobhadra Chakra's outer ring of 28
+  nakṣatras (Abhijit carved from 276°40′–280°53′20″), seven to a side, running
+  clockwise from the east (Kṛttikā…Āśleṣā east, Maghā…Viśākhā south,
+  Anurādhā…Śravaṇa west, Dhaniṣṭhā…Bharaṇī north), and each nakṣatra's three
+  vedha lines: front, and the two diagonals, with the grid cells they cross and
+  the ring nakṣatra they land on (e.g. Kṛttikā → Śravaṇa front, Bharaṇī and
+  Viśākhā diagonally). `Transits.sarvatobhadra(when)` gives, for every
+  transiting graha, its 28-scheme nakṣatra, its motion class (vakri / śīghra /
+  madhya by mean motion) and which natal points (the janma nakṣatra and each
+  natal graha's nakṣatra) its lines land on.
+- **Why:** user request to make the engine capable of the full gochara list.
+  Source: Narapati Jayacharya, *Narapati-jayacharyā Svarodaya* (Sarvatobhadra
+  Chakra).
+- **Deliberately not encoded (needs the source text checked first):** the
+  inner rings (consonants, vowels, rāśis, tithis, weekdays). Each line's cells
+  are returned as grid coordinates so they can be attached later. Also not
+  encoded: which diagonal is *vāma* or *dakṣiṇa*, and the rule that a graha's
+  motion selects or emphasises one line. Texts word both differently, so the
+  diagonals are named by geometry (`diagonal_cw` / `diagonal_ccw`) and the
+  motion class is returned alongside without choosing a line.
+- **Not a rule change:** data only, no verdict or weight, and nothing is shown
+  in the webapp.
+- **Tests:** `tests/test_gochara.py` — 28 distinct border cells, seven per side;
+  Kṛttikā's three lines; every line reciprocal; the Abhijit span; motion
+  classes; and the transit contract on a generic chart.
+
 ## 2026-10-22 — Gochara: nakṣatra-level transits, ingresses, stations, Vedha, Ḍhaiyā, Murti, multi-reference houses (ENGINE DATA, no verdict)
 
 - **Change (CODE, `advance_astrology/vedic/gochara.py` + `Transits` in

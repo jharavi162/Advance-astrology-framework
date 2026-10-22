@@ -19,6 +19,7 @@ from ..ayanamsa import ayanamsa as compute_ayanamsa
 from ..constants import DEFAULT_PLANETS, NAKSHATRA_ARC, SIGNS, VEDIC_GRAHAS, Planet
 from ..nakshatra import nakshatra_of
 from . import gochara
+from . import sarvatobhadra as sbc
 from . import kakshya as kakshya_mod
 from .aspects import graha_aspect_houses
 from .ashtakavarga import sarvashtakavarga
@@ -509,3 +510,34 @@ class Transits:
                 vedha=vd[p])
         return dict(when=when, references=refs, planets=planets,
                     saturn=self.saturn_status(when))
+
+    def sarvatobhadra(self, when: datetime) -> dict:
+        """Sarvatobhadra Chakra vedha for every transiting graha — DATA only.
+
+        For each graha: its 28-scheme nakṣatra, motion class (vakri / śīghra /
+        madhya), and where each of its three vedha lines (front and the two
+        diagonals) lands on the nakṣatra ring. ``hits`` lists the natal
+        points whose nakṣatra a line lands on: ``janma`` (the natal Moon) and
+        each natal graha. Which line a given motion emphasises is left to the
+        reader (see :mod:`.sarvatobhadra`).
+        """
+        natal = {p: sbc.nakshatra_28(lon) for p, lon in self.chart.longitudes.items()
+                 if p in VEDIC_GRAHAS}
+        pos = self.positions(when, VEDIC_GRAHAS)
+        out = {}
+        for p in VEDIC_GRAHAS:
+            nk = sbc.nakshatra_28(pos[p])
+            lines = sbc.vedha_lines(nk)
+            hits = {}
+            for name, ln in lines.items():
+                tgt = ln["lands"]
+                pts = [("janma" if q is Planet.MOON else q.value)
+                       for q, n in natal.items() if n == tgt]
+                if pts:
+                    hits[name] = pts
+            out[p] = dict(nakshatra=nk,
+                          motion=sbc.motion_class(p, self.motion(when, p)["speed"]),
+                          lands={k: v["lands"] for k, v in lines.items()},
+                          hits=hits)
+        return dict(janma_nakshatra=natal[Planet.MOON], natal_nakshatras=natal,
+                    planets=out)
