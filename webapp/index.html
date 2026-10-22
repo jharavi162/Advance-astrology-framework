@@ -12,38 +12,64 @@
 <meta name="apple-mobile-web-app-title" content="HoraSutra"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <style>
-  :root{--bg:#0e0b14;--card:#1a1426;--ink:#f0ecf6;--mut:#a99fc0;--acc:#e6b450;--acc2:#c98bff;
-    --line:#2c2440;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;}
+  :root{--bg:#0e0b14;--card:#1a1426;--card2:#160f22;--ink:#f0ecf6;--mut:#a99fc0;--acc:#e6b450;--acc2:#c98bff;
+    --line:#2c2440;--good:#5fd0a0;--bad:#ff8fa3;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;}
   *{box-sizing:border-box}
   body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#241a36 0%,var(--bg) 60%);color:var(--ink);
        font:14.5px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
-  header{padding:18px 20px;text-align:center;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#1b1430,transparent)}
-  header h1{font:600 22px/1.2 var(--serif);margin:0;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  header p{margin:4px 0 0;color:var(--mut);font-size:12px}
-  .wrap{max-width:1240px;margin:0 auto;padding:18px}
-  h2{font:600 14px var(--serif);margin:0 0 10px;color:var(--acc);letter-spacing:.4px;text-transform:uppercase}
-  .card{background:linear-gradient(180deg,var(--card),#160f22);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
-  form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-  label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--mut);font-weight:600}
-  input,select,textarea{background:#0c0913;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 11px;font-size:16px;font-family:inherit}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px}
+  /* top bar: brand + saved charts */
+  .top{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#1b1430,transparent)}
+  .brand{display:flex;align-items:center;gap:8px;font:600 20px var(--serif);white-space:nowrap}
+  .brand img{height:30px;border-radius:50%}
+  .brand span{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .saved{display:flex;gap:6px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}.saved::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:#221a35;color:var(--mut);cursor:pointer;white-space:nowrap;user-select:none}
+  .chip:hover{color:var(--ink)}
+  .chip.on{color:#241a00;background:linear-gradient(90deg,var(--acc),#f0c875);border-color:transparent;font-weight:700}
+  .chip.add{border-style:dashed}
+  .chip .x{font-weight:700;padding:0 2px;opacity:.7}.chip .x:hover{opacity:1;color:#a8203d}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 28px rgba(0,0,0,.35);min-width:0}
+  h2{font:600 15px var(--serif);margin:0 0 4px;color:var(--acc);letter-spacing:.3px}
+  .hint{font-size:12px;color:var(--mut);margin:0 0 12px}
+  /* birth form */
+  form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+  label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--mut);font-weight:600;min-width:0}
+  label.wide{grid-column:span 2}
+  input,select,textarea{background:#0c0913;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 11px;font-size:16px;font-family:inherit;width:100%;min-width:0}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 3px rgba(201,139,255,.15)}
-  textarea{resize:vertical}
-  .timebox{display:flex;gap:5px}.timebox input,.timebox select{width:58px;text-align:center;padding:10px 4px}
-  .ctabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid var(--line);padding-bottom:0}
-  .ctab{display:inline-flex;align-items:center;gap:7px;background:#221a35;border:1px solid var(--line);border-bottom:none;
-    color:var(--mut);border-radius:12px 12px 0 0;padding:9px 14px;font-size:13.5px;font-weight:600;cursor:pointer;user-select:none;
-    margin-bottom:-1px}
-  .ctab:hover{color:var(--ink);border-color:var(--acc2)}
-  .ctab.on{color:var(--acc);background:linear-gradient(180deg,var(--card),#160f22);border-color:var(--acc);
-    border-bottom:1px solid #160f22}
-  .ctab .x{color:var(--mut);font-weight:700;padding:0 2px;line-height:1}
-  .ctab .x:hover{color:#ff9bb0}
-  button{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer;font-size:15px;min-height:44px}
+  .timebox{display:flex;gap:5px}.timebox input,.timebox select{text-align:center;padding:10px 4px;flex:1 1 0}.timebox select{flex:1.3 1 0}
+  .adv{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#120c1d}
+  .adv summary{cursor:pointer;font-size:12.5px;color:var(--mut);font-weight:600}
+  .adv .advgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+  .actions{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}
+  .actions button[type=submit]{flex:1 1 220px}
+  button{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:14.5px;min-height:44px;font-family:inherit}
   button.sec{background:#2a2140;color:var(--ink);border:1px solid var(--line)}
-  .grid{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:18px;margin-top:18px}
-  .col{display:flex;flex-direction:column;gap:18px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .geo{position:absolute;top:100%;left:0;right:0;z-index:30;background:#0c0913;border:1px solid var(--line);border-radius:12px;max-height:230px;overflow:auto;display:none;margin-top:4px}
+  .geo.on{display:block}.geo-it{padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12.5px;color:var(--ink);font-weight:400}.geo-it:active,.geo-it:hover{background:#2a2140}
+  /* native summary + at-a-glance tiles */
+  .native{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#2a2140;color:var(--acc);font:700 18px var(--serif);flex:0 0 auto}
+  .who{flex:1;min-width:180px}.who b{font-size:16px}.who div{font-size:12.5px;color:var(--mut)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .tile{background:#120c1d;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+  .tile .k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+  .tile .v{font-size:16px;font-weight:700;margin-top:2px}.tile .s{font-size:11.5px;color:var(--mut)}
+  .bad{color:var(--bad)}.good{color:var(--good)}.acc{color:var(--acc)}
+  /* section tabs */
+  .stabs{position:sticky;top:0;z-index:20;display:flex;gap:4px;overflow-x:auto;margin:16px -16px 14px;padding:8px 16px;background:rgba(14,11,20,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);scrollbar-width:none}
+  .stabs::-webkit-scrollbar{display:none}
+  .stab{flex:0 0 auto;background:none;border:0;color:var(--mut);font-weight:600;font-size:14px;padding:8px 12px;border-radius:10px;min-height:0}
+  .stab.on{background:#2a2140;color:var(--acc)}
+  .pane{display:none}.pane.on{display:block}
+  .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+  .stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .mt{margin-top:14px}
+  /* north-indian charts */
   .nwrap{display:flex;justify-content:center}
-  .nchart{width:100%;max-width:360px;height:auto;aspect-ratio:1;display:block;margin:0 auto}
+  .nchart{width:100%;max-width:380px;height:auto;aspect-ratio:1;display:block;margin:0 auto}
   .nchart line,.nchart polygon,.nchart rect{stroke:var(--acc);opacity:.85;fill:none}
   .nsign{font-size:8px;fill:var(--acc);opacity:.6;text-anchor:middle}
   .nasc{font-size:8.5px;fill:var(--acc2);text-anchor:middle;font-weight:700}
@@ -54,119 +80,239 @@
   .npt{font-size:9px;fill:#ff9bb0;text-anchor:middle;font-weight:700}
   .nsah{font-size:8.5px;fill:#f0a0d0;text-anchor:middle}
   .nsav{font-size:9px;fill:#9fb6e8;text-anchor:middle;font-weight:700}
-  .bar{position:relative;background:#0c0913;border:1px solid var(--line);border-radius:6px;height:16px;margin:3px 0;overflow:hidden}
-  .bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--acc2),var(--acc));opacity:.55}
-  .bar b{position:absolute;left:7px;top:0;font-size:11px;line-height:16px;color:var(--ink);font-weight:600}
-  .bar span{position:absolute;right:7px;top:0;font-size:10px;line-height:16px;color:var(--mut)}
-  .bar.strong i{background:linear-gradient(90deg,#5fd0a0,#9fe0c0)}
   .multi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
   .multi .nchart{max-width:240px}.ttl{text-align:center;font:600 12px var(--serif);color:var(--acc2);margin-bottom:4px}
-  table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  .lgnd{font-size:10.5px;color:var(--mut);text-align:center;margin-top:6px}
+  /* small toggle tabs inside cards */
+  .tabs{display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap}
+  .tabs button{background:#2a2140;color:var(--ink);padding:6px 11px;font-weight:600;font-size:12.5px;border:1px solid var(--line);min-height:0}
+  .tabs button.on{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border-color:transparent}
+  /* "abhi" card */
+  .chain{display:flex;flex-direction:column;gap:12px}
+  .lvl .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px}.lvl .row b{font-size:14.5px}
+  .lvl .row span{color:var(--mut);font-size:12px}
+  .prog{height:8px;background:#0c0913;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:5px}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc))}
+  .next{font-size:12.5px;color:var(--mut);border-top:1px dashed var(--line);padding-top:10px}
+  .cta{background:linear-gradient(135deg,#3a2560,#1d1430);border:1px solid #5a3f8a}
+  .cta h3{margin:0 0 4px;font:600 18px var(--serif);color:#fff}
+  .cta ul{margin:8px 0 12px;padding-left:18px;color:#d9cdee;font-size:13px}
+  /* bars */
+  .sb{display:grid;grid-template-columns:72px minmax(0,1fr) 104px;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+  .sb.h{grid-template-columns:96px minmax(0,1fr) 34px}
+  .sb .tr{height:12px;background:#0c0913;border:1px solid var(--line);border-radius:8px;position:relative;overflow:hidden}
+  .sb .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:8px}
+  .sb .tr.mid::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;border-left:1px dashed #6b5f85}
+  .sb .tg{font-size:11.5px;text-align:right}
+  .bar{position:relative;background:#0c0913;border:1px solid var(--line);border-radius:6px;height:18px;margin:4px 0;overflow:hidden}
+  .bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--acc2),var(--acc));opacity:.55}
+  .bar b{position:absolute;left:7px;top:0;font-size:11px;line-height:18px;color:var(--ink);font-weight:600}
+  .bar span{position:absolute;right:7px;top:0;font-size:10.5px;line-height:18px;color:var(--mut)}
+  /* tables, pills */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
   th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase}.retro{color:var(--acc)}
-  tr.dr:hover{background:#1c1530}.tabs{display:flex;gap:7px;margin:0 0 12px;flex-wrap:wrap}
-  .tabs button{background:#2a2140;color:var(--ink);padding:6px 12px;font-weight:600;font-size:12.5px;border:1px solid var(--line);min-height:0}
-  .tabs button.on{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0}
-  .pill{display:inline-block;font-size:11px;background:#0c0913;border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0}.pill b{color:var(--acc)}
+  tr.dr:hover{background:#1c1530}tr.cur td{background:#241a38}
+  .badge{font-size:10px;background:var(--acc);color:#241a00;border-radius:6px;padding:1px 6px;font-weight:800;margin-left:6px}
+  .pill{display:inline-block;font-size:11.5px;background:#0c0913;border:1px solid var(--line);border-radius:20px;padding:3px 10px;margin:0 6px 6px 0}.pill b{color:var(--acc)}
+  .pill.good{border-color:#2f6b55}.pill.bad{border-color:#7a3445}
   .sub{font-size:11.5px;color:var(--mut)}.row{display:flex;gap:10px;flex-wrap:wrap}
-  .grp{margin-bottom:9px}.grp .lbl{color:var(--acc2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-  .geo{position:absolute;top:100%;left:0;right:0;z-index:30;background:#0c0913;border:1px solid var(--line);border-radius:12px;max-height:230px;overflow:auto;display:none;margin-top:4px}
-  .geo.on{display:block}.geo-it{padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12.5px}.geo-it:active,.geo-it:hover{background:#2a2140}
-  .chat-msgs{max-height:min(60vh,480px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;resize:vertical;display:flex;flex-direction:column;gap:8px;background:#0a0710;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:90px}
-  .msg{flex:0 0 auto;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
-  .msg.user{background:#2a2140;align-self:flex-end;max-width:88%}.msg.ai{background:#100a1c;border:1px solid var(--line);max-width:95%;white-space:pre-wrap}
-  .srcs{margin-top:7px;padding-top:6px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}.srcs a{color:var(--acc2);text-decoration:none}
-  .refrow{font-size:12px;color:var(--ink);padding:4px 0;border-bottom:1px solid var(--line)}.refrow b{color:var(--acc)}
-  .lgnd{font-size:10px;color:var(--mut);text-align:center;margin-top:6px}
-  @media (max-width:880px){.wrap{padding:11px}.grid{grid-template-columns:1fr}label{flex:1 1 30%}form button{flex:1 1 100%}header h1{font-size:19px}}
+  .grp{margin-bottom:12px}.grp .lbl,.lbl{color:var(--acc2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+  .refrow{font-size:12.5px;color:var(--ink);padding:5px 0;border-bottom:1px solid var(--line)}.refrow b{color:var(--acc)}
+  @media (max-width:820px){.g2{grid-template-columns:1fr}.wrap{padding:12px}.stabs{margin:14px -12px 12px;padding:8px 12px}
+    .top{padding:10px 12px}.brand{font-size:18px}label.wide{grid-column:1/-1}}
+  @media (max-width:420px){label.tm{grid-column:1/-1}}
 </style>
 </head>
 <body>
-<header><h1><img src="/icon-192.png" alt="" style="height:34px;vertical-align:-9px;margin-right:9px;border-radius:50%">HoraSutra</h1><p>Ancient wisdom · Precise predictions — Kundalī · Gochar · Daśā · Analysis</p></header>
+<div class="top">
+  <div class="brand"><img src="/icon-192.png" alt=""><span>HoraSutra</span></div>
+  <div id="ctabs" class="saved"></div>
+</div>
+
 <div class="wrap">
-  <div id="ctabs" class="ctabs"></div>
+  <!-- Birth form (collapses into the summary card once the chart is cast) -->
   <div class="card" id="homecard">
+    <h2>Janma vivaran</h2>
+    <p class="hint">Naam, janm ki tareekh, samay aur jagah bharein. Jagah search karte hi latitude, longitude aur timezone apne aap bhar jaate hain.</p>
     <form id="f">
-      <label>Date<input id="date" type="date" value="1990-01-01"></label>
-      <label>Time<div class="timebox"><input id="hh" type="number" min="1" max="12" value="12"><input id="mm" type="number" min="0" max="59" value="00"><select id="ap"><option>AM</option><option selected>PM</option></select></div></label>
-      <label style="position:relative;flex:1 1 190px">Place (search)<input id="place" placeholder="city, e.g. Ramgarh" autocomplete="off"><div id="geo" class="geo"></div></label>
-      <label>Latitude<input name="lat" value="28.61" size="7"></label>
-      <label>Longitude<input name="lon" value="77.20" size="7"></label>
-      <label>Timezone<input name="tz" value="Asia/Kolkata" size="13"></label>
-      <label>Gender<select id="gender"><option value="">—</option><option value="male">Male</option><option value="female">Female</option></select></label>
-      <label>System<select id="ay"><option value="lahiri">Lahiri</option><option value="kp">KP</option><option value="raman">Raman</option><option value="multi">Multi (all 3)</option></select></label>
-      <button type="submit">Cast chart</button>
-      <button type="button" class="sec" onclick="saveChart()" title="Is chart ko device par save karo">💾 Save</button>
+      <label class="wide">Naam<input id="nm" placeholder="e.g. Ravi" autocomplete="off"></label>
+      <label>Janm tareekh<input id="date" type="date" value="1990-01-01"></label>
+      <label class="tm">Janm samay<div class="timebox"><input id="hh" type="number" min="1" max="12" value="12"><input id="mm" type="number" min="0" max="59" value="00"><select id="ap"><option>AM</option><option selected>PM</option></select></div></label>
+      <label class="wide" style="position:relative">Janm sthaan (search)<input id="place" placeholder="shehar, e.g. Ramgarh" autocomplete="off"><div id="geo" class="geo"></div></label>
+      <label>Gender<select id="gender"><option value="">—</option><option value="male">Purush</option><option value="female">Stree</option></select></label>
+      <details class="adv"><summary>Advanced settings (latitude, longitude, timezone, system)</summary>
+        <div class="advgrid">
+          <label>Latitude<input name="lat" value="28.61"></label>
+          <label>Longitude<input name="lon" value="77.20"></label>
+          <label>Timezone<input name="tz" value="Asia/Kolkata"></label>
+          <label>System<select id="ay"><option value="lahiri">Lahiri</option><option value="kp">KP</option><option value="raman">Raman</option><option value="multi">Multi (teeno)</option></select></label>
+        </div>
+      </details>
+      <div class="actions">
+        <button type="submit" id="castbtn">Kundli banao</button>
+        <button type="button" class="sec" onclick="saveChart()" title="Is chart ko device par save karo">💾 Save</button>
+      </div>
     </form>
-    <div class="sub" style="margin-top:6px">💾 Save = upar naya TAB ban jaata hai; tab par tap = seedha chart switch (form dobara nahi bharna). Charts sirf IS device ke browser me rehte hain — server par kuch store nahi hota.</div>
+    <div class="sub" style="margin-top:8px">💾 Save karne par chart upar chip ban jaata hai; chip par tap = seedha wahi kundli. Charts sirf IS device ke browser mein rehte hain, server par kuch save nahi hota.</div>
   </div>
 
-  <div id="out" class="grid" style="display:none">
-    <div class="col">
-      <div class="card">
-        <h2 id="d1title">Rāśi (D1)</h2>
-        <div class="tabs" id="layers">
-          <button class="on" data-l="grahas">Grahas</button>
-          <button data-l="arudhas">Arudhas + UL/AL</button>
-          <button data-l="upa">Upagrahas</button>
-          <button data-l="points">Points (BB/IL/Saham)</button>
-          <button data-l="sav">Aṣṭakavarga</button>
-        </div>
-        <div id="d1area"></div>
-        <div id="meta" style="margin-top:8px"></div>
-        <div class="lgnd"><span style="color:#bdd9ff">●</span> graha &nbsp; <span style="color:var(--acc)">●</span> arudha &nbsp; <span style="color:#7fe0c0">●</span> upagraha &nbsp; <span style="color:#ff9bb0">●</span> point &nbsp; <span style="color:#9fb6e8">⊙</span> SAV bindu</div>
+  <div id="out" style="display:none">
+    <!-- Native summary -->
+    <div class="card">
+      <div class="native">
+        <div class="avatar" id="av">?</div>
+        <div class="who" id="who"></div>
+        <button class="sec" onclick="editForm()">✎ Badlo</button>
       </div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+
+    <nav class="stabs" id="stabs">
+      <button class="stab on" data-p="ov">🏠 Overview</button>
+      <button class="stab" data-p="ku">🪐 Kundli</button>
+      <button class="stab" data-p="da">⏳ Daśā</button>
+      <button class="stab" data-p="go">🔭 Gochar</button>
+      <button class="stab" data-p="bl">💪 Bal</button>
+      <button class="stab" data-p="ja">🎯 Jaimini</button>
+      <button class="stab" data-p="kp">🏛 Bhāva &amp; KP</button>
+      <button class="stab" data-p="rf">📖 Reference</button>
+    </nav>
+
+    <!-- OVERVIEW -->
+    <section class="pane on" id="ov">
+      <div class="g2">
+        <div class="card">
+          <h2 id="d1title">Janma kundli (D1)</h2>
+          <p class="hint">Har ghar mein us rāśi ka number aur wahan baithe graha. Upar ke buttons se aur layers jodo.</p>
+          <div class="tabs" id="layers">
+            <button class="on" data-l="grahas">Graha</button>
+            <button data-l="arudhas">Arudha + UL/AL</button>
+            <button data-l="upa">Upagraha</button>
+            <button data-l="points">Points (BB/IL/Sāham)</button>
+            <button data-l="sav">Aṣṭakavarga</button>
+          </div>
+          <div id="d1area"></div>
+          <div id="meta" style="margin-top:8px;text-align:center"></div>
+          <div class="lgnd"><span style="color:#bdd9ff">●</span> graha &nbsp; <span style="color:var(--acc)">●</span> arudha &nbsp; <span style="color:#7fe0c0">●</span> upagraha &nbsp; <span style="color:#ff9bb0">●</span> point &nbsp; <span style="color:#9fb6e8">⊙</span> SAV bindu</div>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <h2>Abhi kya chal raha hai</h2>
+            <p class="hint" id="nowhint">Aaj ki daśā, aur har level kitna beet chuka hai.</p>
+            <div class="chain" id="nowchain"></div>
+          </div>
+          <div class="card cta">
+            <h3>Apni general reading</h3>
+            <div style="font-size:13px;color:#d9cdee">Poori kundli ka vishleshan, PDF mein, aapki bhasha mein.</div>
+            <ul><li>Mann par abhi sabse zyada kya haavi hai</li><li>Stress aur sukh ke asli kaaran</li><li>Aage ki dated timeline</li></ul>
+            <button disabled>📄 Jald aa raha hai</button>
+          </div>
+        </div>
+      </div>
+      <div class="g2 mt">
+        <div class="card">
+          <h2>Yogas</h2>
+          <p class="hint">Chart mein bane khaas yog.</p>
+          <div id="yogas"></div>
+        </div>
+        <div class="card">
+          <h2>Sabse majboot / kamzor</h2>
+          <p class="hint">Ṣaḍbala (graha) aur Aṣṭakavarga SAV (ghar) se.</p>
+          <div id="extremes"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KUNDLI -->
+    <section class="pane" id="ku">
+      <div class="g2">
+        <div class="card">
+          <h2>Varga (divisional) charts</h2>
+          <p class="hint">D9 = shaadi aur bhāgya, D10 = career, D7 = santān. Button dabake switch karo.</p>
+          <div class="tabs" id="vtabs"></div>
+          <div class="nwrap"><svg id="varga" class="nchart"></svg></div>
+          <div id="vmeta" class="lgnd"></div>
+        </div>
+        <div class="card">
+          <h2>Graha sthiti</h2>
+          <p class="hint">Har graha kis rāśi, degree, ghar aur nakṣatra mein hai.</p>
+          <div class="tw"><table id="ptab"><thead><tr><th>Graha</th><th>Rāśi</th><th>°</th><th>Ghar</th><th>Nakṣatra</th><th>Dignity</th></tr></thead><tbody></tbody></table></div>
+          <div class="lbl" style="margin-top:12px">Bhāva swāmī (ghar → lord)</div>
+          <div id="lords"></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <h2>Janm ki baaki details</h2>
+        <p class="hint">Pañcāṅga aur special lagnas.</p>
+        <div id="birth"></div>
+      </div>
+    </section>
+
+    <!-- DASHA -->
+    <section class="pane" id="da">
+      <div class="card">
+        <h2>Vimśottari daśā — poori zindagi</h2>
+        <p class="hint">Chalu mahādaśā highlight hai. Kisi bhi row par tap karo: Mahā → Antar → Pratyantar → Sūkṣma.</p>
+        <div class="tw"><table id="maha"><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- GOCHAR -->
+    <section class="pane" id="go">
       <div class="card">
         <h2>Gochar (transit)</h2>
-        <div class="row" style="margin-bottom:9px">
-          <input id="tdate" type="date"><button class="sec" onclick="showTransit()">Show transit</button>
+        <p class="hint">Kisi bhi tareekh par graha kahan hain, aapke janm lagna se ginkar.</p>
+        <div class="row" style="margin-bottom:10px">
+          <input id="tdate" type="date" style="flex:1 1 160px;width:auto"><button class="sec" onclick="showTransit()">Gochar dikhao</button>
         </div>
         <div class="nwrap"><svg id="tchart" class="nchart"></svg></div>
         <div id="tmeta" class="lgnd"></div>
       </div>
-      <div class="card">
-        <h2>Divisional charts</h2>
-        <div class="tabs" id="vtabs"></div>
-        <div class="nwrap"><svg id="varga" class="nchart"></svg></div>
-        <div id="vmeta" class="lgnd"></div>
-      </div>
-      <div class="card">
-        <h2>Birth details</h2>
-        <div id="birth"></div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card">
-        <h2>Analysis chat — Gemini</h2>
-        <div class="sub" style="margin-bottom:9px">Key server par (GEMINI_API_KEY env) — browser me nahi. Engine ke numbers = ground truth; model apni jyotish-knowledge se interpret karta hai (no web search).</div>
-        <div class="row" style="margin-bottom:7px;align-items:center">
-          <select id="cmodel" style="flex:1">
-            <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (capable)</option>
-            <option value="gemini-2.0-flash">Gemini 2.0 Flash (fast)</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-          </select>
+    </section>
+
+    <!-- BAL -->
+    <section class="pane" id="bl">
+      <div class="g2">
+        <div class="card">
+          <h2>Graha bal (Ṣaḍbala)</h2>
+          <p class="hint">Beech ki dotted line = zaroori bal. Uske daayein = majboot, baayein = kamzor.</p>
+          <div id="shad"></div>
+          <div class="lbl" style="margin-top:14px">Iṣṭa vs Kaṣṭa phala</div>
+          <div class="sub" style="margin-bottom:4px">Bhara hissa = Iṣṭa (shubh phal) ka share.</div>
+          <div id="ishta"></div>
         </div>
-        <div class="sub" style="margin-bottom:7px">🔮 Timing-sawaal pe engine date-scan apne aap chalta hai — "kab hui" → past, "kab hogi" → future, aur saal likho ("2015 se 2018 me…") toh wahi range scan hota hai.</div>
-        <div id="chat" class="chat-msgs"></div>
-        <div class="row" style="margin-top:8px">
-          <textarea id="cin" rows="2" placeholder="Poocho… (e.g. shaadi ka yog kab? career kaisa?)" style="flex:1"></textarea>
-          <button onclick="sendChat()">Send</button>
+        <div class="card">
+          <h2>Ghar ka score (Aṣṭakavarga SAV)</h2>
+          <p class="hint">28 se upar = achha ghar, 25 se neeche = kamzor.</p>
+          <div id="sav"></div>
         </div>
       </div>
-      <div class="card">
-        <h2>Grahas</h2>
-        <table id="ptab"><thead><tr><th>Graha</th><th>Sign</th><th>°</th><th>House</th><th>Nakṣatra</th><th>Dignity</th></tr></thead><tbody></tbody></table>
-        <div id="lords" style="margin-top:10px"></div>
+      <div class="card mt">
+        <h2>Avasthā</h2>
+        <p class="hint">Graha ki "halat": umar (Bālādi), jagrat/swapna, aur mood (Dīptādi).</p>
+        <div id="avtab"></div>
       </div>
+    </section>
+
+    <!-- JAIMINI -->
+    <section class="pane" id="ja">
       <div class="card">
-        <h2>Vimśottari Daśā — full life</h2>
-        <div class="sub">Tap: Mahā → Antar → Pratyantar → Sūkṣma.</div>
-        <table id="maha"><tbody></tbody></table>
+        <h2>Jaimini &amp; sensitive points</h2>
+        <p class="hint">Chara kāraka, Bhṛgu Bindu, Indu Lagna aur Tājika Sāham.</p>
+        <div class="grp"><div class="lbl">Chara kāraka (AK→DK)</div><div id="ckar"></div></div>
+        <div class="grp"><div class="lbl">Sensitive points</div><div id="pts"></div></div>
+        <div class="grp"><div class="lbl">Sāham (Tājika)</div><div id="sahams"></div></div>
       </div>
+    </section>
+
+    <!-- BHAVA & KP -->
+    <section class="pane" id="kp">
       <div class="card">
-        <h2>Bhāva &amp; cusps</h2>
+        <h2>Bhāva &amp; cusps (KP)</h2>
         <div class="row" style="align-items:center;margin-bottom:8px">
           <label style="flex-direction:row;align-items:center;gap:7px;font-size:12px;color:var(--ink)">House system
-            <select id="hsys" style="padding:6px 9px">
+            <select id="hsys" style="padding:6px 9px;width:auto">
               <option value="placidus">Placidus (KP)</option>
               <option value="whole_sign">Whole sign</option>
               <option value="equal">Equal</option>
@@ -175,51 +321,48 @@
             </select>
           </label>
         </div>
-        <div class="sub" style="margin-bottom:8px">Cusp · sign · sign/star/sub lord per house.</div>
-        <table id="cusptab"><thead><tr><th>Bh</th><th>Cusp</th><th>Rāśi-L</th><th>Star-L</th><th>Sub-L</th></tr></thead><tbody></tbody></table>
+        <p class="hint">Har ghar ka cusp, aur uska rāśi / star / sub lord.</p>
+        <div class="tw"><table id="cusptab"><thead><tr><th>Bh</th><th>Cusp</th><th>Rāśi-L</th><th>Star-L</th><th>Sub-L</th></tr></thead><tbody></tbody></table></div>
         <div id="chalit" style="margin-top:10px"></div>
       </div>
-      <div class="card">
-        <h2>Bala &amp; yogas</h2>
-        <div class="grp"><div class="lbl">Ṣaḍbala (rūpa / required)</div><div id="shad"></div></div>
-        <div class="grp"><div class="lbl">Iṣṭa vs Kaṣṭa phala</div><div id="ishta"></div></div>
-        <div class="grp"><div class="lbl">Yogas</div><div id="yogas"></div></div>
-        <div class="grp"><div class="lbl">Avasthās</div><div id="avtab"></div></div>
+      <div class="g2 mt">
+        <div class="card">
+          <h2>Bhāva lords &amp; occupants</h2>
+          <p class="hint">Har ghar: uski rāśi, swāmī, aur usme baithe graha.</p>
+          <div class="tw"><table id="hltab"><thead><tr><th>Bh</th><th>Rāśi</th><th>Swāmī</th><th>Graha</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div class="card">
+          <h2>Graha dṛṣṭi</h2>
+          <p class="hint">Special: Maṅgal 4/8 · Guru 5/9 · Śani 3/10 · Rāhu/Ketu 5/9 — sab 7th.</p>
+          <div class="tw"><table id="asptab"><thead><tr><th>Graha</th><th>Dekhta hai (bhāva · rāśi)</th><th>Grahon par</th></tr></thead><tbody></tbody></table></div>
+        </div>
       </div>
-      <div class="card">
-        <h2>Jaimini &amp; sensitive points</h2>
-        <div class="grp"><div class="lbl">Chara kārakas (AK→DK)</div><div id="ckar"></div></div>
-        <div class="grp"><div class="lbl">Sensitive points</div><div id="pts"></div></div>
-        <div class="grp"><div class="lbl">Sahams (Tājika)</div><div id="sahams"></div></div>
-      </div>
-      <div class="card">
-        <h2>Bhāva lords &amp; occupants</h2>
-        <div class="sub" style="margin-bottom:8px">Har bhāva: us par baithi rāśi, uska swāmī, aur usme baithe grahas.</div>
-        <table id="hltab"><thead><tr><th>Bh</th><th>Rāśi</th><th>Swāmī</th><th>Grahas</th></tr></thead><tbody></tbody></table>
-      </div>
-      <div class="card">
-        <h2>Planetary aspects (Graha dṛṣṭi)</h2>
-        <div class="sub" style="margin-bottom:8px">Special: Maṅgal 4/8 · Guru 5/9 · Śani 3/10 · Rāhu/Ketu 5/9 — sab 7th.</div>
-        <table id="asptab"><thead><tr><th>Graha</th><th>Dekhta hai (bhāva · rāśi)</th><th>Grahon par</th></tr></thead><tbody></tbody></table>
-      </div>
+    </section>
+
+    <!-- REFERENCE -->
+    <section class="pane" id="rf">
       <div class="card">
         <h2>Reference — kāraka · rāśi-lord · bhāva</h2>
-        <div class="sub" style="margin-bottom:8px">Universal (har kundali me same) — ek glossary.</div>
-        <div class="grp"><div class="lbl">Naisargika kārakas (graha → kis cheez ka kāraka)</div><div id="refkar"></div></div>
+        <p class="hint">Universal (har kundli mein same) — ek glossary.</p>
+        <div class="grp"><div class="lbl">Naisargika kāraka (graha → kis cheez ka kāraka)</div><div id="refkar"></div></div>
         <div class="grp"><div class="lbl">Rāśi lords (rāśi → swāmī)</div><div id="refrl"></div></div>
         <div class="grp"><div class="lbl">Bhāva significations (ghar → kya darśāta hai)</div><div id="refbh"></div></div>
       </div>
-    </div>
+    </section>
   </div>
 </div>
 
 <script>
 const SIGNS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
 const SIGN3=SIGNS.map(s=>s.slice(0,3));
+const RASHI_HI=["Mesh","Vrishabh","Mithun","Kark","Simha","Kanya","Tula","Vrishchik","Dhanu","Makar","Kumbh","Meen"];
+const GRAHA_HI={Sun:"Surya",Moon:"Chandra",Mars:"Mangal",Mercury:"Budh",Jupiter:"Guru",Venus:"Shukra",Saturn:"Shani",Rahu:"Rahu",Ketu:"Ketu"};
+const gh=n=>GRAHA_HI[n]||n;
 const NC=[[150,82],[75,30],[30,75],[78,150],[30,225],[75,270],[150,218],[225,270],[270,225],[222,150],[270,75],[225,30]];
 const UPA={Dhuma:'Dh',Vyatipata:'Vy',Parivesha:'Pv',Indrachapa:'Ic',Upaketu:'Uk'};
 const SAH={Vivaha:'Vv',Punarvivaha:'2V',Punya:'Py',Vidya:'Vd',Karma:'Km',Yasas:'Ys'};
 const L={grahas:true,arudhas:false,upa:false,points:false,sav:false};
+const HOUSE_NAME=["Tan","Dhan","Parākram","Sukh","Santān","Ripu","Vivāh","Āyu","Bhāgya","Karma","Lābh","Vyay"];
 // Universal reference (same for every chart)
 const RASHI_LORD=["Mars","Venus","Mercury","Moon","Sun","Mercury","Venus","Mars","Jupiter","Saturn","Saturn","Jupiter"];
 const KARAKA={Sun:"Ātmā, pitā, authority, health, vitality",Moon:"Man, mātā, emotions, fluids, public",
@@ -233,6 +376,10 @@ const BHAVA=["Self, sharīr, vyaktitva, vitality","Dhan, kuṭumb, vāṇī, foo
   "Vivāha, jīvansāthī, partnership, vyāpār","Āyu, transformation, gupt, inheritance, occult",
   "Bhāgya, dharma, pitā, guru, higher learning","Karma, pratiṣṭhā, status, authority, fame",
   "Lābh, āy, baḍe bhāī-bahan, desires fulfilled","Vyay, hāni, mokṣa, videsh, isolation, śayan-sukh"];
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmtD=s=>{const [y,m,d]=s.split('-');return `${+d} ${MON[+m-1]} ${y}`;};
+const fmtM=s=>{const [y,m]=s.split('-');return `${MON[+m-1]} ${y}`;};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function drawNorth(svg,ascSign,cells){
   svg.setAttribute('viewBox','0 0 300 300');svg.setAttribute('preserveAspectRatio','xMidYMid meet');
@@ -274,39 +421,91 @@ function params(extra){
 const natal=ay=>fetch('/api/natal?'+params(ay)).then(r=>r.json());
 
 async function load(ev){
-  if(ev)ev.preventDefault();const ay=document.getElementById('ay').value;const area=document.getElementById('d1area');
-  if(ay==='multi'){
-    document.getElementById('d1title').textContent='Rāśi (D1) — all systems';
-    document.getElementById('layers').style.display='none';
-    const sys=['lahiri','kp','raman'],res=await Promise.all(sys.map(natal));
-    if(res[0].error){alert(res[0].error);return;}
-    area.innerHTML='<div class="multi">'+sys.map((s,i)=>`<div><div class="ttl">${s.toUpperCase()} · ${res[i].lagna_name}</div><svg class="nchart" id="ms${i}"></svg></div>`).join('')+'</div>';
-    sys.forEach((s,i)=>{const c=emptyCells();addGrahas(c,res[i]);drawNorth(document.getElementById('ms'+i),res[i].lagna,c);});
-    finishLoad(res[0]);
-  }else{
-    document.getElementById('d1title').textContent='Rāśi (D1)';document.getElementById('layers').style.display='flex';
-    const j=await natal(ay);if(j.error){alert(j.error);return;}
-    window.NATAL=j;drawD1();finishLoad(j);
-  }
+  if(ev)ev.preventDefault();const ay=document.getElementById('ay').value;
+  const btn=document.getElementById('castbtn');btn.disabled=true;btn.textContent='Kundli ban rahi hai…';
+  try{
+    if(ay==='multi'){
+      document.getElementById('d1title').textContent='Janma kundli (D1) — teeno systems';
+      document.getElementById('layers').style.display='none';
+      const sys=['lahiri','kp','raman'],res=await Promise.all(sys.map(natal));
+      if(res[0].error){alert(res[0].error);return;}
+      finishLoad(res[0]);
+      document.getElementById('d1area').innerHTML='<div class="multi">'+sys.map((s,i)=>`<div><div class="ttl">${s.toUpperCase()} · ${res[i].lagna_name}</div><svg class="nchart" id="ms${i}"></svg></div>`).join('')+'</div>';
+      sys.forEach((s,i)=>{const c=emptyCells();addGrahas(c,res[i]);drawNorth(document.getElementById('ms'+i),res[i].lagna,c);});
+    }else{
+      document.getElementById('d1title').textContent='Janma kundli (D1)';document.getElementById('layers').style.display='flex';
+      const j=await natal(ay);if(j.error){alert(j.error);return;}
+      finishLoad(j);drawD1();
+    }
+  }catch(e){alert('Kundli nahi ban payi: '+e);}
+  finally{btn.disabled=false;btn.textContent='Kundli banao';}
 }
-function finishLoad(j){renderDetails(j);document.getElementById('out').style.display='grid';
+function finishLoad(j){window.NATAL=j;renderDetails(j);renderSummary(j);
+  if(window.ACTIVE==='__home__')renderTabs('__cast__');
+  document.getElementById('homecard').style.display='none';
+  document.getElementById('out').style.display='block';
   if(!document.getElementById('tdate').value)document.getElementById('tdate').value=new Date().toISOString().slice(0,10);
-  showTransit();}
+  showTransit();window.scrollTo({top:0});}
+function editForm(){document.getElementById('homecard').style.display='';window.scrollTo({top:0,behavior:'smooth'});}
+
+// ---- Native summary + at-a-glance tiles + "abhi" card (engine data only) ----
+function pct(a,b){const s=Date.parse(a),e=Date.parse(b),n=Date.now();return Math.max(0,Math.min(100,Math.round((n-s)/(e-s)*100)));}
+function renderSummary(j){
+  const name=document.getElementById('nm').value.trim();
+  const place=document.getElementById('place').value.trim();
+  const g=document.getElementById('gender').value;
+  document.getElementById('av').textContent=(name||'?').slice(0,1).toUpperCase();
+  const t=`${+document.getElementById('hh').value}:${String(+document.getElementById('mm').value).padStart(2,'0')} ${document.getElementById('ap').value}`;
+  document.getElementById('who').innerHTML=`<b>${esc(name||'Bina naam')}</b>${g?` <span class="sub">· ${g==='male'?'Purush':'Stree'}</span>`:''}`
+    +`<div>${fmtD(document.getElementById('date').value)} · ${t}${place?' · '+esc(place):''}</div>`;
+  const moon=j.planets.find(p=>p.ab==='Mo');const now=j.now||{};const vim=now.vimshottari||[];const sat=now.saturn;
+  const moonDig=moon&&/Debil/i.test(moon.dignity)?' <span class="bad" style="font-size:12px">neech</span>':(moon&&/Exalt/i.test(moon.dignity)?' <span class="good" style="font-size:12px">uchcha</span>':'');
+  const lagDeg=Math.floor(j.cusps&&j.cusps[0]?j.cusps[0].deg:0);
+  const tiles=[
+    ['Lagna',`${RASHI_HI[j.lagna]} ${lagDeg}°`,`swāmī ${gh(j.lagnesh)}`],
+    ['Chandra rāśi',`${moon?RASHI_HI[moon.sign]:''}${moonDig}`,moon?`${moon.nak} nakṣatra`:''],
+    ['Abhi ki daśā',vim.length>=2?`${gh(vim[0].lord)} › ${gh(vim[1].lord)}`:'—',vim[2]?`PD ${gh(vim[2].lord)} · ${fmtD(vim[2].end)} tak`:''],
+    ['Shani gochar',sat?`${RASHI_HI[sat.sign]} (${sat.house}th)`:'—',sat?`Sade Sati: ${sat.sade_sati?`<span class="bad">haan · ${sat.phase}</span>`:'<span class="good">nahi</span>'}`:'']];
+  document.getElementById('tiles').innerHTML=tiles.map(([k,v,s])=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+  // abhi kya chal raha hai
+  if(now.date)document.getElementById('nowhint').textContent=`Aaj (${fmtD(now.date)}) ki daśā, aur har level kitna beet chuka hai.`;
+  const names=['Mahādaśā','Antardaśā','Pratyantar'];
+  const lvl=(lab,p,span)=>`<div class="lvl"><div class="row"><b>${lab} · ${p.sign?RASHI_HI[SIGNS.indexOf(p.sign)]||p.sign:gh(p.lord)}</b><span>${span}</span></div><div class="prog"><i style="width:${pct(p.start,p.end)}%"></i></div></div>`;
+  let h=vim.map((p,i)=>lvl(names[i],p,i<2?`${fmtM(p.start)} → ${fmtM(p.end)}`:`${fmtD(p.start)} → ${fmtD(p.end)}`)).join('');
+  const ch=now.chara||[];
+  if(ch.length)h+=lvl('Chara (Jaimini)',ch[ch.length-1],`${fmtM(ch[ch.length-1].start)} → ${fmtM(ch[ch.length-1].end)}`);
+  const nx=[];if(now.next_pd)nx.push(`<b class="acc">${gh(now.next_pd.lord)} PD ${fmtD(now.next_pd.start)}</b>`);
+  if(now.next_ad)nx.push(`<b class="acc">${gh(now.next_ad.lord)} AD ${fmtD(now.next_ad.start)}</b>`);
+  if(nx.length)h+=`<div class="next">Aage: ${nx.join(' · ')}</div>`;
+  document.getElementById('nowchain').innerHTML=h||'<span class="sub">daśā data nahi mila.</span>';
+  // sabse majboot / kamzor
+  const sb=j.strengths.shadbala.slice().sort((a,b)=>b.pct-a.pct);
+  const hs=Array.from({length:12},(_,i)=>({h:i+1,v:j.sarva[(j.lagna+i)%12]})).sort((a,b)=>b.v-a.v);
+  const top=sb[0],low=sb[sb.length-1],ht=hs[0],hl=hs[hs.length-1];
+  document.getElementById('extremes').innerHTML=
+    `<span class="pill good">Majboot graha <b>${gh(top.planet)} ${(top.rupa/top.req).toFixed(2)}</b></span>`
+   +`<span class="pill bad">Kamzor graha <b>${gh(low.planet)} ${(low.rupa/low.req).toFixed(2)}</b></span>`
+   +`<span class="pill good">Majboot ghar <b>${ht.h}th · ${ht.v}</b></span>`
+   +`<span class="pill bad">Kamzor ghar <b>${hl.h}th · ${hl.v}</b></span>`;
+}
 
 function renderDetails(j){
-  window.NATAL=j;
   document.getElementById('meta').innerHTML=`<span class="pill">Lagna <b>${j.lagna_name}</b></span><span class="pill">Lagneśa <b>${j.lagnesh}</b></span><span class="pill">${j.input.ayanamsa}</span>`;
   const tb=document.querySelector('#ptab tbody');tb.innerHTML="";
   j.planets.forEach(p=>tb.insertAdjacentHTML('beforeend',`<tr><td>${p.name}${p.retro?' <span class="retro">℞</span>':''}</td><td>${p.sign_name}</td><td>${p.deg}</td><td>${p.house}</td><td>${p.nak}</td><td>${p.dignity}</td></tr>`));
   document.getElementById('lords').innerHTML=Object.entries(j.house_lords).map(([h,l])=>`<span class="pill">${h} <b>${l}</b></span>`).join('');
-  const mt=document.querySelector('#maha tbody');mt.innerHTML="";j.dasha.forEach((m,i)=>mt.appendChild(dRow(m,1,String(i))));
+  const mt=document.querySelector('#maha tbody');mt.innerHTML="";
+  const curMD=(j.now&&j.now.vimshottari&&j.now.vimshottari[0])||null;
+  j.dasha.forEach((m,i)=>{const r=dRow(m,1,String(i));
+    if(curMD&&m.lord===curMD.lord&&m.start===curMD.start){r.classList.add('cur');r.querySelector('td').insertAdjacentHTML('beforeend','<span class="badge">ABHI</span>');}
+    mt.appendChild(r);});
   // birth details (nakshatra + panchanga + special lagnas, consolidated)
   const moon=j.planets.find(p=>p.ab==='Mo');
   document.getElementById('birth').innerHTML=
     `<div class="grp"><span class="pill">Lagna <b>${j.lagna_name}</b></span><span class="pill">Lagneśa <b>${j.lagnesh}</b></span><span class="pill">Moon nakṣatra <b>${moon?moon.nak:''}</b></span></div>`
    +`<div class="grp"><div class="lbl">Pañcāṅga</div>`+['vara','tithi','nakshatra','yoga','karana'].map(k=>`<span class="pill">${k} <b>${j.panchanga[k]}</b></span>`).join('')+`</div>`
    +`<div class="grp"><div class="lbl">Special lagnas</div>`+Object.entries(j.special).map(([k,a])=>`<span class="pill">${k} <b>${a.sign_name.slice(0,3)} ${Math.round(a.deg)}°</b></span>`).join('')+`</div>`;
-  reloadCusps();renderStrengths(j);renderJaimini(j);
+  reloadCusps();renderStrengths(j);renderSav(j);renderJaimini(j);
   renderHouseLords(j);renderAspects(j);renderReference();
   // vargas (North-Indian, all D2..D60)
   const vt=document.getElementById('vtabs');vt.innerHTML="";const keys=Object.keys(j.vargas);
@@ -316,7 +515,7 @@ function renderDetails(j){
     drawNorth(document.getElementById('varga'),vc.asc,c);
     document.getElementById('vmeta').textContent='D'+n+' · Lagna '+SIGNS[vc.asc];};
   keys.forEach(n=>{const b=document.createElement('button');b.textContent='D'+n;b.onclick=()=>show(n);vt.appendChild(b);});
-  show(keys[0]);
+  show(keys.includes('9')?'9':keys[0]);
 }
 
 function renderCusps(d){
@@ -337,18 +536,23 @@ document.getElementById('hsys').addEventListener('change',reloadCusps);
 function renderStrengths(j){
   const s=j.strengths;
   document.getElementById('shad').innerHTML=s.shadbala.map(b=>{
-    const w=Math.min(100,Math.round(b.rupa/Math.max(b.req,b.rupa)*100));
-    return `<div class="bar${b.strong?' strong':''}"><i style="width:${w}%"></i><b>${b.planet}</b><span>${b.rupa} / ${b.req} rūpa</span></div>`;}).join('');
+    const r=b.rupa/b.req,ok=r>=1,w=Math.min(r/2,1)*100;
+    return `<div class="sb"><span>${gh(b.planet)}</span><div class="tr mid"><i style="width:${w}%;background:${ok?'linear-gradient(90deg,#3f9e7a,#5fd0a0)':'linear-gradient(90deg,#a8455a,#ff8fa3)'}"></i></div><span class="tg ${ok?'good':'bad'}" title="${b.rupa} / ${b.req} rūpa">${r.toFixed(2)} ${ok?'majboot':'kamzor'}</span></div>`;}).join('');
   document.getElementById('ishta').innerHTML=s.ishta_kashta.map(x=>{
     const tot=x.ishta+x.kashta||1,w=Math.round(x.ishta/tot*100);
-    return `<div class="bar"><i style="width:${w}%"></i><b>${x.planet}</b><span>Iṣṭa ${x.ishta} · Kaṣṭa ${x.kashta}</span></div>`;}).join('');
+    return `<div class="bar"><i style="width:${w}%"></i><b>${gh(x.planet)}</b><span>Iṣṭa ${x.ishta} · Kaṣṭa ${x.kashta}</span></div>`;}).join('');
   document.getElementById('yogas').innerHTML=s.yogas.length
-    ?s.yogas.map(y=>`<span class="pill" title="${y.desc}">${y.name} <b>${y.kind}</b></span>`).join('')
+    ?s.yogas.map(y=>`<span class="pill" title="${esc(y.desc)}">${y.name} <b>${y.kind}</b></span>`).join('')
     :`<span class="sub">koi major yoga detect nahi.</span>`;
   document.getElementById('avtab').innerHTML=
-    `<table><thead><tr><th>Gr</th><th>Bālādi</th><th>Jāgradādi</th><th>Dīptādi</th><th>Astha</th></tr></thead><tbody>`
+    `<div class="tw"><table><thead><tr><th>Gr</th><th>Bālādi</th><th>Jāgradādi</th><th>Dīptādi</th><th>Astha</th></tr></thead><tbody>`
     +Object.entries(s.avasthas).map(([ab,a])=>`<tr><td>${ab}</td><td>${a.baladi}</td><td>${a.jagradadi}</td><td>${a.deeptadi}</td><td>${a.combust}</td></tr>`).join('')
-    +`</tbody></table>`;
+    +`</tbody></table></div>`;
+}
+function renderSav(j){
+  document.getElementById('sav').innerHTML=Array.from({length:12},(_,i)=>{
+    const sign=(j.lagna+i)%12,v=j.sarva[sign],cls=v>=28?'good':v<25?'bad':'',col=v>=28?'#5fd0a0':v<25?'#ff8fa3':'#e6b450';
+    return `<div class="sb h"><span>${i+1} ${HOUSE_NAME[i]}</span><div class="tr"><i style="width:${Math.min(v/40,1)*100}%;background:${col}"></i></div><span class="tg ${cls}" title="${SIGNS[sign]}">${v}</span></div>`;}).join('');
 }
 function renderJaimini(j){
   const ROLE={Atmakaraka:'AK',Amatyakaraka:'AmK',Bhratrikaraka:'BK',Matrikaraka:'MK',Pitrikaraka:'PiK',Putrakaraka:'PK',Gnatikaraka:'GK',Darakaraka:'DK'};
@@ -391,7 +595,7 @@ async function showTransit(){const j=window.NATAL;if(!j)return;
   try{const t=await(await fetch('/api/transit?'+params()+'&date='+d)).json();
     const c=emptyCells();t.planets.forEach(p=>c[p.sign].push({t:p.ab+Math.round(p.deg)+'°',cls:'ntr'}));
     drawNorth(document.getElementById('tchart'),j.lagna,c);
-    document.getElementById('tmeta').textContent='Transit '+t.date+' · houses from natal Lagna '+j.lagna_name;
+    document.getElementById('tmeta').textContent='Gochar '+fmtD(t.date)+' · ghar janm lagna '+j.lagna_name+' se gine gaye';
   }catch(e){document.getElementById('tmeta').textContent='transit error: '+e;}
 }
 
@@ -401,22 +605,30 @@ function dRow(d,level,path){const pad=8+(level-1)*18,head=level<4?'▸ ':'↳ ';
   tr.innerHTML=`<td style="padding-left:${pad}px">${head}${d.lord}</td><td class="sub">${d.start}</td><td class="sub">${d.end}</td>`;
   if(level<4){tr.style.cursor='pointer';tr.onclick=()=>toggleDasha(tr,level,path);}return tr;}
 async function toggleDasha(tr,level,path){const cell=tr.querySelector('td');
+  const flip=(a,b)=>{const n=cell.firstChild;if(n&&n.nodeType===3)n.nodeValue=n.nodeValue.replace(a,b);};
   if(tr._open){let n=tr.nextElementSibling;while(n&&+n.dataset.lvl>level){const x=n;n=n.nextElementSibling;x.remove();}
-    tr._open=false;cell.textContent=cell.textContent.replace('▾','▸');return;}
-  cell.textContent=cell.textContent.replace('▸','▾');
+    tr._open=false;flip('▾','▸');return;}
+  flip('▸','▾');
   try{const j=await(await fetch('/api/dasha?'+params()+'&path='+path)).json();let after=tr;
     (j.sub||[]).forEach((c,i)=>{const cr=dRow(c,level+1,path+'.'+i);after.after(cr);after=cr;});tr._open=true;
-  }catch(e){cell.textContent=cell.textContent.replace('▾','▸');}}
+  }catch(e){flip('▾','▸');}}
+
+// section tabs (last tab remembered on this device only)
+const TKEY='horasutra_tab';
+function openTab(id){document.querySelectorAll('.stab').forEach(x=>x.classList.toggle('on',x.dataset.p===id));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===id));
+  try{localStorage.setItem(TKEY,id);}catch(e){}}
+document.getElementById('stabs').addEventListener('click',e=>{const b=e.target.closest('.stab');if(b)openTab(b.dataset.p);});
+try{const t=localStorage.getItem(TKEY);if(t&&document.getElementById(t))openTab(t);}catch(e){}
 
 document.getElementById('f').addEventListener('submit',load);
 
-// ---- SAVED CHARTS as TABS (device-local only: localStorage, server par kuch nahi) ----
-// 🏠 Home tab = birth-details form; har saved chart ka apna tab; chart-tab par
-// form chhipa rehta hai aur chart seedha cast hota hai.
+// ---- SAVED CHARTS as CHIPS (device-local only: localStorage, server par kuch nahi) ----
 const CKEY='horasutra_saved_charts';
 function getSaved(){try{return JSON.parse(localStorage.getItem(CKEY))||[];}catch(e){return[];}}
 function setSaved(l){try{localStorage.setItem(CKEY,JSON.stringify(l));}catch(e){}}
 function snapshotForm(){return{
+  name:document.getElementById('nm').value.trim(),
   date:document.getElementById('date').value,hh:document.getElementById('hh').value,
   mm:document.getElementById('mm').value,ap:document.getElementById('ap').value,
   place:document.getElementById('place').value,
@@ -424,6 +636,7 @@ function snapshotForm(){return{
   tz:document.querySelector('[name=tz]').value,gender:document.getElementById('gender').value,
   ay:document.getElementById('ay').value};}
 function fillForm(c){
+  document.getElementById('nm').value=c.name||c.label||'';
   document.getElementById('date').value=c.date;document.getElementById('hh').value=c.hh;
   document.getElementById('mm').value=c.mm;document.getElementById('ap').value=c.ap;
   document.getElementById('place').value=c.place||'';
@@ -432,128 +645,35 @@ function fillForm(c){
   document.getElementById('ay').value=c.ay||'lahiri';}
 function saveChart(){
   const snap=snapshotForm();
-  const def=(snap.place?snap.place+' ':'')+snap.date;
-  const label=(prompt('Is chart ka naam? (e.g. Meri kundali)',def)||'').trim();
+  const def=snap.name||((snap.place?snap.place+' ':'')+snap.date);
+  const label=(prompt('Is chart ka naam?',def)||'').trim();
   if(!label)return;
+  if(!snap.name){snap.name=label;document.getElementById('nm').value=label;}
   const l=getSaved().filter(c=>c.label!==label);
   l.push({label,...snap});setSaved(l);useChart(label);}
 function delChart(label){
   if(!confirm('"'+label+'" delete karein?'))return;
-  setSaved(getSaved().filter(c=>c.label!==label));showHome();}
+  setSaved(getSaved().filter(c=>c.label!==label));renderTabs(window.ACTIVE===label?'__home__':window.ACTIVE);}
 function showHome(){
+  document.getElementById('nm').value='';
+  document.getElementById('out').style.display='none';
   document.getElementById('homecard').style.display='';
-  renderTabs('__home__');}
+  renderTabs('__home__');window.scrollTo({top:0});}
 function useChart(label){
   const c=getSaved().find(x=>x.label===label);if(!c)return;
-  fillForm(c);renderTabs(label);
-  document.getElementById('homecard').style.display='none';   // chart-tab par form nahi dikhta
-  HIST.length=0;const ch=document.getElementById('chat');if(ch)ch.innerHTML='';  // naya native = naya chat context
-  load();}
+  fillForm(c);renderTabs(label);load();}
 function renderTabs(active){
+  window.ACTIVE=active;
   const el=document.getElementById('ctabs');if(!el)return;el.innerHTML='';
-  const home=document.createElement('span');
-  home.className='ctab'+(active==='__home__'?' on':'');
-  home.textContent='🏠 Home';home.onclick=showHome;el.appendChild(home);
   getSaved().forEach(c=>{
-    const d=document.createElement('span');d.className='ctab'+(c.label===active?' on':'');
-    const t=document.createElement('span');t.textContent='👤 '+c.label;d.appendChild(t);
-    const x=document.createElement('span');x.className='x';x.textContent='×';
+    const d=document.createElement('span');d.className='chip'+(c.label===active?' on':'');
+    const t=document.createElement('span');t.textContent=c.label;d.appendChild(t);
+    const x=document.createElement('span');x.className='x';x.textContent='×';x.title='Delete';
     x.onclick=e=>{e.stopPropagation();delChart(c.label);};d.appendChild(x);
-    d.onclick=()=>useChart(c.label);el.appendChild(d);});}
+    d.onclick=()=>useChart(c.label);el.appendChild(d);});
+  const add=document.createElement('span');add.className='chip add'+(active==='__home__'?' on':'');
+  add.textContent='＋ Nayi kundli';add.onclick=showHome;el.appendChild(add);}
 renderTabs('__home__');
-
-// Analysis chat (Gemini via backend proxy — key stays on server)
-let HIST=[];
-function addMsg(role,txt){const d=document.createElement('div');d.className='msg '+role;d.textContent=txt;
-  const c=document.getElementById('chat');c.appendChild(d);c.scrollTop=1e9;return d;}
-function chatCtx(){const j=window.NATAL;if(!j)return null;
-  return {birth:j.input,lagna:j.lagna_name,lagnesh:j.lagnesh,planets:j.planets,
-    house_lords:j.house_lords,vimshottari_maha:j.dasha,cusps:j.cusps,chalit:j.chalit,
-    arudhas:j.arudhas,upagrahas:j.upagrahas,special_lagnas:j.special,points:j.points,
-    strengths:{shadbala:j.strengths.shadbala,ishta_kashta:j.strengths.ishta_kashta,yogas:j.strengths.yogas},
-    sarvashtakavarga:j.sarva,panchanga:j.panchanga,navamsa_D9:j.vargas['9'],dashamsa_D10:j.vargas['10'],
-    ...(window.LASTSCAN?{last_salience_scan:window.LASTSCAN}:{})};}
-function chartParams(){const P=params();let ay=P.get('ayanamsa');if(ay==='multi')ay='lahiri';
-  return {when:P.get('when'),tz:P.get('tz'),lat:P.get('lat'),lon:P.get('lon'),ayanamsa:ay,
-    gender:P.get('gender')||''};}
-async function sendChat(){const ctx=chatCtx();
-  if(!ctx){alert('Pehle Cast chart karo.');return;}
-  const inp=document.getElementById('cin'),txt=inp.value.trim();if(!txt)return;
-  addMsg('user',txt);inp.value='';HIST.push({role:'user',content:txt});
-  const ai=addMsg('ai','…');
-  try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({messages:HIST,context:ctx,chart:chartParams(),model:document.getElementById('cmodel').value})});
-    const j=await r.json();
-    const chat=document.getElementById('chat');
-    const toTop=()=>{chat.scrollTop+=ai.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;};
-    if(j.error){ai.textContent='⚠ '+j.error;toTop();HIST.pop();
-      if(j.scan)autoScan(j.scan,false);  // engine ka scan+CALL Gemini ke bina bhi dikhta hai
-      return;}
-    ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
-    if(j.note){const n=document.createElement('div');n.className='srcs';n.textContent=j.note;ai.appendChild(n);}
-    toTop();  // bring the start of the new answer to the top so it reads from the beginning
-    if(j.scan)autoScan(j.scan);  // timing question → engine date-scan chal raha hai; result aane par follow-up
-  }catch(e){ai.textContent='Network error: '+e;HIST.pop();}}
-document.getElementById('cin').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();sendChat();}});
-
-// Salience date-scan (heavy engine timeline) — background job + polling
-async function pollScan(job,msg,label){const chat=document.getElementById('chat');
-  let tries=0,res=null;
-  while(tries++<130){await new Promise(r=>setTimeout(r,3000));   // ~6.5 min budget
-    try{res=await(await fetch('/api/scan_status?job='+job)).json();}catch(e){continue;}
-    if(res.status==='done'||res.status==='error')break;
-    msg.textContent=`🔮 Scanning ${label} … ${tries*3}s (engine timeline, ruko)`;chat.scrollTop=chat.scrollHeight;}
-  return res;}
-function renderScan(res,fy,ty,msg){const chat=document.getElementById('chat');
-  window.LASTSCAN={domain:res.domain,range:fy+'–'+ty,windows:res.windows,
-    ...(res.call?{call:res.call}:{}),...(res.pinpoint?{pinpoint:res.pinpoint}:{}),
-    ...(res.nadi?{nadi:res.nadi}:{}),
-    ...(res.convergence?{convergence:res.convergence}:{}),
-    ...(res.verdict?{standing_verdict:res.verdict,standing:res.standing}:{})};
-  let html;
-  const cw=w=>/HERO/.test(w)?'HERO':/before/.test(w)?'pre':'post';
-  const nadiLine=n=>!n?'':`<div class="refrow" style="margin:0 0 8px">🌿 <b style="color:var(--acc)">Nāḍī</b> (BNN, 1/5/9 trine method) · kāraka <b>${n.karaka}</b> · nature: ${n.nature}${(n.chain&&n.chain.length)?`<div class="sub" style="margin-top:3px">🔗 chain (degree-order = story): ${n.chain.map(c=>`<b>${c.planet}</b> ${c.degree}° ${c.relation}${c.retrograde?' [R]':''} <i>[${cw(c.when)}]</i>`).join(' → ')}</div>`:''}</div>`;
-  const oc=k=>!k?'':` · <b style="color:${k==='LOSS/BREAK'?'#ff9bb0':(k==='CHANGE/UPGRADE'?'#7fe0c0':'var(--mut)')}">${k}</b>`;
-  const callLine=c=>!c?'':`<div class="refrow" style="border:1px solid var(--acc);border-radius:8px;padding:7px 9px;margin:4px 0 8px">📌 <b style="color:var(--acc)">CALL: ${c.answer}</b> (${c.confidence})${c.window?` · ~<b>${c.window}</b>${c.chain?' '+c.chain:''}`:''} · quality: ${c.quality}${c.next?`<div class="sub" style="margin-top:3px">⏭ agla strong window: <b>${c.next}</b>${c.next_chain?' '+c.next_chain:''}</div>`:''}</div>`;
-  if(res.macro){
-    html=`<b style="color:var(--acc)">🔮 Macro-scan — kaunse life-areas spike hue (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} life-areas ranked by stand-out spike · CALL = engine ka committed YES/NOT-YET/NO · ~${res.step||30}-day resolution</div>`;
-    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.domain.toUpperCase()}</b>${w.call?` · <b style="color:var(--acc)">${w.call.answer}</b> (${w.call.confidence})${w.call.window?' ~'+w.call.window:''}`:''} · peak <b>${w.date}</b> · ${w.chain}${oc(w.outcome)} · ${w.verdict||''} (${w.standing>=0?'+':''}${w.standing})<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
-  }else{
-    html=res.rupture
-      ?`<b style="color:var(--acc)">🔮 Rupture-timer windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · rupture-score /5 se ranked (LOSS/BREAK = engine ka committed break-read) · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b>`:''}</div>`
-      :`<b style="color:var(--acc)">🔮 Salience-ranked windows — ${res.domain} (${fy}–${ty})</b><div class="sub" style="margin:3px 0 7px">${res.scanned} windows · ~${res.step||30}-day resolution${res.verdict?` · standing: <b>${res.verdict}</b> (${res.standing>=0?'+':''}${res.standing})`:''}</div>`;
-    html+=callLine(res.call);
-    if(res.convergence&&res.convergence.length){const dc=d=>({union:'#7fe0c0',break:'#ff9bb0',troubled:'#e0c060',mixed:'var(--mut)'})[d]||'var(--mut)';
-      html+=`<div class="refrow" style="margin:0 0 8px">🧭 <b style="color:var(--acc)">Multi-method convergence</b> (energised days): ${res.convergence.map(c=>`<b>${c.date}</b> ${c.methods}/5 <span style="color:${dc(c.direction)}">[${c.direction}]</span>`).join(' · ')}<div class="sub">${res.convergence[0].active.join(', ')}</div></div>`;}
-    html+=nadiLine(res.nadi);
-    if(res.pinpoint&&res.pinpoint.length)html+=`<div class="refrow" style="margin:0 0 8px">${res.rupture?'💔':'📍'} <b style="color:var(--acc)">Nāḍī ${res.rupture?'rupture-pinpoint':'pinpoint'}</b> (din-level): ${res.pinpoint.map(p=>`<b>${p.date}</b> (${p.score})`).join(' · ')}<div class="sub">${res.pinpoint[0].hits.join(', ')}</div></div>`;
-    html+=res.windows.map((w,i)=>`<div class="refrow"><b>${i+1}. ${w.date}</b> · ${w.chain} · sal <b>${w.salience}</b> · ${w.systems} sys · KP ${w.kp}${oc(w.outcome)}<div class="sub">${w.nodes.join(', ')}</div></div>`).join('');
-  }
-  msg.innerHTML=html;chat.scrollTop+=msg.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;}
-// AUTO scan: timing-sawaal par backend khud scan kick karta hai; result aate hi
-// engine-windows render + Gemini se ek follow-up narration.
-async function autoScan(scan,narrate=true){
-  if(window.LASTJOB===scan.job)return;window.LASTJOB=scan.job;
-  const msg=addMsg('ai',`🔮 Engine date-scan chal raha hai — "${scan.domain}" ${scan.from_y}–${scan.to_y} … (result aane par yahin bataunga)`);
-  document.getElementById('chat').scrollTop=1e9;
-  const res=await pollScan(scan.job,msg,`"${scan.domain}" ${scan.from_y}–${scan.to_y}`);
-  if(!res||res.status!=='done'){msg.textContent='⚠ Auto date-scan poora nahi hua'+((res&&res.error)?': '+res.error:' — thodi der baad phir poochho.');return;}
-  renderScan(res,scan.from_y,scan.to_y,msg);
-  if(!narrate)return;  // LLM quota over tha — engine windows+CALL kaafi hain
-  // follow-up narration grounded on the engine windows
-  HIST.push({role:'user',content:res.macro
-    ?`(auto) Engine ka multi-domain macro-scan poora ho gaya — batao is window me kaun-se life-areas me sabse bade events (kya kya hua) hue honge aur kab, IN ranked areas se (context me last_salience_scan).`
-    :`(auto) Engine ka ${scan.domain} salience date-scan poora ho gaya — mere pichhle sawaal ka timing-jawab ab IN ranked windows se do (context me last_salience_scan).`});
-  const ai=addMsg('ai','…');
-  try{const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({messages:HIST,context:chatCtx(),chart:chartParams(),model:document.getElementById('cmodel').value})});
-    const j=await r.json();
-    if(j.error){ai.textContent='⚠ '+j.error;HIST.pop();return;}
-    ai.textContent=j.text;HIST.push({role:'assistant',content:j.text});
-    const chat=document.getElementById('chat');chat.scrollTop+=ai.getBoundingClientRect().top-chat.getBoundingClientRect().top-8;
-  }catch(e){ai.textContent='Network error: '+e;HIST.pop();}
-}
 
 // location search → lat/lon/timezone
 const placeEl=document.getElementById('place'),geoEl=document.getElementById('geo');let gt;
@@ -562,9 +682,9 @@ placeEl.addEventListener('input',()=>{clearTimeout(gt);const q=placeEl.value.tri
     geoEl.innerHTML='';(j.results||[]).forEach(p=>{const d=document.createElement('div');d.className='geo-it';
       d.textContent=`${p.name}${p.admin1?', '+p.admin1:''}, ${p.country_code||''} (${p.latitude.toFixed(2)}, ${p.longitude.toFixed(2)})`;
       d.onclick=()=>{document.querySelector('[name=lat]').value=p.latitude.toFixed(4);document.querySelector('[name=lon]').value=p.longitude.toFixed(4);
-        if(p.timezone)document.querySelector('[name=tz]').value=p.timezone;placeEl.value=p.name;geoEl.className='geo';};geoEl.appendChild(d);});
+        if(p.timezone)document.querySelector('[name=tz]').value=p.timezone;placeEl.value=p.name+(p.admin1?', '+p.admin1:'');geoEl.className='geo';};geoEl.appendChild(d);});
     geoEl.className=geoEl.children.length?'geo on':'geo';
-  }catch(e){geoEl.innerHTML='<div class="geo-it">geocoding unavailable — lat/lon manually</div>';geoEl.className='geo on';}},300);});
+  }catch(e){geoEl.innerHTML='<div class="geo-it">jagah search nahi ho payi — Advanced settings mein lat/lon khud daalein</div>';geoEl.className='geo on';}},300);});
 document.addEventListener('click',e=>{if(!e.target.closest('label'))geoEl.className='geo';});
 </script>
 </body>

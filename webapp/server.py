@@ -354,6 +354,43 @@ def _strengths(v):
     return dict(shadbala=bal, ishta_kashta=iks, avasthas=av, yogas=yg)
 
 
+def _period(d):
+    return dict(lord=d.lord.value, sign=d.note or None,
+                start=d.start.date().isoformat(), end=d.end.date().isoformat())
+
+
+def _next_after(periods, cur):
+    """The sibling period that starts right after *cur* (or None)."""
+    for d in periods or []:
+        if d.start >= cur.end:
+            return d
+    return None
+
+
+def _now(v):
+    """'Abhi kya chal raha hai' — the running Vimśottari chain (MD/AD/PD), the
+    running Chara rāśi-daśā (MD/AD), the next PD/AD change, and Saturn's gochar
+    with Sade Sati. Pure engine data for the Overview card; no interpretation."""
+    now = datetime.now(timezone.utc)
+    out = dict(date=now.date().isoformat())
+    vim = v.current_dasha("vimshottari", now, levels=3)
+    out["vimshottari"] = [_period(d) for d in vim]
+    if len(vim) >= 3:
+        nx = _next_after(vim[1].sub_periods, vim[2])
+        out["next_pd"] = _period(nx) if nx else None
+    if len(vim) >= 2:
+        nx = _next_after(vim[0].sub_periods, vim[1])
+        out["next_ad"] = _period(nx) if nx else None
+    out["chara"] = [_period(d) for d in v.current_chara_dasha(now, levels=2)]
+    tr = v.transits()
+    sat = int(tr.transit_sign(now, Planet.SATURN))
+    ss = tr.sade_sati(now)
+    out["saturn"] = dict(sign=sat, sign_name=SIGNS[sat],
+                         house=(sat - int(v.ascendant_sign)) % 12 + 1,
+                         sade_sati=bool(ss["active"]), phase=ss["phase"])
+    return out
+
+
 VARGAS = (2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60)
 
 
@@ -377,6 +414,7 @@ def natal_json(q):
         vargas={str(n): _varga(v, n) for n in VARGAS},
         cusps=_kp_cusps(v), chalit=_chalit(v), sarva=v.sarvashtakavarga(),
         points=_points(v), strengths=_strengths(v), aspects=_aspects(v),
+        now=_now(v),
         panchanga=dict(tithi=getattr(pan.tithi, "name", str(pan.tithi)),
                        nakshatra=str(pan.nakshatra), yoga=str(pan.yoga),
                        karana=str(pan.karana), vara=str(pan.vara)),
