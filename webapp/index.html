@@ -341,14 +341,34 @@
 
     <!-- GOCHAR -->
     <section class="pane" id="go">
-      <div class="card">
-        <h2>Gochar (transit)</h2>
-        <p class="hint">Kisi bhi tareekh par graha kahan hain, aapke janm lagna se ginkar.</p>
-        <div class="row" style="margin-bottom:10px">
-          <input id="tdate" type="date" style="flex:1 1 160px;width:auto"><button class="sec" onclick="showTransit()">Gochar dikhao</button>
+      <div class="g2">
+        <div class="card">
+          <h2>Gochar (transit)</h2>
+          <p class="hint">Kisi bhi tareekh par graha kahan hain, aapke janm lagna se ginkar.</p>
+          <div class="row" style="margin-bottom:10px">
+            <input id="tdate" type="date" style="flex:1 1 160px;width:auto"><button class="sec" onclick="showTransit()">Gochar dikhao</button>
+          </div>
+          <div class="nwrap"><svg id="tchart" class="nchart"></svg></div>
+          <div id="tmeta" class="lgnd"></div>
         </div>
-        <div class="nwrap"><svg id="tchart" class="nchart"></svg></div>
-        <div id="tmeta" class="lgnd"></div>
+        <div class="card">
+          <h2>Lagna aur Chandra se gochar</h2>
+          <p class="hint">Har graha abhi kis rāśi aur nakṣatra mein hai, aur aapke Lagna aur janm Chandra se kaun se ghar mein. ℞ = vakri (Rahu-Ketu hamesha vakri rehte hain).</p>
+          <div id="gtable"><span class="sub">Gochar tab khulne par load hoga…</span></div>
+          <div id="gsat" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <h2 id="grashi_t">Rāśi parivartan</h2>
+        <p class="hint">Kaun sa graha kab nayi rāśi mein jayega, aur woh aapka kaun sa ghar hoga.</p>
+        <div class="tabs gfilter"></div>
+        <div id="grashi"></div>
+      </div>
+      <div class="card mt">
+        <h2 id="gnak_t">Nakṣatra parivartan</h2>
+        <p class="hint">Kaun sa graha kab naye nakṣatra mein jayega, aur us nakṣatra ka swāmī.</p>
+        <div class="tabs gfilter"></div>
+        <div id="gnak"></div>
       </div>
     </section>
 
@@ -680,6 +700,56 @@ async function showTransit(){const j=window.NATAL;if(!j)return;
     drawNorth(document.getElementById('tchart'),j.lagna,c);
     document.getElementById('tmeta').textContent='Gochar '+fmtD(t.date)+' · ghar janm lagna '+j.lagna_name+' se gine gaye';
   }catch(e){document.getElementById('tmeta').textContent='transit error: '+e;}
+  if(document.getElementById('go').classList.contains('on'))loadGochar();
+}
+
+// ---- Gochar: Lagna/Chandra table + rāśi & nakṣatra parivartan (engine data) ----
+const ABHI={Su:'Surya',Mo:'Chandra',Ma:'Mangal',Me:'Budh',Ju:'Guru',Ve:'Shukra',Sa:'Shani',Ra:'Rahu',Ke:'Ketu'};
+const GORDER=['Sa','Ju','Ra','Ke','Ma','Su','Ve','Me'];
+const GKEY='horasutra_gfilter';
+let GF=null;try{GF=JSON.parse(localStorage.getItem(GKEY));}catch(e){}
+if(!Array.isArray(GF))GF=['Sa','Ju','Ra','Ke','Ma'];
+const ord=n=>n+(n===1?'st':n===2?'nd':n===3?'rd':'th');
+const dOnly=s=>fmtD(s.slice(0,10));
+const rx=(ab,r)=>r&&ab!=='Ra'&&ab!=='Ke'?' <span class="retro">℞</span>':'';  // nodes are always vakri
+function renderGFilter(){document.querySelectorAll('.gfilter').forEach(el=>el.innerHTML=GORDER.map(a=>
+  `<button data-a="${a}" class="${GF.includes(a)?'on':''}">${ABHI[a]}</button>`).join(''));}
+document.addEventListener('click',e=>{const b=e.target.closest('.gfilter button');if(!b)return;
+  const a=b.dataset.a;GF=GF.includes(a)?GF.filter(x=>x!==a):[...GF,a];
+  try{localStorage.setItem(GKEY,JSON.stringify(GF));}catch(x){}
+  renderGFilter();if(window.GOCHAR)renderGLists(window.GOCHAR);});
+renderGFilter();
+async function loadGochar(){const j=window.NATAL;if(!j)return;
+  const d=document.getElementById('tdate').value||new Date().toISOString().slice(0,10);
+  const key=params()+'&date='+d;if(window.GOCHAR_KEY===key)return;window.GOCHAR_KEY=key;
+  ['gtable','grashi','gnak'].forEach(id=>document.getElementById(id).innerHTML='<span class="sub">Gochar nikal raha hoon… (kuch second)</span>');
+  document.getElementById('gsat').innerHTML='';
+  try{const g=await(await fetch('/api/gochar?'+key+'&months=12')).json();
+    if(g.error)throw g.error;if(window.GOCHAR_KEY!==key)return;
+    window.GOCHAR=g;renderGTable(g);renderGLists(g);
+  }catch(e){window.GOCHAR_KEY=null;document.getElementById('gtable').innerHTML='<span class="bad">Gochar load nahi hua: '+esc(e)+'</span>';}
+}
+function renderGTable(g){
+  document.getElementById('gtable').innerHTML=`<div class="tw"><table><thead><tr><th>Graha</th><th>Rāśi</th><th>Nakṣatra</th><th>Lagna</th><th>Chandra</th></tr></thead><tbody>`
+   +g.planets.map(p=>`<tr><td>${ABHI[p.ab]}${rx(p.ab,p.retro)}</td><td>${RASHI_HI[p.sign]} ${Math.floor(p.deg)}°</td>`
+     +`<td>${p.nak} <span class="sub">(${p.pada})</span></td><td>${ord(p.houses.lagna)}</td><td>${ord(p.houses.moon)}</td></tr>`).join('')
+   +`</tbody></table></div>`;
+  const s=g.saturn;
+  const st=s.sade_sati?`<span class="bad">Sade Sati · ${s.sade_sati_phase}</span>`:(s.dhaiya?`<span class="bad">Ḍhaiyā · ${s.dhaiya_kind}</span>`:'<span class="good">Sade Sati / Ḍhaiyā nahi</span>');
+  document.getElementById('gsat').innerHTML=`<span class="pill">Shani Chandra se <b>${ord(s.house_from_moon)}</b></span><span class="pill">${st}</span>`;
+}
+function renderGLists(g){
+  const span=`${fmtD(g.date)} se agle ${g.months} mahine`;
+  document.getElementById('grashi_t').textContent='Rāśi parivartan — '+span;
+  document.getElementById('gnak_t').textContent='Nakṣatra parivartan — '+span;
+  const rs=g.rashi_ingresses.filter(r=>GF.includes(r.ab)),ns=g.nakshatra_ingresses.filter(r=>GF.includes(r.ab));
+  const none='<span class="sub">Chune gaye grahon ka is samay mein koi parivartan nahi.</span>';
+  document.getElementById('grashi').innerHTML=rs.length?`<div class="tw"><table><thead><tr><th>Tareekh</th><th>Graha</th><th>Rāśi</th><th>Ghar (Lagna · Chandra)</th></tr></thead><tbody>`
+   +rs.map(r=>`<tr><td>${dOnly(r.when)}</td><td>${ABHI[r.ab]}${rx(r.ab,r.retro)}</td><td>${RASHI_HI[r.from_sign]} → <b>${RASHI_HI[r.to_sign]}</b></td><td>${ord(r.h_lagna)} · ${ord(r.h_moon)}</td></tr>`).join('')
+   +`</tbody></table></div>`:none;
+  document.getElementById('gnak').innerHTML=ns.length?`<div class="tw"><table><thead><tr><th>Tareekh</th><th>Graha</th><th>Nakṣatra</th><th>Swāmī</th></tr></thead><tbody>`
+   +ns.map(r=>`<tr><td>${dOnly(r.when)}</td><td>${ABHI[r.ab]}${rx(r.ab,r.retro)}</td><td>${r.from_nak} → <b>${r.to_nak}</b></td><td>${gh(r.lord)}</td></tr>`).join('')
+   +`</tbody></table></div>`:none;
 }
 
 // Vimśottari lazy drill
@@ -728,6 +798,7 @@ document.getElementById('ktbody').innerHTML=KOOTA.map(([k,d,m])=>`<tr><td>${k}</
 
 function openTab(id){document.querySelectorAll('.stab').forEach(x=>x.classList.toggle('on',x.dataset.p===id));
   document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===id));
+  if(id==='go')loadGochar();
   try{localStorage.setItem(TKEY,id);}catch(e){}}
 document.getElementById('stabs').addEventListener('click',e=>{const b=e.target.closest('.stab');if(b)openTab(b.dataset.p);});
 try{const t=localStorage.getItem(TKEY);if(t&&document.getElementById(t))openTab(t);}catch(e){}

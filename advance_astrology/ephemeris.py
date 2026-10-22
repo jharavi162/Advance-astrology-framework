@@ -177,6 +177,22 @@ class Ephemeris:
 
         return BodyPosition(planet, lon, lat, dist, speed)
 
+    def longitudes(self, planet: Planet, dts_utc) -> tuple[list[float], list[float]]:
+        """Apparent tropical longitudes (deg) for many datetimes in ONE
+        vectorised ephemeris call, plus each instant's TT Julian Date.
+
+        Same formula as :meth:`position` (longitude only, no finite-difference
+        speed), for scans that sample a planet at many instants.
+        """
+        t = self._ts.from_datetimes([d.astimezone(timezone.utc) for d in dts_utc])
+        tts = [float(x) for x in t.tt]
+        if planet in (Planet.RAHU, Planet.KETU):
+            off = 180.0 if planet is Planet.KETU else 0.0
+            return [norm360(mean_lunar_node(x) + off) for x in tts], tts
+        body = self._eph[SKYFIELD_BODY[planet]]
+        _, lon, _ = self._earth.at(t).observe(body).apparent().ecliptic_latlon(epoch=t)
+        return [norm360(float(x)) for x in lon.degrees], tts
+
     def _node_position(self, planet: Planet, t) -> BodyPosition:
         """Mean lunar node (Rahu = ascending, Ketu = descending)."""
         node = mean_lunar_node(t.tt)
