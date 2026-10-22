@@ -1,0 +1,11 @@
+{
+  "_comment": "Key-question cards. Each card fills {question} in reading_default.md. Edit the wording here; bump 'version' after a change so cached answers are regenerated.",
+  "version": 1,
+  "default_question": "is waqt sabse active kya cheezein life me chal Rahi h aur unme se b sabse zyada Mann Pe kya haavi h",
+  "cards": {
+    "stress": {
+      "title": "Life mein major stress kahan se aata hai?",
+      "question": "life ka major stress kahan se aata h"
+    }
+  }
+}

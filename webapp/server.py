@@ -313,6 +313,121 @@ def scan_status(q):
     return _SCANS.get(job, dict(status="unknown"))
 
 
+# --------------------------------------------------------------------------- #
+# Key-question cards — engine bundle + the user's prompt → Claude → Markdown.
+# One generation at a time (shares the scan gate: both are CPU-heavy), answers
+# cached per chart+card+prompt version+month, and a per-IP daily cap on NEW
+# generations because each one is a paid API call.
+# --------------------------------------------------------------------------- #
+_CARDS: dict = {}
+_CARD_KEYS: dict = {}
+_CARD_IP: dict = {}
+CARD_DAILY_LIMIT = int(os.environ.get("CARD_DAILY_LIMIT", "10"))
+CARD_CACHE_DIR = os.environ.get("CARD_CACHE_DIR", "/tmp/horasutra_cards")
+
+
+def _card_key(q, card):
+    from interpreter.claude_reader import prompt_version
+    parts = [q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa",
+                                          "gender", "marital", "place")]
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
+    raw = "|".join(parts + [card, prompt_version(), month])
+    return __import__("hashlib").sha256(raw.encode()).hexdigest()[:24]
+
+
+def _card_cache_get(key):
+    try:
+        with open(os.path.join(CARD_CACHE_DIR, key + ".json"), encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _card_cache_put(key, res):
+    try:
+        os.makedirs(CARD_CACHE_DIR, exist_ok=True)
+        with open(os.path.join(CARD_CACHE_DIR, key + ".json"), "w", encoding="utf-8") as f:
+            json.dump(res, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+
+def _card_worker(job, q, card, key):
+    from interpreter.claude_reader import ReaderError, fill_prompt, load_cards, read
+    from interpreter.reading_bundle import build_bundle
+    st = _CARDS[job]
+    st["status"] = "queued"
+    with _SCAN_GATE:
+        try:
+            st["status"] = "engine"
+            when = datetime.strptime(q["when"][0], "%Y-%m-%d %H:%M").replace(
+                tzinfo=ZoneInfo(q.get("tz", ["Asia/Kolkata"])[0]))
+            place = q.get("place", [""])[0]
+            gender = q.get("gender", [""])[0]
+            now = datetime.now(timezone.utc)
+            bundle = build_bundle(when, float(q["lat"][0]), float(q["lon"][0]),
+                                  place=place, gender=gender,
+                                  ayanamsa=q.get("ayanamsa", ["lahiri"])[0] or "lahiri",
+                                  as_of=now)
+            spec = load_cards()["cards"][card]
+            marital = {"no": "unmarried", "yes": "married"}.get(
+                q.get("marital", [""])[0], "")
+            prompt = fill_prompt(spec["question"], dob=when.strftime("%d/%m/%Y"),
+                                 place=place,
+                                 time=when.strftime("%I:%M %p").lstrip("0").lower(),
+                                 gender=gender, marital=marital)
+            st["status"] = "claude"
+            out = read(prompt, bundle, now.astimezone(when.tzinfo).strftime("%Y-%m-%d"))
+            res = dict(status="done", card=card, title=spec["title"],
+                       text=out["text"], truncated=out["truncated"],
+                       as_of=now.date().isoformat(), ts=time.time())
+            _card_cache_put(key, res)
+            st.update(res)
+        except ReaderError as e:
+            st.update(status="error", error=str(e), ts=time.time())
+        except Exception as e:
+            st.update(status="error", error=f"{type(e).__name__}: {e}", ts=time.time())
+
+
+def card_start(q, ip=""):
+    """Start (or reuse) a key-question card answer; returns the job or the
+    cached answer."""
+    from interpreter.claude_reader import load_cards
+    card = q.get("card", [""])[0]
+    if card not in load_cards()["cards"]:
+        return dict(status="error", error="Ye card abhi uplabdh nahi hai.")
+    for k in ("when", "lat", "lon"):
+        if not q.get(k, [""])[0]:
+            return dict(status="error", error="Pehle kundli banao.")
+    key = _card_key(q, card)
+    hit = _card_cache_get(key)
+    if hit:
+        return dict(hit, cached=True)
+    old = _CARD_KEYS.get(key)
+    if old in _CARDS and _CARDS[old].get("status") in ("queued", "engine", "claude"):
+        return dict(job=old, status=_CARDS[old]["status"])
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return dict(status="error",
+                    error="Claude API key server par set nahi hai (ANTHROPIC_API_KEY).")
+    day = time.time() - 86400
+    recent = [t for t in _CARD_IP.get(ip, []) if t > day]
+    if len(recent) >= CARD_DAILY_LIMIT:
+        return dict(status="error", error="Aaj ke naye jawab ki limit poori ho gayi. Kal dobara try karein.")
+    _CARD_IP[ip] = recent + [time.time()]
+    job = uuid.uuid4().hex[:12]
+    _CARDS[job] = dict(status="queued", ts=time.time())
+    _CARD_KEYS[key] = job
+    for j, s_ in list(_CARDS.items()):
+        if s_.get("status") in ("done", "error") and time.time() - s_.get("ts", 0) > 3600:
+            _CARDS.pop(j, None)
+    threading.Thread(target=_card_worker, args=(job, q, card, key), daemon=True).start()
+    return dict(job=job, status="queued")
+
+
+def card_status(q):
+    return _CARDS.get(q.get("job", [""])[0], dict(status="unknown"))
+
+
 def cusps_json(q):
     """Bhāva table + Chalit shifts for a chosen house system (/api/cusps)."""
     v, _ = _chart(q)
@@ -1107,6 +1222,12 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(transit_json(q)))
             if u.path == "/api/gochar":
                 return self._send(200, json.dumps(gochar_json(q)))
+            if u.path == "/api/card":
+                ip = (self.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+                      or self.client_address[0])
+                return self._send(200, json.dumps(card_start(q, ip)))
+            if u.path == "/api/card_status":
+                return self._send(200, json.dumps(card_status(q)))
             if u.path == "/api/cusps":
                 return self._send(200, json.dumps(cusps_json(q)))
             if u.path == "/api/scan":

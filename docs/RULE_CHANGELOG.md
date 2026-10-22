@@ -11,6 +11,32 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Key-question cards: the user's reading prompt + the engine bundle (PROMPT, no engine rule)
+
+- **Change (PROMPT + plumbing):**
+  - `prompts/reading_default.md` holds the user's own reading prompt
+    verbatim. Its `{question}` slot is the bracketed question, and the seeker's
+    DOB, place, time and gender fill in per chart.
+  - `prompts/cards.json` lists the key-question cards. The first is
+    *"life ka major stress kahan se aata h"*.
+  - `interpreter/reading_bundle.py` gathers the engine's existing outputs into
+    one text block: the Phase-I matrix, daśās to sūkṣma, Jaimini and other
+    daśās, Varṣaphal, Sāhams, vargas, the gochara snapshot, Sarvatobhadra hits,
+    ingresses, BNN windows, double transits, and every domain's Samanvaya
+    reports.
+  - `interpreter/claude_reader.py` sends the filled prompt with the bundle to
+    Claude. The system prompt carries `docs/AI_TRIANGULATION_PROMPT.md` and
+    `docs/AI_EVENT_TIMING_GUIDE.md` unchanged.
+- **Why:** the user asked for the cards to use the same prompt that produced
+  the hand-run readings. Interpretation stays with the AI and the director
+  docs, as CLAUDE.md requires; the bundle only reuses engine data and adds no
+  rule, score or verdict.
+- **Guardrails:**
+  - The system prompt forbids recomputing numbers, predicting death or
+    lifespan, diagnosing illness, and fear language.
+  - Answers are cached per chart, card, prompt version and month.
+  - New generations are capped per visitor per day (`CARD_DAILY_LIMIT`).
+
 ## 2026-10-22 — Sarvatobhadra Chakra: full 81-cell grid, fore/hind lines, Rath's motion and corner rules (ENGINE DATA, not in the app)
 
 - **Change (CODE, `advance_astrology/vedic/sarvatobhadra.py`,

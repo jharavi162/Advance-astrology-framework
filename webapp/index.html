@@ -113,6 +113,13 @@
   .exq span{font-size:12px;border:1px dashed var(--line);border-radius:20px;padding:4px 10px;color:var(--mut)}
   .ktab td:last-child,.ktab th:last-child{text-align:right;white-space:nowrap}
   .ktab tfoot td{font-weight:800;color:var(--acc);border-bottom:0}
+  .ans{margin-top:10px;font-size:13.5px;line-height:1.6}
+  .ans h1,.ans h2,.ans h3,.ans h4{font-family:var(--serif);color:var(--acc);margin:14px 0 6px;font-size:15px}
+  .ans h1{font-size:17px}.ans p{margin:6px 0}.ans ul,.ans ol{margin:6px 0;padding-left:20px}.ans li{margin:3px 0}
+  .ans blockquote{margin:8px 0;padding:8px 12px;border-left:3px solid var(--acc);background:#1f1730;border-radius:6px}
+  .ans table{margin:8px 0}.ans hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+  .ans code{background:#120c1d;padding:1px 5px;border-radius:4px}
+  .qcard.open{grid-column:1/-1}
   .cta h3{margin:0 0 4px;font:600 18px var(--serif);color:#fff}
   .cta ul{margin:8px 0 12px;padding-left:18px;color:#d9cdee;font-size:13px}
   /* bars */
@@ -782,11 +789,57 @@ const MKEY='horasutra_marital';
 function getMarital(){try{return localStorage.getItem(MKEY)||'no';}catch(e){return 'no';}}
 function renderQCards(){const m=getMarital();
   document.querySelectorAll('#marital button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-  document.getElementById('qcards').innerHTML=QCARDS.map(c=>{
+  const order=[...QCARDS.filter(c=>LIVE_CARDS.includes(c.id)),...QCARDS.filter(c=>!LIVE_CARDS.includes(c.id))];  // live cards first
+  document.getElementById('qcards').innerHTML=order.map(c=>{
     const [q,d]=c.id==='marriage'?MARRIAGE_Q[m]:[c.q,c.d];
-    return `<div class="card"><div class="qhead"><div class="qico">${c.ico}</div><h3>${q}</h3></div>
-      <div class="sub">${d}</div><div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div>
-      <span class="soonchip">Jawab jald aa raha hai</span></div>`;}).join('');}
+    const live=LIVE_CARDS.includes(c.id);
+    return `<div class="card qcard" id="qc_${c.id}"><div class="qhead"><div class="qico">${c.ico}</div><h3>${q}</h3></div>
+      <div class="sub">${d}</div>`+(live
+      ?`<div class="qbody"><button class="sec" style="margin-top:12px" onclick="openCard('${c.id}')">🔮 Jawab dekho</button></div>`
+      :`<div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div>
+      <span class="soonchip">Jawab jald aa raha hai</span>`)+`</div>`;}).join('');}
+// Cards whose answer comes from the backend (prompts/cards.json); the rest are still placeholders.
+const LIVE_CARDS=['stress'];
+function cardParams(id){const P=params();if(P.get('ayanamsa')==='multi')P.set('ayanamsa','lahiri');
+  P.set('card',id);P.set('place',document.getElementById('place').value.trim());P.set('marital',getMarital());return P;}
+async function openCard(id){
+  if(!window.NATAL){alert('Pehle kundli banao.');return;}
+  const box=document.querySelector('#qc_'+id+' .qbody');document.getElementById('qc_'+id).classList.add('open');
+  const msg={queued:'Line mein hai…',engine:'Engine saare calculations kar raha hai…',claude:'Jawab likha ja raha hai… (1–3 minute)'};
+  box.innerHTML='<div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div><div class="sub" style="margin-top:8px">Shuru ho raha hai…</div>';
+  const show=r=>{if(r.status==='done'){box.innerHTML=`<div class="ans">${md(r.text)}</div><div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`;return true;}
+    if(r.status==='error'){box.innerHTML=`<div class="bad" style="margin-top:10px">⚠ ${esc(r.error||'Jawab nahi ban paya.')}</div><button class="sec" style="margin-top:8px" onclick="openCard('${id}')">Dobara try karein</button>`;return true;}
+    box.querySelector('.sub').textContent=msg[r.status]||'Kaam chal raha hai…';return false;};
+  try{let r=await(await fetch('/api/card?'+cardParams(id))).json();if(show(r))return;
+    const job=r.job;
+    for(let i=0;i<150;i++){await new Promise(z=>setTimeout(z,3000));
+      try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
+      if(r.status==='unknown'){show({status:'error',error:'Server restart ho gaya. Dobara try karein.'});return;}
+      if(show(r))return;}
+    show({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
+  }catch(e){show({status:'error',error:String(e)});}}
+// Minimal Markdown → HTML for card answers (headings, bold/italic, lists, tables, quotes, rules).
+function md(src){const lines=esc(src).split('\n');let h='',list=null,para=[];
+  const inl=t=>t.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g,'$1<i>$2</i>').replace(/`(.+?)`/g,'<code>$1</code>');
+  const flush=()=>{if(para.length){h+='<p>'+inl(para.join(' '))+'</p>';para=[];}if(list){h+=`</${list}>`;list=null;}};
+  for(let i=0;i<lines.length;i++){const l=lines[i],t=l.trim();
+    if(!t){flush();continue;}
+    let m;
+    if(m=t.match(/^(#{1,4})\s+(.*)/)){flush();h+=`<h${m[1].length}>${inl(m[2])}</h${m[1].length}>`;continue;}
+    if(/^(-{3,}|\*{3,})$/.test(t)){flush();h+='<hr>';continue;}
+    if(t.startsWith('&gt;')){flush();h+='<blockquote>'+inl(t.replace(/^(&gt;\s?)+/,''))+'</blockquote>';continue;}
+    if(t.startsWith('|')){flush();const rows=[];while(i<lines.length&&lines[i].trim().startsWith('|')){rows.push(lines[i].trim());i++;}i--;
+      const cells=r=>r.replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+      const body=rows.filter(r=>!/^\|?\s*:?-{2,}/.test(r));
+      h+='<div class="tw"><table>'+body.map((r,k)=>'<tr>'+cells(r).map(c=>k===0?`<th>${inl(c)}</th>`:`<td>${inl(c)}</td>`).join('')+'</tr>').join('')+'</table></div>';continue;}
+    if(m=t.match(/^([-*]|\d+\.)\s+(.*)/)){const want=/^\d/.test(m[1])?'ol':'ul';
+      if(para.length){h+='<p>'+inl(para.join(' '))+'</p>';para=[];}
+      if(list!==want){if(list)h+=`</${list}>`;h+=`<${want}>`;list=want;}
+      h+='<li>'+inl(m[2])+'</li>';continue;}
+    if(list&&/^\s{2,}/.test(l)){h=h.replace(/<\/li>$/,' '+inl(t)+'</li>');continue;}
+    if(list){h+=`</${list}>`;list=null;}
+    para.push(t);}
+  flush();return h;}
 document.getElementById('marital').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   try{localStorage.setItem(MKEY,b.dataset.m);}catch(x){}renderQCards();});
 renderQCards();

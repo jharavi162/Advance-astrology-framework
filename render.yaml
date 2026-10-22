@@ -13,3 +13,10 @@ services:
       # sync:false → Render prompts for the value on deploy; never committed here.
       - key: GEMINI_API_KEY
         sync: false
+      # Claude API key from platform.claude.com — powers the key-question cards.
+      # sync:false → Render asks for the value; it is never committed here.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      # Max NEW card answers per visitor IP per 24 h (cached answers are free).
+      - key: CARD_DAILY_LIMIT
+        value: "10"
