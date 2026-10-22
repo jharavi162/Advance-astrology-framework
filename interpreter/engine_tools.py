@@ -16,6 +16,11 @@ from advance_astrology.vedic.vargas import VARGA_FUNCS
 from interpreter.reading_bundle import Reading
 
 SECTION_HELP = {
+    "strengths": ("Shadbala of the seven grahas by component (sthana/dig/kala/cheshta/naisargika/"
+                  "drik and their parts: uccha, saptavargaja, oja-yugma, kendradi, drekkana, "
+                  "nathonnatha, paksha, tribhaga, varsha-masa, ayana), Ishta/Kashta phala, and "
+                  "Bhava Bala of all twelve houses (lord's shadbala + bhava digbala + bhava "
+                  "drishti bala)."),
     "gulika": "Gulika and Mandi (start/middle of Saturn's segment) and the other upagrahas, with natal house.",
     "vimshottari": "Vimshottari running chain MD→AD→PD→Sukshma→Prana now, the ADs/PDs around it, next MDs, next AD's PDs.",
     "rashi_dashas": "Chara, Narayana, Sudasa (Jaimini rashi dashas) with ADs; Yogini; Ashtottari; Mudda; Sudarshana chakra year/month signs.",

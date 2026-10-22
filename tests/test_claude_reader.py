@@ -156,7 +156,7 @@ def test_bundle_has_every_section():
     b = build_bundle(datetime(2000, 1, 1, 12, 0, tzinfo=ZoneInfo("Asia/Kolkata")),
                      28.6, 77.2, place="Delhi", gender="F",
                      as_of=datetime(2030, 1, 1, tzinfo=timezone.utc))
-    for sec in ("NATIVE MATRIX DATABANK", "AS-OF DATE: 2030-01-01", "Gulika / Mandi",
+    for sec in ("NATIVE MATRIX DATABANK", "Shadbala by component", "Bhava Bala (Raman", "AS-OF DATE: 2030-01-01", "Gulika / Mandi",
                 "Vimshottari — running chain", "Jaimini rashi dashas", "Varshaphal",
                 "Sahams", "Vargas (graha", "KP — houses", "Gochara on 2030-01-01",
                 "Sarvatobhadra janma points", "Ingresses and stations",
@@ -175,6 +175,7 @@ def test_engine_tools_run_on_a_real_chart():
                      "gochara_on", "varga", "varshaphal_year"}
     assert "Mrita" in TOOLS[1]["description"] or "Deeptadi" in TOOLS[1]["description"]
     assert "deeptadi" in run_tool(r, "engine_section", {"section": "avasthas"})
+    assert "H12 madhya" in run_tool(r, "engine_section", {"section": "strengths"})
     assert "resolved to domain 'mind'" in run_tool(r, "samanvaya", {"domain": "stress"})
     assert "MD " in run_tool(r, "dasha_at", {"date": "2031-06-01"})
     assert "Gochara on 2031-06-01" in run_tool(r, "gochara_on", {"date": "2031-06-01"})

@@ -238,6 +238,11 @@ class VedicChart:
         from .shadbala import compute_shadbala
         return compute_shadbala(self)
 
+    def bhava_bala(self):
+        """Bhāva Bala of the twelve houses (Raman, after Śrīpati / BPHS)."""
+        from .bhava_bala import compute_bhava_bala
+        return compute_bhava_bala(self)
+
     def ishta_kashta(self):
         """Iṣṭa-phala (benefic yield) vs Kaṣṭa-phala (malefic yield)."""
         from .shadbala import compute_ishta_kashta

@@ -11,6 +11,50 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Bhāva Bala, and the Ṣaḍbala breakdown exposed (CODE, engine DATA)
+
+- **Why now:** the cards' plan step named both as gaps ("Bhava Bala per BPHS";
+  "Shadbala component breakdown"), and the user asked for them in the engine.
+- **Ṣaḍbala breakdown (exposure only):** `compute_shadbala` already computed
+  every part, but the bundle printed only the totals. A new `strengths`
+  section, and the `engine_section strengths` tool, list per graha:
+  - sthāna, dig, kāla, ceṣṭā, naisargika and dṛk;
+  - their sub-parts: uccha, saptavargaja, oja-yugma, kendrādi, drekkāṇa,
+    nathonnata, pakṣa, tribhāga, varṣa-māsa and ayana;
+  - Iṣṭa and Kaṣṭa phala.
+
+  No calculation changed.
+- **Bhāva Bala (new):** `advance_astrology/vedic/bhava_bala.py`, with
+  `VedicChart.bhava_bala()`. Source: B.V. Raman, *Graha and Bhava Balas*,
+  ch. IX, after Śrīpati Paddhati and BPHS. A bhāva's strength is the sum of
+  three parts:
+  - **Bhāvādhipati bala:** the Ṣaḍbala piṇḍa of the lord of the sign holding
+    the bhāva-madhya.
+  - **Bhāva digbala:** Nara, Jalacara, Catuṣpada and Kīṭa signs have full
+    strength (60) at bhāvas 1, 4, 10 and 7, falling 10 per bhāva to nil
+    opposite. Dhanus and Makara are split into halves.
+  - **Bhāva dṛṣṭi bala:**
+    - Śrīpati's graded drishti curve, plus the viśeṣa drishti of Mars (+15),
+      Jupiter (+30) and Saturn (+45);
+    - Jupiter and Mercury are taken whole, and the others a quarter;
+    - benefics add and malefics subtract;
+    - Mercury counts as a full benefic, Moon follows pakṣa, and Rāhu and Ketu
+      are excluded.
+
+  Madhyas are Śrīpati's: Lagna, MC and their opposites, with each quadrant
+  trisected. This is the same as the Porphyry cusps.
+- **Doctrine test:** `tests/test_bhava_bala.py` reproduces Raman's Example 59
+  (the book's Standard Horoscope) from the book's own longitudes and Ṣaḍbala
+  figures:
+  - all twelve digbalas match exactly;
+  - the twelve net drishti values and eleven totals match within 0.3 virūpa,
+    which is rounding of the book's minute values;
+  - the twelfth total is unreadable in the scan, so it is not tested.
+- **Failure mode addressed:** coverage. House strength in the classical
+  sense was missing, and the strength components were computed but hidden.
+
+---
+
 ## 2026-10-22 — Lajjitādi and Śayanādi avasthās (CODE, engine DATA)
 
 - **Change:** `advance_astrology/vedic/avastha.py` gains `lajjitadi_avastha`,
