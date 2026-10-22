@@ -1,5 +1,5 @@
 {
-  "_comment": "Key-question cards. Each card fills {question} in reading_default.md. Edit the wording here; bump 'version' after a change so cached answers are regenerated.",
+  "_comment": "Key-question cards and the paid PDF reading. Each fills {question} in reading_default.md. Edit the wording here; bump 'version' after a change so cached answers are regenerated.",
   "version": 1,
   "default_question": "is waqt sabse active kya cheezein life me chal Rahi h aur unme se b sabse zyada Mann Pe kya haavi h",
   "cards": {
@@ -7,5 +7,9 @@
       "title": "Life mein major stress kahan se aata hai?",
       "question": "life ka major stress kahan se aata h"
     }
+  },
+  "pdf": {
+    "title": "Is waqt sabse active kya hai, aur mann par kya haavi hai",
+    "question": "is waqt sabse active kya cheezein life me chal Rahi h aur unme se b sabse zyada Mann Pe kya haavi h"
   }
 }

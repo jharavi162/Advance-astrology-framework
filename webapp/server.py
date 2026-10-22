@@ -324,14 +324,44 @@ _CARD_KEYS: dict = {}
 _CARD_IP: dict = {}
 CARD_DAILY_LIMIT = int(os.environ.get("CARD_DAILY_LIMIT", "10"))
 CARD_CACHE_DIR = os.environ.get("CARD_CACHE_DIR", "/tmp/horasutra_cards")
+# Until payment is wired in, a PDF is unlocked with this code (unset = PDFs off).
+PDF_UNLOCK_CODE = os.environ.get("PDF_UNLOCK_CODE", "")
+_CHART_FIELDS = ("when", "tz", "lat", "lon", "ayanamsa", "gender", "place")
+
+
+def _card_spec(card):
+    from interpreter.claude_reader import load_cards
+    c = load_cards()
+    return c["pdf"] if card == "pdf" else c["cards"].get(card)
+
+
+def _calc_key(q):
+    """One chart, this month, this engine/prompt version: the store of engine
+    results Claude already fetched, shared by its cards and its PDF."""
+    from interpreter.claude_reader import prompt_version
+    raw = "|".join([q.get(k, [""])[0] for k in _CHART_FIELDS]
+                   + [prompt_version(), datetime.now(timezone.utc).strftime("%Y-%m")])
+    return "calc-" + __import__("hashlib").sha256(raw.encode()).hexdigest()[:24]
+
+
+def _calc_merge(key, results):
+    have = (_card_cache_get(key) or {}).get("results", [])
+    seen = {(r["tool"], json.dumps(r["input"], sort_keys=True)) for r in have}
+    for r in results:
+        k = (r["tool"], json.dumps(r["input"], sort_keys=True))
+        if k not in seen:
+            have.append(r)
+            seen.add(k)
+    _card_cache_put(key, dict(results=have))
 
 
 def _card_key(q, card):
     from interpreter.claude_reader import prompt_version
-    parts = [q.get(k, [""])[0] for k in ("when", "tz", "lat", "lon", "ayanamsa",
-                                          "gender", "marital", "place")]
+    from interpreter.claude_reader import load_cards
+    parts = [q.get(k, [""])[0] for k in _CHART_FIELDS + ("marital",)]
     month = datetime.now(timezone.utc).strftime("%Y-%m")
-    raw = "|".join(parts + [card, prompt_version(), month])
+    spec = json.dumps([load_cards().get("version"), _card_spec(card)], sort_keys=True)
+    raw = "|".join(parts + [card, spec, prompt_version(), month])
     return __import__("hashlib").sha256(raw.encode()).hexdigest()[:24]
 
 
@@ -353,7 +383,7 @@ def _card_cache_put(key, res):
 
 
 def _card_worker(job, q, card, key):
-    from interpreter.claude_reader import ReaderError, fill_prompt, load_cards, read
+    from interpreter.claude_reader import ReaderError, fill_prompt, read
     from interpreter.reading_bundle import Reading
     st = _CARDS[job]
     st["status"] = "queued"
@@ -369,7 +399,7 @@ def _card_worker(job, q, card, key):
                               place=place, gender=gender,
                               ayanamsa=q.get("ayanamsa", ["lahiri"])[0] or "lahiri",
                               as_of=now)
-            spec = load_cards()["cards"][card]
+            spec = _card_spec(card)
             marital = {"no": "unmarried", "yes": "married"}.get(
                 q.get("marital", [""])[0], "")
             prompt = fill_prompt(spec["question"], dob=when.strftime("%d/%m/%Y"),
@@ -377,12 +407,36 @@ def _card_worker(job, q, card, key):
                                  time=when.strftime("%I:%M %p").lstrip("0").lower(),
                                  gender=gender, marital=marital)
             st["status"] = "claude"
+            # Engine results this chart already had fetched this month (by a
+            # card or a PDF) go in up front, so Claude does not spend tool
+            # rounds asking for them again.
+            ck = _calc_key(q)
+            pre = (_card_cache_get(ck) or {}).get("results", [])
             out = read(prompt, reading, now.astimezone(when.tzinfo).strftime("%Y-%m-%d"),
-                       on_step=lambda calls: st.update(steps=len(calls)))
+                       on_step=lambda calls: st.update(steps=len(calls)), preloaded=pre)
+            _calc_merge(ck, out["results"])
             res = dict(status="done", card=card, title=spec["title"],
                        text=out["text"], truncated=out["truncated"],
                        plan=out["plan"], gaps=out["gaps"], steps=len(out["calls"]),
-                       as_of=now.date().isoformat(), ts=time.time())
+                       reused=len(pre), as_of=now.date().isoformat(), ts=time.time())
+            if card == "pdf":
+                st["status"] = "pdf"
+                from interpreter.pdf_report import render
+                tz = when.tzinfo
+                details = [("Naam", q.get("name", [""])[0] or "—"),
+                           ("Janm tithi", when.strftime("%d/%m/%Y")),
+                           ("Janm samay", when.strftime("%I:%M %p").lstrip("0").lower()),
+                           ("Janm sthan", place or "—")]
+                if gender:
+                    details.append(("Ling", {"M": "Purush", "F": "Stri"}.get(gender.upper()[:1], gender)))
+                details.append(("Reading ki tareekh", now.astimezone(tz).strftime("%d/%m/%Y")))
+                pdf = render(out["text"], title=spec["title"], details=details,
+                             plan=out["plan"], gaps=out["gaps"],
+                             footer=f"HoraSutra · {now.astimezone(tz):%d %b %Y}")
+                os.makedirs(CARD_CACHE_DIR, exist_ok=True)
+                with open(os.path.join(CARD_CACHE_DIR, key + ".pdf"), "wb") as f:
+                    f.write(pdf)
+                res["pdf"] = f"/api/pdf?key={key}"
             _card_cache_put(key, res)
             _log_card(card, out)
             st.update(res)
@@ -410,19 +464,24 @@ def _log_card(card, out):
 def card_start(q, ip=""):
     """Start (or reuse) a key-question card answer; returns the job or the
     cached answer."""
-    from interpreter.claude_reader import load_cards
+    import hmac
     card = q.get("card", [""])[0]
-    if card not in load_cards()["cards"]:
+    if not _card_spec(card):
         return dict(status="error", error="Ye card abhi uplabdh nahi hai.")
     for k in ("when", "lat", "lon"):
         if not q.get(k, [""])[0]:
             return dict(status="error", error="Pehle kundli banao.")
+    if card == "pdf":
+        if not PDF_UNLOCK_CODE:
+            return dict(status="error", error="PDF abhi uplabdh nahi hai.")
+        if not hmac.compare_digest(q.get("code", [""])[0].strip(), PDF_UNLOCK_CODE):
+            return dict(status="error", error="Access code sahi nahi hai.")
     key = _card_key(q, card)
     hit = _card_cache_get(key)
     if hit:
         return dict(hit, cached=True)
     old = _CARD_KEYS.get(key)
-    if old in _CARDS and _CARDS[old].get("status") in ("queued", "engine", "claude"):
+    if old in _CARDS and _CARDS[old].get("status") in ("queued", "engine", "claude", "pdf"):
         return dict(job=old, status=_CARDS[old]["status"])
     if not os.environ.get("ANTHROPIC_API_KEY"):
         return dict(status="error",
@@ -440,6 +499,18 @@ def card_start(q, ip=""):
             _CARDS.pop(j, None)
     threading.Thread(target=_card_worker, args=(job, q, card, key), daemon=True).start()
     return dict(job=job, status="queued")
+
+
+def pdf_file(q):
+    """The rendered PDF for a finished PDF job (its key is the card cache key)."""
+    key = q.get("key", [""])[0]
+    if not re.fullmatch(r"[0-9a-f]{24}", key):
+        return None
+    try:
+        with open(os.path.join(CARD_CACHE_DIR, key + ".pdf"), "rb") as f:
+            return f.read()
+    except OSError:
+        return None
 
 
 def card_status(q):
@@ -1198,11 +1269,13 @@ def chat_json(body):
 
 
 class H(BaseHTTPRequestHandler):
-    def _send(self, code, body, ctype="application/json"):
+    def _send(self, code, body, ctype="application/json", headers=None):
         b = body.encode() if isinstance(body, str) else body
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(b)))
+        for k, v in (headers or {}).items():
+            self.send_header(k, v)
         self.end_headers()
         self.wfile.write(b)
 
@@ -1245,6 +1318,12 @@ class H(BaseHTTPRequestHandler):
                 ip = (self.headers.get("X-Forwarded-For", "").split(",")[0].strip()
                       or self.client_address[0])
                 return self._send(200, json.dumps(card_start(q, ip)))
+            if u.path == "/api/pdf":
+                pdf = pdf_file(q)
+                if pdf is None:
+                    return self._send(404, json.dumps({"error": "PDF nahi mila."}))
+                return self._send(200, pdf, "application/pdf", {
+                    "Content-Disposition": 'attachment; filename="HoraSutra-reading.pdf"'})
             if u.path == "/api/card_status":
                 return self._send(200, json.dumps(card_status(q)))
             if u.path == "/api/cusps":

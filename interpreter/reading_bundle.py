@@ -39,6 +39,30 @@ def _z(lon: float) -> str:
     return f"{SIGNS[int(lon // 30)]} {lon % 30:.2f}°"
 
 
+def _fmt(x, tz) -> str:
+    """Compact text for an engine report: the same fields and values as its
+    repr, without the Python noise (datetime(...), <Planet.X: 'X'>, quotes,
+    microseconds). Instants are shown to the minute in the native's zone."""
+    import dataclasses
+    import enum
+    if dataclasses.is_dataclass(x) and not isinstance(x, type):
+        return f"{type(x).__name__}(" + ", ".join(
+            f"{f.name}={_fmt(getattr(x, f.name), tz)}" for f in dataclasses.fields(x)) + ")"
+    if isinstance(x, datetime):
+        return x.astimezone(tz).strftime("%Y-%m-%d %H:%M")
+    if isinstance(x, enum.Enum):
+        return str(x.value)
+    if isinstance(x, (list, tuple)):
+        return "[" + ", ".join(_fmt(i, tz) for i in x) + "]"
+    if isinstance(x, dict):
+        return "{" + ", ".join(f"{_fmt(k, tz)}: {_fmt(v, tz)}" for k, v in x.items()) + "}"
+    if isinstance(x, float):
+        return f"{x:.3f}".rstrip("0").rstrip(".")
+    if isinstance(x, str):
+        return repr(x) if any(c in x for c in ",=[]{}():") else x
+    return str(x)
+
+
 def _h(lines: list, title: str) -> None:
     lines.append("")
     lines.append(f"## {title}")
@@ -295,7 +319,7 @@ class Reading:
                                 if name != domain else "")]
         for en, eng in ENGINES.items():
             try:
-                L.append(f"  {en}: {eng.evaluate(self.v, prof, start, stop)}")
+                L.append(f"  {en}: {_fmt(eng.evaluate(self.v, prof, start, stop), self.tz)}")
             except Exception as e:                           # pragma: no cover
                 L.append(f"  {en}: unavailable ({type(e).__name__}: {e})")
         return "\n".join(L)

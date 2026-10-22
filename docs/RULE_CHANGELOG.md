@@ -11,6 +11,39 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-23 — Paid PDF reading, shared engine results per chart, leaner engine text (plumbing, no rule)
+
+- **PDF reading:** `prompts/cards.json` gains a `pdf` entry. It uses the
+  user's default question: *"is waqt sabse active kya cheezein life me chal
+  Rahi h aur unme se b sabse zyada Mann Pe kya haavi h"*. It goes through
+  the same plan → engine tools → reading pipeline as the cards.
+  `interpreter/pdf_report.py` lays the reading out with reportlab:
+  - a cover table of the seeker's details;
+  - the reading exactly as written;
+  - an appendix of Claude's plan and gaps;
+  - a care line.
+
+  DejaVu Sans is bundled for the diacritics. Until payment is wired in, the
+  PDF is unlocked with `PDF_UNLOCK_CODE`; if that is unset, PDFs are off.
+- **Engine results reused per chart:** every successful tool result is saved
+  per chart, month and engine version. The next reading of that chart (a
+  card or the PDF) receives them up front in its first message, so Claude
+  does not spend tool rounds fetching them again. It still fetches anything
+  not there. The data is the same; only the number of rounds changes.
+- **Leaner engine text (same data):** Samanvaya reports are now printed
+  without Python repr noise. `datetime.datetime(2026, 5, 22, 0, 36, 3, …)`
+  becomes `2026-05-22 06:06` in the native's zone, `<Planet.SATURN: 'Saturn'>`
+  becomes `Saturn`, and needless quotes are dropped. The fields and values
+  are unchanged. This cuts about 37% of that text.
+- **Cache:** the tools and system prompt (the director docs) are cached for
+  1 hour instead of 5 minutes.
+- **Cache keys:** `cards.json` left `prompt_version()`. Each card's own spec
+  is in its key, so editing one card no longer regenerates the others.
+- **Why:** the user asked for cheaper readings with no loss of quality, and
+  for the ₹500 PDF built on the default question.
+
+---
+
 ## 2026-10-22 — Bhāva Bala, and the Ṣaḍbala breakdown exposed (CODE, engine DATA)
 
 - **Why now:** the cards' plan step named both as gaps ("Bhava Bala per BPHS";

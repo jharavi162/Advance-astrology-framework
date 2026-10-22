@@ -17,6 +17,9 @@ services:
       # sync:false → Render asks for the value; it is never committed here.
       - key: ANTHROPIC_API_KEY
         sync: false
+      # Unlocks the paid PDF reading until payment is wired in; unset = PDFs off.
+      - key: PDF_UNLOCK_CODE
+        sync: false
       # Max NEW card answers per visitor IP per 24 h (cached answers are free).
       - key: CARD_DAILY_LIMIT
         value: "10"

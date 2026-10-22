@@ -95,8 +95,9 @@ def fill_prompt(question: str, *, dob: str, place: str, time: str,
 def prompt_version() -> str:
     """Hash of everything that shapes an answer, for cache keys."""
     h = hashlib.sha256()
+    # cards.json is not here: each card's own spec goes into its cache key,
+    # so editing one card does not regenerate the others.
     for p in (os.path.join(PROMPTS, "reading_default.md"),
-              os.path.join(PROMPTS, "cards.json"),
               os.path.join(DOCS, "AI_TRIANGULATION_PROMPT.md"),
               os.path.join(DOCS, "AI_EVENT_TIMING_GUIDE.md")):
         h.update(_read(p).encode())
@@ -118,8 +119,10 @@ def _stream(client, messages, *, last_round: bool):
     with client.beta.messages.stream(
         model=MODEL,
         max_tokens=MAX_TOKENS,
+        # Tools + system are the same for every reading: cache them for an
+        # hour so readings within the hour read them at the cache price.
         system=[{"type": "text", "text": system_prompt(),
-                 "cache_control": {"type": "ephemeral"}}],
+                 "cache_control": {"type": "ephemeral", "ttl": "1h"}}],
         tools=TOOLS,
         # The last round may not call tools, so the reading gets written.
         tool_choice={"type": "none"} if last_round else {"type": "auto"},
@@ -145,12 +148,26 @@ def _cache_last(messages) -> None:
     last[-1]["cache_control"] = {"type": "ephemeral"}
 
 
+def _preloaded_text(preloaded) -> str:
+    if not preloaded:
+        return ""
+    parts = ["\n\n---\nENGINE DATA ALREADY FETCHED for this chart this month (same as "
+             "calling these tools again; fetch only what is not here):"]
+    for r in preloaded:
+        args = json.dumps(r["input"], ensure_ascii=False, sort_keys=True)
+        parts.append(f"\n### {r['tool']} {args}\n{r['result']}")
+    return "\n".join(parts)
+
+
 def read(user_prompt: str, reading, as_of: str, client=None,
-         on_step=None) -> dict:
+         on_step=None, preloaded=None) -> dict:
     """Plan → engine tool calls → reading.
 
     *reading* is an ``interpreter.reading_bundle.Reading``. Returns
-    ``dict(text, plan, gaps, calls, model, usage, truncated)``. *client* may
+    ``dict(text, plan, gaps, calls, results, model, usage, truncated)``;
+    ``results`` holds each successful tool call with its output, and a later
+    reading of the same chart can pass them back as *preloaded* so the data
+    is in hand from the start instead of costing tool rounds. *client* may
     be injected (tests); otherwise an ``anthropic.Anthropic()`` client is
     built from ``ANTHROPIC_API_KEY``. *on_step(calls)* is told each tool round.
     """
@@ -165,8 +182,8 @@ def read(user_prompt: str, reading, as_of: str, client=None,
     messages = [{"role": "user", "content": (
         f"{user_prompt}\n\n---\nENGINE DATA (as of {as_of}) — ground truth. The natal "
         f"matrix is below; call record_plan, then fetch every other calculation with the "
-        f"engine tools.\n\n{reading.matrix()}")}]
-    plan, gaps, calls = [], [], []
+        f"engine tools.\n\n{reading.matrix()}{_preloaded_text(preloaded)}")}]
+    plan, gaps, calls, results_ = [], [], [], []
     usage: dict = {}
     msg = None
     try:
@@ -191,6 +208,7 @@ def read(user_prompt: str, reading, as_of: str, client=None,
                 else:
                     try:
                         out, err = run_tool(reading, b.name, args), False
+                        results_.append(dict(tool=b.name, input=args, result=out))
                     except Exception as e:
                         out, err = f"{type(e).__name__}: {e}", True
                     calls.append(dict(tool=b.name, input=args, error=err))
@@ -213,6 +231,6 @@ def read(user_prompt: str, reading, as_of: str, client=None,
     text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text").strip()
     if not text or msg.stop_reason == "tool_use":
         raise ReaderError("Claude ne khaali jawab diya.")
-    return dict(text=text, plan=plan, gaps=gaps, calls=calls,
+    return dict(text=text, plan=plan, gaps=gaps, calls=calls, results=results_,
                 model=getattr(msg, "model", MODEL), usage=usage,
                 truncated=msg.stop_reason == "max_tokens")
