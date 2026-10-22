@@ -11,6 +11,41 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Cards: Claude plans the calculations from the granthas, then calls the engine (PROMPT + tools, plus one DATA domain)
+
+- **Change (PROMPT + plumbing):**
+  - Claude no longer receives one fixed bundle. It gets the natal matrix and
+    then works in three steps:
+    1. It calls `record_plan` and lists, from the granthas, every calculation
+       the question needs, with source and reason. Any calculation the
+       granthas call for that no tool provides goes in `gaps`.
+    2. It fetches each planned calculation through `interpreter/engine_tools.py`:
+       `engine_section`, `samanvaya(domain)`, `dasha_at(date)`,
+       `gochara_on(date)`, `varga(D-n)` and `varshaphal_year`. Tools other
+       than `record_plan` are refused until the plan exists.
+    3. It writes the reading. The last round allows no tool calls, so a
+       reading is always written.
+  - `interpreter/reading_bundle.py` is split into named sections on a
+    `Reading` object. `build_bundle` still joins all of them. No calculation
+    changed.
+  - The webapp shows the plan under the answer as "Is jawab ke liye kya-kya
+    dekha gaya". Each answer logs its tool calls and gaps to stdout and to
+    `CARD_CACHE_DIR/gaps.jsonl`; that list is the queue of engine
+    additions to review.
+- **DATA:** a new `mind` theme in `THEME_LEXICON`: houses 4 and 5, kāraka
+  Moon, negate 6/8/12, with synonyms mann, stress, tension, chinta, anxiety and
+  others. Sources: BPHS ch.3 (*candro manaḥ*), and BPHS ch.11 / Phaladeepika
+  ch.1 for the 4th as the heart and inner contentment and the 5th as buddhi.
+  `samanvaya("stress")` now resolves; before, it raised.
+- **Why:** the user asked that the AI first identify, from the śāstra, which
+  calculations a question needs (for example Dukhita or Mṛta avasthā) and then
+  call the engine for them. The engine still computes every number and no rule
+  or score was added. Gaps are reported, never computed by the AI.
+- **Failure mode addressed:** coverage. A fixed bundle could not follow the
+  question, and an unmet śāstric need was invisible.
+
+---
+
 ## 2026-10-22 — Key-question cards: the user's reading prompt + the engine bundle (PROMPT, no engine rule)
 
 - **Change (PROMPT + plumbing):**
