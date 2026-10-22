@@ -789,7 +789,8 @@ const MKEY='horasutra_marital';
 function getMarital(){try{return localStorage.getItem(MKEY)||'no';}catch(e){return 'no';}}
 function renderQCards(){const m=getMarital();
   document.querySelectorAll('#marital button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-  document.getElementById('qcards').innerHTML=QCARDS.map(c=>{
+  const order=[...QCARDS.filter(c=>LIVE_CARDS.includes(c.id)),...QCARDS.filter(c=>!LIVE_CARDS.includes(c.id))];  // live cards first
+  document.getElementById('qcards').innerHTML=order.map(c=>{
     const [q,d]=c.id==='marriage'?MARRIAGE_Q[m]:[c.q,c.d];
     const live=LIVE_CARDS.includes(c.id);
     return `<div class="card qcard" id="qc_${c.id}"><div class="qhead"><div class="qico">${c.ico}</div><h3>${q}</h3></div>
