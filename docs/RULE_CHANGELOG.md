@@ -11,6 +11,56 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Lajjitādi and Śayanādi avasthās (CODE, engine DATA)
+
+- **Change:** `advance_astrology/vedic/avastha.py` gains `lajjitadi_avastha`,
+  `shayanadi_avastha`, `shayanadi_index` and `running_ghati`.
+  `VedicChart.avasthas(p)` now also returns `lajjitadi` and `shayanadi`, and
+  `VedicChart.birth_ghati` gives the ghaṭī running at birth. Claude reads
+  them through the `avasthas` engine tool. They are data only, with no score.
+- **Śāstra:** BPHS, avasthā adhyāya.
+  - **Lajjitādi**, six moods:
+    - Lajjita: in the 5th with Rāhu/Ketu, the Sun, Saturn or Mars.
+    - Garvita: exalted or in mūlatrikoṇa.
+    - Kṣudhita: in an enemy's sign, joined or aspected by an enemy, or joined
+      by Saturn.
+    - Tṛṣita: in a watery sign, aspected by a malefic and not by a benefic.
+    - Mudita: in a friend's sign, joined or aspected by a benefic, or joined
+      by Jupiter.
+    - Kṣobhita: with the Sun and joined or aspected by a malefic, or aspected
+      by an enemy.
+
+    Every state met is returned with its condition.
+  - **Śayanādi**, twelve activities: (C × P × A + M + G + L) mod 12, with 0
+    read as 12 (Nidrā). C is the graha's nakṣatra, P its number, A its
+    navāṁśa, M the Moon's nakṣatra, G the ghaṭī and L the lagna sign.
+- **Conventions:**
+  - Lajjitādi:
+    - "Joined" means the same sign.
+    - Drishti is the sign-based graha drishti of the seven grahas.
+    - Friend and enemy are the pañcadhā relationship, including great
+      friend and great enemy.
+    - Benefic and malefic are natural: the waxing Moon and an unafflicted
+      Mercury count as benefic.
+    - Watery signs are Karka, Vṛścika and Mīna.
+    - It applies to the seven grahas; Rāhu and Ketu count only as company.
+  - Śayanādi:
+    - Graha numbers run Sun 1 to Saturn 7, Rāhu 8, Ketu 9. BPHS gives
+      Śayanādi results for Rāhu and Ketu too.
+    - The navāṁśa is counted 1–9 within the sign.
+    - G is the ghaṭī *running* at birth, i.e. whole ghaṭīs since sunrise
+      plus one.
+  - These follow Yenbeeyes, "Avasthas of Planets" (2009), after BPHS. Its
+    worked example (Sun in Hasta, A 6, M 25, G 20, L 10 → 133 → Śayana) is
+    the doctrine test. The engine reproduced all nine Śayanādi states of
+    that example with these conventions.
+- **Left out:** the Śayanādi sub-state (dṛṣṭi, ceṣṭā, viceṣṭā). It needs
+  the first syllable of the native's name, which the app does not collect.
+- **Failure mode addressed:** coverage. The plan step named these avasthās
+  for mood and "mann" questions, and the engine did not yet compute them.
+
+---
+
 ## 2026-10-22 — Cards: Claude plans the calculations from the granthas, then calls the engine (PROMPT + tools, plus one DATA domain)
 
 - **Change (PROMPT + plumbing):**
