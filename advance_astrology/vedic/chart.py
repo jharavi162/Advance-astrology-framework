@@ -345,10 +345,25 @@ class VedicChart:
         return yoga_mod.detect_yogas(self.ascendant_sign, self.signs,
                                      self.longitudes)
 
-    def avasthas(self, planet: Planet) -> dict[str, str]:
+    @cached_property
+    def birth_ghati(self) -> int | None:
+        """The ghaṭī running at birth, counted from the preceding sunrise."""
+        rise, _, _, _ = self.natal._ephemeris.day_portions(
+            self.when_utc, self.natal.latitude, self.natal.longitude)
+        return None if rise is None else avastha.running_ghati(self.when_utc, rise)
+
+    def avasthas(self, planet: Planet) -> dict:
         sun = self.longitudes[Planet.SUN]
-        return avastha.all_avasthas(planet, self.longitudes[planet],
-                                    sun_longitude=sun)
+        out = avastha.all_avasthas(planet, self.longitudes[planet], sun_longitude=sun)
+        moon_waxing = (self.longitudes[Planet.MOON] - sun) % 360 < 180
+        out["lajjitadi"] = avastha.lajjitadi_avastha(
+            planet, self.signs, self.longitudes, self.ascendant_sign,
+            moon_waxing=moon_waxing)
+        if self.birth_ghati is not None and planet in avastha.SHAYANADI_NUMBER:
+            out["shayanadi"] = avastha.shayanadi_avastha(
+                planet, self.longitudes[planet], self.longitudes[Planet.MOON],
+                self.ascendant_sign, self.birth_ghati)
+        return out
 
     # -- Compatibility -------------------------------------------------- #
     @staticmethod

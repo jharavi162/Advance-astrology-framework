@@ -22,7 +22,9 @@ SECTION_HELP = {
     "varshaphal": "Running Tajika annual chart: Varsha lagna, Muntha and its lord, year lord, annual positions.",
     "sahams": "All Tajika sahams with sign/degree and natal house.",
     "vargas": "D9, D7, D10, D30, D60 placements (use the varga tool for any other division).",
-    "avasthas": "Baladi (incl. Mrita), Jagradadi and Deeptadi (incl. Dukhita, Khala, Vikala) avasthas of every graha.",
+    "avasthas": ("Every graha's avasthas: Baladi (incl. Mrita), Jagradadi, Deeptadi (incl. Duhkhita, "
+                 "Vikala), combustion, Lajjitadi (Lajjita/Garvita/Kshudhita/Trishita/Mudita/Kshobhita, "
+                 "each with the condition that met it; seven grahas) and Shayanadi (twelve activities)."),
     "kp": "KP: houses each graha signifies.",
     "gochara_now": "Today's gochara: houses from Lagna/Moon/Sun/AL/UL/Karakamsha, nakshatra, tara, vedha, SAV, kakshya, aspects, Saturn from Moon (sade-sati/dhaiya), Sarvatobhadra hits.",
     "ingresses": "Next 18 months: rashi and nakshatra ingresses and retro/direct stations of Saturn, Jupiter, Rahu, Ketu, Mars.",
