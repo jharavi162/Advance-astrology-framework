@@ -96,6 +96,23 @@
   .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc))}
   .next{font-size:12.5px;color:var(--mut);border-top:1px dashed var(--line);padding-top:10px}
   .cta{background:linear-gradient(135deg,#3a2560,#1d1430);border:1px solid #5a3f8a}
+  /* Sawaal (key questions) + Milan tabs — fixed UI, backend aane par jawab yahan bharenge */
+  .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .qhead{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+  .qico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#2a2140;font-size:19px;flex:0 0 auto}
+  .qhead h3{margin:0;font:600 15.5px var(--serif);color:var(--ink)}
+  .skel{height:10px;border-radius:6px;background:linear-gradient(90deg,#221a35,#33284c,#221a35);background-size:200% 100%;animation:sh 1.8s infinite linear;margin-top:9px}
+  .skel.w80{width:80%}.skel.w60{width:60%}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .soonchip{display:inline-block;font-size:10.5px;font-weight:700;color:var(--acc);border:1px solid #5a4a2a;background:#2a2112;border-radius:20px;padding:2px 9px;margin-top:12px}
+  .seg{display:flex;gap:4px;background:#120c1d;border:1px solid var(--line);border-radius:10px;padding:3px;width:max-content;max-width:100%;overflow-x:auto}
+  .seg button{background:none;border:0;color:var(--mut);font-size:13px;font-weight:600;padding:6px 12px;border-radius:8px;min-height:0;white-space:nowrap}
+  .seg button.on{background:#2a2140;color:var(--acc)}
+  .askbox textarea{min-height:70px;resize:vertical}
+  .exq{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+  .exq span{font-size:12px;border:1px dashed var(--line);border-radius:20px;padding:4px 10px;color:var(--mut)}
+  .ktab td:last-child,.ktab th:last-child{text-align:right;white-space:nowrap}
+  .ktab tfoot td{font-weight:800;color:var(--acc);border-bottom:0}
   .cta h3{margin:0 0 4px;font:600 18px var(--serif);color:#fff}
   .cta ul{margin:8px 0 12px;padding-left:18px;color:#d9cdee;font-size:13px}
   /* bars */
@@ -171,6 +188,8 @@
 
     <nav class="stabs" id="stabs">
       <button class="stab on" data-p="ov">🏠 Overview</button>
+      <button class="stab" data-p="sw">✨ Aapke sawaal</button>
+      <button class="stab" data-p="ml">💞 Milan</button>
       <button class="stab" data-p="ku">🪐 Kundli</button>
       <button class="stab" data-p="da">⏳ Daśā</button>
       <button class="stab" data-p="go">🔭 Gochar</button>
@@ -222,6 +241,67 @@
           <p class="hint">Ṣaḍbala (graha) aur Aṣṭakavarga SAV (ghar) se.</p>
           <div id="extremes"></div>
         </div>
+      </div>
+    </section>
+
+    <!-- AAPKE SAWAAL (key questions) — fixed UI; jawab backend aane par -->
+    <section class="pane" id="sw">
+      <div class="card">
+        <h2>Aapke liye key analysis</h2>
+        <p class="hint">Aapki kundli ke hisaab se zindagi ke sabse zaroori sawaalon ke jawab. Har jawab engine ke calculations aur hamare jyotish prompt se banega.</p>
+        <div class="lbl">Aapki shaadi</div>
+        <div class="seg" id="marital">
+          <button data-m="no" class="on">Nahi hui</button><button data-m="yes">Ho chuki hai</button><button data-m="na">Batana nahi</button>
+        </div>
+        <div class="sub" style="margin-top:6px">Isse shaadi wale card ka sawaal tay hota hai. Shaadi ki tareekh nahi poochhi jaati.</div>
+      </div>
+      <div class="qgrid mt" id="qcards"></div>
+      <div class="g2 mt">
+        <div class="card cta">
+          <h3>Aapke mann par abhi kya haavi hai?</h3>
+          <div style="font-size:13px;color:#d9cdee">Detailed current-state reading, PDF mein.</div>
+          <ul><li>Mann par abhi sabse zyada kya haavi hai</li><li>Stress aur sukh ke asli kaaran</li><li>Aage ki dated timeline</li></ul>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:22px;font-weight:800;color:var(--acc)">₹100</span><button disabled>📄 Jald aa raha hai</button></div>
+        </div>
+        <div class="card askbox">
+          <h2>Apna sawaal poochiye</h2>
+          <p class="hint">Bas sawaal likhiye. Jyotish ki techniques hum khud lagayenge.</p>
+          <textarea placeholder="e.g. Meri shaadi kab hogi?" disabled></textarea>
+          <div class="exq"><span>Naukri kab badlegi?</span><span>Ghar kab le paunga?</span><span>Videsh ka yog hai?</span></div>
+          <button disabled>🔮 Jald aa raha hai</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MILAN (match making) — fixed UI; backend baad mein -->
+    <section class="pane" id="ml">
+      <div class="g2">
+        <div class="card">
+          <h2>Kundli milan</h2>
+          <p class="hint" id="mlhint">Partner ki janm details bhariye. Aapki kundli upar wali hai.</p>
+          <form id="mlf" onsubmit="return false">
+            <label class="wide">Partner ka naam<input id="mlnm" placeholder="e.g. Priya" autocomplete="off"></label>
+            <label>Janm tareekh<input id="mldate" type="date"></label>
+            <label class="tm">Janm samay<div class="timebox"><input id="mlhh" type="number" min="1" max="12" value="12"><input id="mlmm" type="number" min="0" max="59" value="00"><select id="mlap"><option>AM</option><option selected>PM</option></select></div></label>
+            <label class="wide">Janm sthaan<input id="mlplace" placeholder="shehar, e.g. Patna" autocomplete="off"></label>
+            <div class="actions"><button type="submit" disabled>💞 Milan — jald aa raha hai</button></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Guna Milan (Ashtakoot)</h2>
+          <p class="hint">36 guna ka paramparik milan. 18 se upar = theek, 24 se upar = achha.</p>
+          <div class="tw"><table class="ktab">
+            <thead><tr><th>Koot</th><th>Kya dekhta hai</th><th>Guna</th></tr></thead>
+            <tbody id="ktbody"></tbody>
+            <tfoot><tr><td colspan="2">Kul</td><td>— / 36</td></tr></tfoot>
+          </table></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <h2>Gehra milan analysis</h2>
+        <p class="hint">Sirf guna kaafi nahi hote. Yahan dono kundliyon ka 7th ghar, D9, Manglik dosh aur rishte ka swabhav dekha jayega.</p>
+        <div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div>
+        <span class="soonchip">Jald aa raha hai</span>
       </div>
     </section>
 
@@ -442,6 +522,8 @@ async function load(ev){
   finally{btn.disabled=false;btn.textContent='Kundli banao';}
 }
 function finishLoad(j){window.NATAL=j;renderDetails(j);renderSummary(j);
+  const nm=document.getElementById('nm').value.trim();
+  document.getElementById('mlhint').textContent=`Partner ki janm details bhariye. Doosri kundli: ${nm||'upar wali kundli'}.`;
   if(window.ACTIVE==='__home__')renderTabs('__cast__');
   document.getElementById('homecard').style.display='none';
   document.getElementById('out').style.display='block';
@@ -616,6 +698,34 @@ async function toggleDasha(tr,level,path){const cell=tr.querySelector('td');
 
 // section tabs (last tab remembered on this device only)
 const TKEY='horasutra_tab';
+// ---- Aapke sawaal: fixed cards (jawab backend se aayenge) ----
+const QCARDS=[
+  {id:'career',ico:'💼',q:'Career kaisa hoga?',d:'Kaun sa field suit karta hai, naukri ya business, aur agla bada badlav kab.'},
+  {id:'marriage',ico:'💍',q:null,d:null},
+  {id:'partner',ico:'💞',q:'Partner aur rishta kaisa hoga?',d:'Partner ka nature, rishte ki quality, kahan takraav aur kahan sahara.'},
+  {id:'stress',ico:'🌧',q:'Life mein major stress kahan se aata hai?',d:'Kaun sa ghar aur kaun sa daur bojh deta hai, aur kab halka hoga.'},
+  {id:'sukh',ico:'☀️',q:'Life mein major sukh kahan se aata hai?',d:'Kahan se sahara, kamai aur khushi milti hai.'}];
+const MARRIAGE_Q={no:['Shaadi kab hogi?','Agli do sabse majboot windows, aur kis daur mein.'],
+  yes:['Shaadi kab hui, aur rishta kaisa chal raha hai?','Chart ke hisaab se shaadi ka samay, aur abhi rishte ka haal.'],
+  na:['Shaadi ka yog aur timing','Shaadi ka promise, aur sabse majboot windows.']};
+const MKEY='horasutra_marital';
+function getMarital(){try{return localStorage.getItem(MKEY)||'no';}catch(e){return 'no';}}
+function renderQCards(){const m=getMarital();
+  document.querySelectorAll('#marital button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  document.getElementById('qcards').innerHTML=QCARDS.map(c=>{
+    const [q,d]=c.id==='marriage'?MARRIAGE_Q[m]:[c.q,c.d];
+    return `<div class="card"><div class="qhead"><div class="qico">${c.ico}</div><h3>${q}</h3></div>
+      <div class="sub">${d}</div><div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div>
+      <span class="soonchip">Jawab jald aa raha hai</span></div>`;}).join('');}
+document.getElementById('marital').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  try{localStorage.setItem(MKEY,b.dataset.m);}catch(x){}renderQCards();});
+renderQCards();
+// ---- Milan: koota table (score backend aane par) ----
+const KOOTA=[['Varna','Soch aur kaam ka mel',1],['Vashya','Ek doosre par asar aur aakarshan',2],['Tara','Sehat aur bhāgya ka mel',3],
+  ['Yoni','Swabhav aur shaaririk mel',4],['Graha Maitri','Dimaag aur dosti',5],['Gana','Swabhav: Dev, Manushya ya Rakshas',6],
+  ['Bhakoot','Parivaar, paisa aur prem',7],['Nadi','Sehat aur santān',8]];
+document.getElementById('ktbody').innerHTML=KOOTA.map(([k,d,m])=>`<tr><td>${k}</td><td class="sub">${d}</td><td>— / ${m}</td></tr>`).join('');
+
 function openTab(id){document.querySelectorAll('.stab').forEach(x=>x.classList.toggle('on',x.dataset.p===id));
   document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===id));
   try{localStorage.setItem(TKEY,id);}catch(e){}}
