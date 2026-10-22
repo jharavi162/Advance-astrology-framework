@@ -102,7 +102,7 @@ def test_read_plans_then_fetches_then_answers():
     assert out["calls"] == [dict(tool="engine_section", input={"section": "avasthas"}, error=False)]
     first, second = fake.calls
     assert first["model"] == cr.MODEL and first["thinking"] == {"type": "adaptive"}
-    assert first["system"][0]["cache_control"] == {"type": "ephemeral"}
+    assert first["system"][0]["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
     assert first["fallbacks"] == "default"
     assert "server-side-fallback-2026-07-01" in first["betas"]
     assert {t["name"] for t in first["tools"]} >= {"record_plan", "engine_section", "samanvaya"}
@@ -115,6 +115,26 @@ def test_read_plans_then_fetches_then_answers():
     assert "cache_control" in res[-1]
     assert "cache_control" not in second["messages"][0]["content"][0]
     assert out["usage"]["input_tokens"] == 20 and steps == [out["calls"]]
+    assert out["results"] == [dict(tool="engine_section", input={"section": "avasthas"},
+                                   result="SECTION avasthas")]
+
+
+def test_preloaded_results_go_in_the_first_message():
+    fake = FakeClient()
+    pre = [dict(tool="engine_section", input={"section": "kp"}, result="KP DATA")]
+    cr.read("P", FakeReading(), "d", client=fake, preloaded=pre)
+    body = fake.calls[0]["messages"][0]["content"][0]["text"]
+    assert "ALREADY FETCHED" in body and "KP DATA" in body and '{"section": "kp"}' in body
+
+
+def test_compact_report_format_keeps_fields():
+    from datetime import datetime as dt
+    from interpreter.reading_bundle import _fmt
+    from interpreter.engines.kp_engine import KPWindow
+    w = KPWindow(when=dt(2026, 5, 22, 0, 36, 3, 290835, tzinfo=timezone.utc),
+                 chain=("Ve", "Ra"), fulfil=5, negate=4)
+    assert _fmt(w, ZoneInfo("Asia/Kolkata")) == \
+        "KPWindow(when=2026-05-22 06:06, chain=[Ve, Ra], fulfil=5, negate=4)"
 
 
 def test_tools_before_plan_are_refused():
@@ -183,6 +203,40 @@ def test_engine_tools_run_on_a_real_chart():
     assert "Year 2031" in run_tool(r, "varshaphal_year", {"year": 2031})
     with pytest.raises(ValueError):
         run_tool(r, "varga", {"division": 5})
+
+
+def test_pdf_renders_the_markdown():
+    from interpreter.pdf_report import render
+    md = "# Shirshak\n\n> **Mukhya:** 12th\n\n- ek\n- do\n\n| Kab | Kya |\n|---|---|\n| 2026 | Ketu |\n\nSaaf ā ṣ ṛ."
+    b = render(md, title="Test", details=[("DOB", "01/01/2000")],
+               plan=[dict(calculation="c", source="BPHS", why="w")], gaps=[])
+    assert b.startswith(b"%PDF") and len(b) > 5000
+
+
+def test_pdf_needs_the_unlock_code(monkeypatch, tmp_path):
+    from webapp import server
+    monkeypatch.setattr(server, "CARD_CACHE_DIR", str(tmp_path))
+    base = {"when": ["1991-04-04 06:23"], "tz": ["Asia/Kolkata"],
+            "lat": ["23.72"], "lon": ["85.44"], "card": ["pdf"]}
+    monkeypatch.setattr(server, "PDF_UNLOCK_CODE", "")
+    assert "uplabdh nahi" in server.card_start(dict(base))["error"]
+    monkeypatch.setattr(server, "PDF_UNLOCK_CODE", "secret")
+    assert "code" in server.card_start(dict(base, code=["nope"]))["error"]
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    assert "ANTHROPIC_API_KEY" in server.card_start(dict(base, code=["secret"]))["error"]
+    assert server.pdf_file({"key": ["../etc/passwd"]}) is None
+
+
+def test_calc_store_merges_without_duplicates(monkeypatch, tmp_path):
+    from webapp import server
+    monkeypatch.setattr(server, "CARD_CACHE_DIR", str(tmp_path))
+    q = {"when": ["1991-04-04 06:23"], "lat": ["23.72"], "lon": ["85.44"]}
+    k = server._calc_key(q)
+    a = dict(tool="engine_section", input={"section": "kp"}, result="A")
+    server._calc_merge(k, [a])
+    server._calc_merge(k, [a, dict(a, input={"section": "gulika"})])
+    assert len(server._card_cache_get(k)["results"]) == 2
+    assert server._calc_key(dict(q, marital=["yes"])) == k     # shared by every card
 
 
 def test_card_start_guards(monkeypatch, tmp_path):

@@ -46,6 +46,7 @@
   .actions{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}
   .actions button[type=submit]{flex:1 1 220px}
   button{background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:14.5px;min-height:44px;font-family:inherit}
+  a.btnlink{display:inline-flex;align-items:center;background:linear-gradient(90deg,var(--acc),#f0c875);color:#241a00;border-radius:10px;padding:10px 16px;font-weight:700;font-size:14.5px;min-height:44px;box-sizing:border-box;text-decoration:none;margin-top:4px}
   button.sec{background:#2a2140;color:var(--ink);border:1px solid var(--line)}
   button:disabled{opacity:.5;cursor:not-allowed}
   .geo{position:absolute;top:100%;left:0;right:0;z-index:30;background:#0c0913;border:1px solid var(--line);border-radius:12px;max-height:230px;overflow:auto;display:none;margin-top:4px}
@@ -265,11 +266,14 @@
       </div>
       <div class="qgrid mt" id="qcards"></div>
       <div class="g2 mt">
-        <div class="card cta">
-          <h3>Aapke mann par abhi kya haavi hai?</h3>
-          <div style="font-size:13px;color:#d9cdee">Detailed current-state reading, PDF mein.</div>
-          <ul><li>Mann par abhi sabse zyada kya haavi hai</li><li>Stress aur sukh ke asli kaaran</li><li>Aage ki dated timeline</li></ul>
-          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:22px;font-weight:800;color:var(--acc)">₹100</span><button disabled>📄 Jald aa raha hai</button></div>
+        <div class="card cta" id="pdfcard">
+          <h3>Is waqt sabse active kya hai, aur mann par kya haavi hai?</h3>
+          <div style="font-size:13px;color:#d9cdee">Poori current-state reading, PDF mein.</div>
+          <ul><li>Life mein abhi sabse active kya chal raha hai</li><li>Mann par sabse zyada kya haavi hai, aur kyon</li><li>Daśā, gochar, bal aur avasthā se jude specific points</li></ul>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:22px;font-weight:800;color:var(--acc)">₹500</span>
+            <input id="pdfcode" placeholder="Access code" autocomplete="off" style="max-width:150px">
+            <button id="pdfbtn" onclick="openPdf()">📄 PDF banao</button></div>
+          <div class="sub" id="pdfmsg" style="margin-top:8px">Payment jald judega; tab tak access code se.</div>
         </div>
         <div class="card askbox">
           <h2>Apna sawaal poochiye</h2>
@@ -819,6 +823,25 @@ async function openCard(id){
       if(show(r))return;}
     show({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
   }catch(e){show({status:'error',error:String(e)});}}
+// Paid PDF reading: same job pipeline as the cards, card id 'pdf'.
+async function openPdf(){
+  if(!window.NATAL){alert('Pehle kundli banao.');return;}
+  const msgEl=document.getElementById('pdfmsg'),btn=document.getElementById('pdfbtn');
+  const say=(t,bad)=>{msgEl.innerHTML=bad?`<span class="bad">⚠ ${esc(t)}</span>`:esc(t);};
+  const msg={queued:'Line mein hai…',engine:'Engine saare calculations kar raha hai…',claude:'Claude reading likh raha hai… (3–6 minute)',pdf:'PDF ban raha hai…'};
+  const P=cardParams('pdf');P.set('code',document.getElementById('pdfcode').value.trim());
+  P.set('name',(document.getElementById('nm').value||'').trim());
+  const done=r=>{if(r.status==='done'){msgEl.innerHTML=`<a class="btnlink" href="${r.pdf}">⬇ PDF download karo</a>`;btn.disabled=false;return true;}
+    if(r.status==='error'){say(r.error||'PDF nahi ban paya.',true);btn.disabled=false;return true;}
+    say(r.status==='claude'&&r.steps?`Claude ne engine se ${r.steps} calculations maangi… reading ban rahi hai`:(msg[r.status]||'Kaam chal raha hai…'));return false;};
+  btn.disabled=true;say('Shuru ho raha hai…');
+  try{let r=await(await fetch('/api/card?'+P)).json();if(done(r))return;const job=r.job;
+    for(let i=0;i<300;i++){await new Promise(z=>setTimeout(z,3000));
+      try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
+      if(r.status==='unknown'){done({status:'error',error:'Server restart ho gaya. Dobara try karein.'});return;}
+      if(done(r))return;}
+    done({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
+  }catch(e){done({status:'error',error:String(e)});}}
 // The grantha-based plan Claude recorded before fetching the engine data.
 function planHtml(r){const p=r.plan||[];if(!p.length)return '';
   const rows=p.map(x=>`<tr><td>${esc(x.calculation||'')}</td><td>${esc(x.source||'')}</td><td>${esc(x.why||'')}</td></tr>`).join('');
