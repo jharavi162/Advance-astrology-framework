@@ -11,6 +11,57 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Sarvatobhadra Chakra: full 81-cell grid, fore/hind lines, Rath's motion and corner rules (ENGINE DATA, not in the app)
+
+- **Change (CODE, `advance_astrology/vedic/sarvatobhadra.py`,
+  `Transits.sarvatobhadra`):** replaces the ring-only version of the same day.
+  - The whole 9×9 grid: 28 nakṣatras, 16 vowels, the name consonants (with
+    the attached triplets on ka, pa, bha, da), 12 rāśis, and the five tithi
+    groups with their weekdays (Nandā: Sun/Tue, Bhadrā: Mon/Wed, Jayā: Thu,
+    Riktā: Fri, Pūrṇā: Sat at the centre).
+  - Orientation as in the source diagrams: North at the top, nakṣatras
+    clockwise from the north-east corner.
+  - The three lines are now named as in the source. **across**: to the
+    opposite wall. **fore**: the diagonal in the zodiacal direction of travel.
+    **hind**: the reverse diagonal. Each line lists every box it crosses.
+  - The corner rule: the padas either side of a corner add that corner's vowel
+    and the Pūrṇā tithi. The interchangeable syllable pairs are included.
+  - `predominant_line` gives the line each motion makes predominant, per Rath's
+    Rules II–III.
+  - Per transiting graha, `Transits.sarvatobhadra` reports hits on four of the
+    five pañca-śalāka: janma nakṣatra, janma rāśi, janma tithi group and janma
+    weekday. It also reports hits on each natal graha's nakṣatra.
+- **Why / sources:** user asked to find the classical source for the parts
+  left out earlier.
+  - **Rules I–III and the corner rule:** Sanjay Rath, "Sarvatobhadra Cakra",
+    *Saptarishis Astrology*. The chakra is cited there and elsewhere to
+    Janārdana Harjī's *Mānasāgarī* (trailokya-dīpika chakra), the
+    Brahmayāmala and the Narapati Jayacharya *Svarodaya* tradition.
+  - **Cell layout:** taken from the published calculator at ayurastro.com.
+    It is accepted only because it matches every worked line in Rath's
+    article, box for box: Kṛttikā, Rohiṇī, Mṛgaśirā, Punarvasu, and the four
+    central nakṣatras' across syllables. Those lines are now doctrine tests.
+  - **Fore = forward = "left", hind = behind = "right":** Astro Pankaj Seth's
+    lesson and Wikipedia name the same lines this way.
+- **Where sources disagree (recorded, not resolved):**
+  - *Luminaries and nodes.* Rath: Sun and Moon fore, Rāhu/Ketu hind. Other
+    teachers: these four cast all three lines equally. All three lines are
+    always returned, and "predominant" is a separate field.
+  - *Across line.* Many authorities count the across line on the nakṣatra
+    only, so its other boxes are reported apart as `across_boxes`.
+  - *The akṣara on U. Bhādrapadā's across line.* Read here as **da**, as in
+    Rath's Punarvasu example; his corollary text renders it as ḍa.
+- **Not encoded:** the vedha strength multipliers (×2 retrograde, ×3 exalted,
+  ×½ debilitated). These are a weighting, and engines emit no scores. Also not
+  encoded: the fifth interchangeable syllable pair, whose letters are garbled
+  in the source, and the name-syllable śalāka, which needs the native's name.
+- **Tests:** `tests/test_gochara.py` checks:
+  - grid composition, and the worked lines for Kṛttikā, Rohiṇī, Mṛgaśirā and
+    Punarvasu;
+  - the central across syllables with their triplets, line reciprocity, the
+    corner rule, the Abhijit span, and the motion / predominant-line rules;
+  - the transit contract.
+
 ## 2026-10-22 — Sarvatobhadra Chakra: nakṣatra ring and vedha lines (ENGINE DATA, not in the app)
 
 - **Change (CODE, `advance_astrology/vedic/sarvatobhadra.py` +

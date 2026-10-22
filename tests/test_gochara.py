@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from advance_astrology import Planet, VedicChart
+from advance_astrology.constants import SIGNS
 from advance_astrology.nakshatra import nakshatra_of
 from advance_astrology.vedic import gochara
 
@@ -169,42 +170,94 @@ def test_houses_from_and_snapshot_agree(tr):
 
 
 # --------------------------------------------------------------------------- #
-# Sarvatobhadra Chakra (nakṣatra ring geometry; inner rings not encoded)
+# Sarvatobhadra Chakra (grid + vedha lines; worked lines from Rath, Saptarishis)
 # --------------------------------------------------------------------------- #
 
 from advance_astrology.vedic import sarvatobhadra as sbc  # noqa: E402
 
 
-def test_sbc_ring_has_28_distinct_border_cells():
-    cells = list(sbc.CELLS.values())
-    assert len(sbc.CELLS) == 28 and len(set(cells)) == 28
-    corners = {(0, 0), (0, 8), (8, 0), (8, 8)}
-    for r, c in cells:
-        assert (r in (0, 8) or c in (0, 8)) and (r, c) not in corners
+def _names(nak, line):
+    return [x["name"] for x in sbc.vedha_lines(nak)[line]["content"]]
+
+
+def test_sbc_grid_composition():
+    kinds = {}
+    for row in sbc.GRID:
+        assert len(row) == 9
+        for cell in row:
+            kinds.setdefault(cell["kind"], []).append(cell["name"])
+    assert len(kinds["nakshatra"]) == 28 and len(set(kinds["nakshatra"])) == 28
+    assert sorted(kinds["rashi"]) == sorted(SIGNS)
+    assert len(set(kinds["vowel"])) == 16                    # "a" appears twice
+    assert sorted(kinds["tithi"]) == sorted(sbc.TITHI_GROUPS)
+    assert sbc.GRID[4][4]["name"] == "Purna" and sbc.GRID[4][4]["weekdays"] == ["Saturday"]
+    days = [d for row in sbc.GRID for c in row if c["kind"] == "tithi" for d in c["weekdays"]]
+    assert sorted(days) == sorted(sbc.WEEKDAYS)
     sides = {}
-    for n, s in sbc.SIDE.items():
-        sides.setdefault(s, []).append(n)
-    assert {s: len(v) for s, v in sides.items()} == dict(east=7, south=7, west=7, north=7)
+    for n, s_ in sbc.SIDE.items():
+        sides[s_] = sides.get(s_, 0) + 1
+    assert sides == dict(east=7, south=7, west=7, north=7)
     assert sbc.SIDE["Krittika"] == "east" and sbc.SIDE["Magha"] == "south"
     assert sbc.SIDE["Anuradha"] == "west" and sbc.SIDE["Dhanishta"] == "north"
 
 
-def test_sbc_krittika_lines():
-    lands = {k: v["lands"] for k, v in sbc.vedha_lines("Krittika").items()}
-    assert lands == dict(front="Shravana", diagonal_cw="Vishakha",
-                         diagonal_ccw="Bharani")
+def test_sbc_krittika_worked_lines():
+    # Rath: hind Bharaṇī; fore a, Taurus, Nandā, Bhadrā, Libra, ta, Viśākhā;
+    # across Śravaṇa.
+    assert _names("Krittika", "hind") == ["Bharani"]
+    assert _names("Krittika", "fore") == ["a", "Taurus", "Nanda", "Bhadra",
+                                         "Libra", "ta", "Vishakha"]
+    assert sbc.vedha_lines("Krittika")["across"]["lands"] == "Shravana"
+
+
+def test_sbc_rohini_and_mrigashira_worked_lines():
+    # Rohiṇī: u, Aśvinī, va, Gemini, au, Virgo, ra, Svātī and Abhijit.
+    assert _names("Rohini", "hind") == ["u", "Ashwini"]
+    assert _names("Rohini", "fore") == ["va", "Gemini", "au", "Virgo", "ra", "Swati"]
+    assert sbc.vedha_lines("Rohini")["across"]["lands"] == "Abhijit"
+    # Mṛgaśirā: Cancer, ka, Leo, pa, Citrā, Revatī, la, a, Uttarāṣāḍhā.
+    assert _names("Mrigashira", "fore") == ["ka", "Cancer", "Leo", "pa", "Chitra"]
+    assert _names("Mrigashira", "hind") == ["a", "la", "Revati"]
+    assert sbc.vedha_lines("Mrigashira")["across"]["lands"] == "Uttara Ashadha"
+
+
+def test_sbc_punarvasu_worked_lines():
+    # Hind: Pūrva Bhādrapadā, da, ka, Aries…; fore: Uttara Phalgunī, ḍa, ma;
+    # across: Mūla, ha, au, aṁ, ya, Cancer, Scorpio, Bhadrā (Mon, Wed).
+    hind = _names("Punarvasu", "hind")
+    assert hind[-1] == "Purva Bhadrapada" and {"da", "ka", "Aries"} <= set(hind)
+    assert _names("Punarvasu", "fore") == ["dda", "ma", "Uttara Phalguni"]
+    across = sbc.vedha_lines("Punarvasu")["across"]
+    assert [x["name"] for x in across["content"]] == ["ha", "Cancer", "au", "Bhadra",
+                                                       "am", "Scorpio", "ya", "Mula"]
+    bhadra = [x for x in across["content"] if x["name"] == "Bhadra"][0]
+    assert bhadra["weekdays"] == ["Monday", "Wednesday"]
+
+
+def test_sbc_central_nakshatras_across_syllables():
+    # Ārdrā, Hastā, P.Āṣāḍhā, U.Bhādrapadā: across vedha on ka, pa, bha, da,
+    # each with its attached triplet.
+    first = {n: sbc.vedha_lines(n)["across"]["content"][0]
+             for n in ("Ardra", "Hasta", "Purva Ashadha", "Uttara Bhadrapada")}
+    assert {n: c["name"] for n, c in first.items()} == {
+        "Ardra": "ka", "Hasta": "pa", "Purva Ashadha": "bha", "Uttara Bhadrapada": "da"}
+    assert first["Ardra"]["attached"] == ["gha", "nga", "cha"]
+    assert sbc.syllables_hit([first["Ardra"]]) >= {"ka", "gha", "nga", "cha"}
 
 
 def test_sbc_lines_are_reciprocal():
-    # A straight line drawn from A that lands on B is the same line from B.
     for n in sbc.CELLS:
         lines = sbc.vedha_lines(n)
-        back = sbc.vedha_lines(lines["front"]["lands"])
-        assert back["front"]["lands"] == n
-        for d in ("diagonal_cw", "diagonal_ccw"):
-            tgt = lines[d]["lands"]
-            assert tgt is not None
-            assert n in {v["lands"] for v in sbc.vedha_lines(tgt).values()}
+        assert sbc.vedha_lines(lines["across"]["lands"])["across"]["lands"] == n
+        assert sbc.vedha_lines(lines["fore"]["lands"])["hind"]["lands"] == n
+
+
+def test_sbc_corner_rule():
+    k = sbc.corner_trigger(2 * (360 / 27) + 1.0)          # Kṛttikā pada 1
+    assert k["corner"] == "NE" and k["activated"] == ["a", "Purna"]
+    assert sbc.corner_trigger(2 * (360 / 27) - 1.0)["corner"] == "NE"   # Bharaṇī p4
+    assert sbc.corner_trigger(2 * (360 / 27) + 5.0) is None            # Kṛttikā p2
+    assert sbc.corner_trigger(9 * (360 / 27) + 1.0)["corner"] == "SE"  # Maghā p1
 
 
 def test_sbc_abhijit_span():
@@ -215,21 +268,31 @@ def test_sbc_abhijit_span():
     assert sbc.nakshatra_28(359.9) == "Revati"
 
 
-def test_sbc_motion_class():
+def test_sbc_motion_and_predominant_line():
     assert sbc.motion_class(P.RAHU, -0.05) == "vakri"
-    assert sbc.motion_class(P.MARS, -0.2) == "vakri"
     assert sbc.motion_class(P.JUPITER, 0.2) == "shighra"
     assert sbc.motion_class(P.SATURN, 0.01) == "madhya"
+    assert sbc.predominant_line(P.KETU, "vakri") == "hind"
+    assert sbc.predominant_line(P.SUN, "madhya") == "fore"
+    assert sbc.predominant_line(P.MARS, "vakri") == "hind"
+    assert sbc.predominant_line(P.MARS, "shighra") == "fore"
+    assert sbc.predominant_line(P.MARS, "madhya") == "across"
+    assert [sbc.tithi_group(n) for n in (1, 5, 6, 15, 16, 30)] == [
+        "Nanda", "Purna", "Nanda", "Purna", "Nanda", "Purna"]
 
 
 def test_transit_sarvatobhadra_contract(tr):
     r = tr.sarvatobhadra(START)
-    assert r["janma_nakshatra"] == sbc.nakshatra_28(tr.chart.longitudes[P.MOON])
+    assert r["janma"]["nakshatra"] == sbc.nakshatra_28(tr.chart.longitudes[P.MOON])
     for p, d in r["planets"].items():
         assert d["nakshatra"] == sbc.nakshatra_28(tr.positions(START, [p])[p])
-        assert set(d["lands"]) == {"front", "diagonal_cw", "diagonal_ccw"}
-        for line, pts in d["hits"].items():
-            tgt = d["lands"][line]
-            for q in pts:
-                natal = P.MOON if q == "janma" else P(q)
-                assert r["natal_nakshatras"][natal] == tgt
+        assert set(d["lands"]) == {"across", "fore", "hind"}
+        assert d["predominant"] == sbc.predominant_line(p, d["motion"])
+        for line, labels in d["hits"].items():
+            key = "across" if line == "across_boxes" else line
+            for lab in labels:
+                if lab == "janma_nakshatra":
+                    assert r["janma"]["nakshatra"] in d["boxes"][key]
+                elif lab.endswith("_nakshatra"):
+                    q = P(lab[: -len("_nakshatra")])
+                    assert r["natal_nakshatras"][q] in d["boxes"][key]
