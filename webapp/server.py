@@ -435,6 +435,62 @@ def transit_json(q):
     return dict(date=d, lagna=int(v.ascendant_sign), planets=pl)
 
 
+GOCHAR_PLANETS = (Planet.SATURN, Planet.JUPITER, Planet.RAHU, Planet.KETU,
+                  Planet.MARS, Planet.SUN, Planet.VENUS, Planet.MERCURY)
+
+
+def gochar_json(q):
+    """Full gochara DATA for a date (engine output, no interpretation): every
+    graha's sign/degree/nakṣatra/pada, motion, houses from Lagna, Moon, Sun,
+    AL, UL and Kārakāṁśa, SAV, Kakṣyā, tārā, dṛṣṭi and Vedha; Saturn from the
+    Moon (Sāḍhe Sātī / Ḍhaiyā); and, for the next ``months`` months, every
+    sign ingress (with Murti), nakṣatra ingress (with tārā) and vakri/mārgī
+    station of the slower grahas."""
+    v, _ = _chart(q)
+    tr = v.transits()
+    tz = ZoneInfo(q.get("tz", ["Asia/Kolkata"])[0])
+    d = (q.get("date", [""])[0] or datetime.now().strftime("%Y-%m-%d"))
+    when = datetime.strptime(d, "%Y-%m-%d").replace(hour=12, tzinfo=timezone.utc)
+    months = max(1, min(24, int(q.get("months", ["12"])[0] or 12)))
+    end = when + timedelta(days=round(months * 30.44))
+    ab = lambda ps: [ABBR[x] for x in ps]
+    loc = lambda w: w.astimezone(tz).strftime("%Y-%m-%d %H:%M")
+    snap = tr.snapshot(when)
+    planets = []
+    for p, x in snap["planets"].items():
+        vd = x["vedha"]
+        planets.append(dict(
+            ab=ABBR[p], name=p.value, sign=x["sign"], sign_name=SIGNS[x["sign"]],
+            deg=round(x["degree"], 2), nak=x["nakshatra_name"], pada=x["pada"],
+            nak_lord=x["nakshatra_lord"].value, retro=x["retrograde"],
+            speed=round(x["speed"], 3), houses=x["houses"], sav=x["sav"],
+            kakshya=x["kakshya_active"], tara=x["tara"],
+            aspects_lagna=x["aspects_from_lagna"], aspects_moon=x["aspects_from_moon"],
+            vedha=dict(good=vd["good"], vedha_house=vd["vedha_house"],
+                       obstructed_by=ab(vd["obstructed_by"]),
+                       vipareeta_by=ab(vd["vipareeta_by"]))))
+    rashi, nak, stations = [], [], []
+    for p in GOCHAR_PLANETS:
+        for x in tr.sign_ingresses(p, when, end):
+            rashi.append(dict(ab=ABBR[p], planet=p.value, when=loc(x["when"]),
+                              from_sign=x["from_sign"], to_sign=x["to_sign"],
+                              h_lagna=x["house_from_lagna"], h_moon=x["house_from_moon"],
+                              retro=x["retrograde"], murti=x["murti"]))
+        for x in tr.nakshatra_ingresses(p, when, end):
+            nak.append(dict(ab=ABBR[p], planet=p.value, when=loc(x["when"]),
+                            from_nak=nakshatra_of((x["from_nakshatra"] + .5) * 360 / 27).name,
+                            to_nak=nakshatra_of((x["to_nakshatra"] + .5) * 360 / 27).name,
+                            lord=x["lord"].value, retro=x["retrograde"], tara=x["tara"]))
+        for x in tr.stations(p, when, end):
+            stations.append(dict(ab=ABBR[p], planet=p.value, when=loc(x["when"]),
+                                 turns=x["turns"]))
+    for lst in (rashi, nak, stations):
+        lst.sort(key=lambda r: r["when"])
+    return dict(date=d, months=months, references=snap["references"],
+                planets=planets, saturn=snap["saturn"],
+                rashi_ingresses=rashi, nakshatra_ingresses=nak, stations=stations)
+
+
 def dasha_json(q):
     """Lazy daśā drill: path = dot-separated indices (maha.antar.pratyantar).
     Returns the children of the node at that path (antar / pratyantar / sūkṣma)."""
@@ -1049,6 +1105,8 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(dasha_json(q)))
             if u.path == "/api/transit":
                 return self._send(200, json.dumps(transit_json(q)))
+            if u.path == "/api/gochar":
+                return self._send(200, json.dumps(gochar_json(q)))
             if u.path == "/api/cusps":
                 return self._send(200, json.dumps(cusps_json(q)))
             if u.path == "/api/scan":

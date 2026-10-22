@@ -11,6 +11,49 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-22 — Gochara: nakṣatra-level transits, ingresses, stations, Vedha, Ḍhaiyā, Murti, multi-reference houses (ENGINE DATA, no verdict)
+
+- **Change (CODE, `advance_astrology/vedic/gochara.py` + `Transits` in
+  `advance_astrology/vedic/transits.py`):** the transit calculator now also
+  exposes, as data only:
+  - **nakṣatra-level gochara** — each transit's nakṣatra, pada and nakṣatra
+    lord, and its **tārā** counted from the janma nakṣatra (`tara_bala`);
+  - **rāśi parivartan** (`sign_ingresses`, with the house entered from Lagna and
+    Moon and the ingress **Murti**) and **nakṣatra parivartan**
+    (`nakshatra_ingresses`, with the new nakṣatra's lord and tārā);
+  - **vakri / mārgī stations** (`stations`) and daily motion (`motion`);
+  - **Vedha** (`vedha`) per graha from the natal Moon, including the
+    Sun–Saturn and Moon–Mercury exemptions and *vipareeta* vedha;
+  - **Saturn from the Moon** (`saturn_status`): Sāḍhe Sātī phase and Ḍhaiyā
+    (4th Kaṇṭaka/Ardhāṣṭama, 8th Aṣṭama);
+  - **houses from any reference** (`houses_from`, `reference_signs`): Lagna,
+    Moon and Sun (Sudarśana triad) and the Jaimini points AL, UL and
+    Kārakāṁśa;
+  - `snapshot(when)`, which gathers all of the above with the existing SAV,
+    Kakṣyā and gochar-dṛṣṭi for one date.
+  The ingress and station scanners sample through a new vectorised
+  `Ephemeris.longitudes` (same formula as `position`, longitude only), so a
+  12-month scan of eight grahas runs in about two seconds.
+- **Why:** the user asked for every classical gochara method to be computable.
+  Śāstra basis: **Phaladeepika**, gochara adhyāya (ch. 26) — good houses from
+  the Moon and their paired vedha points, the Sun–Saturn and Moon–Mercury
+  exemption; tārā-bala as in the muhūrta texts (e.g. **Muhūrta
+  Chintāmaṇi**); Sāḍhe Sātī and Ḍhaiyā as Saturn's transit of the 12th/1st/2nd
+  and 4th/8th from the natal Moon; Sudarśana chakra (**BPHS**) for counting from
+  Lagna, Moon and Sun together; Jaimini Sūtras for reading from AL, UL and
+  Kārakāṁśa. Rāhu/Ketu are not in the classical vedha table; they follow
+  Saturn's houses (later practice) and are not counted as obstructors. The
+  **Murti** rule (transit Moon from natal Moon at ingress: 1/6/11 Swarṇa,
+  2/5/9 Rajata, 3/7/10 Tāmra, 4/8/12 Loha) is a panchāṅga convention; no
+  classical verse is cited for it.
+- **Not a rule change:** no engine verdict, score or weighting is added, and no
+  timing window moves. The webapp's Gochar tab shows only the Lagna/Moon house
+  table, rāśi parivartan and nakṣatra parivartan; the rest is available to the
+  engines and the AI through `/api/gochar` and `Transits.snapshot`.
+- **Tests:** `tests/test_gochara.py` — vedha table and exemptions, tārā count,
+  Murti mapping, Saturn-from-Moon phases, and scanner contracts on a generic
+  chart (no native dates).
+
 ## 2026-10-04 — Current-life reading: choose the headline theme by the mind's link, not the transit cluster (PROMPT, no engine rule)
 
 - **Change (DOCS, `docs/AI_TRIANGULATION_PROMPT.md` §5-bis):** added a
