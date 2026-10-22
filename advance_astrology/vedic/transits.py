@@ -514,30 +514,60 @@ class Transits:
     def sarvatobhadra(self, when: datetime) -> dict:
         """Sarvatobhadra Chakra vedha for every transiting graha — DATA only.
 
-        For each graha: its 28-scheme nakṣatra, motion class (vakri / śīghra /
-        madhya), and where each of its three vedha lines (front and the two
-        diagonals) lands on the nakṣatra ring. ``hits`` lists the natal
-        points whose nakṣatra a line lands on: ``janma`` (the natal Moon) and
-        each natal graha. Which line a given motion emphasises is left to the
-        reader (see :mod:`.sarvatobhadra`).
+        For each graha: its 28-scheme nakṣatra, motion class, the line that
+        predominates by Rath's Rules II–III, the three lines (across / fore /
+        hind) with the boxes they cross and the nakṣatra they land on, the
+        corner rule if it applies, and ``hits``: which natal points each line
+        touches — the janma nakṣatra, janma rāśi (Moon sign), janma tithi
+        group and janma weekday (four of the five pañca-śalāka; the name
+        syllable needs the native's name), plus each natal graha's nakṣatra.
+        Many authorities count the *across* line on the nakṣatra only; hits on
+        its other boxes are listed separately as ``across_boxes``.
         """
+        moon_lon = self.chart.longitudes[Planet.MOON]
+        pan = self.chart.panchanga()
+        janma = dict(nakshatra=sbc.nakshatra_28(moon_lon),
+                     rashi=SIGNS[int(self.natal_moon_sign)],
+                     tithi=sbc.tithi_group(pan.tithi.number),
+                     vara=str(pan.vara).split()[0])
         natal = {p: sbc.nakshatra_28(lon) for p, lon in self.chart.longitudes.items()
                  if p in VEDIC_GRAHAS}
         pos = self.positions(when, VEDIC_GRAHAS)
         out = {}
         for p in VEDIC_GRAHAS:
             nk = sbc.nakshatra_28(pos[p])
+            motion = sbc.motion_class(p, self.motion(when, p)["speed"])
             lines = sbc.vedha_lines(nk)
             hits = {}
             for name, ln in lines.items():
-                tgt = ln["lands"]
-                pts = [("janma" if q is Planet.MOON else q.value)
-                       for q, n in natal.items() if n == tgt]
-                if pts:
-                    hits[name] = pts
-            out[p] = dict(nakshatra=nk,
-                          motion=sbc.motion_class(p, self.motion(when, p)["speed"]),
-                          lands={k: v["lands"] for k, v in lines.items()},
-                          hits=hits)
-        return dict(janma_nakshatra=natal[Planet.MOON], natal_nakshatras=natal,
-                    planets=out)
+                got = []
+                for x in ln["content"]:
+                    k = x["kind"]
+                    if k == "nakshatra":
+                        if x["name"] == janma["nakshatra"]:
+                            got.append("janma_nakshatra")
+                        got += [f"{q.value}_nakshatra" for q, n in natal.items()
+                                if n == x["name"] and q is not Planet.MOON]
+                    elif k == "rashi" and x["name"] == janma["rashi"]:
+                        got.append("janma_rashi")
+                    elif k == "tithi":
+                        if x["name"] == janma["tithi"]:
+                            got.append("janma_tithi")
+                        if janma["vara"] in x["weekdays"]:
+                            got.append("janma_vara")
+                if name == "across":
+                    nak_only = [g for g in got if g.endswith("_nakshatra")]
+                    rest = [g for g in got if not g.endswith("_nakshatra")]
+                    if nak_only:
+                        hits["across"] = nak_only
+                    if rest:
+                        hits["across_boxes"] = rest
+                elif got:
+                    hits[name] = got
+            out[p] = dict(
+                nakshatra=nk, motion=motion,
+                predominant=sbc.predominant_line(p, motion),
+                lands={k: v["lands"] for k, v in lines.items()},
+                boxes={k: [x["name"] for x in v["content"]] for k, v in lines.items()},
+                corner=sbc.corner_trigger(pos[p]), hits=hits)
+        return dict(janma=janma, natal_nakshatras=natal, planets=out)
