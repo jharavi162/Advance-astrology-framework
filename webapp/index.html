@@ -104,6 +104,15 @@
   .qhead h3{margin:0;font:600 15.5px var(--serif);color:var(--ink)}
   .skel{height:10px;border-radius:6px;background:linear-gradient(90deg,#221a35,#33284c,#221a35);background-size:200% 100%;animation:sh 1.8s infinite linear;margin-top:9px}
   .skel.w80{width:80%}.skel.w60{width:60%}
+  .jprog{margin-top:12px}.ptop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .ptime{font:700 22px var(--serif);color:var(--acc);font-variant-numeric:tabular-nums}
+  .pbar{height:6px;border-radius:4px;background:#221a35;overflow:hidden;margin:8px 0 10px}
+  .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),#f0c875);transition:width 1s linear}
+  .psteps{list-style:none;padding:0;margin:0;font-size:13px;line-height:1.9;color:var(--mut)}
+  .psteps li.ok{color:#9fd8a8}.psteps li.on{color:var(--ink);font-weight:600}
+  .pnow{margin-top:8px;font-size:13px;min-height:20px}
+  .pgot{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px}
+  .pchip{font-size:11.5px;padding:3px 8px;border-radius:999px;background:#1f1730;border:1px solid var(--line);color:#cbbfe0}
   @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
   .soonchip{display:inline-block;font-size:10.5px;font-weight:700;color:var(--acc);border:1px solid #5a4a2a;background:#2a2112;border-radius:20px;padding:2px 9px;margin-top:12px}
   .seg{display:flex;gap:4px;background:#120c1d;border:1px solid var(--line);border-radius:10px;padding:3px;width:max-content;max-width:100%;overflow-x:auto}
@@ -807,41 +816,59 @@ function renderQCards(){const m=getMarital();
 const LIVE_CARDS=['stress'];
 function cardParams(id){const P=params();if(P.get('ayanamsa')==='multi')P.set('ayanamsa','lahiri');
   P.set('card',id);P.set('place',document.getElementById('place').value.trim());P.set('marital',getMarital());return P;}
+// Progress screen for a reading job: timer, steps, what Claude is looking at.
+function Progress(el,kind){
+  const T=kind==='pdf'?300:210, t0=Date.now();let r={status:'queued'},k=0,shown=0;
+  const steps=[['engine','Kundli ki saari calculations'],['plan','Granth ke hisaab se zaroori calculations tay karna'],
+    ['fetch','Engine se data lena'],['write','Jawab likhna']].concat(kind==='pdf'?[['pdf','PDF banana']]:[]);
+  el.innerHTML=`<div class="jprog"><div class="ptop"><span class="ptime">0:00</span><span class="sub">Aam taur par ${kind==='pdf'?'4–6':'3–4'} minute lagte hain</span></div>
+    <div class="pbar"><i></i></div><ol class="psteps"></ol><div class="pnow"></div><div class="pgot"></div>
+    <div class="sub" style="margin-top:8px">Aap is screen par bane rahiye. Jawab poora banne par yahin dikhega.</div></div>`;
+  const $=q=>el.querySelector(q);
+  const stage=()=>{const st=r.status;if(st==='queued')return -1;if(st==='engine')return 0;if(st==='pdf')return 4;
+    if(st==='claude'){if(!(r.plan_items||[]).length)return 1;return (r.rounds||0)>=2||(r.steps||0)>=6?3:2;}return 0;};
+  const paint=()=>{const sec=Math.floor((Date.now()-t0)/1000),g=stage();
+    $('.ptime').textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+    const floor=[0.04,0.12,0.3,0.55,0.93][Math.max(0,g)]||0.02;
+    const p=Math.min(0.97,Math.max(floor,1-Math.exp(-sec/(T*0.6))));shown=Math.max(shown,p);
+    $('.pbar i').style.width=(shown*100).toFixed(1)+'%';
+    $('.psteps').innerHTML=steps.map(([id,t],i)=>`<li class="${i<g?'ok':i===g?'on':''}">${i<g?'✓':i===g?'●':'○'} ${t}${
+      id==='fetch'&&r.steps?` <span class="sub">(${r.steps})</span>`:''}${id==='engine'&&r.reused&&i<g?` <span class="sub">(${r.reused} pehle se saved)</span>`:''}</li>`).join('');
+    const items=r.plan_items||[];
+    $('.pnow').innerHTML=g===-1?'Line mein hai, pichhla kaam poora hote hi shuru hoga…':g===0?'Daśā, gochar, bal, avasthā aur har school ka data nikal raha hai…':
+      g===1?'Claude sawaal padh ke tay kar raha hai ki granthon ke hisaab se kya-kya dekhna hai…':
+      items.length?`<span class="sub">Claude dekh raha hai:</span> <b>${esc(items[k%items.length].c)}</b> <span class="sub">· ${esc(items[k%items.length].s)}</span>`:'';
+    const got=r.fetched||[];$('.pgot').innerHTML=got.length?got.slice(-8).map(x=>`<span class="pchip">✓ ${esc(x)}</span>`).join(''):'';};
+  const iv=setInterval(()=>{paint();if(Math.floor((Date.now()-t0)/1000)%3===0)k++;},1000);paint();
+  return {update(x){r=x;paint();},stop(){clearInterval(iv);}};}
+// Start a reading job (a card, or the PDF) and poll it with the progress screen.
+async function runJob(P,el,kind,onDone){const pv=Progress(el,kind);
+  try{let r=await(await fetch('/api/card?'+P)).json();
+    if(r.status==='done'||r.status==='error'){pv.stop();return onDone(r);}
+    const job=r.job;pv.update(r);
+    for(let i=0;i<(kind==='pdf'?300:240);i++){await new Promise(z=>setTimeout(z,3000));
+      try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
+      if(r.status==='unknown'){pv.stop();return onDone({status:'error',error:'Server restart ho gaya. Dobara try karein.'});}
+      if(r.status==='done'||r.status==='error'){pv.stop();return onDone(r);}
+      pv.update(r);}
+    pv.stop();onDone({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
+  }catch(e){pv.stop();onDone({status:'error',error:String(e)});}}
 async function openCard(id){
   if(!window.NATAL){alert('Pehle kundli banao.');return;}
   const box=document.querySelector('#qc_'+id+' .qbody');document.getElementById('qc_'+id).classList.add('open');
-  const msg={queued:'Line mein hai…',engine:'Engine saare calculations kar raha hai…',claude:'Claude granth ke hisaab se calculations chun raha hai… (2–5 minute)'};
-  box.innerHTML='<div class="skel"></div><div class="skel w80"></div><div class="skel w60"></div><div class="sub" style="margin-top:8px">Shuru ho raha hai…</div>';
-  const show=r=>{if(r.status==='done'){box.innerHTML=`<div class="ans">${md(r.text)}</div>${planHtml(r)}<div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`;return true;}
-    if(r.status==='error'){box.innerHTML=`<div class="bad" style="margin-top:10px">⚠ ${esc(r.error||'Jawab nahi ban paya.')}</div><button class="sec" style="margin-top:8px" onclick="openCard('${id}')">Dobara try karein</button>`;return true;}
-    box.querySelector('.sub').textContent=(r.status==='claude'&&r.steps?`Claude ne engine se ${r.steps} calculations maangi… jawab ban raha hai`:msg[r.status])||'Kaam chal raha hai…';return false;};
-  try{let r=await(await fetch('/api/card?'+cardParams(id))).json();if(show(r))return;
-    const job=r.job;
-    for(let i=0;i<240;i++){await new Promise(z=>setTimeout(z,3000));
-      try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
-      if(r.status==='unknown'){show({status:'error',error:'Server restart ho gaya. Dobara try karein.'});return;}
-      if(show(r))return;}
-    show({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
-  }catch(e){show({status:'error',error:String(e)});}}
+  await runJob(cardParams(id),box,'card',r=>{
+    if(r.status==='done'){box.innerHTML=`<div class="ans">${md(r.text)}</div>${planHtml(r)}<div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`;return;}
+    box.innerHTML=`<div class="bad" style="margin-top:10px">⚠ ${esc(r.error||'Jawab nahi ban paya.')}</div><button class="sec" style="margin-top:8px" onclick="openCard('${id}')">Dobara try karein</button>`;});}
 // Paid PDF reading: same job pipeline as the cards, card id 'pdf'.
 async function openPdf(){
   if(!window.NATAL){alert('Pehle kundli banao.');return;}
   const msgEl=document.getElementById('pdfmsg'),btn=document.getElementById('pdfbtn');
-  const say=(t,bad)=>{msgEl.innerHTML=bad?`<span class="bad">⚠ ${esc(t)}</span>`:esc(t);};
-  const msg={queued:'Line mein hai…',engine:'Engine saare calculations kar raha hai…',claude:'Claude reading likh raha hai… (3–6 minute)',pdf:'PDF ban raha hai…'};
   const P=cardParams('pdf');P.set('code',document.getElementById('pdfcode').value.trim());
   P.set('name',(document.getElementById('nm').value||'').trim());
-  const done=r=>{if(r.status==='done'){msgEl.innerHTML=`<a class="btnlink" href="${r.pdf}">⬇ PDF download karo</a>`;btn.disabled=false;return true;}
-    if(r.status==='error'){say(r.error||'PDF nahi ban paya.',true);btn.disabled=false;return true;}
-    say(r.status==='claude'&&r.steps?`Claude ne engine se ${r.steps} calculations maangi… reading ban rahi hai`:(msg[r.status]||'Kaam chal raha hai…'));return false;};
-  btn.disabled=true;say('Shuru ho raha hai…');
-  try{let r=await(await fetch('/api/card?'+P)).json();if(done(r))return;const job=r.job;
-    for(let i=0;i<300;i++){await new Promise(z=>setTimeout(z,3000));
-      try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
-      if(r.status==='unknown'){done({status:'error',error:'Server restart ho gaya. Dobara try karein.'});return;}
-      if(done(r))return;}
-    done({status:'error',error:'Bahut der lag gayi. Dobara try karein.'});
-  }catch(e){done({status:'error',error:String(e)});}}
+  btn.disabled=true;
+  await runJob(P,msgEl,'pdf',r=>{btn.disabled=false;
+    msgEl.innerHTML=r.status==='done'?`<a class="btnlink" href="${r.pdf}">⬇ PDF download karo</a>`
+      :`<span class="bad">⚠ ${esc(r.error||'PDF nahi ban paya.')}</span>`;});}
 // The grantha-based plan Claude recorded before fetching the engine data.
 function planHtml(r){const p=r.plan||[];if(!p.length)return '';
   const rows=p.map(x=>`<tr><td>${esc(x.calculation||'')}</td><td>${esc(x.source||'')}</td><td>${esc(x.why||'')}</td></tr>`).join('');

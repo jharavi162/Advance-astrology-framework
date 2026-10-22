@@ -96,7 +96,8 @@ def test_system_prompt_carries_the_director_docs():
 def test_read_plans_then_fetches_then_answers():
     fake = FakeClient()
     steps = []
-    out = cr.read("PROMPT", FakeReading(), "2026-10-22", client=fake, on_step=steps.append)
+    out = cr.read("PROMPT", FakeReading(), "2026-10-22", client=fake,
+                  on_step=lambda c, p: steps.append((list(c), list(p))))
     assert out["text"] == "## Jawab\nStress 12th se." and not out["truncated"]
     assert out["plan"] == PLAN["items"] and out["gaps"] == PLAN["gaps"]
     assert out["calls"] == [dict(tool="engine_section", input={"section": "avasthas"}, error=False)]
@@ -114,7 +115,7 @@ def test_read_plans_then_fetches_then_answers():
                                            "SECTION avasthas"]
     assert "cache_control" in res[-1]
     assert "cache_control" not in second["messages"][0]["content"][0]
-    assert out["usage"]["input_tokens"] == 20 and steps == [out["calls"]]
+    assert out["usage"]["input_tokens"] == 20 and steps == [(out["calls"], out["plan"])]
     assert out["results"] == [dict(tool="engine_section", input={"section": "avasthas"},
                                    result="SECTION avasthas")]
 

@@ -147,3 +147,30 @@ def run_tool(r: Reading, name: str, args: dict) -> str:
     else:
         raise ValueError(f"unknown tool {name}")
     return "\n".join(L).strip("\n")
+
+
+SECTION_LABEL = {
+    "strengths": "Shadbala aur Bhāva bala", "gulika": "Gulika aur Māndi",
+    "vimshottari": "Vimśottari daśā", "rashi_dashas": "Chara, Nārāyaṇa aur Yoginī daśā",
+    "varshaphal": "Varṣaphal", "sahams": "Sāham", "vargas": "Varga kundliyaan",
+    "avasthas": "Grahon ki avasthāein", "kp": "KP significators",
+    "gochara_now": "Aaj ka gochar", "ingresses": "Aane wale gochar badlaav",
+    "bnn_windows": "Natal grahon par degree hits", "double_transit": "Guru-Śani double transit",
+}
+
+
+def label(name: str, args: dict) -> str:
+    """A short Hinglish label for a tool call, for the progress screen."""
+    if name == "engine_section":
+        return SECTION_LABEL.get(args.get("section"), str(args.get("section")))
+    if name == "samanvaya":
+        return f"{str(args.get('domain', '')).title()}: sab schools ki report"
+    if name == "dasha_at":
+        return f"{args.get('date')} ki daśā"
+    if name == "gochara_on":
+        return f"{args.get('date')} ka gochar"
+    if name == "varga":
+        return f"D{args.get('division')} kundli"
+    if name == "varshaphal_year":
+        return f"{args.get('year')} ka varṣaphal"
+    return name

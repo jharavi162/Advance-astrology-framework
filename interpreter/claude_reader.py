@@ -169,7 +169,8 @@ def read(user_prompt: str, reading, as_of: str, client=None,
     reading of the same chart can pass them back as *preloaded* so the data
     is in hand from the start instead of costing tool rounds. *client* may
     be injected (tests); otherwise an ``anthropic.Anthropic()`` client is
-    built from ``ANTHROPIC_API_KEY``. *on_step(calls)* is told each tool round.
+    built from ``ANTHROPIC_API_KEY``. *on_step(calls, plan)* is told after each
+    tool round, for progress display.
     """
     import anthropic
 
@@ -217,7 +218,7 @@ def read(user_prompt: str, reading, as_of: str, client=None,
             messages.append({"role": "assistant", "content": msg.content})
             messages.append({"role": "user", "content": results})
             if on_step:
-                on_step(calls)
+                on_step(calls, plan)
     except anthropic.AuthenticationError:
         raise ReaderError("Claude API key galat hai ya band hai.")
     except anthropic.RateLimitError:

@@ -412,8 +412,10 @@ def _card_worker(job, q, card, key):
             # rounds asking for them again.
             ck = _calc_key(q)
             pre = (_card_cache_get(ck) or {}).get("results", [])
+            st["reused"] = len(pre)
             out = read(prompt, reading, now.astimezone(when.tzinfo).strftime("%Y-%m-%d"),
-                       on_step=lambda calls: st.update(steps=len(calls)), preloaded=pre)
+                       on_step=lambda calls, plan: _progress(st, calls, plan),
+                       preloaded=pre)
             _calc_merge(ck, out["results"])
             res = dict(status="done", card=card, title=spec["title"],
                        text=out["text"], truncated=out["truncated"],
@@ -444,6 +446,16 @@ def _card_worker(job, q, card, key):
             st.update(status="error", error=str(e), ts=time.time())
         except Exception as e:
             st.update(status="error", error=f"{type(e).__name__}: {e}", ts=time.time())
+
+
+def _progress(st, calls, plan):
+    """What the progress screen shows while Claude works: the plan's items
+    and the engine data fetched so far."""
+    from interpreter.engine_tools import label
+    st.update(steps=len(calls), rounds=st.get("rounds", 0) + 1,
+              plan_items=[dict(c=x.get("calculation", ""), s=x.get("source", ""))
+                          for x in plan][:40],
+              fetched=[label(c["tool"], c["input"]) for c in calls if not c["error"]])
 
 
 def _log_card(card, out):
