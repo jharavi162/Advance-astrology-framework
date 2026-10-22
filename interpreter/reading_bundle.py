@@ -52,7 +52,7 @@ class Reading:
     at a time.
     """
 
-    SECTIONS = ("gulika", "vimshottari", "rashi_dashas", "varshaphal", "sahams",
+    SECTIONS = ("strengths", "gulika", "vimshottari", "rashi_dashas", "varshaphal", "sahams",
                 "vargas", "avasthas", "kp", "gochara_now", "ingresses",
                 "bnn_windows", "double_transit")
 
@@ -88,6 +88,21 @@ class Reading:
         return "\n".join(L).strip("\n")
 
     # -- sections -------------------------------------------------------------
+    def _strengths(self, L):
+        v = self.v
+        _h(L, "Shadbala by component (virupas; 60 = 1 rupa) and Ishta/Kashta")
+        ik = v.ishta_kashta()
+        for p, x in v.shadbala().items():
+            c = ", ".join(f"{k} {val:.1f}" for k, val in x.components.items())
+            L.append(f"  {p.value}: total {x.total_rupa:.2f} rupa (needs {x.required_rupa}, "
+                     f"ratio {x.ratio:.2f}) = sthana {x.sthana:.1f} + dig {x.dig:.1f} + kala "
+                     f"{x.kala:.1f} + cheshta {x.cheshta:.1f} + naisargika {x.naisargika:.1f} + "
+                     f"drik {x.drik:+.1f}; parts: {c}; ishta {ik[p].ishta:.1f}, kashta "
+                     f"{ik[p].kashta:.1f}")
+        _h(L, "Bhava Bala (Raman ch. IX, Sripati madhyas): adhipati + dig + drishti")
+        for x in v.bhava_bala().values():
+            L.append(f"  {x}")
+
     def _gulika(self, L):
         v, house, lat, lon, ayanamsa = self.v, self.house, self.lat, self.lon, self.ayanamsa
         _h(L, "Gulika / Mandi (time-based upagrahas)")
