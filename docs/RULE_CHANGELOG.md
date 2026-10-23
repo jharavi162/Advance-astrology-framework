@@ -11,6 +11,27 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-23 — Own-server deploy kit (ops, no rule)
+
+- **Change:** `deploy/` contains everything needed to run the app on one
+  Ubuntu 24.04 server.
+  - `setup.sh` installs Python and Caddy, clones the repo, asks for the
+    secrets once, writes systemd units and a firewall, and serves the app
+    over HTTPS on the domain.
+  - The app runs on 127.0.0.1 (new `HOST` env var), so only Caddy can reach
+    it.
+  - Every 2 minutes the server pulls GitHub `main`. New code is
+    test-imported in a scratch copy first, so a broken commit never replaces
+    the running version.
+  - Saved readings and PDFs live in `/var/lib/horasutra` and survive deploys.
+    They are backed up daily and 14 backups are kept.
+  - Logs are kept in journald. A new `/api/health` endpoint lets you check
+    that the app is up.
+- **Why:** the user chose to move off Render before adding credits, login
+  and payment, which need storage that does not vanish.
+
+---
+
 ## 2026-10-23 — The seeker sees "engine", never the AI's name (PROMPT + UI)
 
 - **Change:**

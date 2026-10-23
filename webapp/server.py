@@ -1338,6 +1338,8 @@ class H(BaseHTTPRequestHandler):
                          else "image/png")
                 with open(os.path.join(HERE, fn), "rb") as f:
                     return self._send(200, f.read(), ctype)
+            if u.path == "/api/health":
+                return self._send(200, json.dumps({"ok": True}))
             if u.path == "/api/natal":
                 return self._send(200, json.dumps(natal_json(q)))
             if u.path == "/api/dasha":
@@ -1374,8 +1376,11 @@ class H(BaseHTTPRequestHandler):
 
 def main():
     port = int(os.environ.get("PORT", "8000"))
-    print(f"Astrology frontend → http://localhost:{port}  (Ctrl-C to stop)")
-    ThreadingHTTPServer(("0.0.0.0", port), H).serve_forever()
+    # Behind a reverse proxy (deploy/) set HOST=127.0.0.1 so only the proxy
+    # can reach the app.
+    host = os.environ.get("HOST", "0.0.0.0")
+    print(f"Astrology frontend → http://{host}:{port}  (Ctrl-C to stop)", flush=True)
+    ThreadingHTTPServer((host, port), H).serve_forever()
 
 
 if __name__ == "__main__":

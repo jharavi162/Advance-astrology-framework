@@ -1,0 +1,6 @@
+[Unit]
+Description=HoraSutra: pull GitHub main and restart if it changed
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/horasutra/deploy/update.sh

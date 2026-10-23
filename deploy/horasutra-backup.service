@@ -1,0 +1,6 @@
+[Unit]
+Description=HoraSutra: daily backup of saved readings (14 kept)
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'tar -czf /var/backups/horasutra/data-$(date +%%F).tgz -C /var/lib horasutra && ls -1t /var/backups/horasutra/data-*.tgz | tail -n +15 | xargs -r rm --'

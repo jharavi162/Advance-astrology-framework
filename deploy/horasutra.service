@@ -1,0 +1,22 @@
+[Unit]
+Description=HoraSutra web app
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=horasutra
+Group=horasutra
+WorkingDirectory=/opt/horasutra
+EnvironmentFile=/etc/horasutra/env
+ExecStart=/opt/horasutra/.venv/bin/python -m webapp.server
+Restart=always
+RestartSec=3
+# The app only writes its data folder.
+ProtectSystem=strict
+ReadWritePaths=/var/lib/horasutra
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
