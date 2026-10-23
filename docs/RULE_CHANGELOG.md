@@ -11,6 +11,32 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-23 — Sawaal tab: one card, ₹1000 multi-topic PDF, free-form "Apna sawaal" (PROMPT + plumbing)
+
+- **Cards:** only "Life mein major stress kahan se aata hai?" is shown. The
+  career, marriage, partner and sukh placeholders are gone.
+- **PDF report (₹1000):** the box lists its topics:
+  - shaadi kab hogi;
+  - career kaisa hoga;
+  - wealth hoga ya nahi;
+  - life ke major sukh kahan se aate hain;
+  - relationship kaisa hoga;
+  - is waqt mann pe sabse zyada kya haavi h.
+
+  The PDF question in `prompts/cards.json` now asks all of these in the
+  user's words, so the report delivers what the box promises. A test checks
+  that every advertised topic is in the question. `MAX_TOKENS` rises to
+  64,000 for the longer report; tokens are billed only as used.
+- **Apna sawaal poochiye:** the seeker's own question fills the same prompt,
+  as "Is chart ko analyse krke Batao k <sawaal>". It runs through the same
+  plan → engine tools → reading pipeline, with the progress screen. Each
+  question is cached on its own. Every one is a paid call, so it is limited
+  to `ASK_DAILY_LIMIT` per visitor per day (default 3), on top of the
+  general card limit.
+- **Why:** user request.
+
+---
+
 ## 2026-10-23 — Paid PDF reading, shared engine results per chart, leaner engine text (plumbing, no rule)
 
 - **PDF reading:** `prompts/cards.json` gains a `pdf` entry. It uses the

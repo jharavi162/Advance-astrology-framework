@@ -1,5 +1,5 @@
 {
-  "_comment": "Key-question cards and the paid PDF reading. Each fills {question} in reading_default.md. Edit the wording here; bump 'version' after a change so cached answers are regenerated.",
+  "_comment": "Key-question cards, the paid PDF report and the free-form 'ask' question. Each fills {question} in reading_default.md ('ask' puts its prefix before the seeker's own words). Edit the wording here; bump 'version' after a change so cached answers are regenerated.",
   "version": 1,
   "default_question": "is waqt sabse active kya cheezein life me chal Rahi h aur unme se b sabse zyada Mann Pe kya haavi h",
   "cards": {
@@ -9,7 +9,11 @@
     }
   },
   "pdf": {
-    "title": "Is waqt sabse active kya hai, aur mann par kya haavi hai",
-    "question": "is waqt sabse active kya cheezein life me chal Rahi h aur unme se b sabse zyada Mann Pe kya haavi h"
+    "title": "Aapki detailed life report",
+    "question": "Shaadi kab hogi, career kaisa hoga, wealth hoga ya nahi, life ke major sukh kahan se aate h, relationship kaisa hoga, aur is waqt sabse active kya cheezein life me chal Rahi h aur unme se b sabse zyada Mann Pe kya haavi h"
+  },
+  "ask": {
+    "title": "Aapka sawaal",
+    "prefix": "k "
   }
 }

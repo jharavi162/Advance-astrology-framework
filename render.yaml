@@ -20,6 +20,9 @@ services:
       # Unlocks the paid PDF reading until payment is wired in; unset = PDFs off.
       - key: PDF_UNLOCK_CODE
         sync: false
+      # Max free-form "Apna sawaal" questions per visitor IP per 24 h.
+      - key: ASK_DAILY_LIMIT
+        value: "3"
       # Max NEW card answers per visitor IP per 24 h (cached answers are free).
       - key: CARD_DAILY_LIMIT
         value: "10"
