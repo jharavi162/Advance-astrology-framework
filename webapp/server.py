@@ -329,10 +329,25 @@ PDF_UNLOCK_CODE = os.environ.get("PDF_UNLOCK_CODE", "")
 _CHART_FIELDS = ("when", "tz", "lat", "lon", "ayanamsa", "gender", "place")
 
 
-def _card_spec(card):
+ASK_DAILY_LIMIT = int(os.environ.get("ASK_DAILY_LIMIT", "3"))
+_ASK_IP: dict = {}
+
+
+def _ask_text(q):
+    return " ".join(q.get("question", [""])[0].split())[:400]
+
+
+def _card_spec(card, q=None):
+    """The card's title + the question that fills the prompt. 'ask' carries
+    the seeker's own question (after its prefix)."""
     from interpreter.claude_reader import load_cards
     c = load_cards()
-    return c["pdf"] if card == "pdf" else c["cards"].get(card)
+    if card == "pdf":
+        return c["pdf"]
+    if card == "ask":
+        return dict(title=c["ask"]["title"],
+                    question=c["ask"]["prefix"] + _ask_text(q or {}))
+    return c["cards"].get(card)
 
 
 def _calc_key(q):
@@ -360,7 +375,7 @@ def _card_key(q, card):
     from interpreter.claude_reader import load_cards
     parts = [q.get(k, [""])[0] for k in _CHART_FIELDS + ("marital",)]
     month = datetime.now(timezone.utc).strftime("%Y-%m")
-    spec = json.dumps([load_cards().get("version"), _card_spec(card)], sort_keys=True)
+    spec = json.dumps([load_cards().get("version"), _card_spec(card, q)], sort_keys=True)
     raw = "|".join(parts + [card, spec, prompt_version(), month])
     return __import__("hashlib").sha256(raw.encode()).hexdigest()[:24]
 
@@ -399,7 +414,7 @@ def _card_worker(job, q, card, key):
                               place=place, gender=gender,
                               ayanamsa=q.get("ayanamsa", ["lahiri"])[0] or "lahiri",
                               as_of=now)
-            spec = _card_spec(card)
+            spec = _card_spec(card, q)
             marital = {"no": "unmarried", "yes": "married"}.get(
                 q.get("marital", [""])[0], "")
             prompt = fill_prompt(spec["question"], dob=when.strftime("%d/%m/%Y"),
@@ -478,8 +493,10 @@ def card_start(q, ip=""):
     cached answer."""
     import hmac
     card = q.get("card", [""])[0]
-    if not _card_spec(card):
+    if card not in ("pdf", "ask") and not _card_spec(card):
         return dict(status="error", error="Ye card abhi uplabdh nahi hai.")
+    if card == "ask" and len(_ask_text(q)) < 5:
+        return dict(status="error", error="Apna sawaal likhiye.")
     for k in ("when", "lat", "lon"):
         if not q.get(k, [""])[0]:
             return dict(status="error", error="Pehle kundli banao.")
@@ -502,6 +519,11 @@ def card_start(q, ip=""):
     recent = [t for t in _CARD_IP.get(ip, []) if t > day]
     if len(recent) >= CARD_DAILY_LIMIT:
         return dict(status="error", error="Aaj ke naye jawab ki limit poori ho gayi. Kal dobara try karein.")
+    if card == "ask":
+        asked = [t for t in _ASK_IP.get(ip, []) if t > day]
+        if len(asked) >= ASK_DAILY_LIMIT:
+            return dict(status="error", error=f"Aaj ke {ASK_DAILY_LIMIT} sawaal poore ho gaye. Kal dobara poochhiye.")
+        _ASK_IP[ip] = asked + [time.time()]
     _CARD_IP[ip] = recent + [time.time()]
     job = uuid.uuid4().hex[:12]
     _CARDS[job] = dict(status="queued", ts=time.time())

@@ -228,6 +228,30 @@ def test_pdf_needs_the_unlock_code(monkeypatch, tmp_path):
     assert server.pdf_file({"key": ["../etc/passwd"]}) is None
 
 
+def test_ask_puts_the_seekers_question_in_the_prompt(monkeypatch, tmp_path):
+    from webapp import server
+    monkeypatch.setattr(server, "CARD_CACHE_DIR", str(tmp_path))
+    base = {"when": ["1998-02-20 05:00"], "tz": ["Asia/Kolkata"],
+            "lat": ["26.15"], "lon": ["85.9"], "card": ["ask"]}
+    assert "sawaal" in server.card_start(dict(base, question=["  "]))["error"]
+    spec = server._card_spec("ask", dict(base, question=["Meri  naukri kab badlegi?"]))
+    assert spec["question"] == "k Meri naukri kab badlegi?"
+    p = cr.fill_prompt(spec["question"], dob="20/02/1998", place="Darbhanga", time="5:00 am")
+    assert "Is chart ko analyse krke Batao k Meri naukri kab badlegi?" in p
+    k1 = server._card_key(dict(base, question=["a b c d e"]), "ask")
+    k2 = server._card_key(dict(base, question=["a b c d f"]), "ask")
+    assert k1 != k2                                  # each question cached on its own
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")
+    monkeypatch.setattr(server, "ASK_DAILY_LIMIT", 0)
+    assert "sawaal poore" in server.card_start(dict(base, question=["Videsh ka yog hai?"]), "1.2.3.4")["error"]
+
+
+def test_pdf_question_covers_every_advertised_topic():
+    q = cr.load_cards()["pdf"]["question"].lower()
+    for t in ("shaadi", "career", "wealth", "sukh", "relationship", "mann pe"):
+        assert t in q, t
+
+
 def test_calc_store_merges_without_duplicates(monkeypatch, tmp_path):
     from webapp import server
     monkeypatch.setattr(server, "CARD_CACHE_DIR", str(tmp_path))

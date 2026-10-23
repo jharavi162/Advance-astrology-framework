@@ -120,7 +120,7 @@
   .seg button.on{background:#2a2140;color:var(--acc)}
   .askbox textarea{min-height:70px;resize:vertical}
   .exq{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-  .exq span{font-size:12px;border:1px dashed var(--line);border-radius:20px;padding:4px 10px;color:var(--mut)}
+  .exq span{font-size:12px;border:1px dashed var(--line);border-radius:20px;padding:4px 10px;color:var(--mut);cursor:pointer}
   .ktab td:last-child,.ktab th:last-child{text-align:right;white-space:nowrap}
   .ktab tfoot td{font-weight:800;color:var(--acc);border-bottom:0}
   .ans{margin-top:10px;font-size:13.5px;line-height:1.6}
@@ -271,15 +271,15 @@
         <div class="seg" id="marital">
           <button data-m="no" class="on">Nahi hui</button><button data-m="yes">Ho chuki hai</button><button data-m="na">Batana nahi</button>
         </div>
-        <div class="sub" style="margin-top:6px">Isse shaadi wale card ka sawaal tay hota hai. Shaadi ki tareekh nahi poochhi jaati.</div>
+        <div class="sub" style="margin-top:6px">Isse reading mein shaadi wala hissa tay hota hai. Shaadi ki tareekh nahi poochhi jaati.</div>
       </div>
       <div class="qgrid mt" id="qcards"></div>
       <div class="g2 mt">
         <div class="card cta" id="pdfcard">
-          <h3>Is waqt sabse active kya hai, aur mann par kya haavi hai?</h3>
-          <div style="font-size:13px;color:#d9cdee">Poori current-state reading, PDF mein.</div>
-          <ul><li>Life mein abhi sabse active kya chal raha hai</li><li>Mann par sabse zyada kya haavi hai, aur kyon</li><li>Daśā, gochar, bal aur avasthā se jude specific points</li></ul>
-          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:22px;font-weight:800;color:var(--acc)">₹500</span>
+          <h3>Aapki detailed life report</h3>
+          <div style="font-size:13px;color:#d9cdee">In sab vishayon par detailed report ke liye PDF download karein:</div>
+          <ul><li>Shaadi kab hogi?</li><li>Career kaisa hoga?</li><li>Wealth hoga ya nahi?</li><li>Life ke major sukh kahan se aate hain?</li><li>Relationship kaisa hoga?</li><li>Is waqt mann par sabse zyada kya haavi hai?</li></ul>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><span style="font-size:22px;font-weight:800;color:var(--acc)">₹1000</span>
             <input id="pdfcode" placeholder="Access code" autocomplete="off" style="max-width:150px">
             <button id="pdfbtn" onclick="openPdf()">📄 PDF banao</button></div>
           <div class="sub" id="pdfmsg" style="margin-top:8px">Payment jald judega; tab tak access code se.</div>
@@ -287,9 +287,10 @@
         <div class="card askbox">
           <h2>Apna sawaal poochiye</h2>
           <p class="hint">Bas sawaal likhiye. Jyotish ki techniques hum khud lagayenge.</p>
-          <textarea placeholder="e.g. Meri shaadi kab hogi?" disabled></textarea>
-          <div class="exq"><span>Naukri kab badlegi?</span><span>Ghar kab le paunga?</span><span>Videsh ka yog hai?</span></div>
-          <button disabled>🔮 Jald aa raha hai</button>
+          <textarea id="askq" maxlength="400" placeholder="e.g. Meri naukri kab badlegi?"></textarea>
+          <div class="exq" id="askex"><span>Naukri kab badlegi?</span><span>Ghar kab le paunga?</span><span>Videsh ka yog hai?</span></div>
+          <button id="askbtn" onclick="openAsk()">🔮 Jawab dekho</button>
+          <div id="askout"></div>
         </div>
       </div>
     </section>
@@ -791,21 +792,14 @@ async function toggleDasha(tr,level,path){const cell=tr.querySelector('td');
 const TKEY='horasutra_tab';
 // ---- Aapke sawaal: fixed cards (jawab backend se aayenge) ----
 const QCARDS=[
-  {id:'career',ico:'💼',q:'Career kaisa hoga?',d:'Kaun sa field suit karta hai, naukri ya business, aur agla bada badlav kab.'},
-  {id:'marriage',ico:'💍',q:null,d:null},
-  {id:'partner',ico:'💞',q:'Partner aur rishta kaisa hoga?',d:'Partner ka nature, rishte ki quality, kahan takraav aur kahan sahara.'},
-  {id:'stress',ico:'🌧',q:'Life mein major stress kahan se aata hai?',d:'Kaun sa ghar aur kaun sa daur bojh deta hai, aur kab halka hoga.'},
-  {id:'sukh',ico:'☀️',q:'Life mein major sukh kahan se aata hai?',d:'Kahan se sahara, kamai aur khushi milti hai.'}];
-const MARRIAGE_Q={no:['Shaadi kab hogi?','Agli do sabse majboot windows, aur kis daur mein.'],
-  yes:['Shaadi kab hui, aur rishta kaisa chal raha hai?','Chart ke hisaab se shaadi ka samay, aur abhi rishte ka haal.'],
-  na:['Shaadi ka yog aur timing','Shaadi ka promise, aur sabse majboot windows.']};
+  {id:'stress',ico:'🌧',q:'Life mein major stress kahan se aata hai?',d:'Kaun sa ghar aur kaun sa daur bojh deta hai, aur kab halka hoga.'}];
 const MKEY='horasutra_marital';
 function getMarital(){try{return localStorage.getItem(MKEY)||'no';}catch(e){return 'no';}}
 function renderQCards(){const m=getMarital();
   document.querySelectorAll('#marital button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   const order=[...QCARDS.filter(c=>LIVE_CARDS.includes(c.id)),...QCARDS.filter(c=>!LIVE_CARDS.includes(c.id))];  // live cards first
   document.getElementById('qcards').innerHTML=order.map(c=>{
-    const [q,d]=c.id==='marriage'?MARRIAGE_Q[m]:[c.q,c.d];
+    const [q,d]=[c.q,c.d];
     const live=LIVE_CARDS.includes(c.id);
     return `<div class="card qcard" id="qc_${c.id}"><div class="qhead"><div class="qico">${c.ico}</div><h3>${q}</h3></div>
       <div class="sub">${d}</div>`+(live
@@ -818,10 +812,10 @@ function cardParams(id){const P=params();if(P.get('ayanamsa')==='multi')P.set('a
   P.set('card',id);P.set('place',document.getElementById('place').value.trim());P.set('marital',getMarital());return P;}
 // Progress screen for a reading job: timer, steps, what Claude is looking at.
 function Progress(el,kind){
-  const T=kind==='pdf'?300:210, t0=Date.now();let r={status:'queued'},k=0,shown=0;
+  const T=kind==='pdf'?420:210, t0=Date.now();let r={status:'queued'},k=0,shown=0;
   const steps=[['engine','Kundli ki saari calculations'],['plan','Granth ke hisaab se zaroori calculations tay karna'],
     ['fetch','Engine se data lena'],['write','Jawab likhna']].concat(kind==='pdf'?[['pdf','PDF banana']]:[]);
-  el.innerHTML=`<div class="jprog"><div class="ptop"><span class="ptime">0:00</span><span class="sub">Aam taur par ${kind==='pdf'?'4–6':'3–4'} minute lagte hain</span></div>
+  el.innerHTML=`<div class="jprog"><div class="ptop"><span class="ptime">0:00</span><span class="sub">Aam taur par ${kind==='pdf'?'5–8':'3–4'} minute lagte hain</span></div>
     <div class="pbar"><i></i></div><ol class="psteps"></ol><div class="pnow"></div><div class="pgot"></div>
     <div class="sub" style="margin-top:8px">Aap is screen par bane rahiye. Jawab poora banne par yahin dikhega.</div></div>`;
   const $=q=>el.querySelector(q);
@@ -846,7 +840,7 @@ async function runJob(P,el,kind,onDone){const pv=Progress(el,kind);
   try{let r=await(await fetch('/api/card?'+P)).json();
     if(r.status==='done'||r.status==='error'){pv.stop();return onDone(r);}
     const job=r.job;pv.update(r);
-    for(let i=0;i<(kind==='pdf'?300:240);i++){await new Promise(z=>setTimeout(z,3000));
+    for(let i=0;i<(kind==='pdf'?400:240);i++){await new Promise(z=>setTimeout(z,3000));
       try{r=await(await fetch('/api/card_status?job='+job)).json();}catch(e){continue;}
       if(r.status==='unknown'){pv.stop();return onDone({status:'error',error:'Server restart ho gaya. Dobara try karein.'});}
       if(r.status==='done'||r.status==='error'){pv.stop();return onDone(r);}
@@ -859,7 +853,18 @@ async function openCard(id){
   await runJob(cardParams(id),box,'card',r=>{
     if(r.status==='done'){box.innerHTML=`<div class="ans">${md(r.text)}</div>${planHtml(r)}<div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`;return;}
     box.innerHTML=`<div class="bad" style="margin-top:10px">⚠ ${esc(r.error||'Jawab nahi ban paya.')}</div><button class="sec" style="margin-top:8px" onclick="openCard('${id}')">Dobara try karein</button>`;});}
-// Paid PDF reading: same job pipeline as the cards, card id 'pdf'.
+// "Apna sawaal poochiye": the seeker's own question, in the same prompt.
+document.getElementById('askex').addEventListener('click',e=>{const t=e.target.closest('span');
+  if(t)document.getElementById('askq').value=t.textContent;});
+async function openAsk(){
+  if(!window.NATAL){alert('Pehle kundli banao.');return;}
+  const qv=document.getElementById('askq').value.trim(),out=document.getElementById('askout'),btn=document.getElementById('askbtn');
+  if(qv.length<5){out.innerHTML='<div class="bad" style="margin-top:10px">⚠ Apna sawaal likhiye.</div>';return;}
+  const P=cardParams('ask');P.set('question',qv);btn.disabled=true;
+  await runJob(P,out,'card',r=>{btn.disabled=false;
+    out.innerHTML=r.status==='done'?`<div class="ans">${md(r.text)}</div>${planHtml(r)}<div class="sub" style="margin-top:8px">Kundli ka vishleshan ${fmtD(r.as_of)} tak ke data par${r.truncated?' · jawab adhoora reh gaya':''}.</div>`
+      :`<div class="bad" style="margin-top:10px">⚠ ${esc(r.error||'Jawab nahi ban paya.')}</div>`;});}
+// Paid PDF report: same job pipeline as the cards, card id 'pdf'.
 async function openPdf(){
   if(!window.NATAL){alert('Pehle kundli banao.');return;}
   const msgEl=document.getElementById('pdfmsg'),btn=document.getElementById('pdfbtn');

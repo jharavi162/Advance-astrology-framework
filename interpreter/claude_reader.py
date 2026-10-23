@@ -22,7 +22,7 @@ DOCS = os.path.join(ROOT, "docs")
 
 MODEL = os.environ.get("HORASUTRA_MODEL", "claude-opus-5-5")
 EFFORT = os.environ.get("HORASUTRA_EFFORT", "high")
-MAX_TOKENS = 32000
+MAX_TOKENS = 64000      # the multi-topic PDF report is long; thinking counts too
 
 SYSTEM_HEADER = """You are the interpretation layer of HoraSutra, a Vedic astrology app.
 
