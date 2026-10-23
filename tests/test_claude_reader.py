@@ -261,7 +261,7 @@ def test_calc_store_merges_without_duplicates(monkeypatch, tmp_path):
     server._calc_merge(k, [a])
     server._calc_merge(k, [a, dict(a, input={"section": "gulika"})])
     assert len(server._card_cache_get(k)["results"]) == 2
-    assert server._calc_key(dict(q, marital=["yes"])) == k     # shared by every card
+    assert server._calc_key(dict(q, card=["ask"])) == k        # shared by every card
 
 
 def test_card_start_guards(monkeypatch, tmp_path):
