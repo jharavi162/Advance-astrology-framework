@@ -873,7 +873,7 @@ async function openPdf(){
   P.set('name',(document.getElementById('nm').value||'').trim());
   btn.disabled=true;
   await runJob(P,msgEl,'pdf',r=>{btn.disabled=false;
-    msgEl.innerHTML=r.status==='done'?`<a class="btnlink" href="${r.pdf}">⬇ PDF download karo</a>`
+    msgEl.innerHTML=r.status==='done'?`<a class="btnlink" href="${r.pdf}" target="_blank" rel="noopener">⬇ PDF download karo</a>`
       :`<span class="bad">⚠ ${esc(r.error||'PDF nahi ban paya.')}</span>`;});}
 // The grantha-based plan Claude recorded before fetching the engine data.
 function planHtml(r){const p=r.plan||[];if(!p.length)return '';
