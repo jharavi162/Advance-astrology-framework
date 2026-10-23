@@ -1,0 +1,13 @@
+# Caddy gets and renews the HTTPS certificate for the domain by itself.
+__DOMAIN__, www.__DOMAIN__ {
+	encode gzip
+	# Long jobs (PDF reports) run in the background and the page polls, so
+	# no request stays open for minutes.
+	reverse_proxy 127.0.0.1:8000
+	log {
+		output file /var/log/caddy/horasutra-access.log {
+			roll_size 20mb
+			roll_keep 10
+		}
+	}
+}
