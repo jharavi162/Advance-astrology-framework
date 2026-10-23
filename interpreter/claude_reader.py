@@ -81,11 +81,10 @@ def system_prompt() -> str:
 
 
 def fill_prompt(question: str, *, dob: str, place: str, time: str,
-                gender: str = "", marital: str = "") -> str:
+                gender: str = "") -> str:
     """The user's prompt template with the seeker's details and *question*."""
-    g = {"male": "male", "m": "male", "female": "female", "f": "female"}.get(
+    gl = {"male": "male", "m": "male", "female": "female", "f": "female"}.get(
         (gender or "").lower(), gender or "")
-    gl = " ".join(x for x in (g, marital) if x)
     t = _read(os.path.join(PROMPTS, "reading_default.md"))
     return (t.replace("{dob}", dob).replace("{place}", place or "—")
              .replace("{time}", time).replace("{question}", question)

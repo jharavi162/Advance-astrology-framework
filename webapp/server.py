@@ -373,7 +373,7 @@ def _calc_merge(key, results):
 def _card_key(q, card):
     from interpreter.claude_reader import prompt_version
     from interpreter.claude_reader import load_cards
-    parts = [q.get(k, [""])[0] for k in _CHART_FIELDS + ("marital",)]
+    parts = [q.get(k, [""])[0] for k in _CHART_FIELDS]
     month = datetime.now(timezone.utc).strftime("%Y-%m")
     spec = json.dumps([load_cards().get("version"), _card_spec(card, q)], sort_keys=True)
     raw = "|".join(parts + [card, spec, prompt_version(), month])
@@ -415,12 +415,10 @@ def _card_worker(job, q, card, key):
                               ayanamsa=q.get("ayanamsa", ["lahiri"])[0] or "lahiri",
                               as_of=now)
             spec = _card_spec(card, q)
-            marital = {"no": "unmarried", "yes": "married"}.get(
-                q.get("marital", [""])[0], "")
             prompt = fill_prompt(spec["question"], dob=when.strftime("%d/%m/%Y"),
                                  place=place,
                                  time=when.strftime("%I:%M %p").lstrip("0").lower(),
-                                 gender=gender, marital=marital)
+                                 gender=gender)
             st["status"] = "claude"
             # Engine results this chart already had fetched this month (by a
             # card or a PDF) go in up front, so Claude does not spend tool

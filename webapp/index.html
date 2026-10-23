@@ -268,11 +268,6 @@
       <div class="card">
         <h2>Aapke liye key analysis</h2>
         <p class="hint">Aapki kundli ke hisaab se zindagi ke sabse zaroori sawaalon ke jawab. Har jawab engine ke calculations aur hamare jyotish prompt se banega.</p>
-        <div class="lbl">Aapki shaadi</div>
-        <div class="seg" id="marital">
-          <button data-m="no" class="on">Nahi hui</button><button data-m="yes">Ho chuki hai</button><button data-m="na">Batana nahi</button>
-        </div>
-        <div class="sub" style="margin-top:6px">Isse reading mein shaadi wala hissa tay hota hai. Shaadi ki tareekh nahi poochhi jaati.</div>
       </div>
       <div class="qgrid mt" id="qcards"></div>
       <div class="g2 mt">
@@ -794,10 +789,7 @@ const TKEY='horasutra_tab';
 // ---- Aapke sawaal: fixed cards (jawab backend se aayenge) ----
 const QCARDS=[
   {id:'stress',ico:'🌧',q:'Life mein major stress kahan se aata hai?',d:'Kaun sa ghar aur kaun sa daur bojh deta hai, aur kab halka hoga.'}];
-const MKEY='horasutra_marital';
-function getMarital(){try{return localStorage.getItem(MKEY)||'no';}catch(e){return 'no';}}
-function renderQCards(){const m=getMarital();
-  document.querySelectorAll('#marital button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+function renderQCards(){
   const order=[...QCARDS.filter(c=>LIVE_CARDS.includes(c.id)),...QCARDS.filter(c=>!LIVE_CARDS.includes(c.id))];  // live cards first
   document.getElementById('qcards').innerHTML=order.map(c=>{
     const [q,d]=[c.q,c.d];
@@ -810,7 +802,7 @@ function renderQCards(){const m=getMarital();
 // Cards whose answer comes from the backend (prompts/cards.json); the rest are still placeholders.
 const LIVE_CARDS=['stress'];
 function cardParams(id){const P=params();if(P.get('ayanamsa')==='multi')P.set('ayanamsa','lahiri');
-  P.set('card',id);P.set('place',document.getElementById('place').value.trim());P.set('marital',getMarital());return P;}
+  P.set('card',id);P.set('place',document.getElementById('place').value.trim());return P;}
 // Progress screen for a reading job: timer, steps, what Claude is looking at.
 function Progress(el,kind){
   const T=kind==='pdf'?420:210, t0=Date.now();let r={status:'queued'},k=0,shown=0;
@@ -902,8 +894,6 @@ function md(src){const lines=esc(src).split('\n');let h='',list=null,para=[];
     if(list){h+=`</${list}>`;list=null;}
     para.push(t);}
   flush();return h;}
-document.getElementById('marital').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  try{localStorage.setItem(MKEY,b.dataset.m);}catch(x){}renderQCards();});
 renderQCards();
 // ---- Milan: koota table (score backend aane par) ----
 const KOOTA=[['Varna','Soch aur kaam ka mel',1],['Vashya','Ek doosre par asar aur aakarshan',2],['Tara','Sehat aur bhāgya ka mel',3],

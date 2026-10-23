@@ -11,6 +11,16 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-23 — Prompt: married/unmarried removed (PROMPT)
+
+- **Change:** the prompt's gender line now carries the gender alone ("Gender -
+  female"). The "Aapki shaadi" selector and the `marital` parameter are gone
+  from the webapp and the cache keys. Birth details and gender still come
+  from the chart form.
+- **Why:** user request. The seeker's marital status is not asked.
+
+---
+
 ## 2026-10-23 — Sawaal tab: one card, ₹1000 multi-topic PDF, free-form "Apna sawaal" (PROMPT + plumbing)
 
 - **Cards:** only "Life mein major stress kahan se aata hai?" is shown. The
