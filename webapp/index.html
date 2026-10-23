@@ -803,7 +803,8 @@ function renderQCards(){
 const LIVE_CARDS=['stress'];
 function cardParams(id){const P=params();if(P.get('ayanamsa')==='multi')P.set('ayanamsa','lahiri');
   P.set('card',id);P.set('place',document.getElementById('place').value.trim());return P;}
-// Progress screen for a reading job: timer, steps, what Claude is looking at.
+// Progress screen for a reading job: timer, steps, what the engine is looking at
+// (the seeker sees 'engine' everywhere; the AI behind it is not named).
 function Progress(el,kind){
   const T=kind==='pdf'?420:210, t0=Date.now();let r={status:'queued'},k=0,shown=0;
   const steps=[['engine','Kundli ki saari calculations'],['plan','Granth ke hisaab se zaroori calculations tay karna'],
@@ -823,8 +824,8 @@ function Progress(el,kind){
       id==='fetch'&&r.steps?` <span class="sub">(${r.steps})</span>`:''}${id==='engine'&&r.reused&&i<g?` <span class="sub">(${r.reused} pehle se saved)</span>`:''}</li>`).join('');
     const items=r.plan_items||[];
     $('.pnow').innerHTML=g===-1?'Line mein hai, pichhla kaam poora hote hi shuru hoga…':g===0?'Daśā, gochar, bal, avasthā aur har school ka data nikal raha hai…':
-      g===1?'Claude sawaal padh ke tay kar raha hai ki granthon ke hisaab se kya-kya dekhna hai…':
-      items.length?`<span class="sub">Claude dekh raha hai:</span> <b>${esc(items[k%items.length].c)}</b> <span class="sub">· ${esc(items[k%items.length].s)}</span>`:'';
+      g===1?'Engine sawaal padh ke tay kar raha hai ki granthon ke hisaab se kya-kya dekhna hai…':
+      items.length?`<span class="sub">Engine dekh raha hai:</span> <b>${esc(items[k%items.length].c)}</b> <span class="sub">· ${esc(items[k%items.length].s)}</span>`:'';
     const got=r.fetched||[];$('.pgot').innerHTML=got.length?got.slice(-8).map(x=>`<span class="pchip">✓ ${esc(x)}</span>`).join(''):'';};
   const iv=setInterval(()=>{paint();if(Math.floor((Date.now()-t0)/1000)%3===0)k++;},1000);paint();
   return {update(x){r=x;paint();},stop(){clearInterval(iv);}};}

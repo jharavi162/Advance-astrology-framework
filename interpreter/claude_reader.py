@@ -57,6 +57,9 @@ specific and tie each point to the chart data that shows it; no generic
 statements. State the as-of date the reading is for. The plan is shown to the
 seeker separately, so do not repeat it in the reading.
 
+Speak as the HoraSutra engine: never mention Claude, Anthropic, an AI or a
+language model in the reading; say "engine" if the analysis needs a name.
+
 Care rules: do not predict death or lifespan; do not diagnose illness (say it
 is the chart's indication, not a diagnosis); do not frighten. Do not offer
 extra services or ask follow-up questions at the end.
@@ -177,7 +180,7 @@ def read(user_prompt: str, reading, as_of: str, client=None,
 
     if client is None:
         if not os.environ.get("ANTHROPIC_API_KEY"):
-            raise ReaderError("ANTHROPIC_API_KEY server par set nahi hai.")
+            raise ReaderError("Engine abhi chalu nahi hai. Thodi der baad try karein.")
         client = anthropic.Anthropic()
     messages = [{"role": "user", "content": (
         f"{user_prompt}\n\n---\nENGINE DATA (as of {as_of}) — ground truth. The natal "
@@ -219,18 +222,18 @@ def read(user_prompt: str, reading, as_of: str, client=None,
             if on_step:
                 on_step(calls, plan)
     except anthropic.AuthenticationError:
-        raise ReaderError("Claude API key galat hai ya band hai.")
+        raise ReaderError("Engine abhi chalu nahi hai. Thodi der baad try karein.")
     except anthropic.RateLimitError:
-        raise ReaderError("Claude abhi busy hai (rate limit). Thodi der baad dobara try karein.")
+        raise ReaderError("Engine abhi busy hai. Thodi der baad dobara try karein.")
     except anthropic.APIStatusError as e:
-        raise ReaderError(f"Claude API error {e.status_code}.")
+        raise ReaderError(f"Engine me dikkat aayi ({e.status_code}). Thodi der baad try karein.")
     except anthropic.APIConnectionError:
-        raise ReaderError("Claude se connect nahi ho paya.")
+        raise ReaderError("Engine se connect nahi ho paya. Thodi der baad try karein.")
     if msg.stop_reason == "refusal":
         raise ReaderError("Is sawaal ka jawab abhi nahi ban paya.")
     text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text").strip()
     if not text or msg.stop_reason == "tool_use":
-        raise ReaderError("Claude ne khaali jawab diya.")
+        raise ReaderError("Jawab nahi ban paya. Dobara try karein.")
     return dict(text=text, plan=plan, gaps=gaps, calls=calls, results=results_,
                 model=getattr(msg, "model", MODEL), usage=usage,
                 truncated=msg.stop_reason == "max_tokens")

@@ -512,7 +512,7 @@ def card_start(q, ip=""):
         return dict(job=old, status=_CARDS[old]["status"])
     if not os.environ.get("ANTHROPIC_API_KEY"):
         return dict(status="error",
-                    error="Claude API key server par set nahi hai (ANTHROPIC_API_KEY).")
+                    error="Engine abhi chalu nahi hai. Thodi der baad try karein.")
     day = time.time() - 86400
     recent = [t for t in _CARD_IP.get(ip, []) if t > day]
     if len(recent) >= CARD_DAILY_LIMIT:

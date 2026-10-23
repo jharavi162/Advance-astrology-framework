@@ -11,6 +11,21 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-23 — The seeker sees "engine", never the AI's name (PROMPT + UI)
+
+- **Change:**
+  - The progress screen now says "Engine sawaal padh ke tay kar raha hai…"
+    and "Engine dekh raha hai: …".
+  - Error messages say "Engine abhi chalu nahi hai / busy hai". None of them
+    name Claude or the API key.
+  - The system header tells the model to speak as the HoraSutra engine and
+    never mention Claude, Anthropic or an AI in a reading.
+  - A test fails if "claude" appears anywhere the page shows to the seeker.
+    Internal status names and comments are excluded.
+- **Why:** user request.
+
+---
+
 ## 2026-10-23 — Prompt: married/unmarried removed (PROMPT)
 
 - **Change:** the prompt's gender line now carries the gender alone ("Gender -

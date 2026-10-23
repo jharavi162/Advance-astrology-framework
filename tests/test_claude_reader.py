@@ -224,7 +224,7 @@ def test_pdf_needs_the_unlock_code(monkeypatch, tmp_path):
     monkeypatch.setattr(server, "PDF_UNLOCK_CODE", "secret")
     assert "code" in server.card_start(dict(base, code=["nope"]))["error"]
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    assert "ANTHROPIC_API_KEY" in server.card_start(dict(base, code=["secret"]))["error"]
+    assert "chalu nahi" in server.card_start(dict(base, code=["secret"]))["error"]
     assert server.pdf_file({"key": ["../etc/passwd"]}) is None
 
 
@@ -273,9 +273,19 @@ def test_card_start_guards(monkeypatch, tmp_path):
     assert "kundli" in server.card_start({"card": ["stress"]})["error"].lower()
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     r = server.card_start(dict(base, card=["stress"]))
-    assert r["status"] == "error" and "ANTHROPIC_API_KEY" in r["error"]
+    assert r["status"] == "error" and "chalu nahi" in r["error"]
     # A cached answer is served without a key and without starting a job.
     key = server._card_key(dict(base, card=["stress"]), "stress")
     server._card_cache_put(key, dict(status="done", text="cached", card="stress"))
     hit = server.card_start(dict(base, card=["stress"]))
     assert hit["status"] == "done" and hit["cached"] and hit["text"] == "cached"
+
+
+def test_seeker_never_sees_the_ai_named():
+    import re
+    from pathlib import Path
+    html = Path(cr.ROOT, "webapp", "index.html").read_text(encoding="utf-8")
+    shown = re.sub(r"//[^\n]*", "", html)                 # comments are not shown
+    shown = re.sub(r"st==='claude'|status==='claude'", "", shown)   # internal job status
+    assert "claude" not in shown.lower()
+    assert "never mention Claude" in cr.SYSTEM_HEADER
