@@ -262,6 +262,11 @@ _SEEDED_SYNONYMS = {
     "padhai": "education", "shiksha": "education", "study": "education",
     "relocation": "relocation", "shift": "relocation", "move": "relocation",
     "sheher change": "relocation", "base change": "relocation",
+    # Interview / selection / offer = obtaining service: the career profile's KP
+    # set (2-6-10-11 fulfil, 5-8-9-12 negate) is the classical KP judgment for
+    # "will I get the job" (KSK Reader VI, service matters).
+    "interview": "career", "selection": "career", "job offer": "career",
+    "offer letter": "career", "job switch": "career", "job change": "career",
 }
 
 

@@ -394,6 +394,16 @@ addresses (coverage vs discrimination).
   Murti mapping, Saturn-from-Moon phases, and scanner contracts on a generic
   chart (no native dates).
 
+## 2026-10-26 — "interview / selection / offer" resolve to career (DATA, synonyms only)
+
+- **Change (DATA, `interpreter/significators.py`):** added interview, selection,
+  job offer, offer letter, job switch, job change as synonyms of the seeded
+  `career` domain (previously "interview" raised "could not map").
+- **Why:** getting selected = obtaining service, judged in KP from the 6th/10th
+  cusps with 2-6-10-11 as fulfilment and 5-8-9-12 as negation (KSK Reader VI) —
+  exactly the existing career profile, so no new domain row is needed. No
+  engine rule, no native data.
+
 ## 2026-10-04 — Current-life reading: choose the headline theme by the mind's link, not the transit cluster (PROMPT, no engine rule)
 
 - **Change (DOCS, `docs/AI_TRIANGULATION_PROMPT.md` §5-bis):** added a
