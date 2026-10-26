@@ -110,3 +110,8 @@ def test_second_marriage_nadi_karaka_is_gender_aware():
     assert _descriptor_karaka(v, prof) == Planet.VENUS
     v.gender = "female"
     assert _descriptor_karaka(v, prof) == Planet.MARS
+
+
+def test_interview_and_offer_words_resolve_to_career():
+    for w in ("interview", "selection", "offer letter", "job switch"):
+        assert resolve(w).name == "career"
