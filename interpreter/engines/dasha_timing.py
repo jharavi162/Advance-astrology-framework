@@ -18,7 +18,7 @@ dispositors + kāraka + Darakaraka) — domain-general, never a hard-coded nativ
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from advance_astrology import Planet
 from advance_astrology.constants import RULERSHIPS, SIGNS
@@ -50,12 +50,32 @@ class CharaPeriod:
 
 
 @dataclass(frozen=True)
+class SeventhLordTrineData:
+    """Phaladeepika X.14 raw inputs: the 7th-lord's rāśi and navāṃśa, the lords
+    of both (pair 1) and Venus/Moon (pair 2) with their Ṣaḍbala, the signs in
+    trine (1/5/9) to either, and every Jupiter transit span through one of them.
+    The śloka times marriage in the daśā of the stronger planet while Jupiter
+    crosses such a sign — the AI makes that call; no window is ranked here."""
+    seventh_lord: str
+    rasi_sign: str
+    navamsa_sign: str
+    rasi_lord: str
+    navamsa_lord: str
+    shadbala_ratio: dict          # planet → total_rupa / required_rupa
+    stronger_of_lords: str        # of (rasi_lord, navamsa_lord), by ratio
+    stronger_of_venus_moon: str
+    trine_signs: dict             # sign → ("1st from 7L-rāśi", "5th from 7L-navāṃśa", …)
+    jupiter_windows: tuple[tuple[datetime, datetime, str, tuple[str, ...]], ...]
+
+
+@dataclass(frozen=True)
 class DashaTimingReport:
     domain: str
     significators: tuple[Significator, ...]
     vimshottari: tuple[VimPeriod, ...]
     chara: tuple[CharaPeriod, ...]
     transit_triggers: tuple[tuple[datetime, datetime, str], ...]  # (start, end, what)
+    seventh_lord_trines: SeventhLordTrineData | None = None   # marriage family only
 
     def active_windows(self, label: str) -> list[VimPeriod]:
         """Convenience for the AI: every antardaśā in which `label` is running."""
@@ -169,10 +189,71 @@ class DashaTimingEngine:
                                  f"double-transit on {_ord(h)}-lord ({lord.value}, H{lord_house})"))
         triggers.sort()
 
+        is_marriage = not profile.rupture_matter and \
+            (profile.base_domain or profile.name) == "marriage"
         return DashaTimingReport(
             domain=profile.name, significators=tuple(sig),
             vimshottari=tuple(vim), chara=tuple(chara),
-            transit_triggers=tuple(triggers))
+            transit_triggers=tuple(triggers),
+            seventh_lord_trines=_seventh_lord_trines(v, tr, start, end)
+            if is_marriage else None)
+
+
+def _seventh_lord_trines(v, tr, start: datetime, end: datetime) -> SeventhLordTrineData:
+    """Phaladeepika X.14 (and the 7th-lord-in-transit family of JP XIV): the
+    rāśi/navāṃśa of the Lagna's 7th lord, their lords, Venus/Moon, and Jupiter's
+    passage through any sign trine to either reference."""
+    l7 = v.house_lord(7)
+    rasi = v.signs[l7]
+    nav = v.varga(9).signs[l7]
+    rasi_lord, nav_lord = RULERSHIPS[SIGNS[rasi]], RULERSHIPS[SIGNS[nav]]
+    sb = v.shadbala()
+    ratio = {p.value: round(sb[p].ratio, 3)
+             for p in dict.fromkeys((rasi_lord, nav_lord, Planet.VENUS, Planet.MOON))}
+
+    def stronger(a: Planet, b: Planet) -> str:
+        return a.value if ratio[a.value] >= ratio[b.value] else b.value
+
+    trines: dict = {}
+    for ref, base in (("7L-rāśi", rasi), ("7L-navāṃśa", nav)):
+        for n, off in ((1, 0), (5, 4), (9, 8)):
+            trines.setdefault(SIGNS[(base + off) % 12], []).append(f"{_ord(n)} from {ref}")
+    windows = tuple((s, e, SIGNS[sign], tuple(trines[SIGNS[sign]]))
+                    for s, e, sign in _sign_spans(tr, Planet.JUPITER, start, end)
+                    if SIGNS[sign] in trines)
+    return SeventhLordTrineData(
+        seventh_lord=l7.value, rasi_sign=SIGNS[rasi], navamsa_sign=SIGNS[nav],
+        rasi_lord=rasi_lord.value, navamsa_lord=nav_lord.value,
+        shadbala_ratio=ratio, stronger_of_lords=stronger(rasi_lord, nav_lord),
+        stronger_of_venus_moon=stronger(Planet.VENUS, Planet.MOON),
+        trine_signs={k: tuple(r) for k, r in trines.items()},
+        jupiter_windows=windows)
+
+
+def _sign_spans(tr, planet: Planet, start: datetime, end: datetime,
+                step_days: int = 7) -> list[tuple[datetime, datetime, int]]:
+    """Contiguous (start, end, sign) spans of a transit planet's whole sign.
+    The step must stay below the shortest retrograde re-entry (~3 weeks)."""
+    step, one_day = timedelta(days=step_days), timedelta(days=1)
+    spans: list = []
+    s0, sign = start, tr.transit_sign(start, planet)
+    d = start
+    while d < end:
+        nxt = min(d + step, end)
+        s2 = tr.transit_sign(nxt, planet)
+        if s2 != sign:
+            lo, hi = d, nxt
+            while hi - lo > one_day:
+                mid = lo + (hi - lo) / 2
+                if tr.transit_sign(mid, planet) == sign:
+                    lo = mid
+                else:
+                    hi = mid
+            spans.append((s0, hi, sign))
+            s0, sign = hi, s2
+        d = nxt
+    spans.append((s0, end, sign))
+    return spans
 
 
 def _chara_periods(v) -> list[dict]:

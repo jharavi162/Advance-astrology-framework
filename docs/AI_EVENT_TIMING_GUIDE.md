@@ -42,6 +42,16 @@ List every Jupiter+Saturn **double-transit window on the matter's house** (and i
 lord). **These are the candidate event dates.** The double-transit on the bhāva is
 a *primary trigger*, not a mere confirmation (see Principle A).
 
+**2b. For marriage, add the 7th-lord trine windows (Phaladeepika X.14).** The
+dasha engine's `seventh_lord_trines` lists every span when Jupiter crosses a sign
+trine (1/5/9) to the rāśi or navāṃśa of the Lagna's 7th lord. The śloka reads
+them in the daśā of the stronger of the 7th lord's rāśi-lord and navāṃśa-lord,
+or of Venus/Moon. The engine gives the Ṣaḍbala ratios, not the verdict. Treat a
+window as a candidate in its own right, like the double-transit. When the
+running daśā is one of the named planets, the window narrows. When Venus or the
+Moon is a long mahādaśā, almost every trine span qualifies, so the rule
+discriminates little and must lean on the double-transit and the AD/PD onset.
+
 **3. Overlay each significator's daśā (MD>AD>PD) onto those windows.**
 Mark which windows also carry a significator's daśā — **lord AND kāraka; do not
 demand they co-fire** (Principle B). A candidate window needs *a* significator

@@ -11,6 +11,31 @@ addresses (coverage vs discrimination).
 
 ---
 
+## 2026-10-27 — 7th-lord trine windows as dasha-engine DATA (Phaladeepika X.14, user-approved)
+
+- **Change:** for the marriage family (not divorce), `DashaTimingReport` now
+  carries `seventh_lord_trines`. It holds the Lagna's 7th lord, its rāśi and
+  navāṃśa, the lords of both, and the Ṣaḍbala ratios of those two lords and of
+  Venus and the Moon (with the stronger of each pair). It also lists the signs
+  trine (1/5/9) to either reference, and every Jupiter transit span through
+  one of them. Nothing is ranked or scored. `AI_EVENT_TIMING_GUIDE.md` step 2b
+  says how to read it.
+- **Why (śāstra):** Phaladeepika X.14 (Subrahmanya Sastri tr.): *"Find which of
+  the two in the following two pairs is stronger: (1) the lords of the Rasi and
+  Navamsa occupied by the lord of the 7th house; (2) Venus and the Moon. During
+  the Dasa-period of that planet when Jupiter passes through a sign triangular
+  to the Rasi or Navamsa occupied by the lord of the 7th, the marriage may be
+  declared to take place."*
+- **Interpretation choices:** the sign itself counts as a trine (1/5/9), the
+  usual trikoṇa reading. "Stronger" uses the Ṣaḍbala ratio
+  (total ÷ required rūpa), the engine's existing strength measure. A variant
+  heard from a practitioner counts from the 7th-from-Ārūḍha lord's navāṃśa and
+  uses only the 5th/9th. It was not found in the texts on hand, so it was
+  **not** added.
+- **Failure mode:** coverage. No engine exposed this classical marriage timer.
+  It was added because the śloka calls for it, not to fit any native's date
+  (the test asserts only re-derivability).
+
 ## 2026-10-23 — Own-server deploy kit (ops, no rule)
 
 - **Change:** `deploy/` contains everything needed to run the app on one

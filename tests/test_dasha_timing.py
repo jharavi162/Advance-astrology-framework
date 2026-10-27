@@ -10,7 +10,7 @@ blind-test integrity intact (CLAUDE.md).
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from advance_astrology import VedicChart
+from advance_astrology import VedicChart, Planet
 from advance_astrology.constants import RULERSHIPS, SIGNS
 from interpreter.engines import DashaTimingEngine
 from interpreter.engines.dasha_timing import VimPeriod, DashaTimingReport
@@ -103,6 +103,36 @@ def test_transit_triggers_well_formed():
     for s, e, what in rep.transit_triggers:
         assert s < e
         assert isinstance(what, str) and "transit" in what
+
+
+def test_seventh_lord_trine_data_follows_phaladeepika_x14():
+    # Phaladeepika X.14: Jupiter crossing a sign trine (1/5/9) to the rāśi or
+    # navāṃśa of the 7th lord, read with the stronger of (lords of those two
+    # signs) and of (Venus, Moon). Every field must be re-derivable from the
+    # chart; marriage family only. No event date is asserted.
+    v = _chart()
+    span = (datetime(2018, 1, 1, tzinfo=UTC), datetime(2030, 1, 1, tzinfo=UTC))
+    for q in ("marriage", "second marriage"):
+        d = DashaTimingEngine().evaluate(v, resolve(q), *span).seventh_lord_trines
+        l7 = v.house_lord(7)
+        rasi, nav = v.signs[l7], v.varga(9).signs[l7]
+        assert d.seventh_lord == l7.value
+        assert (d.rasi_sign, d.navamsa_sign) == (SIGNS[rasi], SIGNS[nav])
+        assert d.rasi_lord == RULERSHIPS[SIGNS[rasi]].value
+        assert d.navamsa_lord == RULERSHIPS[SIGNS[nav]].value
+        want = {SIGNS[(b + o) % 12] for b in (rasi, nav) for o in (0, 4, 8)}
+        assert set(d.trine_signs) == want
+        assert d.stronger_of_lords in (d.rasi_lord, d.navamsa_lord)
+        assert d.stronger_of_venus_moon in ("Venus", "Moon")
+        tr = v.transits()
+        assert d.jupiter_windows
+        for s, e, sign, refs in d.jupiter_windows:
+            assert span[0] <= s < e <= span[1] and sign in want and refs
+            mid = s + (e - s) / 2
+            assert SIGNS[tr.transit_sign(mid, Planet.JUPITER)] == sign
+        assert "score" not in vars(d) and "verdict" not in vars(d)
+    for q in ("career", "divorce"):
+        assert DashaTimingEngine().evaluate(v, resolve(q), *span).seventh_lord_trines is None
 
 
 def test_engine_is_deterministic():
