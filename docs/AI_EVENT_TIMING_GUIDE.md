@@ -66,6 +66,26 @@ such windows as *"activity that may not consummate"* (Principle F).
 that contradicts the native's life stage (Principle G). Do not cap the search
 below the plausible range — *especially* when the natal read says "late."
 
+**5b. Run the full transit checklist before answering. Skip nothing, even for a
+one-day question.** For each chart (and the partner's):
+- the running daśā at every level, MD / AD / PD / sūkṣma, and the next
+  change dates;
+- gochara counted from the Moon **and** from the Lagna (Phaladeepika XXVI);
+- the double transit on the matter's bhāva;
+- the BAV and SAV of each transit sign;
+- tārā and Chandrāṣṭama, for day-level questions;
+- retrograde and stationary planets;
+- **combustion and heliacal rising** (Sun–planet distance), for example a
+  combust or retrograde Venus during a marriage talk;
+- eclipses and node sign-changes;
+- degree-level transit contacts on natal points;
+- Jaimini AL / UL / DK and the chara daśā sign;
+- the Tājika year and muntha;
+- KP, for promise only.
+
+A factor missed here once left a forecast incomplete: Venus was combust and
+retrograde at a marriage meeting, and the forecast did not mention it.
+
 **6. Choose.** Pick by the **tightest convergence** of (bhāva double-transit) ×
 (a significator's daśā), quality-checked by the PD lord. Give a **primary and a
 secondary** window. Name the daśā and the transit at each. Never let a score decide.
