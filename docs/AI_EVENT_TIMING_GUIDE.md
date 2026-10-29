@@ -70,7 +70,11 @@ below the plausible range — *especially* when the natal read says "late."
 one-day question.** For each chart (and the partner's):
 - the running daśā at every level, MD / AD / PD / sūkṣma, and the next
   change dates;
-- gochara counted from the Moon **and** from the Lagna (Phaladeepika XXVI);
+- **rāśi gochara**: every graha's sign counted from the Moon **and** from the
+  Lagna (Phaladeepika XXVI), with **vedha** checked;
+- **nakṣatra gochara**: the tārā of every *slow* graha (Saturn, Jupiter,
+  Rāhu/Ketu, Mars) counted from the janma-nakṣatra, and any transit over the
+  janma-nakṣatra. Day-level tārā covers only the Moon;
 - the double transit on the matter's bhāva;
 - the BAV and SAV of each transit sign;
 - tārā and Chandrāṣṭama, for day-level questions;
